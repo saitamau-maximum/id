@@ -1,9 +1,15 @@
-import { Hono } from 'hono'
+import { drizzle } from "drizzle-orm/d1";
+import { factory } from "./factory";
 
-const app = new Hono()
+const app = factory.createApp();
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const route = app
+  .use(async (c, next) => {
+    const client = drizzle(c.env.DB);
+    await next();
+  })
+  .get("/", (c) => c.text("Hello Maximum IDP Server!"));
 
-export default app
+export default app;
+
+export type AppType = typeof route;

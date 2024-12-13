@@ -1,6 +1,13 @@
 {
   "name": "@idp/server",
   "type": "module",
+  "scripts": {
+    "typegen": "wrangler types",
+    "generate:migrations": "drizzle-kit generate",
+    "apply:migrations:local": "wrangler d1 migrations apply --local idp-db-preview",
+    "apply:migrations:preview": "wrangler d1 migrations apply --remote idp-db-preview",
+    "apply:migrations:prod": "wrangler d1 migrations apply --env production --remote idp-db"
+  },
   "exports": {
     ".": {
       "import": "./src/index.ts",
@@ -8,10 +15,12 @@
     }
   },
   "dependencies": {
-    "hono": "^4.6.13"
+    "hono": "^4.6.13",
+    "drizzle-orm": "^0.36.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241112.0",
-    "wrangler": "^3.88.0"
+    "wrangler": "^3.88.0",
+    "drizzle-kit": "^0.28.0"
   }
 }
