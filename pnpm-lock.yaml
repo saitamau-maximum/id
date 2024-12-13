@@ -6,7 +6,9 @@ settings:
 
 importers:
 
-  .:
+  .: {}
+
+  workspaces/client:
     dependencies:
       '@remix-run/cloudflare':
         specifier: ^2.14.0

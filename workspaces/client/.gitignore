@@ -1,0 +1,6 @@
+/.cache
+/build
+.env
+.dev.vars
+
+.wrangler
