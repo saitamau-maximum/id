@@ -1,3 +1,14 @@
-name = "saitamau-maximum-idp"
+name = "idp-client"
 pages_build_output_dir = "build/client"
-compatibility_date = "2024-09-02"
+compatibility_date = "2024-05-12"
+
+services = [{ binding = "IDP_SERVER", service = "idp-server" }]
+
+[vars]
+MODE = "development"
+
+[env.production]
+services = [{ binding = "IDP_SERVER", service = "idp-server" }]
+
+[env.production.vars]
+MODE = "production"

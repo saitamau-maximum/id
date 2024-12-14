@@ -2,6 +2,7 @@
   "name": "@idp/server",
   "type": "module",
   "scripts": {
+    "dev": "wrangler dev --local",
     "typegen": "wrangler types",
     "generate:migrations": "drizzle-kit generate",
     "apply:migrations:local": "wrangler d1 migrations apply --local idp-db-preview",
@@ -20,7 +21,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241112.0",
-    "wrangler": "^3.88.0",
+    "wrangler": "^3.95.0",
     "drizzle-kit": "^0.28.0"
   }
 }

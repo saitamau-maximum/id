@@ -1,7 +1,7 @@
 {
   "name": "@idp/root",
   "scripts": {
-    "dev": "pnpm -C workspaces/app dev",
-    "build": "pnpm -C workspaces/app build"
+    "dev": "pnpm -r --parallel dev",
+    "build": "pnpm -C workspaces/client build"
   }
 }
