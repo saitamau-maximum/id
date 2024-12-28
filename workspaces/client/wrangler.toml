@@ -7,6 +7,9 @@ services = [{ binding = "IDP_SERVER", service = "idp-server" }]
 [vars]
 MODE = "development"
 
+[dev]
+port = 8788
+
 [env.production]
 services = [{ binding = "IDP_SERVER", service = "idp-server" }]
 

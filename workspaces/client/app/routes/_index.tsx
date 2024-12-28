@@ -2,7 +2,7 @@ import {
   type LoaderFunctionArgs,
   type MetaFunction,
 } from "@remix-run/cloudflare";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 export const meta: MetaFunction = () => {
   return [
@@ -27,6 +27,7 @@ export default function Index() {
     <div>
       <h1>Welcome to Remix!</h1>
       <p>{data.message}</p>
+      <Link to="http://localhost:8787/auth/maximum">Auth With Maximum</Link>
     </div>
   );
 }
