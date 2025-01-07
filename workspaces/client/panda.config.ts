@@ -29,6 +29,8 @@ export default defineConfig({
 
 	shorthands: false,
 
+	minify: true,
+
 	// The output directory for your css system
 	outdir: "styled-system",
 });
