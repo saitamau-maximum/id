@@ -10,13 +10,15 @@ export default function Login() {
 	const { isLoading, isAuthorized } = useAuth();
 	const navigate = useNavigate();
 
+	const shouldProceed = !isLoading && isAuthorized;
+
 	useEffect(() => {
-		if (!isLoading && isAuthorized) {
+		if (shouldProceed) {
 			navigate("/");
 		}
-	}, [isLoading, isAuthorized, navigate]);
+	}, [shouldProceed, navigate]);
 
-	if (isLoading) {
+	if (shouldProceed) {
 		return null;
 	}
 

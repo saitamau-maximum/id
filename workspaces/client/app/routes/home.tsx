@@ -7,14 +7,15 @@ import { useAuth } from "~/hooks/useAuth";
 export default function Home() {
 	const { isLoading, isAuthorized, user } = useAuth();
 	const navigate = useNavigate();
+	const shouldProtect = !isLoading && !isAuthorized;
 
 	useEffect(() => {
-		if (!isLoading && !isAuthorized) {
+		if (shouldProtect) {
 			navigate("/login");
 		}
-	}, [isLoading, isAuthorized, navigate]);
+	}, [shouldProtect, navigate]);
 
-	if (isLoading) {
+	if (shouldProtect) {
 		return null;
 	}
 
