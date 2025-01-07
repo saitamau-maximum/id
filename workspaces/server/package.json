@@ -6,7 +6,7 @@
 		"build": "tsc",
 		"typegen": "wrangler types",
 		"generate:migrations": "drizzle-kit generate",
-		"apply:migrations:local": "wrangler d1 migrations apply --local idp-db-preview",
+		"apply:migrations:local": "wrangler d1 migrations apply --local idp-db-local",
 		"apply:migrations:preview": "wrangler d1 migrations apply --remote idp-db-preview",
 		"apply:migrations:prod": "wrangler d1 migrations apply --env production --remote idp-db",
 		"deploy:preview": "wrangler deploy --env preview",

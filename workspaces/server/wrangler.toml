@@ -16,6 +16,8 @@ id = "dev"              # dev なので仮の ID を指定
 [[d1_databases]]
 binding = "DB"
 database_id = "dev" # dev なので仮の ID を指定
+database_name = "idp-db-local"
+migrations_dir = "drizzle"
 
 # --- Preview ---
 
