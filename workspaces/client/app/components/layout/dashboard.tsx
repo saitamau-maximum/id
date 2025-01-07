@@ -5,7 +5,7 @@ import { useAuth } from "~/hooks/useAuth";
 import { Sidebar } from "./internal/sidebar";
 
 export default function Dashboard() {
-	const { isLoading, isAuthorized, isInitialzied } = useAuth();
+	const { isLoading, isAuthorized, isInitialized: isInitialzied } = useAuth();
 	const navigate = useNavigate();
 
 	// 読み込みが終わっていてかつ認証されていない場合はログイン画面にリダイレクト

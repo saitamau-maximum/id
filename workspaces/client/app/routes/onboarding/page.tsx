@@ -6,7 +6,7 @@ import { useAuth } from "~/hooks/useAuth";
 import { RegisterForm } from "./internal/form";
 
 export default function Onboarding() {
-	const { isLoading, isInitialzied, isAuthorized } = useAuth();
+	const { isLoading, isInitialized: isInitialzied, isAuthorized } = useAuth();
 	const navigate = useNavigate();
 	const shouldProoceed = !isLoading && !isInitialzied && isAuthorized;
 

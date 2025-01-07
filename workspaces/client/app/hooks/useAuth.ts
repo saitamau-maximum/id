@@ -11,7 +11,7 @@ export function useAuth() {
 	return {
 		isLoading,
 		user: data,
-		isInitialzied: data?.initialized || false,
+		isInitialized: !!data?.initialized,
 		isAuthorized: !error,
 		refetch,
 	};
