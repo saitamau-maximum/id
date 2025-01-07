@@ -21,6 +21,9 @@ export const usersRelations = relations(users, ({ one , many}) => ({
 		fields: [users.id],
 		references: [usersProfile.userId],
 	}),
+	oauthIssuedSecrets: many(oauthClientSecret),
+	oauthIssuedTokens: many(oauthToken),
+	oauthConnections: many(oauthConnection),
 }));
 
 export const usersProfile = sqliteTable("usersprofile", {
@@ -148,3 +151,87 @@ export const oauthConnection = sqliteTable(
     pk: primaryKey({ columns: [table.userId, table.providerId] }),
   }),
 )
+
+// ---------- OAuth Relations ---------- //
+
+export const oauthClientRelations = relations(oauthClient, ({ one, many }) => ({
+	owner: one(users, {
+		fields: [oauthClient.ownerId],
+		references: [users.id],
+	}),
+  secrets: many(oauthClientSecret),
+  callbacks: many(oauthClientCallback),
+  scopes: many(oauthClientScope),
+}))
+
+export const oauthClientSecretRelations = relations(oauthClientSecret, ({ one }) => ({
+  client: one(oauthClient, {
+    fields: [oauthClientSecret.clientId],
+    references: [oauthClient.id],
+  }),
+	issuer: one(users, {
+		fields: [oauthClientSecret.issuedBy],
+		references: [users.id],
+	}),
+}))
+
+export const oauthClientCallbackRelations = relations(oauthClientCallback, ({ one }) => ({
+  client: one(oauthClient, {
+    fields: [oauthClientCallback.clientId],
+    references: [oauthClient.id],
+  }),
+}))
+
+export const oauthScopeRelations = relations(oauthScope, ({ many }) => ({
+  clients: many(oauthClientScope),
+  tokens: many(oauthTokenScope),
+}))
+
+export const oauthClientScopeRelations = relations(oauthClientScope, ({ one }) => ({
+  client: one(oauthClient, {
+    fields: [oauthClientScope.clientId],
+    references: [oauthClient.id],
+  }),
+  scope: one(oauthScope, {
+    fields: [oauthClientScope.scopeId],
+    references: [oauthScope.id],
+  }),
+}))
+
+export const oauthTokenRelations = relations(oauthToken, ({ one, many }) => ({
+  client: one(oauthClient, {
+    fields: [oauthToken.clientId],
+    references: [oauthClient.id],
+  }),
+	user: one(users, {
+		fields: [oauthToken.userId],
+		references: [users.id],
+	}),
+  scopes: many(oauthTokenScope),
+}))
+
+export const oauthTokenScopeRelations = relations(oauthTokenScope, ({ one }) => ({
+  token: one(oauthToken, {
+    fields: [oauthTokenScope.tokenId],
+    references: [oauthToken.id],
+  }),
+  scope: one(oauthScope, {
+    fields: [oauthTokenScope.scopeId],
+    references: [oauthScope.id],
+  }),
+}))
+
+export const oauthProviderRelations = relations(oauthProvider, ({ many }) => ({
+	connections: many(oauthConnection),
+}))
+
+export const oauthConnectionRelations = relations(oauthConnection, ({ one }) => ({
+	provider: one(oauthProvider, {
+		fields: [oauthConnection.providerId],
+		references: [oauthProvider.id],
+	}),
+	user: one(users, {
+		fields: [oauthConnection.userId],
+		references: [users.id],
+	}),
+}))
