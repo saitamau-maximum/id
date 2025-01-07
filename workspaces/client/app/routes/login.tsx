@@ -1,0 +1,70 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router";
+import { css } from "styled-system/css";
+import { AnchorLike } from "~/components/ui/anchor-like";
+import { ButtonLike } from "~/components/ui/button-like";
+import { useAuth } from "~/hooks/useAuth";
+import { env } from "~/utils/env";
+
+export default function Login() {
+	const { isLoading, isAuthorized } = useAuth();
+	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (!isLoading && isAuthorized) {
+			navigate("/");
+		}
+	}, [isLoading, isAuthorized, navigate]);
+
+	if (isLoading) {
+		return null;
+	}
+
+	return (
+		<div
+			className={css({
+				width: "100%",
+				height: "100%",
+				display: "flex",
+				flexDirection: "column",
+				justifyContent: "center",
+				alignItems: "center",
+				gap: 8,
+			})}
+		>
+			<img src="/Maximum-logo.svg" alt="logo" width="200" height="40" />
+			<h1
+				className={css({
+					fontSize: "4xl",
+					fontWeight: "bold",
+					color: "gray.700",
+				})}
+			>
+				Maximum IDP
+			</h1>
+			<p
+				className={css({
+					textAlign: "center",
+					color: "gray.600",
+					lineHeight: 2,
+				})}
+			>
+				Maximum IDPへようこそ！
+				<br />
+				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
+				<br />
+				<a
+					href="https://github.com/saitamau-maximum"
+					className={css({ color: "blue.500" })}
+				>
+					<AnchorLike>Github Organization</AnchorLike>
+				</a>
+				に所属している方であれば <br />
+				どなたでもログイン可能です。
+			</p>
+			<a href={`${env("SERVER_HOST")}/auth/login`}>
+				<ButtonLike>Login</ButtonLike>
+			</a>
+		</div>
+	);
+}

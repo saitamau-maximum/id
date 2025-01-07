@@ -1,0 +1,64 @@
+name = "idp-preview"
+main = "src/index.ts"
+compatibility_date = "2024-12-13"
+
+[dev]
+port = 8787
+
+[vars]
+CLIENT_REDIRECT_URL = "http://localhost:5173/verify"
+CLIENT_ORIGIN = "http://localhost:5173"
+
+[[kv_namespaces]]
+binding = "IDP_SESSION"
+id = "dev"              # dev なので仮の ID を指定
+
+[[d1_databases]]
+binding = "DB"
+database_id = "dev" # dev なので仮の ID を指定
+
+# --- Preview ---
+
+[env.preview]
+name = "idp-server-preview"
+
+[env.preview.vars]
+CLIENT_REDIRECT_URL = "https://id-preview.maximum.vc/verify"
+CLIENT_ORIGIN = "https://id-preview.maximum.vc"
+
+[[env.preview.routes]]
+pattern = "api-preview.id.maximum.vc"
+custom_domain = true
+
+[[env.preview.d1_databases]]
+database_id = "a6e54aed-340c-4495-9010-6e679c83bc45"
+binding = "DB"
+database_name = "idp-db-preview"
+migrations_dir = "drizzle"
+
+[[env.preview.kv_namespaces]]
+binding = "IDP_SESSION"
+id = "8566bd47321c43cab679ab65bb60e38b"
+
+# --- Production ---
+
+[env.production]
+name = "idp-server"
+
+[env.production.vars]
+CLIENT_REDIRECT_URL = "https://id.maximum.vc/verify"
+CLIENT_ORIGIN = "https://id.maximum.vc"
+
+[[env.production.routes]]
+pattern = "api.id.maximum.vc"
+custom_domain = true
+
+[[env.production.d1_databases]]
+database_id = "7b42a115-ebac-47c9-9388-759082eb0d22"
+binding = "DB"
+database_name = "idp-db"
+migrations_dir = "drizzle"
+
+[[env.production.kv_namespaces]]
+binding = "IDP_SESSION"
+id = "0cd11121be304250a5246b2c1a5e185d"
