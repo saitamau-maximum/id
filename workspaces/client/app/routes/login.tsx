@@ -64,7 +64,7 @@ export default function Login() {
 				に所属している方であれば <br />
 				どなたでもログイン可能です。
 			</p>
-			<a href={`${env("SERVER_HOST")}/auth/login`}>
+			<a href={`${env("SERVER_HOST")}/auth/login-tmp`}>
 				<ButtonLike>Login</ButtonLike>
 			</a>
 		</div>

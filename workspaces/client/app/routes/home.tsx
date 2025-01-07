@@ -1,23 +1,9 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 
 import { useAuth } from "~/hooks/useAuth";
 
 export default function Home() {
-	const { isLoading, isAuthorized, user } = useAuth();
-	const navigate = useNavigate();
-	const shouldProtect = !isLoading && !isAuthorized;
-
-	useEffect(() => {
-		if (shouldProtect) {
-			navigate("/login");
-		}
-	}, [shouldProtect, navigate]);
-
-	if (shouldProtect) {
-		return null;
-	}
+	const { user } = useAuth();
 
 	return (
 		<div

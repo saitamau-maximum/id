@@ -1,8 +1,32 @@
-import { Outlet } from "react-router";
+import { useEffect } from "react";
+import { Outlet, useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { useAuth } from "~/hooks/useAuth";
 import { Sidebar } from "./internal/sidebar";
 
 export default function Dashboard() {
+	const { isLoading, isAuthorized, isInitialzied } = useAuth();
+	const navigate = useNavigate();
+
+	// 読み込みが終わっていてかつ認証されていない場合はログイン画面にリダイレクト
+	const shouldLogin = !isLoading && !isAuthorized;
+	// 読み込みが終わっていてかつ初期登録がまだの場合は初期登録画面にリダイレクト
+	const shouldOnboarding = !isLoading && isAuthorized && !isInitialzied;
+
+	useEffect(() => {
+		if (shouldLogin) {
+			navigate("/login");
+		}
+		if (shouldOnboarding) {
+			navigate("/onboarding");
+		}
+	}, [shouldLogin, shouldOnboarding, navigate]);
+
+	// 認証済みかつ初期登録済みの場合以外は何も表示しない
+	if (!isAuthorized || !isInitialzied) {
+		return null;
+	}
+
 	return (
 		<div className={css({ display: "flex", height: "100%" })}>
 			<Sidebar />
