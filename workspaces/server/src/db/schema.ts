@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { int, primaryKey, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable(
 	"users",
@@ -16,7 +16,7 @@ export const users = sqliteTable(
 	}),
 );
 
-export const usersRelations = relations(users, ({ one }) => ({
+export const usersRelations = relations(users, ({ one , many}) => ({
 	profile: one(usersProfile, {
 		fields: [users.id],
 		references: [usersProfile.userId],
@@ -31,3 +31,120 @@ export const usersProfile = sqliteTable("usersprofile", {
 	displayName: text("display_name"),
 	profileImageURL: text("profile_image_url"),
 });
+
+// ---------- OAuth 関連 ---------- //
+
+export const oauthClient = sqliteTable('oauth_client', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  logoUrl: text('logo_url'),
+  ownerId: text('owner_id').notNull().references(() => users.id),
+})
+
+export const oauthClientSecret = sqliteTable(
+  'oauth_client_secret',
+  {
+    clientId: text('client_id')
+      .notNull()
+      .references(() => oauthClient.id),
+    secret: text('secret').notNull(),
+    description: text('description'),
+    issuedBy: text('issued_by').notNull().references(() => users.id),
+    issuedAt: int('issued_at', { mode: 'timestamp_ms' }).notNull(),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.clientId, table.secret] }),
+  }),
+)
+
+export const oauthClientCallback = sqliteTable(
+  'oauth_client_callback',
+  {
+    clientId: text('client_id')
+      .notNull()
+      .references(() => oauthClient.id),
+    callbackUrl: text('callback_url').notNull(),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.clientId, table.callbackUrl] }),
+  }),
+)
+
+export const oauthScope = sqliteTable('oauth_scope', {
+  id: int('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  name: text('name').notNull().unique(),
+  description: text('description'),
+})
+
+export const oauthClientScope = sqliteTable(
+  'oauth_client_scope',
+  {
+    clientId: text('client_id')
+      .notNull()
+      .references(() => oauthClient.id),
+    scopeId: int('scope_id', { mode: 'number' })
+      .notNull()
+      .references(() => oauthScope.id),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.clientId, table.scopeId] }),
+  }),
+)
+
+export const oauthToken = sqliteTable('oauth_token', {
+  id: int('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  clientId: text('client_id')
+    .notNull()
+    .references(() => oauthClient.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  code: text('code').notNull().unique(),
+  codeExpiresAt: int('code_expires_at', { mode: 'timestamp_ms' }).notNull(),
+  codeUsed: int('code_used', { mode: 'boolean' }).notNull(),
+  redirectUri: text('redirect_uri'),
+  accessToken: text('access_token').notNull().unique(),
+  accessTokenExpiresAt: int('access_token_expires_at', {
+    mode: 'timestamp_ms',
+  }).notNull(),
+})
+
+export const oauthTokenScope = sqliteTable(
+  'oauth_token_scope',
+  {
+    tokenId: int('token_id', { mode: 'number' })
+      .notNull()
+      .references(() => oauthToken.id),
+    scopeId: int('scope_id', { mode: 'number' })
+      .notNull()
+      .references(() => oauthScope.id),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.tokenId, table.scopeId] }),
+  }),
+)
+
+// さすがに client_secret とかは環境変数側に持たせるべき(見れちゃうので)
+// → たぶん各々の OAuth ページとかを作ることになりそう
+// OAuth の接続情報に対する Reference Provider ID として使う
+export const oauthProvider = sqliteTable('oauth_provider', {
+  id: int('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
+  name: text('name').notNull(),
+})
+
+export const oauthConnection = sqliteTable(
+  'oauth_connection',
+  {
+    userId: text('user_id').notNull(),
+    providerId: int('provider_id', { mode: 'number' })
+      .notNull()
+      .references(() => oauthProvider.id),
+    providerUserId: text('provider_user_id').notNull(), // OAuth Provider 側の User ID
+    // 以下取れそうな情報を書く
+    email: text('email'),
+    name: text('name'),
+    profileImageUrl: text('profile_image_url'),
+  },
+  table => ({
+    pk: primaryKey({ columns: [table.userId, table.providerId] }),
+  }),
+)
