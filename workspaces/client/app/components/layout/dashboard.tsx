@@ -5,13 +5,13 @@ import { useAuth } from "~/hooks/useAuth";
 import { Sidebar } from "./internal/sidebar";
 
 export default function Dashboard() {
-	const { isLoading, isAuthorized, isInitialized: isInitialzied } = useAuth();
 	const navigate = useNavigate();
+	const { isLoading, isAuthorized, isInitialized } = useAuth();
 
 	// 読み込みが終わっていてかつ認証されていない場合はログイン画面にリダイレクト
 	const shouldLogin = !isLoading && !isAuthorized;
 	// 読み込みが終わっていてかつ初期登録がまだの場合は初期登録画面にリダイレクト
-	const shouldOnboarding = !isLoading && isAuthorized && !isInitialzied;
+	const shouldOnboarding = !isLoading && isAuthorized && !isInitialized;
 
 	useEffect(() => {
 		if (shouldLogin) {
@@ -23,7 +23,7 @@ export default function Dashboard() {
 	}, [shouldLogin, shouldOnboarding, navigate]);
 
 	// 認証済みかつ初期登録済みの場合以外は何も表示しない
-	if (!isAuthorized || !isInitialzied) {
+	if (!isAuthorized || !isInitialized) {
 		return null;
 	}
 

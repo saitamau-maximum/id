@@ -6,9 +6,9 @@ import { useAuth } from "~/hooks/useAuth";
 import { RegisterForm } from "./internal/form";
 
 export default function Onboarding() {
-	const { isLoading, isInitialized: isInitialzied, isAuthorized } = useAuth();
+	const { isLoading, isInitialized, isAuthorized } = useAuth();
 	const navigate = useNavigate();
-	const shouldProoceed = !isLoading && !isInitialzied && isAuthorized;
+	const shouldProoceed = !isLoading && !isInitialized && isAuthorized;
 
 	useEffect(() => {
 		if (!shouldProoceed) {

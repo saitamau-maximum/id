@@ -29,7 +29,7 @@ export default function Home() {
 				alt={user?.displayName}
 			/>
 			<div>
-				Authrized! Welcome to Maximum IDP!
+				Authorized! Welcome to Maximum IDP!
 				<p>Your user id is {user?.id}</p>
 				<p>Your display name is {user?.displayName}</p>
 			</div>
