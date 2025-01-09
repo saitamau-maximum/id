@@ -142,11 +142,7 @@ export class CloudflareOauthRepository implements IOauthRepository {
 					gt(token.accessTokenExpiresAt, new Date()),
 				),
 			with: {
-				client: {
-					with: {
-						secrets: true,
-					},
-				},
+				client: true,
 				scopes: {
 					with: {
 						scope: true,
