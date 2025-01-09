@@ -84,46 +84,6 @@ const route = app
 		});
 		return c.redirect(redirectUrl);
 	})
-	.get("/login-tmp", async (c) => {
-		// oauthが死んでいるので一時的にログインを許可する
-		const { SessionRepository, UserRepository } = c.var;
-
-		let foundUserId = null;
-		try {
-			// ユーザーが存在するか確認
-			const res = await UserRepository.fetchUserByProviderInfo(
-				"dummy-user-id",
-				PROVIDER_IDENTIFIER,
-			);
-			foundUserId = res.id;
-		} catch (e) {
-			// もしユーザーが見つからなかったら新規作成
-			foundUserId = await UserRepository.createUser(
-				"dummy-user-id",
-				PROVIDER_IDENTIFIER,
-				{
-					displayName: "sor4chi",
-					profileImageURL: "https://github.com/sor4chi.png",
-				},
-			);
-		}
-
-		const now = Math.floor(Date.now() / 1000);
-		const jwt = await sign(
-			{
-				userId: foundUserId,
-				iat: now,
-				exp: now + JWT_EXPIRATION,
-			},
-			c.env.JWT_SECRET,
-		);
-
-		const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
-
-		await SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
-
-		return c.redirect(`${c.env.CLIENT_REDIRECT_URL}?ott=${ott}`);
-	})
 	.get(
 		"/callback",
 		vValidator("query", callbackRequestQuerySchema),
