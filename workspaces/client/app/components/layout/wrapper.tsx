@@ -10,6 +10,16 @@ export default function Wrapper() {
 				height: "calc(100dvh - token(spacing.6) * 2)",
 				background: "white",
 				borderRadius: "md",
+				lgDown: {
+					margin: "4",
+					width: "calc(100vw - token(spacing.4) * 2)",
+					height: "calc(100dvh - token(spacing.4) * 2)",
+				},
+				mdDown: {
+					margin: "2",
+					width: "calc(100vw - token(spacing.2) * 2)",
+					height: "calc(100dvh - token(spacing.2) * 2)",
+				},
 			})}
 		>
 			<Outlet />

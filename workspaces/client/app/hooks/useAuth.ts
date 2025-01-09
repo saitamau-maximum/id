@@ -8,5 +8,11 @@ export function useAuth() {
 		queryFn: authRepository.me,
 	});
 
-	return { isLoading, user: data, isAuthorized: !error, refetch };
+	return {
+		isLoading,
+		user: data,
+		isInitialized: !!data?.initialized,
+		isAuthorized: !error,
+		refetch,
+	};
 }

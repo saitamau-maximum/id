@@ -1,10 +1,14 @@
 export type Profile = {
 	displayName: string;
 	profileImageURL: string;
+	email: string;
+	studentId: string;
+	grade: string;
 };
 
 export type User = {
 	id: string;
+	initialized: boolean;
 } & Partial<Profile>;
 
 export interface IUserRepository {
@@ -18,4 +22,5 @@ export interface IUserRepository {
 		provider: string,
 	) => Promise<User>;
 	fetchUserById: (userId: string) => Promise<User>;
+	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }

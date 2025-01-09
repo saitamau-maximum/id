@@ -114,7 +114,7 @@ export const Sidebar = () => {
 											{nav.label}
 										</span>
 										<br />
-										Cooming Soon ...
+										Coming Soon ...
 									</span>
 								) : (
 									<Link

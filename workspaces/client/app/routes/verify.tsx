@@ -30,5 +30,6 @@ export default function Verify() {
 	useEffect(() => {
 		const ott = param.get("ott");
 		if (ott) getJwt(ott);
-	}, [param, getJwt]);
+		else navigate("/login");
+	}, [param, getJwt, navigate]);
 }

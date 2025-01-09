@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { type InferInsertModel, and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -28,7 +28,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				providerUserId,
 				provider,
 			}),
-			this.client.insert(schema.usersProfile).values({
+			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
 				userId,
 				displayName: payload.displayName,
@@ -63,6 +63,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
+			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 		};
@@ -82,8 +83,39 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
+			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 		};
+	}
+
+	async updateUser(userId: string, payload: Partial<Profile>): Promise<void> {
+		const value: Omit<
+			InferInsertModel<typeof schema.userProfiles>,
+			"id" | "userId"
+		> = {
+			displayName: payload.displayName,
+			profileImageURL: payload.profileImageURL,
+			email: payload.email,
+			studentId: payload.studentId,
+			grade: payload.grade,
+		};
+
+		const [_, res] = await this.client.batch([
+			this.client
+				.update(schema.userProfiles)
+				.set(value)
+				.where(eq(schema.userProfiles.userId, userId)),
+			this.client
+				.update(schema.users)
+				.set({
+					initializedAt: new Date(),
+				})
+				.where(eq(schema.users.id, userId)),
+		]);
+
+		if (!res.success) {
+			throw new Error("Failed to update user");
+		}
 	}
 }
