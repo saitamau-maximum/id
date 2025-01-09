@@ -43,12 +43,6 @@ const route = app
 					},
 					400,
 				);
-			// えーなんかここ消すと c.req.valid が undefined になって動かないんだが
-			// なくても動いたのに...　型エラーが出るが無視...
-			// source: https://github.com/honojs/middleware/blob/main/packages/valibot-validator/src/index.ts
-			// もしかして: https://github.com/honojs/middleware/commit/c5abbc993d8e3663dfd4f2af7ba921acd5bd83ed
-			// アプデすると直りそう
-			return res.output;
 		}),
 		async (c) => {
 			const { client_id, client_secret, code, grant_type, redirect_uri } =
