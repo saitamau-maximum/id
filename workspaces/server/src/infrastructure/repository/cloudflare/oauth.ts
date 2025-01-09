@@ -1,7 +1,10 @@
 import { type InferInsertModel, and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
-import type { IOauthRepository } from "./../../../usecase/repository/oauth";
+import type {
+	IOauthRepository,
+	Scope,
+} from "./../../../usecase/repository/oauth";
 
 export class CloudflareOauthRepository implements IOauthRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -32,5 +35,51 @@ export class CloudflareOauthRepository implements IOauthRepository {
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes.map((clientScope) => clientScope.scope),
 		};
+	}
+
+	async createAccessToken(
+		clientId: string,
+		userId: string,
+		code: string,
+		redirectUri: string | undefined,
+		accessToken: string,
+		scopes: Scope[],
+	) {
+		// transaction が使えないが、 batch だと autoincrement な token id を取得できないので、 Cloudflare の力を信じてふつうに insert する
+		const tokenInsertRes = await this.client
+			.insert(schema.oauthToken)
+			.values({
+				clientId,
+				userId,
+				code,
+				codeExpiresAt: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+				codeUsed: false,
+				redirectUri,
+				accessToken,
+				accessTokenExpiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
+			})
+			.returning();
+
+		if (tokenInsertRes.length === 0) {
+			return { success: false as const, message: "Failed to insert token" };
+		}
+
+		const tokenScopeInsertRes = await this.client
+			.insert(schema.oauthTokenScope)
+			.values(
+				scopes.map((scope) => ({
+					tokenId: tokenInsertRes[0].id,
+					scopeId: scope.id,
+				})),
+			);
+
+		if (!tokenScopeInsertRes.success) {
+			return {
+				success: false as const,
+				message: "Failed to insert token scope",
+			};
+		}
+
+		return { success: true as const };
 	}
 }

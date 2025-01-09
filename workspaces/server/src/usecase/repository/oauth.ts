@@ -58,12 +58,27 @@ export type OauthConnection = {
 	profileImageUrl: string | null;
 };
 
+type GetClientByIdRes = Client & {
+	callbackUrls: ClientCallback["callbackUrl"][];
+	scopes: Scope[];
+};
+
+type CreateAccessTokenSuccessRes = {
+	success: true;
+};
+type CreateAccessTokenErrorRes = {
+	success: false;
+	message: string;
+};
+
 export type IOauthRepository = {
-	getClientById: (clientId: string) => Promise<
-		| (Client & {
-				callbackUrls: ClientCallback["callbackUrl"][];
-				scopes: Scope[];
-		  })
-		| undefined
-	>;
+	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
+	createAccessToken: (
+		clientId: string,
+		userId: string,
+		code: string,
+		redirectUri: string | undefined,
+		accessToken: string,
+		scopes: Scope[],
+	) => Promise<CreateAccessTokenSuccessRes | CreateAccessTokenErrorRes>;
 };
