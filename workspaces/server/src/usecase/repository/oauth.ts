@@ -1,5 +1,3 @@
-import type { User } from "./user";
-
 export type Client = {
 	id: string;
 	name: string;
@@ -12,8 +10,8 @@ export type ClientSecret = {
 	clientId: Client["id"];
 	secret: string;
 	description: string | null;
-	issuedBy: User["id"];
-	issuedAt: string;
+	issuedBy: string;
+	issuedAt: Date;
 };
 
 export type ClientCallback = {
@@ -35,13 +33,13 @@ export type ClientScope = {
 export type Token = {
 	id: number;
 	clientId: Client["id"];
-	userId: User["id"];
+	userId: string;
 	code: string;
-	codeExpiresAt: number;
+	codeExpiresAt: Date;
 	codeUsed: boolean;
 	redirectUri: string | null;
 	accessToken: string;
-	accessTokenExpiresAt: number;
+	accessTokenExpiresAt: Date;
 };
 
 export type OauthProvider = {
@@ -50,7 +48,7 @@ export type OauthProvider = {
 };
 
 export type OauthConnection = {
-	userId: User["id"];
+	userId: string;
 	providerId: number;
 	providerUserId: string;
 	email: string | null;
@@ -71,6 +69,11 @@ type CreateAccessTokenErrorRes = {
 	message: string;
 };
 
+type GetTokenByCodeRes = Token & {
+	client: Client & { secrets: ClientSecret[] };
+	scopes: Scope[];
+};
+
 export type IOauthRepository = {
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
 	createAccessToken: (
@@ -81,4 +84,7 @@ export type IOauthRepository = {
 		accessToken: string,
 		scopes: Scope[],
 	) => Promise<CreateAccessTokenSuccessRes | CreateAccessTokenErrorRes>;
+	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
+	deleteTokenById: (tokenId: number) => Promise<boolean>;
+	setCodeUsed: (code: string) => Promise<boolean>;
 };

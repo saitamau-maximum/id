@@ -82,4 +82,55 @@ export class CloudflareOauthRepository implements IOauthRepository {
 
 		return { success: true as const };
 	}
+
+	async getTokenByCode(code: string) {
+		const res = await this.client.query.oauthToken.findFirst({
+			where: (token, { eq, and, gt }) =>
+				and(eq(token.code, code), gt(token.codeExpiresAt, new Date())),
+			with: {
+				client: {
+					with: {
+						secrets: true,
+					},
+				},
+				scopes: {
+					with: {
+						scope: true,
+					},
+				},
+			},
+		});
+
+		if (!res) return undefined;
+
+		const { scopes, ...token } = res;
+
+		return {
+			...token,
+			scopes: scopes.map((scope) => scope.scope),
+		};
+	}
+
+	async deleteTokenById(tokenId: number) {
+		const res = await this.client.batch([
+			// 順番を逆にすると外部キー制約で落ちるよ (戒め)
+			// token に紐づく scope を削除
+			this.client
+				.delete(schema.oauthTokenScope)
+				.where(eq(schema.oauthTokenScope.tokenId, tokenId)),
+			// token を削除
+			this.client
+				.delete(schema.oauthToken)
+				.where(eq(schema.oauthToken.id, tokenId)),
+		]);
+		return res.every((r) => r.success);
+	}
+
+	async setCodeUsed(code: string) {
+		const res = await this.client
+			.update(schema.oauthToken)
+			.set({ codeUsed: true })
+			.where(eq(schema.oauthToken.code, code));
+		return res.success;
+	}
 }

@@ -1,181 +1,164 @@
-import { zValidator } from '@hono/zod-validator'
-import { token, tokenScope } from 'db/schema'
-import { eq } from 'drizzle-orm'
-import { Hono } from 'hono'
-import { HonoEnv } from 'load-context'
-import { z } from 'zod'
-
-const app = new Hono<HonoEnv>()
+import { vValidator } from "@hono/valibot-validator";
+import * as v from "valibot";
+import { factory } from "../../factory";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
-app.post(
-  '/',
-  async (c, next) => {
-    // もし Authorization ヘッダーがある場合は 401 を返す
-    const authHeader = c.req.header('Authorization')
-    if (authHeader) {
-      return c.json(
-        {
-          error: 'invalid_request',
-          error_description: 'Authorization header is not allowed',
-          // "error_uri": "" // そのうち書く
-        },
-        401,
-      )
-    }
-    return next()
-  },
-  zValidator(
-    'form',
-    z.object({
-      grant_type: z.string(),
-      code: z.string(),
-      redirect_uri: z.string().url().optional(),
-      client_id: z.string(),
-      client_secret: z.string(),
-    }),
-    async (res, c) => {
-      // TODO: いい感じのエラー画面を作るかも
-      if (!res.success)
-        return c.json(
-          {
-            error: 'invalid_request',
-            error_description: 'Invalid Parameters',
-            // "error_uri": "" // そのうち書く
-          },
-          400,
-        )
-    },
-  ),
-  async c => {
-    const { client_id, client_secret, code, redirect_uri, grant_type } =
-      c.req.valid('form')
+const requestBodySchema = v.object({
+	grant_type: v.pipe(v.string(), v.nonEmpty()),
+	code: v.pipe(v.string(), v.nonEmpty()),
+	redirect_uri: v.optional(v.pipe(v.string(), v.nonEmpty(), v.url())),
+	client_id: v.pipe(v.string(), v.nonEmpty()),
+	client_secret: v.pipe(v.string(), v.nonEmpty()),
+});
 
-    const nowUnixMs = Date.now()
-    const nowDate = new Date(nowUnixMs)
+const app = factory.createApp();
 
-    const tokenInfo = await c.var.dbClient.query.token.findFirst({
-      where: (token, { eq, and, gt }) =>
-        and(eq(token.code, code), gt(token.code_expires_at, nowDate)),
-      with: {
-        client: {
-          with: {
-            secrets: {
-              where: (secret, { eq }) => eq(secret.secret, client_secret),
-            },
-          },
-        },
-        scopes: {
-          with: {
-            scope: true,
-          },
-        },
-      },
-    })
+const route = app
+	.post(
+		"/",
+		async (c, next) => {
+			// もし Authorization ヘッダーがある場合は 401 を返す
+			const authHeader = c.req.header("Authorization");
+			if (authHeader) {
+				return c.json(
+					{
+						error: "invalid_request",
+						error_description: "Authorization header is not allowed",
+						// "error_uri": "" // そのうち書く
+					},
+					401,
+				);
+			}
+			return next();
+		},
+		vValidator("form", requestBodySchema, async (res, c) => {
+			// TODO: いい感じのエラー画面を作るかも
+			if (!res.success)
+				return c.json(
+					{
+						error: "invalid_request",
+						error_description: "Invalid Parameters",
+						// "error_uri": "" // そのうち書く
+					},
+					400,
+				);
+			// えーなんかここ消すと c.req.valid が undefined になって動かないんだが
+			// なくても動いたのに...　型エラーが出るが無視...
+			// source: https://github.com/honojs/middleware/blob/main/packages/valibot-validator/src/index.ts
+			// もしかして: https://github.com/honojs/middleware/commit/c5abbc993d8e3663dfd4f2af7ba921acd5bd83ed
+			// アプデすると直りそう
+			return res.output;
+		}),
+		async (c) => {
+			const { client_id, client_secret, code, grant_type, redirect_uri } =
+				c.req.valid("form");
 
-    c.header('Cache-Control', 'no-store')
-    c.header('Pragma', 'no-cache')
+			c.header("Cache-Control", "no-store");
+			c.header("Pragma", "no-cache");
 
-    // Token が見つからない場合
-    if (!tokenInfo) {
-      return c.json(
-        {
-          error: 'invalid_grant',
-          error_description: 'Invalid Code (Not Found, Expired, etc)',
-          // "error_uri": "" // そのうち書く
-        },
-        401,
-      )
-    }
+			const nowUnixMs = Date.now();
 
-    // redirect_uri 一致チェック
-    if (
-      (redirect_uri && tokenInfo.redirect_uri !== redirect_uri) ||
-      (!redirect_uri && tokenInfo.redirect_uri)
-    ) {
-      return c.json(
-        {
-          error: 'invalid_request',
-          error_description: 'Redirect URI mismatch',
-          // "error_uri": "" // そのうち書く
-        },
-        400,
-      )
-    }
+			const tokenInfo = await c.var.OauthRepository.getTokenByCode(code);
 
-    // client id, secret のペアが存在するかチェック
-    if (
-      tokenInfo.client.id !== client_id ||
-      tokenInfo.client.secrets.length === 0
-    ) {
-      return c.json(
-        {
-          error: 'invalid_client',
-          error_description: 'Invalid client_id or client_secret',
-          // "error_uri": "" // そのうち書く
-        },
-        401,
-      )
-    }
+			// Token が見つからない場合
+			if (!tokenInfo) {
+				return c.json(
+					{
+						error: "invalid_grant",
+						error_description: "Invalid Code (Not Found, Expired, etc)",
+						// "error_uri": "" // そのうち書く
+					},
+					401,
+				);
+			}
 
-    // grant_type チェック
-    if (grant_type !== 'authorization_code') {
-      return c.json(
-        {
-          error: 'unsupported_grant_type',
-          error_description: 'grant_type must be authorization_code',
-          // "error_uri": "" // そのうち書く
-        },
-        400,
-      )
-    }
+			// redirect_uri 一致チェック
+			if (
+				(redirect_uri && tokenInfo.redirectUri !== redirect_uri) ||
+				(!redirect_uri && tokenInfo.redirectUri)
+			) {
+				return c.json(
+					{
+						error: "invalid_request",
+						error_description: "Redirect URI mismatch",
+						// "error_uri": "" // そのうち書く
+					},
+					400,
+				);
+			}
 
-    // もしすでに token が使われていた場合
-    if (tokenInfo.code_used) {
-      // そのレコードを削除
-      // 失敗していても response は変わらないので無視
-      await c.var.dbClient.batch([
-        // これ順番逆にすると外部キー制約で落ちるよ (戒め)
-        c.var.dbClient
-          .delete(tokenScope)
-          .where(eq(tokenScope.token_id, tokenInfo.id)),
-        c.var.dbClient.delete(token).where(eq(token.id, tokenInfo.id)),
-      ])
-      return c.json(
-        {
-          error: 'invalid_grant',
-          error_description: 'Invalid Code (Already Used)',
-          // "error_uri": "" // そのうち書く
-        },
-        401,
-      )
-    }
+			// client id, secret のペアが存在するかチェック
+			if (
+				tokenInfo.client.id !== client_id ||
+				!tokenInfo.client.secrets.some((s) => s.secret === client_secret)
+			) {
+				return c.json(
+					{
+						error: "invalid_client",
+						error_description: "Invalid client_id or client_secret",
+						// "error_uri": "" // そのうち書く
+					},
+					401,
+				);
+			}
 
-    // token が使われたことを記録
-    await c.var.dbClient
-      .update(token)
-      .set({ code_used: true })
-      .where(eq(token.id, tokenInfo.id))
+			// grant_type チェック
+			if (grant_type !== "authorization_code") {
+				return c.json(
+					{
+						error: "unsupported_grant_type",
+						error_description: "grant_type must be authorization_code",
+						// "error_uri": "" // そのうち書く
+					},
+					400,
+				);
+			}
 
-    // token の残り時間を計算
-    const remMs = tokenInfo.code_expires_at.getTime() - nowUnixMs
+			// もしすでに token が使われていた場合
+			if (tokenInfo.codeUsed) {
+				// そのレコードを削除
+				// batch に失敗していても response は変わらないので結果は無視する
+				await c.var.OauthRepository.deleteTokenById(tokenInfo.id);
+				return c.json(
+					{
+						error: "invalid_grant",
+						error_description: "Invalid Code (Already Used)",
+						// "error_uri": "" // そのうち書く
+					},
+					401,
+				);
+			}
 
-    return c.json(
-      {
-        access_token: tokenInfo.access_token,
-        token_type: 'bearer',
-        expires_in: Math.floor(remMs / 1000),
-        scope: tokenInfo.scopes.map(s => s.scope.name).join(' '),
-      },
-      200,
-    )
-  },
-)
+			// token が使われたことを記録
+			const res = await c.var.OauthRepository.setCodeUsed(code);
+			if (!res) {
+				return c.json(
+					{
+						error: "server_error",
+						error_description: "Failed to set code used",
+						// "error_uri": "" // そのうち書く
+					},
+					500,
+				);
+			}
 
-// POST 以外は許容しない
-app.all('/', async c => {
-  return c.text('method not allowed', 405)
-})
+			// token の残り時間を計算
+			const remMs = tokenInfo.codeExpiresAt.getTime() - nowUnixMs;
 
-export default app
+			return c.json(
+				{
+					access_token: tokenInfo.accessToken,
+					token_type: "bearer",
+					expires_in: Math.floor(remMs / 1000),
+					scope: tokenInfo.scopes.map((s) => s.name).join(" "),
+				},
+				200,
+			);
+		},
+	)
+	.all("/", async (c) => {
+		return c.text("method not allowed", 405);
+	});
+
+export { route as oauthAccessTokenRoute };
