@@ -7,5 +7,6 @@ interface Env {
 	MAXIMUM_AUTH_ID: string;
 	MAXIMUM_AUTH_SECRET: string;
 	JWT_SECRET: string;
+	PRIVKEY_FOR_OAUTH: string;
 	DB: D1Database;
 }

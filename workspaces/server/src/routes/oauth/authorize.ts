@@ -1,255 +1,234 @@
-import { importKey } from '@saitamau-maximum/auth/internal'
-import { _Layout } from 'api/_templates/layout'
-import { Context, Hono } from 'hono'
-import { validator } from 'hono/validator'
-import { HonoEnv } from 'load-context'
-import { generateAuthToken } from 'utils/auth-token.server'
-import cookieSessionStorage from 'utils/session.server'
-import { z } from 'zod'
-
-import { _Authorize } from './_templates/authorize'
-
-const app = new Hono<HonoEnv>()
+import { vValidator } from "@hono/valibot-validator";
+import type { Context } from "hono";
+import { getCookie, setCookie } from "hono/cookie";
+import { sign } from "hono/jwt";
+import { validator } from "hono/validator";
+import * as v from "valibot";
+import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
+import { type HonoEnv, factory } from "../../factory";
+import type { User } from "../../usecase/repository/user";
+import { generateAuthToken } from "../../utils/oauth/auth-token";
+import { importKey } from "../../utils/oauth/key";
+import { _Layout } from "../_templates/layout";
+import { _Authorize } from "./_templates/authorize";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/27
 
-app.get(
-  '/',
-  // TODO: Bad Request の画面をいい感じにするかも
-  validator('query', async (query, c: Context<HonoEnv>) => {
-    // client_id がパラメータにあるか・複数存在しないか
-    const { data: clientId, success: success1 } = z
-      .string()
-      .safeParse(query['client_id'])
-    if (!success1) {
-      return c.text('Bad Request: invalid client_id', 400)
-    }
+const app = factory.createApp();
 
-    // client_id が DB にあるか
-    const client = await c.var.dbClient.query.client.findFirst({
-      where: (client, { eq }) => eq(client.id, clientId),
-      with: {
-        callbacks: true,
-        scopes: {
-          with: {
-            scope: true,
-          },
-        },
-      },
-    })
-    if (!client) return c.text('Bad Request: client_id not registered', 400)
+const route = app.get(
+	"/",
+	// TODO: Bad Request の画面をいい感じにするかも
+	// Memo: なんかうまく型が聞いてくれないので c に明示的に型をつける　おま環ですか
+	validator("query", async (query, c: Context<HonoEnv>) => {
+		// client_id がパラメータにあるか・複数存在しないか
+		const { output: clientId, success: success1 } = v.safeParse(
+			v.pipe(v.string(), v.nonEmpty()),
+			query.client_id,
+		);
+		if (!success1) {
+			return c.text("Bad Request: invalid client_id", 400);
+		}
 
-    // redirect_uri が複数ないことをチェック
-    // redirectUri: パラメータで指定されたやつ、 null 許容
-    // redirectTo: 最終的にリダイレクトするやつ、 non-null
-    const { data: redirectUri, success: success2 } = z
-      .string()
-      .url()
-      .optional()
-      .safeParse(query['redirect_uri'])
-    let redirectTo: string = redirectUri || ''
-    if (!success2) {
-      return c.text('Bad Request: invalid redirect_uri', 400)
-    }
+		// client_id が DB にあるか
+		const client = await c.var.OauthRepository.getClientById(clientId);
+		if (!client) return c.text("Bad Request: client_id not registered", 400);
 
-    // redirect_uri がパラメータとして与えられていない場合
-    if (!redirectUri) {
-      if (client.callbacks.length === 0) {
-        return c.text('Bad Request: redirect_uri not registered', 400)
-      }
-      if (client.callbacks.length > 1) {
-        return c.text('Bad Request: ambiguous redirect_uri', 400)
-      }
+		// redirect_uri が複数ないことをチェック
+		const { output: redirectUri, success: success2 } = v.safeParse(
+			v.optional(v.string()),
+			query.redirect_uri,
+		);
+		if (!success2) {
+			return c.text("Bad Request: invalid redirect_uri", 400);
+		}
 
-      // DB 内に登録されているものを callback として扱う
-      redirectTo = client.callbacks[0].callback_url
-    } else {
-      // Redirect URI のクエリパラメータ部分は変わることを許容する
-      const normalizedUri = new URL(redirectUri)
-      normalizedUri.search = ''
+		// redirectUri: パラメータで指定されたやつ、 null 許容
+		// redirectTo: 最終的にリダイレクトするやつ、 non-null
+		let redirectTo = redirectUri ?? "";
 
-      const registeredUri = client.callbacks.find(
-        data => data.callback_url === normalizedUri.toString(),
-      )
+		// redirect_uri がパラメータとして与えられていない場合
+		if (!redirectUri) {
+			if (client.callbackUrls.length === 0) {
+				return c.text("Bad Request: redirect_uri not registered", 400);
+			}
+			if (client.callbackUrls.length > 1) {
+				return c.text("Bad Request: ambiguous redirect_uri", 400);
+			}
 
-      if (!registeredUri) {
-        return c.text('Bad Request: redirect_uri not registered', 400)
-      }
-    }
+			// DB 内に登録されているものを callback として扱う
+			redirectTo = client.callbackUrls[0];
+		} else {
+			// 絶対 URL かチェック
+			if (!URL.canParse(redirectUri)) {
+				return c.text("Bad Request: invalid redirect_uri", 400);
+			}
 
-    // redirectTo !== "" を assert
-    if (redirectTo === '') {
-      return c.text('Internal Server Error: redirect_uri is empty', 500)
-    }
+			// Redirect URI のクエリパラメータ部分は変わることを許容する
+			const normalizedUri = new URL(redirectUri);
+			normalizedUri.search = "";
 
-    const { data: state, success: success3 } = z
-      .string()
-      .optional()
-      .safeParse(query['state'])
-    if (!success3) {
-      return c.text('Bad Request: too many state', 400)
-    }
+			const registeredUri = client.callbackUrls.find(
+				(callbackUrl) => callbackUrl === normalizedUri.toString(),
+			);
 
-    // ---------- 以下エラー時リダイレクトさせるやつ ---------- //
+			if (!registeredUri) {
+				return c.text("Bad Request: redirect_uri not registered", 400);
+			}
+		}
 
-    const errorRedirect = (
-      error: string,
-      description: string,
-      _errorUri: string,
-    ) => {
-      const callback = new URL(redirectTo)
+		// redirectTo が URL-like であることを assert
+		if (!URL.canParse(redirectTo)) {
+			return c.text("Internal Server Error: redirect_uri is empty", 500);
+		}
 
-      callback.searchParams.append('error', error)
-      callback.searchParams.append('error_description', description)
-      // callback.searchParams.append("error_uri", "") // そのうち書きたいね
-      if (state) callback.searchParams.append('state', state)
+		const { output: state, success: success3 } = v.safeParse(
+			v.optional(v.string()),
+			query.state,
+		);
+		if (!success3) {
+			return c.text("Bad Request: too many state", 400);
+		}
 
-      return c.redirect(callback.toString(), 302)
-    }
+		// ---------- 以下エラー時リダイレクトさせるやつ ---------- //
+		const errorRedirect = (
+			error: string,
+			description: string,
+			_errorUri: string,
+		) => {
+			const callback = new URL(redirectTo);
 
-    const { data: responseType, success: success4 } = z
-      .string()
-      .safeParse(query['response_type'])
-    if (!success4) {
-      return errorRedirect('invalid_request', 'response_type required', '')
-    }
-    if (responseType !== 'code') {
-      return errorRedirect(
-        'unsupported_response_type',
-        "only 'code' is supported",
-        '',
-      )
-    }
+			callback.searchParams.append("error", error);
+			callback.searchParams.append("error_description", description);
+			// callback.searchParams.append("error_uri", _errorUri) // そのうちドキュメント書いておきたいね
+			if (state) callback.searchParams.append("state", state);
 
-    const { data: scope, success: success5 } = z
-      .string()
-      .regex(
-        /^[\x21|\x23-\x5B|\x5D-\x7E]+(?:\x20+[\x21|\x23-\x5B|\x5D-\x7E]+)*$/,
-      )
-      .optional()
-      .safeParse(query['scope'])
-    if (!success5) {
-      return errorRedirect('invalid_scope', 'invalid scope', '')
-    }
+			return c.redirect(callback.toString(), 302);
+		};
 
-    if (scope) {
-      const scopes = scope.split(' ')
-      const scopeSet = new Set(scope.split(' '))
-      if (scopes.length !== scopeSet.size) {
-        return errorRedirect(
-          'invalid_scope',
-          'there are duplicates in scopes',
-          '',
-        )
-      }
+		const { output: responseType, success: success4 } = v.safeParse(
+			v.pipe(v.string(), v.nonEmpty()),
+			query.response_type,
+		);
+		if (!success4) {
+			return errorRedirect("invalid_request", "response_type required", "");
+		}
+		if (responseType !== "code") {
+			return errorRedirect(
+				"unsupported_response_type",
+				"only 'code' is supported",
+				"",
+			);
+		}
 
-      const dbScopesSet = new Set(client.scopes.map(scope => scope.scope.name))
+		const { output: scope, success: success5 } = v.safeParse(
+			v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
+			query.scope,
+		);
+		if (!success5) {
+			return errorRedirect("invalid_scope", "invalid scope", "");
+		}
 
-      const unknownScopes = scopes.filter(scope => !dbScopesSet.has(scope))
-      if (unknownScopes.length > 0) {
-        return errorRedirect(
-          'invalid_scope',
-          `unknown scope: ${unknownScopes.join(', ')}`,
-          '',
-        )
-      }
+		if (scope) {
+			const scopes = scope.split(" ");
+			const scopeSet = new Set(scope.split(" "));
+			if (scopes.length !== scopeSet.size) {
+				return errorRedirect(
+					"invalid_scope",
+					"there are duplicates in scopes",
+					"",
+				);
+			}
 
-      client.scopes = client.scopes.filter(scope =>
-        scopeSet.has(scope.scope.name),
-      )
-    }
+			const dbScopesSet = new Set(client.scopes.map((scope) => scope.name));
 
-    if (client.scopes.length === 0) {
-      return errorRedirect(
-        'invalid_scope',
-        'there must be at least one scope specified',
-        '',
-      )
-    }
+			const unknownScopes = scopes.filter((scope) => !dbScopesSet.has(scope));
+			if (unknownScopes.length > 0) {
+				return errorRedirect(
+					"invalid_scope",
+					`non-registered scope(s): ${unknownScopes.join(", ")}`,
+					"",
+				);
+			}
 
-    return {
-      clientId,
-      redirectUri,
-      redirectTo,
-      state,
-      scope,
-      clientInfo: client,
-    }
-  }),
-  async c => {
-    const { clientId, redirectUri, redirectTo, state, scope, clientInfo } =
-      c.req.valid('query')
-    const nowUnixMs = Date.now()
+			client.scopes = client.scopes.filter((scope) => scopeSet.has(scope.name));
+		}
 
-    const privateKey = await importKey(c.env.PRIVKEY, 'privateKey')
-    const token = await generateAuthToken({
-      clientId,
-      redirectUri,
-      scope,
-      state,
-      time: nowUnixMs,
-      key: privateKey,
-    })
+		if (client.scopes.length === 0) {
+			return errorRedirect(
+				"invalid_scope",
+				"there must be at least one scope specified",
+				"",
+			);
+		}
 
-    // ログインしてるか
-    const { getSession } = cookieSessionStorage(c.env)
-    const session = await getSession(c.req.raw.headers.get('Cookie'))
-    const userId = session.get('user_id')
-    const thisUrl = new URL(c.req.url)
-    const afterLoginUrl = thisUrl.pathname + thisUrl.search
-    if (!userId) {
-      // ログインしてない場合はログイン画面に飛ばす
-      return c.redirect(
-        `/login?continue_to=${encodeURIComponent(afterLoginUrl)}`,
-        302,
-      )
-    }
-    const userInfo = await c.var.idpClient.findUserById(userId)
-    if (!userInfo) {
-      // 存在しないユーザー
-      // そんなわけないのでログインしなおし
-      // TODO: login ページでは user_id を消すようにする
-      return c.redirect(
-        `/login?continue_to=${encodeURIComponent(afterLoginUrl)}`,
-        302,
-      )
-    }
+		return {
+			clientId,
+			redirectUri,
+			redirectTo,
+			state,
+			scope,
+			clientInfo: client,
+		};
+	}),
+	async (c) => {
+		const { clientId, redirectUri, redirectTo, state, scope, clientInfo } =
+			c.req.valid("query");
+		const nowUnixMs = Date.now();
 
-    const responseHtml = _Layout({
-      children: _Authorize({
-        appName: clientInfo.name,
-        appLogo: clientInfo.logo_url,
-        scopes: clientInfo.scopes.map(data => ({
-          name: data.scope.name,
-          description: data.scope.description,
-        })),
-        oauthFields: {
-          clientId,
-          redirectUri,
-          redirectTo,
-          state,
-          scope,
-          token,
-          nowUnixMs,
-        },
-        user: {
-          displayName: userInfo.display_name,
-          profileImageUrl: userInfo.profile_image_url,
-        },
-      }),
-      subtitle: clientInfo.name,
-    })
+		const privateKey = await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey");
+		const token = await generateAuthToken({
+			clientId,
+			redirectUri,
+			scope,
+			state,
+			time: nowUnixMs,
+			key: privateKey,
+		});
 
-    c.header('Cache-Control', 'no-store')
-    c.header('Pragma', 'no-cache')
-    return c.html(responseHtml)
-  },
-)
+		// ログインしてることを middleware でチェック済み... な想定
+		// const userInfo = await c.var.UserRepository.fetchUserById(payload.userId);
+		const userInfo: User = {
+			id: "dummy",
+			initialized: true,
+			displayName: "dummy",
+			profileImageURL: "https://github.com/a01sa01to.png",
+		};
 
-// OAuth 仕様としては POST も Optional で許容してもよい
-// 必要なら対応させるかもしれないが、今のところまあいらんやろ
-app.all('/', async c => {
-  return c.text('method not allowed', 405)
-})
+		// 初期登録まだ
+		if (!userInfo.displayName || !userInfo.profileImageURL) {
+			return c.text("not implemented", 503);
+		}
 
-export default app
+		const responseHtml = _Layout({
+			children: _Authorize({
+				appName: clientInfo.name,
+				appLogo: clientInfo.logoUrl,
+				scopes: clientInfo.scopes.map((scope) => ({
+					name: scope.name,
+					description: scope.description,
+				})),
+				oauthFields: {
+					clientId,
+					redirectUri,
+					redirectTo,
+					state,
+					scope,
+					token,
+					nowUnixMs,
+				},
+				user: {
+					displayName: userInfo.displayName,
+					profileImageUrl: userInfo.profileImageURL,
+				},
+			}),
+			subtitle: clientInfo.name,
+		});
+
+		c.header("Cache-Control", "no-store");
+		c.header("Pragma", "no-cache");
+		return c.html(responseHtml);
+	},
+);
+
+export { route as oauthAuthorizeRoute };

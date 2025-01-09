@@ -9,4 +9,28 @@ export class CloudflareOauthRepository implements IOauthRepository {
 	constructor(db: D1Database) {
 		this.client = drizzle(db, { schema });
 	}
+
+	async getClientById(clientId: string) {
+		const res = await this.client.query.oauthClient.findFirst({
+			where: (client, { eq }) => eq(client.id, clientId),
+			with: {
+				callbacks: true,
+				scopes: {
+					with: {
+						scope: true,
+					},
+				},
+			},
+		});
+
+		if (!res) return undefined;
+
+		const { callbacks, scopes, ...client } = res;
+
+		return {
+			...client,
+			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
+			scopes: scopes.map((clientScope) => clientScope.scope),
+		};
+	}
 }
