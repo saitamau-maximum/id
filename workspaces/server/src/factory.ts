@@ -10,6 +10,7 @@ export type HonoEnv = {
 		SessionRepository: ISessionRepository;
 		UserRepository: IUserRepository;
 		OauthRepository: IOauthRepository;
+		tokenInfo?: Awaited<ReturnType<IOauthRepository["getTokenByAccessToken"]>>;
 	} & JwtVariables<{ userId: string }>;
 };
 

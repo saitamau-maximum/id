@@ -69,7 +69,7 @@ type CreateAccessTokenErrorRes = {
 	message: string;
 };
 
-type GetTokenByCodeRes = Token & {
+type GetTokenRes = Token & {
 	client: Client & { secrets: ClientSecret[] };
 	scopes: Scope[];
 };
@@ -84,7 +84,10 @@ export type IOauthRepository = {
 		accessToken: string,
 		scopes: Scope[],
 	) => Promise<CreateAccessTokenSuccessRes | CreateAccessTokenErrorRes>;
-	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
+	getTokenByCode: (code: string) => Promise<GetTokenRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<boolean>;
 	setCodeUsed: (code: string) => Promise<boolean>;
+	getTokenByAccessToken: (
+		accessToken: string,
+	) => Promise<GetTokenRes | undefined>;
 };

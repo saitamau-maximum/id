@@ -133,4 +133,35 @@ export class CloudflareOauthRepository implements IOauthRepository {
 			.where(eq(schema.oauthToken.code, code));
 		return res.success;
 	}
+
+	async getTokenByAccessToken(accessToken: string) {
+		const res = await this.client.query.oauthToken.findFirst({
+			where: (token, { eq, and, gt }) =>
+				and(
+					eq(token.accessToken, accessToken),
+					gt(token.accessTokenExpiresAt, new Date()),
+				),
+			with: {
+				client: {
+					with: {
+						secrets: true,
+					},
+				},
+				scopes: {
+					with: {
+						scope: true,
+					},
+				},
+			},
+		});
+
+		if (!res) return undefined;
+
+		const { scopes, ...token } = res;
+
+		return {
+			...token,
+			scopes: scopes.map((scope) => scope.scope),
+		};
+	}
 }
