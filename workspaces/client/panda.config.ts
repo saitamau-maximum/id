@@ -30,7 +30,7 @@ export default defineConfig({
 	shorthands: false,
 
 	minify: true,
-	hash: true,
+	hash: process.env.NODE_ENV === "production",
 
 	// The output directory for your css system
 	outdir: "styled-system",
