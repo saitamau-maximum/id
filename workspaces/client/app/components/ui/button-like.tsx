@@ -3,6 +3,7 @@ import { css, cva, cx } from "styled-system/css";
 
 type Props = ComponentProps<"span"> & {
 	variant?: "primary" | "secondary";
+	disabled?: boolean;
 };
 
 const buttonLikeStyle = cva({
@@ -41,15 +42,25 @@ const buttonLikeStyle = cva({
 				},
 			},
 		},
+		disabled: {
+			true: {
+				opacity: 0.5,
+				cursor: "not-allowed",
+			},
+		},
 	},
 });
 
 export const ButtonLike = ({
 	variant = "primary",
+	disabled,
 	className,
 	...props
 }: Props) => {
 	return (
-		<span {...props} className={cx(className, buttonLikeStyle({ variant }))} />
+		<span
+			{...props}
+			className={cx(className, buttonLikeStyle({ variant, disabled }))}
+		/>
 	);
 };

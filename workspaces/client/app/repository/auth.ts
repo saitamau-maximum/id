@@ -1,6 +1,7 @@
 import { client } from "~/utils/hono";
 export type User = {
 	id: string;
+	initialized: boolean;
 	displayName?: string;
 	profileImageURL?: string;
 };
