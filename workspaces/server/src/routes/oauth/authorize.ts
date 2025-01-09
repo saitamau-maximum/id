@@ -1,7 +1,4 @@
-import { vValidator } from "@hono/valibot-validator";
 import type { Context } from "hono";
-import { getCookie, setCookie } from "hono/cookie";
-import { sign } from "hono/jwt";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
