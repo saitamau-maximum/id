@@ -1,5 +1,5 @@
 import { factory } from "../../factory";
-import { authMiddleware } from "./_middleware";
+import { authByAccessTokenMiddleware } from "../../middleware/oauth";
 
 const app = factory.createApp();
 
@@ -36,7 +36,7 @@ const INVALID_REQUEST_RESPONSE: InvalidResponseType = {
 };
 
 const route = app
-	.get("/", authMiddleware, async (c) => {
+	.get("/", authByAccessTokenMiddleware, async (c) => {
 		const tokenInfo = c.var.tokenInfo;
 
 		c.header("Cache-Control", "no-store");
