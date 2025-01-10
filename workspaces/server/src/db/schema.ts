@@ -9,22 +9,11 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
-export const users = sqliteTable(
-	"users",
-	{
-		id: text("id").primaryKey(),
-		providerUserId: text("provider_user_id").notNull(),
-		provider: text("provider").notNull(),
-		/* 初期登録日時。NULLの場合は未初期化 */
-		initializedAt: integer("initialized_at", { mode: "timestamp" }),
-	},
-	(table) => ({
-		providerUserUnique: uniqueIndex("provider_user_unique").on(
-			table.providerUserId,
-			table.provider,
-		),
-	}),
-);
+export const users = sqliteTable("users", {
+	id: text("id").primaryKey(),
+	/* 初期登録日時。NULLの場合は未初期化 */
+	initializedAt: integer("initialized_at", { mode: "timestamp" }),
+});
 
 export const usersRelations = relations(users, ({ one, many }) => ({
 	profile: one(userProfiles, {

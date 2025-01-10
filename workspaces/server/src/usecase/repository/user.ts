@@ -14,12 +14,12 @@ export type User = {
 export interface IUserRepository {
 	createUser: (
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 		payload: Partial<Profile>,
 	) => Promise<string>;
 	fetchUserByProviderInfo: (
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 	) => Promise<User>;
 	fetchUserById: (userId: string) => Promise<User>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
