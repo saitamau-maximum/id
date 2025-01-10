@@ -2,11 +2,13 @@
 
 interface Env {
 	IDP_SESSION: KVNamespace;
+	CACHE: KVNamespace;
 	CLIENT_REDIRECT_URL: "http://localhost:5173/verify";
 	CLIENT_ORIGIN: "http://localhost:5173";
 	MAXIMUM_AUTH_ID: string;
 	MAXIMUM_AUTH_SECRET: string;
 	JWT_SECRET: string;
 	PRIVKEY_FOR_OAUTH: string;
+	GITHUB_TOKEN: string;
 	DB: D1Database;
 }

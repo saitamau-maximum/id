@@ -9,6 +9,7 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
+	providerUserId: string;
 } & Partial<Profile>;
 
 export interface IUserRepository {
