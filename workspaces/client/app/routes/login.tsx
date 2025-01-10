@@ -32,14 +32,31 @@ export default function Login() {
 				justifyContent: "center",
 				alignItems: "center",
 				gap: 8,
+				padding: 4,
 			})}
 		>
-			<img src="/Maximum-logo.svg" alt="logo" width="200" height="40" />
+			<img
+				src="/Maximum-logo.svg"
+				alt="logo"
+				width="200"
+				height="40"
+				className={css({
+					width: "200px",
+					height: "40px",
+					mdDown: {
+						width: "150px",
+						height: "30px",
+					},
+				})}
+			/>
 			<h1
 				className={css({
 					fontSize: "4xl",
-					fontWeight: "bold",
-					color: "gray.700",
+					fontWeight: 800,
+					color: "gray.600",
+					mdDown: {
+						fontSize: "3xl",
+					},
 				})}
 			>
 				Maximum IDP
