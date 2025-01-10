@@ -53,7 +53,7 @@ importers:
         version: 0.51.1(typescript@5.7.2)
       '@react-router/dev':
         specifier: ^7.1.1
-        version: 7.1.1(@react-router/serve@7.1.1(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2))(@types/node@20.17.12)(lightningcss@1.25.1)(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2)(vite@5.4.11(@types/node@20.17.12)(lightningcss@1.25.1))(wrangler@3.95.0)
+        version: 7.1.1(@react-router/serve@7.1.1(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2))(@types/node@20.17.12)(lightningcss@1.25.1)(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2)(vite@5.4.11(@types/node@20.17.12)(lightningcss@1.25.1))(wrangler@3.95.0(@cloudflare/workers-types@4.20241205.0))
       '@types/node':
         specifier: ^20
         version: 20.17.12
@@ -79,8 +79,8 @@ importers:
   workspaces/server:
     dependencies:
       '@hono/valibot-validator':
-        specifier: ^0.5.1
-        version: 0.5.1(hono@4.6.13)(valibot@1.0.0-beta.10(typescript@5.7.2))
+        specifier: ^0.5.2
+        version: 0.5.2(hono@4.6.13)(valibot@1.0.0-beta.10(typescript@5.7.2))
       drizzle-orm:
         specifier: ^0.36.1
         version: 0.36.1(@cloudflare/workers-types@4.20241205.0)(@types/react@19.0.3)(react@19.0.0)
@@ -1066,8 +1066,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@hono/valibot-validator@0.5.1':
-    resolution: {integrity: sha512-TXNFh1jofWNCX9sOX2gyw6qCXuAKr4yk//hOf9Lc8vcdIhQXTRQY6RPkKwL/14EldoIngkLj3iMHTXXhjgMCWg==}
+  '@hono/valibot-validator@0.5.2':
+    resolution: {integrity: sha512-WbTr8PCFNAME0ale62rmmq+E8bGp5a7VPiVNmNT+Ue12GJE3Ax+CWBGtHhR0TzAEiloPvJND3IbjHIgtNtsqhw==}
     peerDependencies:
       hono: '>=3.9.0'
       valibot: ^1.0.0 || ^1.0.0-beta.4 || ^1.0.0-rc
@@ -3603,7 +3603,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@hono/valibot-validator@0.5.1(hono@4.6.13)(valibot@1.0.0-beta.10(typescript@5.7.2))':
+  '@hono/valibot-validator@0.5.2(hono@4.6.13)(valibot@1.0.0-beta.10(typescript@5.7.2))':
     dependencies:
       hono: 4.6.13
       valibot: 1.0.0-beta.10(typescript@5.7.2)
@@ -3853,7 +3853,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@react-router/dev@7.1.1(@react-router/serve@7.1.1(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2))(@types/node@20.17.12)(lightningcss@1.25.1)(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2)(vite@5.4.11(@types/node@20.17.12)(lightningcss@1.25.1))(wrangler@3.95.0)':
+  '@react-router/dev@7.1.1(@react-router/serve@7.1.1(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2))(@types/node@20.17.12)(lightningcss@1.25.1)(react-router@7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(typescript@5.7.2)(vite@5.4.11(@types/node@20.17.12)(lightningcss@1.25.1))(wrangler@3.95.0(@cloudflare/workers-types@4.20241205.0))':
     dependencies:
       '@babel/core': 7.26.0
       '@babel/generator': 7.26.2

@@ -1,9 +1,11 @@
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { factory } from "./factory";
+import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { authRoute } from "./routes/auth";
+import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
 
 const app = factory.createApp();
@@ -16,6 +18,7 @@ const route = app
 			new CloudflareSessionRepository(c.env.IDP_SESSION),
 		);
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
+		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
 		await next();
 	})
 	.use((c, next) => {
@@ -25,6 +28,7 @@ const route = app
 	})
 	.route("/auth", authRoute)
 	.route("/user", userRoute)
+	.route("/oauth", oauthRoute)
 	.onError((e, c) => {
 		console.error(e);
 		return c.text("Internal Server Error", 500);
