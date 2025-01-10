@@ -42,12 +42,12 @@ export type Token = {
 	accessTokenExpiresAt: Date;
 };
 
-export type OauthProvider = {
+export type OAuthProvider = {
 	id: number;
 	name: string;
 };
 
-export type OauthConnection = {
+export type OAuthConnection = {
 	userId: string;
 	providerId: number;
 	providerUserId: string;
@@ -79,7 +79,7 @@ type GetTokenByATRes = Token & {
 	scopes: Scope[];
 };
 
-export type IOauthRepository = {
+export type IOAuthRepository = {
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
 	createAccessToken: (
 		clientId: string,

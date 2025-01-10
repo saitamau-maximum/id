@@ -77,7 +77,7 @@ const route = app
 				return c.text("Bad Request: authorization request expired", 400);
 			}
 
-			const client = await c.var.OauthRepository.getClientById(client_id);
+			const client = await c.var.OAuthRepository.getClientById(client_id);
 
 			if (!client) {
 				return c.text("Internal Server Error: client not found", 500);
@@ -126,7 +126,7 @@ const route = app
 			);
 
 			// DB に格納
-			const saveResult = await c.var.OauthRepository.createAccessToken(
+			const saveResult = await c.var.OAuthRepository.createAccessToken(
 				client_id,
 				userInfo.id,
 				code,

@@ -1,7 +1,7 @@
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { factory } from "./factory";
-import { CloudflareOauthRepository } from "./infrastructure/repository/cloudflare/oauth";
+import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { authRoute } from "./routes/auth";
@@ -18,7 +18,7 @@ const route = app
 			new CloudflareSessionRepository(c.env.IDP_SESSION),
 		);
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
-		c.set("OauthRepository", new CloudflareOauthRepository(c.env.DB));
+		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
 		await next();
 	})
 	.use((c, next) => {

@@ -2,11 +2,11 @@ import { eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
-	IOauthRepository,
+	IOAuthRepository,
 	Scope,
 } from "./../../../usecase/repository/oauth";
 
-export class CloudflareOauthRepository implements IOauthRepository {
+export class CloudflareOAuthRepository implements IOAuthRepository {
 	private client: DrizzleD1Database<typeof schema>;
 
 	constructor(db: D1Database) {
