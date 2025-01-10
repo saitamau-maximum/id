@@ -8,6 +8,9 @@ port = 8787
 [vars]
 CLIENT_REDIRECT_URL = "http://localhost:5173/verify"
 CLIENT_ORIGIN = "http://localhost:5173"
+GITHUB_APP_ID = "387915"
+GITHUB_APP_INSTALLID = "41674415"
+GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 
 [[kv_namespaces]]
 binding = "IDP_SESSION"
@@ -27,6 +30,9 @@ name = "idp-server-preview"
 [env.preview.vars]
 CLIENT_REDIRECT_URL = "https://id-preview.maximum.vc/verify"
 CLIENT_ORIGIN = "https://id-preview.maximum.vc"
+GITHUB_APP_ID = "387915"
+GITHUB_APP_INSTALLID = "41674415"
+GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 
 [[env.preview.routes]]
 pattern = "api-preview.id.maximum.vc"
@@ -50,6 +56,9 @@ name = "idp-server"
 [env.production.vars]
 CLIENT_REDIRECT_URL = "https://id.maximum.vc/verify"
 CLIENT_ORIGIN = "https://id.maximum.vc"
+GITHUB_APP_ID = "387915"
+GITHUB_APP_INSTALLID = "41674415"
+GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 
 [[env.production.routes]]
 pattern = "api.id.maximum.vc"
