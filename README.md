@@ -12,7 +12,7 @@ pnpm build
 
 #### 環境変数の設定
 
-`.dev.vars.example` を `.dev.vars` という名前でコピーしてください。
+`workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーしてください。
 各変数の説明を以下に記載します。
 
 - `JWT_SECRET`: JWT の署名に使用する鍵。適当な文字列を設定してください。
