@@ -14,7 +14,7 @@ export class CloudflareOauthRepository implements IOauthRepository {
 	}
 
 	async getClientById(clientId: string) {
-		const res = await this.client.query.oauthClient.findFirst({
+		const res = await this.client.query.oauthClients.findFirst({
 			where: (client, { eq }) => eq(client.id, clientId),
 			with: {
 				callbacks: true,
@@ -47,7 +47,7 @@ export class CloudflareOauthRepository implements IOauthRepository {
 	) {
 		// transaction が使えないが、 batch だと autoincrement な token id を取得できないので、 Cloudflare の力を信じてふつうに insert する
 		const tokenInsertRes = await this.client
-			.insert(schema.oauthToken)
+			.insert(schema.oauthTokens)
 			.values({
 				clientId,
 				userId,
@@ -65,7 +65,7 @@ export class CloudflareOauthRepository implements IOauthRepository {
 		}
 
 		const tokenScopeInsertRes = await this.client
-			.insert(schema.oauthTokenScope)
+			.insert(schema.oauthTokenScopes)
 			.values(
 				scopes.map((scope) => ({
 					tokenId: tokenInsertRes[0].id,
@@ -84,7 +84,7 @@ export class CloudflareOauthRepository implements IOauthRepository {
 	}
 
 	async getTokenByCode(code: string) {
-		const res = await this.client.query.oauthToken.findFirst({
+		const res = await this.client.query.oauthTokens.findFirst({
 			where: (token, { eq, and, gt }) =>
 				and(eq(token.code, code), gt(token.codeExpiresAt, new Date())),
 			with: {
@@ -116,26 +116,26 @@ export class CloudflareOauthRepository implements IOauthRepository {
 			// 順番を逆にすると外部キー制約で落ちるよ (戒め)
 			// token に紐づく scope を削除
 			this.client
-				.delete(schema.oauthTokenScope)
-				.where(eq(schema.oauthTokenScope.tokenId, tokenId)),
+				.delete(schema.oauthTokenScopes)
+				.where(eq(schema.oauthTokenScopes.tokenId, tokenId)),
 			// token を削除
 			this.client
-				.delete(schema.oauthToken)
-				.where(eq(schema.oauthToken.id, tokenId)),
+				.delete(schema.oauthTokens)
+				.where(eq(schema.oauthTokens.id, tokenId)),
 		]);
 		return res.every((r) => r.success);
 	}
 
 	async setCodeUsed(code: string) {
 		const res = await this.client
-			.update(schema.oauthToken)
+			.update(schema.oauthTokens)
 			.set({ codeUsed: true })
-			.where(eq(schema.oauthToken.code, code));
+			.where(eq(schema.oauthTokens.code, code));
 		return res.success;
 	}
 
 	async getTokenByAccessToken(accessToken: string) {
-		const res = await this.client.query.oauthToken.findFirst({
+		const res = await this.client.query.oauthTokens.findFirst({
 			where: (token, { eq, and, gt }) =>
 				and(
 					eq(token.accessToken, accessToken),
