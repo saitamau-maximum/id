@@ -3,6 +3,20 @@ const keypairGenAlgorithm = {
 	namedCurve: "P-521",
 };
 
+const keypairUsage = ["sign", "verify"];
+
+const generateKeyPair = () =>
+	crypto.subtle.generateKey(
+		keypairGenAlgorithm,
+		true,
+		keypairUsage,
+	) as Promise<CryptoKeyPair>;
+
+const exportKey = async (key: CryptoKey) => {
+	const exportedKey = (await crypto.subtle.exportKey("jwk", key)) as JsonWebKey;
+	return btoa(JSON.stringify(exportedKey));
+};
+
 const importKey = async (data: string, type: "publicKey" | "privateKey") => {
 	const keyData = JSON.parse(atob(data));
 	return crypto.subtle.importKey(
@@ -25,4 +39,4 @@ const derivePublicKey = async (privateKey: CryptoKey) => {
 	return importKey(btoa(JSON.stringify(publicKey)), "publicKey");
 };
 
-export { derivePublicKey, importKey };
+export { derivePublicKey, importKey, exportKey, generateKeyPair };
