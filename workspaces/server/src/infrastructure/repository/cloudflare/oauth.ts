@@ -45,6 +45,8 @@ export class CloudflareOAuthRepository implements IOAuthRepository {
 		accessToken: string,
 		scopes: Scope[],
 	) {
+		const time = Date.now();
+
 		// transaction が使えないが、 batch だと autoincrement な token id を取得できないので、 Cloudflare の力を信じてふつうに insert する
 		const tokenInsertRes = await this.client
 			.insert(schema.oauthTokens)
@@ -52,35 +54,32 @@ export class CloudflareOAuthRepository implements IOAuthRepository {
 				clientId,
 				userId,
 				code,
-				codeExpiresAt: new Date(Date.now() + 1 * 60 * 1000), // 1 min
+				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
 				accessToken,
-				accessTokenExpiresAt: new Date(Date.now() + 1 * 60 * 60 * 1000), // 1 hour
+				accessTokenExpiresAt: new Date(time + 1 * 60 * 60 * 1000), // 1 hour
 			})
 			.returning();
 
-		if (tokenInsertRes.length === 0) {
-			return { success: false as const, message: "Failed to insert token" };
+		const insertedToken = tokenInsertRes.at(0);
+
+		if (!insertedToken) {
+			throw new Error("Failed to insert token");
 		}
 
 		const tokenScopeInsertRes = await this.client
 			.insert(schema.oauthTokenScopes)
 			.values(
 				scopes.map((scope) => ({
-					tokenId: tokenInsertRes[0].id,
+					tokenId: insertedToken.id,
 					scopeId: scope.id,
 				})),
 			);
 
 		if (!tokenScopeInsertRes.success) {
-			return {
-				success: false as const,
-				message: "Failed to insert token scope",
-			};
+			throw new Error("Failed to insert token scope");
 		}
-
-		return { success: true as const };
 	}
 
 	async getTokenByCode(code: string) {
@@ -123,7 +122,10 @@ export class CloudflareOAuthRepository implements IOAuthRepository {
 				.delete(schema.oauthTokens)
 				.where(eq(schema.oauthTokens.id, tokenId)),
 		]);
-		return res.every((r) => r.success);
+
+		if (res.some((r) => !r.success)) {
+			throw new Error("Failed to delete token");
+		}
 	}
 
 	async setCodeUsed(code: string) {
@@ -131,7 +133,10 @@ export class CloudflareOAuthRepository implements IOAuthRepository {
 			.update(schema.oauthTokens)
 			.set({ codeUsed: true })
 			.where(eq(schema.oauthTokens.code, code));
-		return res.success;
+
+		if (!res.success) {
+			throw new Error("Failed to set code used");
+		}
 	}
 
 	async getTokenByAccessToken(accessToken: string) {

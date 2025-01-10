@@ -125,26 +125,25 @@ const route = app
 				crypto.getRandomValues(new Uint8Array(39)),
 			);
 
-			// DB に格納
-			const saveResult = await c.var.OAuthRepository.createAccessToken(
+			// DB に格納して返す
+			return await c.var.OAuthRepository.createAccessToken(
 				client_id,
 				userInfo.id,
 				code,
 				redirect_uri,
 				accessToken,
 				scopes,
-			);
-
-			if (!saveResult.success) {
-				redirectTo.searchParams.append("error", "server_error");
-				redirectTo.searchParams.append("error_description", saveResult.message);
-				// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
-				return c.redirect(redirectTo.href, 302);
-			}
-
-			redirectTo.searchParams.append("code", code);
-
-			return c.redirect(redirectTo.href, 302);
+			)
+				.then(() => {
+					redirectTo.searchParams.append("code", code);
+					return c.redirect(redirectTo.href, 302);
+				})
+				.catch((e: Error) => {
+					redirectTo.searchParams.append("error", "server_error");
+					redirectTo.searchParams.append("error_description", e.message);
+					// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
+					return c.redirect(redirectTo.href, 302);
+				});
 		},
 	)
 	.all(async (c) => {

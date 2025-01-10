@@ -61,14 +61,6 @@ type GetClientByIdRes = Client & {
 	scopes: Scope[];
 };
 
-type CreateAccessTokenSuccessRes = {
-	success: true;
-};
-type CreateAccessTokenErrorRes = {
-	success: false;
-	message: string;
-};
-
 type GetTokenByCodeRes = Token & {
 	client: Client & { secrets: ClientSecret[] };
 	scopes: Scope[];
@@ -88,10 +80,10 @@ export type IOAuthRepository = {
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
-	) => Promise<CreateAccessTokenSuccessRes | CreateAccessTokenErrorRes>;
+	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
-	deleteTokenById: (tokenId: number) => Promise<boolean>;
-	setCodeUsed: (code: string) => Promise<boolean>;
+	deleteTokenById: (tokenId: number) => Promise<void>;
+	setCodeUsed: (code: string) => Promise<void>;
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;

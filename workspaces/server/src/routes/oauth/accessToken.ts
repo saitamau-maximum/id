@@ -112,7 +112,7 @@ const route = app
 			// もしすでに token が使われていた場合
 			if (tokenInfo.codeUsed) {
 				// そのレコードを削除
-				// batch に失敗していても response は変わらないので結果は無視する
+				// delete に失敗していても response は変わらないので結果は無視する
 				await c.var.OAuthRepository.deleteTokenById(tokenInfo.id);
 				return c.json(
 					{
@@ -125,8 +125,9 @@ const route = app
 			}
 
 			// token が使われたことを記録
-			const res = await c.var.OAuthRepository.setCodeUsed(code);
-			if (!res) {
+			try {
+				await c.var.OAuthRepository.setCodeUsed(code);
+			} catch {
 				return c.json(
 					{
 						error: "server_error",
