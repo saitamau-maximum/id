@@ -3,7 +3,7 @@ import { validator } from "hono/validator";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import { type HonoEnv, factory } from "../../factory";
-import type { User } from "../../usecase/repository/user";
+import { cookieAuthMiddleware } from "../../middleware/auth";
 import { generateAuthToken } from "../../utils/oauth/auth-token";
 import { importKey } from "../../utils/oauth/key";
 import { _Layout } from "../_templates/layout";
@@ -16,6 +16,7 @@ const app = factory.createApp();
 const route = app
 	.get(
 		"/",
+		// パラメータチェックしてからログイン処理をさせる
 		// TODO: Bad Request の画面をいい感じにするかも
 		// Memo: なんかうまく型が聞いてくれないので c に明示的に型をつける　おま環ですか
 		validator("query", async (query, c: Context<HonoEnv>) => {
@@ -171,6 +172,7 @@ const route = app
 				clientInfo: client,
 			};
 		}),
+		cookieAuthMiddleware,
 		async (c) => {
 			const { clientId, redirectUri, redirectTo, state, scope, clientInfo } =
 				c.req.valid("query");
@@ -187,13 +189,9 @@ const route = app
 			});
 
 			// ログインしてることを middleware でチェック済み... な想定
-			// const userInfo = await c.var.UserRepository.fetchUserById(payload.userId);
-			const userInfo: User = {
-				id: "dummy",
-				initialized: true,
-				displayName: "dummy",
-				profileImageURL: "https://github.com/a01sa01to.png",
-			};
+			const userInfo = await c.var.UserRepository.fetchUserById(
+				c.var.jwtPayload.userId,
+			);
 
 			// 初期登録まだ
 			if (!userInfo.displayName || !userInfo.profileImageURL) {
