@@ -149,7 +149,7 @@ const route = app
 					iat: now,
 					exp: now + JWT_EXPIRATION,
 				},
-				c.env.JWT_SECRET,
+				c.env.SECRET,
 			);
 
 			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");

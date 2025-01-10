@@ -3,6 +3,6 @@ import { factory } from "../factory";
 
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
 	return jwt({
-		secret: c.env.JWT_SECRET,
+		secret: c.env.SECRET,
 	})(c, next);
 });

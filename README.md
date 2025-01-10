@@ -37,7 +37,7 @@ pnpm build
 `workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーし、変更してください。
 各変数の説明を以下に記載します。
 
-- `JWT_SECRET`: JWT の署名に使用する鍵。適当な文字列を設定してください。
+- `SECRET`: JWT の署名や Cookie の暗号化に使用する鍵。適当な文字列を設定してください。
 - `PRIVKEY_FOR_OAUTH`: OAuth で使用する秘密鍵。 server を立ち上げたら `/oauth/util/keygen` から生成できます。
   - Preview には `` が、 Production には `` の公開鍵に対応する秘密鍵が設定されています。 (あとでかく)
 - `GITHUB_APP_PRIVKEY`: GitHub App の秘密鍵。 GitHub App 設定画面の「Generate a private key」で取得し、以下のコードで変換してください。
