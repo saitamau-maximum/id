@@ -1,3 +1,5 @@
+import type { OAuthConnection } from "./oauth";
+
 export type Profile = {
 	displayName: string;
 	profileImageURL: string;
@@ -9,18 +11,19 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
-	providerUserId: string;
-} & Partial<Profile>;
+} & Partial<Profile> & {
+		oauthConnections: OAuthConnection[];
+	};
 
 export interface IUserRepository {
 	createUser: (
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 		payload: Partial<Profile>,
 	) => Promise<string>;
 	fetchUserByProviderInfo: (
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 	) => Promise<User>;
 	fetchUserById: (userId: string) => Promise<User>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;

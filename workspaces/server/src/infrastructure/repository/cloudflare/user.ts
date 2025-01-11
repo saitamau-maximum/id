@@ -16,7 +16,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async createUser(
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 		payload: Partial<Profile> = {},
 	): Promise<string> {
 		const userId = crypto.randomUUID();
@@ -25,8 +25,14 @@ export class CloudflareUserRepository implements IUserRepository {
 		const [_, res] = await this.client.batch([
 			this.client.insert(schema.users).values({
 				id: userId,
+			}),
+			this.client.insert(schema.oauthConnections).values({
+				userId,
+				providerId,
 				providerUserId,
-				provider,
+				email: payload.email,
+				name: payload.displayName,
+				profileImageUrl: payload.profileImageURL,
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
@@ -45,28 +51,34 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchUserByProviderInfo(
 		providerUserId: string,
-		provider: string,
+		providerId: number,
 	): Promise<User> {
-		const user = await this.client.query.users.findFirst({
-			where: and(
-				eq(schema.users.providerUserId, providerUserId),
-				eq(schema.users.provider, provider),
-			),
+		const res = await this.client.query.oauthConnections.findFirst({
+			where: (oauthConn, { eq, and }) =>
+				and(
+					eq(oauthConn.providerId, providerId),
+					eq(oauthConn.providerUserId, providerUserId),
+				),
 			with: {
-				profile: true,
+				user: {
+					with: {
+						profile: true,
+						oauthConnections: true,
+					},
+				},
 			},
 		});
 
-		if (!user) {
+		if (!res) {
 			throw new Error("User not found");
 		}
 
 		return {
-			id: user.id,
-			initialized: !!user.initializedAt,
-			providerUserId: user.providerUserId,
-			displayName: user.profile.displayName ?? undefined,
-			profileImageURL: user.profile.profileImageURL ?? undefined,
+			id: res.user.id,
+			initialized: !!res.user.initializedAt,
+			displayName: res.user.profile.displayName ?? undefined,
+			profileImageURL: res.user.profile.profileImageURL ?? undefined,
+			oauthConnections: res.user.oauthConnections,
 		};
 	}
 
@@ -75,6 +87,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			where: eq(schema.users.id, userId),
 			with: {
 				profile: true,
+				oauthConnections: true,
 			},
 		});
 
@@ -84,10 +97,10 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
-			providerUserId: user.providerUserId,
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
+			oauthConnections: user.oauthConnections,
 		};
 	}
 

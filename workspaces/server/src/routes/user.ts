@@ -1,5 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
+import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 
@@ -37,14 +38,18 @@ const route = app
 			UserRepository,
 		} = c.var;
 
-		const githubUser = await UserRepository.fetchUserById(payload.userId);
+		const user = await UserRepository.fetchUserById(payload.userId);
 
-		if (!githubUser.providerUserId) {
+		const githubConn = user.oauthConnections.find(
+			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+		);
+
+		if (!githubConn || !githubConn.name) {
 			return c.text("User not found", 404);
 		}
 
 		const cached = await ContributionCacheRepository.get(
-			githubUser.providerUserId,
+			githubConn.name, // GitHub の login (= @username) が入っている
 		);
 
 		if (cached) {
@@ -52,13 +57,13 @@ const route = app
 		}
 
 		const contributions = await ContributionRepository.getContributions(
-			githubUser.providerUserId,
+			githubConn.name,
 		);
 
 		// パフォーマンスのため post cache する
 		// ref: https://zenn.dev/monica/articles/a9fdc5eea7f59c
 		c.executionCtx.waitUntil(
-			ContributionCacheRepository.set(githubUser.providerUserId, contributions),
+			ContributionCacheRepository.set(githubConn.name, contributions),
 		);
 
 		return c.json(contributions, 200);

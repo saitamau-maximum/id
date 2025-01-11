@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import { factory } from "../../factory";
-import type { User } from "../../usecase/repository/user";
+import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey } from "../../utils/oauth/key";
@@ -25,6 +25,7 @@ const callbackSchema = v.object({
 const route = app
 	.post(
 		"/",
+		cookieAuthMiddleware,
 		vValidator("form", callbackSchema, (res, c) => {
 			// TODO: いい感じのエラー画面を作るかも
 			if (!res.success) return c.text("Bad Request: invalid parameters", 400);
@@ -63,13 +64,9 @@ const route = app
 			}
 
 			// ログインしてることを middleware でチェック済み... な想定
-			// const userInfo = await c.var.UserRepository.fetchUserById(payload.userId);
-			const userInfo: User = {
-				id: "dummy", // memo: dev 時はここを変えよう！ Foreign key error が出るぞ！
-				initialized: true,
-				displayName: "dummy",
-				profileImageURL: "https://github.com/a01sa01to.png",
-			};
+			const userInfo = await c.var.UserRepository.fetchUserById(
+				c.var.jwtPayload.payload.userId,
+			);
 
 			// タイムリミットは 5 min
 			if (time + 5 * 60 * 1000 < nowUnixMs) {

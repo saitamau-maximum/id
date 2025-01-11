@@ -5,10 +5,14 @@ interface Env {
 	CACHE: KVNamespace;
 	CLIENT_REDIRECT_URL: "http://localhost:5173/verify";
 	CLIENT_ORIGIN: "http://localhost:5173";
+	GITHUB_APP_ID: "387915";
+	GITHUB_APP_INSTALLID: "41674415";
+	GITHUB_OAUTH_ID: "Iv1.3fef0e17322d38ce";
 	MAXIMUM_AUTH_ID: string;
 	MAXIMUM_AUTH_SECRET: string;
-	JWT_SECRET: string;
+	SECRET: string;
 	PRIVKEY_FOR_OAUTH: string;
-	GITHUB_TOKEN: string;
+	GITHUB_APP_PRIVKEY: string;
+	GITHUB_OAUTH_SECRET: string;
 	DB: D1Database;
 }
