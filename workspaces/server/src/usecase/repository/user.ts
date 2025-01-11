@@ -3,6 +3,7 @@ import type { OAuthConnection } from "./oauth";
 export type Profile = {
 	displayName: string;
 	realName: string;
+	realNameKana: string;
 	displayId: string;
 	profileImageURL: string;
 	email: string;

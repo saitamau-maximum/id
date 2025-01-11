@@ -9,6 +9,7 @@ const app = factory.createApp();
 const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
 	realName: v.pipe(v.string(), v.nonEmpty()),
+	realNameKana: v.pipe(v.string(), v.nonEmpty()),
 	displayId: v.pipe(v.string(), v.nonEmpty()),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	studentId: v.pipe(v.string(), v.nonEmpty()),
@@ -21,13 +22,21 @@ const route = app
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
 
-		const { displayName, realName, displayId, email, studentId, grade } =
-			c.req.valid("json");
+		const {
+			displayName,
+			realName,
+			realNameKana,
+			displayId,
+			email,
+			studentId,
+			grade,
+		} = c.req.valid("json");
 
 		await UserRepository.updateUser(payload.userId, {
 			displayName,
 			displayId,
 			realName,
+			realNameKana,
 			email,
 			studentId,
 			grade,

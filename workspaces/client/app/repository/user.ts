@@ -4,6 +4,7 @@ export interface IUserRepository {
 	register: (
 		displayName: string,
 		realName: string,
+		realNameKana: string,
 		displayId: string,
 		email: string,
 		studentId: string,
@@ -15,6 +16,7 @@ export class UserRepositoryImpl implements IUserRepository {
 	async register(
 		displayName: string,
 		realName: string,
+		realNameKana: string,
 		displayId: string,
 		email: string,
 		studentId: string,
@@ -24,6 +26,7 @@ export class UserRepositoryImpl implements IUserRepository {
 			json: {
 				displayName,
 				realName,
+				realNameKana,
 				displayId,
 				email,
 				studentId,

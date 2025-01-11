@@ -17,6 +17,7 @@ const GRADE = [
 const RegisterFormSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty("表示名を入力してください")),
 	realName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
+	realNameKana: v.pipe(v.string(), v.nonEmpty("本名(かな)を入力してください")),
 	displayId: v.pipe(
 		v.string(),
 		v.nonEmpty("表示IDを入力してください"),
@@ -54,6 +55,7 @@ export const RegisterForm = () => {
 	const { user } = useAuth();
 	const displayNameId = useId();
 	const realNameId = useId();
+	const realNameKanaId = useId();
 	const displayIdId = useId();
 	const emailId = useId();
 	const studentId = useId();
@@ -67,6 +69,7 @@ export const RegisterForm = () => {
 		): Promise<RegisterFormStateType> => {
 			const displayName = formData.get("displayName");
 			const realName = formData.get("realName");
+			const realNameKana = formData.get("realNameKana");
 			const displayId = formData.get("displayId");
 			const email = formData.get("email");
 			const studentId = formData.get("studentId");
@@ -75,6 +78,7 @@ export const RegisterForm = () => {
 			const result = v.safeParse(RegisterFormSchema, {
 				displayName,
 				realName,
+				realNameKana,
 				displayId,
 				email,
 				studentId,
@@ -87,6 +91,7 @@ export const RegisterForm = () => {
 					default: {
 						displayName: displayName?.toString() ?? undefined,
 						realName: realName?.toString() ?? undefined,
+						realNameKana: realNameKana?.toString() ?? undefined,
 						displayId: displayId?.toString() ?? undefined,
 						email: email?.toString() ?? undefined,
 						studentId: studentId?.toString() ?? undefined,
@@ -98,6 +103,9 @@ export const RegisterForm = () => {
 							: undefined,
 						realName: errors.nested?.realName
 							? errors.nested.realName.join(", ")
+							: undefined,
+						realNameKana: errors.nested?.realNameKana
+							? errors.nested.realNameKana.join(", ")
 							: undefined,
 						displayId: errors.nested?.displayId
 							? errors.nested.displayId.join(", ")
@@ -119,6 +127,7 @@ export const RegisterForm = () => {
 				await userRepository.register(
 					result.output.displayName,
 					result.output.realName,
+					result.output.realNameKana,
 					result.output.displayId,
 					result.output.email,
 					result.output.studentId,
@@ -136,6 +145,7 @@ export const RegisterForm = () => {
 					default: {
 						displayName: result.output.displayName,
 						realName: result.output.realName,
+						realNameKana: result.output.realNameKana,
 						displayId: result.output.displayId,
 						email: result.output.email,
 						studentId: result.output.studentId,
@@ -152,6 +162,7 @@ export const RegisterForm = () => {
 		default: {
 			displayName: user?.displayName,
 			realName: user?.realName,
+			realNameKana: user?.realNameKana,
 			displayId: user?.displayId,
 			email: user?.email,
 			studentId: user?.studentId,
@@ -208,6 +219,26 @@ export const RegisterForm = () => {
 					})}
 				>
 					{state.error.realName}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<label htmlFor={realNameKanaId}>
+					<Form.LabelText>本名(かな)</Form.LabelText>
+				</label>
+				<Form.Input
+					id={realNameKanaId}
+					placeholder="やまだ たろう"
+					required
+					name="realNameKana"
+					defaultValue={state.default.realNameKana}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.realNameKana}
 				</p>
 			</Form.FieldSet>
 			<Form.FieldSet>

@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "c11625a0-4f41-4e82-ba62-2ee944fa98db",
+  "id": "a39f2abc-59c6-4ee2-a4bc-e52cf4abf3f8",
   "prevId": "a0942458-6480-4729-8daa-8357be48333a",
   "tables": {
     "oauth_client_callbacks": {
@@ -585,6 +585,13 @@
         },
         "real_name": {
           "name": "real_name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "real_name_kana": {
+          "name": "real_name_kana",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

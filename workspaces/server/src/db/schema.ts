@@ -33,6 +33,7 @@ export const userProfiles = sqliteTable(
 			.notNull(),
 		displayName: text("display_name"),
 		realName: text("real_name"),
+		realNameKana: text("real_name_kana"),
 		displayId: text("display_id"),
 		profileImageURL: text("profile_image_url"),
 		email: text("email"),

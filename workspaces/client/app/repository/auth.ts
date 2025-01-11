@@ -4,6 +4,7 @@ export type User = {
 	initialized: boolean;
 	displayName?: string;
 	realName?: string;
+	realNameKana?: string;
 	displayId?: string;
 	profileImageURL?: string;
 	email?: string;
