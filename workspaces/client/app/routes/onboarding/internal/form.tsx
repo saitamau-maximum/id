@@ -16,6 +16,15 @@ const GRADE = [
 
 const RegisterFormSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty("表示名を入力してください")),
+	realName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
+	displayId: v.pipe(
+		v.string(),
+		v.nonEmpty("表示IDを入力してください"),
+		v.regex(
+			/^[a-z0-9_]{3,16}$/,
+			"表示IDは3文字以上16文字以下の半角英小文字、半角数字、アンダースコア(_)で入力してください。",
+		),
+	),
 	email: v.pipe(
 		v.string(),
 		v.nonEmpty("メールアドレスを入力してください"),
@@ -44,6 +53,8 @@ export const RegisterForm = () => {
 	const { userRepository } = useRepository();
 	const { user } = useAuth();
 	const displayNameId = useId();
+	const realNameId = useId();
+	const displayIdId = useId();
 	const emailId = useId();
 	const studentId = useId();
 	const gradeId = useId();
@@ -55,12 +66,16 @@ export const RegisterForm = () => {
 			formData: FormData,
 		): Promise<RegisterFormStateType> => {
 			const displayName = formData.get("displayName");
+			const realName = formData.get("realName");
+			const displayId = formData.get("displayId");
 			const email = formData.get("email");
 			const studentId = formData.get("studentId");
 			const grade = formData.get("grade");
 
 			const result = v.safeParse(RegisterFormSchema, {
 				displayName,
+				realName,
+				displayId,
 				email,
 				studentId,
 				grade,
@@ -71,6 +86,8 @@ export const RegisterForm = () => {
 				return {
 					default: {
 						displayName: displayName?.toString() ?? undefined,
+						realName: realName?.toString() ?? undefined,
+						displayId: displayId?.toString() ?? undefined,
 						email: email?.toString() ?? undefined,
 						studentId: studentId?.toString() ?? undefined,
 						grade: grade?.toString() ?? undefined,
@@ -78,6 +95,12 @@ export const RegisterForm = () => {
 					error: {
 						displayName: errors.nested?.displayName
 							? errors.nested.displayName.join(", ")
+							: undefined,
+						realName: errors.nested?.realName
+							? errors.nested.realName.join(", ")
+							: undefined,
+						displayId: errors.nested?.displayId
+							? errors.nested.displayId.join(", ")
 							: undefined,
 						email: errors.nested?.email
 							? errors.nested.email.join(", ")
@@ -95,6 +118,8 @@ export const RegisterForm = () => {
 			try {
 				await userRepository.register(
 					result.output.displayName,
+					result.output.realName,
+					result.output.displayId,
 					result.output.email,
 					result.output.studentId,
 					result.output.grade,
@@ -109,10 +134,12 @@ export const RegisterForm = () => {
 			} catch (e) {
 				return {
 					default: {
-						displayName: displayName?.toString() ?? undefined,
-						email: email?.toString() ?? undefined,
-						studentId: studentId?.toString() ?? undefined,
-						grade: grade?.toString() ?? undefined,
+						displayName: result.output.displayName,
+						realName: result.output.realName,
+						displayId: result.output.displayId,
+						email: result.output.email,
+						studentId: result.output.studentId,
+						grade: result.output.grade,
 					},
 					error: { message: "ユーザー登録に失敗しました" },
 				};
@@ -122,7 +149,14 @@ export const RegisterForm = () => {
 	);
 
 	const [state, submitAction, isPending] = useActionState(RegisterFormAction, {
-		default: {},
+		default: {
+			displayName: user?.displayName,
+			realName: user?.realName,
+			displayId: user?.displayId,
+			email: user?.email,
+			studentId: user?.studentId,
+			grade: user?.grade,
+		},
 		error: {},
 	});
 
@@ -154,6 +188,46 @@ export const RegisterForm = () => {
 					})}
 				>
 					{state.error.displayName}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<label htmlFor={realNameId}>
+					<Form.LabelText>本名</Form.LabelText>
+				</label>
+				<Form.Input
+					id={realNameId}
+					placeholder="山田 太郎"
+					required
+					name="realName"
+					defaultValue={state.default.realName}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.realName}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<label htmlFor={displayIdId}>
+					<Form.LabelText>表示ID</Form.LabelText>
+				</label>
+				<Form.Input
+					id={displayIdId}
+					placeholder="maximum_taro"
+					required
+					name="displayId"
+					defaultValue={state.default.displayId}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.displayId}
 				</p>
 			</Form.FieldSet>
 			<Form.FieldSet>

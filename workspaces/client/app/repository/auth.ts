@@ -3,7 +3,12 @@ export type User = {
 	id: string;
 	initialized: boolean;
 	displayName?: string;
+	realName?: string;
+	displayId?: string;
 	profileImageURL?: string;
+	email?: string;
+	studentId?: string;
+	grade?: string;
 };
 
 export interface IAuthRepository {

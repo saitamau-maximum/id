@@ -3,6 +3,8 @@ import { client } from "~/utils/hono";
 export interface IUserRepository {
 	register: (
 		displayName: string,
+		realName: string,
+		displayId: string,
 		email: string,
 		studentId: string,
 		grade: string,
@@ -12,6 +14,8 @@ export interface IUserRepository {
 export class UserRepositoryImpl implements IUserRepository {
 	async register(
 		displayName: string,
+		realName: string,
+		displayId: string,
 		email: string,
 		studentId: string,
 		grade: string,
@@ -19,6 +23,8 @@ export class UserRepositoryImpl implements IUserRepository {
 		const res = await client.user.register.$post({
 			json: {
 				displayName,
+				realName,
+				displayId,
 				email,
 				studentId,
 				grade,
