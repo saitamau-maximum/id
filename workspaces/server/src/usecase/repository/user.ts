@@ -11,9 +11,11 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
-} & Partial<Profile> & {
-		oauthConnections: OAuthConnection[];
-	};
+} & Partial<Profile>;
+
+export type UserWithOAuthConnection = User & {
+	oauthConnections: OAuthConnection[];
+};
 
 export interface IUserRepository {
 	createUser: (
@@ -21,10 +23,13 @@ export interface IUserRepository {
 		providerId: number,
 		payload: Partial<Profile>,
 	) => Promise<string>;
-	fetchUserByProviderInfo: (
+	fetchUserIdByProviderInfo: (
 		providerUserId: string,
 		providerId: number,
-	) => Promise<User>;
-	fetchUserById: (userId: string) => Promise<User>;
+	) => Promise<string>;
+	fetchUserProfileById: (userId: string) => Promise<User>;
+	fetchUserWithOAuthConnectionById: (
+		userId: string,
+	) => Promise<UserWithOAuthConnection>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }

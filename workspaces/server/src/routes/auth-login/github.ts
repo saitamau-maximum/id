@@ -135,11 +135,11 @@ const route = app
 			let foundUserId = null;
 			try {
 				// ユーザーが存在するか確認
-				const res = await c.var.UserRepository.fetchUserByProviderInfo(
+				const id = await c.var.UserRepository.fetchUserIdByProviderInfo(
 					String(user.id),
 					OAUTH_PROVIDER_IDS.GITHUB,
 				);
-				foundUserId = res.id;
+				foundUserId = id;
 			} catch (e) {
 				// もしユーザーが見つからなかったら新規作成
 				foundUserId = await c.var.UserRepository.createUser(

@@ -38,7 +38,9 @@ const route = app
 			UserRepository,
 		} = c.var;
 
-		const user = await UserRepository.fetchUserById(payload.userId);
+		const user = await UserRepository.fetchUserWithOAuthConnectionById(
+			payload.userId,
+		);
 
 		const githubConn = user.oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,

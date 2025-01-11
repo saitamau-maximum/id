@@ -5,6 +5,7 @@ import type {
 	IUserRepository,
 	Profile,
 	User,
+	UserWithOAuthConnection,
 } from "./../../../usecase/repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -49,40 +50,51 @@ export class CloudflareUserRepository implements IUserRepository {
 		throw new Error("Failed to create user");
 	}
 
-	async fetchUserByProviderInfo(
+	async fetchUserIdByProviderInfo(
 		providerUserId: string,
 		providerId: number,
-	): Promise<User> {
+	): Promise<string> {
 		const res = await this.client.query.oauthConnections.findFirst({
 			where: (oauthConn, { eq, and }) =>
 				and(
 					eq(oauthConn.providerId, providerId),
 					eq(oauthConn.providerUserId, providerUserId),
 				),
-			with: {
-				user: {
-					with: {
-						profile: true,
-						oauthConnections: true,
-					},
-				},
-			},
 		});
 
 		if (!res) {
 			throw new Error("User not found");
 		}
 
+		return res.userId;
+	}
+
+	async fetchUserProfileById(userId: string): Promise<User> {
+		const user = await this.client.query.users.findFirst({
+			where: eq(schema.users.id, userId),
+			with: {
+				profile: true,
+			},
+		});
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
 		return {
-			id: res.user.id,
-			initialized: !!res.user.initializedAt,
-			displayName: res.user.profile.displayName ?? undefined,
-			profileImageURL: res.user.profile.profileImageURL ?? undefined,
-			oauthConnections: res.user.oauthConnections,
+			id: user.id,
+			initialized: !!user.initializedAt,
+			displayName: user.profile.displayName ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
 		};
 	}
 
-	async fetchUserById(userId: string): Promise<User> {
+	async fetchUserWithOAuthConnectionById(
+		userId: string,
+	): Promise<UserWithOAuthConnection> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -100,6 +112,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
 			oauthConnections: user.oauthConnections,
 		};
 	}
