@@ -1,6 +1,7 @@
-import { Octokit } from "@octokit/core";
+import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
@@ -23,7 +24,12 @@ const route = app
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
 		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
 		const octokit = new Octokit({
-			auth: c.env.GITHUB_TOKEN,
+			authStrategy: createAppAuth,
+			auth: {
+				appId: c.env.GITHUB_APP_ID,
+				privateKey: atob(c.env.GITHUB_APP_PRIVKEY),
+				installationId: c.env.GITHUB_APP_INSTALLID,
+			},
 		});
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
 		c.set(

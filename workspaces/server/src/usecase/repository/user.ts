@@ -1,3 +1,5 @@
+import type { OAuthConnection } from "./oauth";
+
 export type Profile = {
 	displayName: string;
 	profileImageURL: string;
@@ -9,7 +11,9 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
-} & Partial<Profile>;
+} & Partial<Profile> & {
+		oauthConnections: OAuthConnection[];
+	};
 
 export interface IUserRepository {
 	createUser: (

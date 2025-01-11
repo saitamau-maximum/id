@@ -63,6 +63,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				user: {
 					with: {
 						profile: true,
+						oauthConnections: true,
 					},
 				},
 			},
@@ -77,6 +78,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initialized: !!res.user.initializedAt,
 			displayName: res.user.profile.displayName ?? undefined,
 			profileImageURL: res.user.profile.profileImageURL ?? undefined,
+			oauthConnections: res.user.oauthConnections,
 		};
 	}
 
@@ -85,6 +87,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			where: eq(schema.users.id, userId),
 			with: {
 				profile: true,
+				oauthConnections: true,
 			},
 		});
 
@@ -97,6 +100,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
+			oauthConnections: user.oauthConnections,
 		};
 	}
 
