@@ -16,12 +16,25 @@ export const ProfileCard: React.FC<Props> = ({
 	grade,
 }) => {
 	return (
-		<div className={css({ display: "flex", alignItems: "center", gap: 8 })}>
+		<div
+			className={css({
+				display: "flex",
+				alignItems: "center",
+				gap: 8,
+				mdDown: {
+					gap: 4,
+				},
+			})}
+		>
 			<img
 				className={css({
 					width: "120px",
 					height: "120px",
 					borderRadius: "50%",
+					mdDown: {
+						width: "80px",
+						height: "80px",
+					},
 				})}
 				width={120}
 				height={120}
@@ -30,7 +43,16 @@ export const ProfileCard: React.FC<Props> = ({
 			/>
 			<div>
 				<div className={css({ display: "flex", gap: 4 })}>
-					<span className={css({ color: "gray.500", fontWeight: "bold" })}>
+					<span
+						className={css({
+							color: "gray.500",
+							fontWeight: "bold",
+							fontSize: "md",
+							mdDown: {
+								fontSize: "sm",
+							},
+						})}
+					>
 						{grade}
 					</span>
 				</div>
@@ -40,6 +62,9 @@ export const ProfileCard: React.FC<Props> = ({
 						alignItems: "center",
 						gap: 4,
 						marginBottom: 1,
+						mdDown: {
+							marginBottom: 0,
+						},
 					})}
 				>
 					<h1
@@ -47,6 +72,9 @@ export const ProfileCard: React.FC<Props> = ({
 							fontSize: "3xl",
 							fontWeight: "bold",
 							color: "gray.600",
+							mdDown: {
+								fontSize: "2xl",
+							},
 						})}
 					>
 						{displayName}
@@ -55,6 +83,9 @@ export const ProfileCard: React.FC<Props> = ({
 						className={css({
 							color: "gray.500",
 							fontSize: "xl",
+							mdDown: {
+								fontSize: "lg",
+							},
 						})}
 					>
 						{realName}
@@ -63,6 +94,10 @@ export const ProfileCard: React.FC<Props> = ({
 				<p
 					className={css({
 						color: "gray.600",
+						fontSize: "md",
+						mdDown: {
+							fontSize: "sm",
+						},
 					})}
 				>
 					@{displayId}
