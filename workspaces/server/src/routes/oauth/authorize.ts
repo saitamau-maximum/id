@@ -6,8 +6,8 @@ import { type HonoEnv, factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { generateAuthToken } from "../../utils/oauth/auth-token";
 import { importKey } from "../../utils/oauth/key";
-import { _Layout } from "../_templates/layout";
 import { _Authorize } from "./_templates/authorize";
+import { _Layout } from "./_templates/layout";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/27
 
