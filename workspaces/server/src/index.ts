@@ -1,9 +1,12 @@
+import { Octokit } from "@octokit/core";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { factory } from "./factory";
+import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
+import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { authRoute } from "./routes/auth";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
@@ -19,6 +22,14 @@ const route = app
 		);
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
 		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
+		const octokit = new Octokit({
+			auth: c.env.GITHUB_TOKEN,
+		});
+		c.set("ContributionRepository", new GithubContributionRepository(octokit));
+		c.set(
+			"ContributionCacheRepository",
+			new CloudflareContributionCacheRepository(c.env.CACHE),
+		);
 		await next();
 	})
 	.use((c, next) => {

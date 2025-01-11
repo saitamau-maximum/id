@@ -64,6 +64,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return {
 			id: user.id,
 			initialized: !!user.initializedAt,
+			providerUserId: user.providerUserId,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 		};
@@ -83,6 +84,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
+			providerUserId: user.providerUserId,
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
