@@ -51,11 +51,7 @@ const route = app
 	})
 	.route("/auth", authRoute)
 	.route("/user", userRoute)
-	.route("/oauth", oauthRoute)
-	.onError((e, c) => {
-		console.error(e);
-		return c.text("Internal Server Error", 500);
-	});
+	.route("/oauth", oauthRoute);
 
 export default app;
 
