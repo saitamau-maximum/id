@@ -9,5 +9,5 @@ export const DEV_FLAGS = {
 
 export const PROD_FLAGS = {
 	...FLAGS_DEFAULT,
-	ENABLE_LOGIN: false,
+	ENABLE_LOGIN: true,
 };
