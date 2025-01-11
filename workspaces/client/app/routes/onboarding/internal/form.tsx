@@ -222,7 +222,7 @@ export const RegisterForm = () => {
 				</label>
 				<Form.Input
 					id={displayNameId}
-					placeholder="Maximum 太郎"
+					placeholder="Maximum"
 					required
 					name="displayName"
 					defaultValue={state.default.displayName}
