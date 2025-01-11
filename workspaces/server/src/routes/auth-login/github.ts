@@ -3,6 +3,7 @@ import {
 	deleteCookie,
 	getCookie,
 	getSignedCookie,
+	setCookie,
 	setSignedCookie,
 } from "hono/cookie";
 import { sign } from "hono/jwt";
@@ -163,15 +164,17 @@ const route = app
 				getCookieOptions(requestUrl.protocol === "http:"),
 			);
 
-			// const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
+			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
 
-			// await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
+			await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
 
-			// return c.redirect(`${c.env.CLIENT_REDIRECT_URL}?ott=${ott}`);
+			const query = new URLSearchParams();
+			query.set("ott", ott);
 
-			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO) ?? "/";
-			deleteCookie(c, "continue_to");
-			return c.redirect(continueTo);
+			return c.redirect(
+				`${c.env.CLIENT_REDIRECT_URL}?${query.toString()}`,
+				302,
+			);
 		},
 	);
 

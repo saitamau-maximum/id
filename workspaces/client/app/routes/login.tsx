@@ -83,7 +83,7 @@ export default function Login() {
 				どなたでもログイン可能です。
 			</p>
 			{FLAG.ENABLE_LOGIN ? (
-				<a href={`${env("SERVER_HOST")}/auth/login`}>
+				<a href={`${env("SERVER_HOST")}/auth/login/github`}>
 					<ButtonLike>Login</ButtonLike>
 				</a>
 			) : (
