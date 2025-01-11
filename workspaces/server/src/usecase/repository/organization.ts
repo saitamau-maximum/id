@@ -1,3 +1,3 @@
 export interface IOrganizationRepository {
-  checkIsMember: (userName: string, orgName?: string) => Promise<boolean>;
+	checkIsMember: (userName: string, orgName?: string) => Promise<boolean>;
 }

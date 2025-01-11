@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { css, cva, cx } from "styled-system/css";
+import { cva, cx } from "styled-system/css";
 
 type Props = ComponentProps<"span"> & {
 	variant?: "primary" | "secondary";
