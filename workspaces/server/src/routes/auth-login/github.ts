@@ -58,8 +58,16 @@ const callbackRequestQuerySchema = v.object({
 	state: v.pipe(v.string(), v.nonEmpty()),
 });
 
+const loginRequestQuerySchema = v.object({
+	continue_to: v.optional(v.string()),
+});
+
 const route = app
-	.get("/", async (c) => {
+	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
+		const { continue_to } = c.req.valid("query");
+
+		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+
 		const requestUrl = new URL(c.req.url);
 
 		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
