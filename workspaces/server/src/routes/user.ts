@@ -28,6 +28,40 @@ const route = app
 		});
 
 		return c.text("ok", 200);
+	})
+	.get("/contributions", async (c) => {
+		const payload = c.get("jwtPayload");
+		const {
+			ContributionRepository,
+			ContributionCacheRepository,
+			UserRepository,
+		} = c.var;
+
+		const githubUser = await UserRepository.fetchUserById(payload.userId);
+
+		if (!githubUser.providerUserId) {
+			return c.text("User not found", 404);
+		}
+
+		const cached = await ContributionCacheRepository.get(
+			githubUser.providerUserId,
+		);
+
+		if (cached) {
+			return c.json(cached, 200);
+		}
+
+		const contributions = await ContributionRepository.getContributions(
+			githubUser.providerUserId,
+		);
+
+		// パフォーマンスのため post cache する
+		// ref: https://zenn.dev/monica/articles/a9fdc5eea7f59c
+		c.executionCtx.waitUntil(
+			ContributionCacheRepository.set(githubUser.providerUserId, contributions),
+		);
+
+		return c.json(contributions, 200);
 	});
 
 export { route as userRoute };

@@ -12,13 +12,19 @@ GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 
+# IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく
+
 [[kv_namespaces]]
 binding = "IDP_SESSION"
 id = "dev"              # dev なので仮の ID を指定
 
+[[kv_namespaces]]
+binding = "CACHE"
+id = "dev"        # dev なので仮の ID を指定
+
 [[d1_databases]]
 binding = "DB"
-database_id = "dev" # dev なので仮の ID を指定
+database_id = "dev"            # dev なので仮の ID を指定
 database_name = "idp-db-local"
 migrations_dir = "drizzle"
 
@@ -48,6 +54,10 @@ migrations_dir = "drizzle"
 binding = "IDP_SESSION"
 id = "8566bd47321c43cab679ab65bb60e38b"
 
+[[env.preview.kv_namespaces]]
+binding = "CACHE"
+id = "8566bd47321c43cab679ab65bb60e38b"
+
 # --- Production ---
 
 [env.production]
@@ -72,4 +82,8 @@ migrations_dir = "drizzle"
 
 [[env.production.kv_namespaces]]
 binding = "IDP_SESSION"
+id = "0cd11121be304250a5246b2c1a5e185d"
+
+[[env.production.kv_namespaces]]
+binding = "CACHE"
 id = "0cd11121be304250a5246b2c1a5e185d"

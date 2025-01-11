@@ -2,6 +2,7 @@
 
 interface Env {
 	IDP_SESSION: KVNamespace;
+	CACHE: KVNamespace;
 	CLIENT_REDIRECT_URL: "http://localhost:5173/verify";
 	CLIENT_ORIGIN: "http://localhost:5173";
 	GITHUB_APP_ID: "387915";
