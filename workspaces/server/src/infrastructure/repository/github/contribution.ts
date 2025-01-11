@@ -53,11 +53,12 @@ export class GithubContributionRepository implements IContributionRepository {
 		);
 
 		const weeks = data.user.contributionsCollection.contributionCalendar.weeks;
-		const maxContributions = Math.max(
-			...weeks.flatMap((week) =>
-				week.contributionDays.map((day) => day.contributionCount),
-			),
-		);
+		const maxContributions =
+			Math.max(
+				...weeks.flatMap((week) =>
+					week.contributionDays.map((day) => day.contributionCount),
+				),
+			) || 1; // 0除算を避けるため
 
 		return {
 			weeks: weeks.map((week) =>
