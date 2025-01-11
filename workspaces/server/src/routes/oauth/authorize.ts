@@ -177,6 +177,7 @@ const route = app
 			const { clientId, redirectUri, redirectTo, state, scope, clientInfo } =
 				c.req.valid("query");
 			const nowUnixMs = Date.now();
+			const { userId } = c.get("jwtPayload");
 
 			const privateKey = await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey");
 			const token = await generateAuthToken({
@@ -189,12 +190,10 @@ const route = app
 			});
 
 			// ログインしてることを middleware でチェック済み... な想定
-			const userInfo = await c.var.UserRepository.fetchUserById(
-				c.var.jwtPayload.userId,
-			);
+			const userInfo = await c.var.UserRepository.fetchUserProfileById(userId);
 
 			// 初期登録まだ
-			if (!userInfo.displayName || !userInfo.profileImageURL) {
+			if (!userInfo.initialized) {
 				return c.text("not implemented", 503);
 			}
 
@@ -216,8 +215,9 @@ const route = app
 						nowUnixMs,
 					},
 					user: {
-						displayName: userInfo.displayName,
-						profileImageUrl: userInfo.profileImageURL,
+						// 初期登録済みなので displayName は必ず存在する（はず）
+						displayName: userInfo.displayName ?? "",
+						profileImageUrl: userInfo.profileImageURL ?? "",
 					},
 				}),
 				subtitle: clientInfo.name,

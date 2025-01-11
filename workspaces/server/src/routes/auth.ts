@@ -29,7 +29,7 @@ const route = app
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
 		try {
-			const res = await UserRepository.fetchUserById(payload.userId);
+			const res = await UserRepository.fetchUserProfileById(payload.userId);
 			return c.json(res);
 		} catch (e) {
 			return c.json({ error: "user not found" }, 404);

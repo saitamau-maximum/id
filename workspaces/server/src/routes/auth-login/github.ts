@@ -58,8 +58,16 @@ const callbackRequestQuerySchema = v.object({
 	state: v.pipe(v.string(), v.nonEmpty()),
 });
 
+const loginRequestQuerySchema = v.object({
+	continue_to: v.optional(v.string()),
+});
+
 const route = app
-	.get("/", async (c) => {
+	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
+		const { continue_to } = c.req.valid("query");
+
+		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+
 		const requestUrl = new URL(c.req.url);
 
 		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
@@ -127,11 +135,11 @@ const route = app
 			let foundUserId = null;
 			try {
 				// ユーザーが存在するか確認
-				const res = await c.var.UserRepository.fetchUserByProviderInfo(
+				const id = await c.var.UserRepository.fetchUserIdByProviderInfo(
 					String(user.id),
 					OAUTH_PROVIDER_IDS.GITHUB,
 				);
-				foundUserId = res.id;
+				foundUserId = id;
 			} catch (e) {
 				// もしユーザーが見つからなかったら新規作成
 				foundUserId = await c.var.UserRepository.createUser(
