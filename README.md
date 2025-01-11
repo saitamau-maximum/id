@@ -45,7 +45,7 @@ pnpm apply:seed:local
   - `openssl rand -base64 32` が便利です。
   - 適当な文字列を設定してください。
 - `PRIVKEY_FOR_OAUTH`: OAuth で使用する秘密鍵
-  - `pnpm dev`で立ち上げたサーバーへ `curl http://localhost:8787/oauth/util/keygen` でリクエストを送ることで生成できます。
+  - `pnpm dev` でサーバーを立ち上げ、<http://localhost:8787/oauth/util/keygen> へブラウザでアクセスして生成してください。
   - Preview には `` が、 Production には `` の公開鍵に対応する秘密鍵が設定されています。 (あとでかく)
 - `GITHUB_APP_PRIVKEY`: GitHub App の秘密鍵
   - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth)の「Generate a private key」で取得し、以下のコードで変換してください。
