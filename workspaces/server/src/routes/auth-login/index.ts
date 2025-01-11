@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { setCookie } from "hono/cookie";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../../constants/cookie";
 import { factory } from "../../factory";
 import { authLoginGithubRoute } from "./github";
 
@@ -18,7 +19,7 @@ const route = app
 		async (c) => {
 			const { continue_to } = c.req.valid("query");
 
-			setCookie(c, "continue_to", continue_to ?? "/");
+			setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
 
 			// @sor4chi たのんだ
 			// これも Client 側にする？

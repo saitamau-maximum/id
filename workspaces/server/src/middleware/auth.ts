@@ -1,5 +1,6 @@
 import { getSignedCookie } from "hono/cookie";
 import { jwt, verify } from "hono/jwt";
+import { COOKIE_NAME } from "../constants/cookie";
 import { factory } from "../factory";
 
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
@@ -10,7 +11,7 @@ export const authMiddleware = factory.createMiddleware(async (c, next) => {
 
 export const cookieAuthMiddleware = factory.createMiddleware(
 	async (c, next) => {
-		const jwt = await getSignedCookie(c, c.env.SECRET, "token");
+		const jwt = await getSignedCookie(c, c.env.SECRET, COOKIE_NAME.LOGIN_STATE);
 		if (jwt) {
 			const payload = await verify(jwt, c.env.SECRET);
 			if (payload) {

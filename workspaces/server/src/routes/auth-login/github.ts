@@ -10,6 +10,7 @@ import { sign } from "hono/jwt";
 import type { CookieOptions } from "hono/utils/cookie";
 import { Octokit } from "octokit";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
@@ -17,7 +18,6 @@ import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 const app = factory.createApp();
 
 const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
-const STATE_COOKIE_NAME = "oauth_state";
 
 interface GitHubOAuthTokenResponse {
 	access_token: string;
@@ -65,7 +65,7 @@ const route = app
 		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
 		await setSignedCookie(
 			c,
-			STATE_COOKIE_NAME,
+			COOKIE_NAME.OAUTH_SESSION_STATE,
 			state,
 			c.env.SECRET,
 			getCookieOptions(requestUrl.protocol === "http:"),
@@ -93,9 +93,9 @@ const route = app
 			const storedState = await getSignedCookie(
 				c,
 				c.env.SECRET,
-				STATE_COOKIE_NAME,
+				COOKIE_NAME.OAUTH_SESSION_STATE,
 			);
-			deleteCookie(c, STATE_COOKIE_NAME);
+			deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
 
 			if (state !== storedState) {
 				return c.text("state mismatch", 400);
@@ -177,7 +177,7 @@ const route = app
 			const requestUrl = new URL(c.req.url);
 			await setSignedCookie(
 				c,
-				"token",
+				COOKIE_NAME.LOGIN_STATE,
 				jwt,
 				c.env.SECRET,
 				getCookieOptions(requestUrl.protocol === "http:"),
@@ -189,7 +189,7 @@ const route = app
 
 			// return c.redirect(`${c.env.CLIENT_REDIRECT_URL}?ott=${ott}`);
 
-			const continueTo = getCookie(c, "continue_to") ?? "/";
+			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO) ?? "/";
 			deleteCookie(c, "continue_to");
 			return c.redirect(continueTo);
 		},
