@@ -42,6 +42,7 @@ const route = app
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
 			const nowUnixMs = Date.now();
+			const { userId } = c.get("jwtPayload");
 
 			c.header("Cache-Control", "no-store");
 			c.header("Pragma", "no-cache");
@@ -62,11 +63,6 @@ const route = app
 			if (!isValidToken) {
 				return c.text("Bad Request: invalid auth_token", 400);
 			}
-
-			// ログインしてることを middleware でチェック済み... な想定
-			const userInfo = await c.var.UserRepository.fetchUserById(
-				c.var.jwtPayload.payload.userId,
-			);
 
 			// タイムリミットは 5 min
 			if (time + 5 * 60 * 1000 < nowUnixMs) {
@@ -125,7 +121,7 @@ const route = app
 			// DB に格納して返す
 			return await c.var.OAuthRepository.createAccessToken(
 				client_id,
-				userInfo.id,
+				userId,
 				code,
 				redirect_uri,
 				accessToken,
