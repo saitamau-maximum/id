@@ -1,0 +1,7 @@
+{
+	"name": "@idp/flag",
+	"type": "module",
+	"exports": {
+		".": "./src/index.ts"
+	}
+}
