@@ -15,11 +15,26 @@ const GRADE = [
 ];
 
 const RegisterFormSchema = v.object({
-	displayName: v.pipe(v.string(), v.nonEmpty("表示名を入力してください")),
+	displayName: v.pipe(v.string(), v.nonEmpty("ユーザー名を入力してください")),
+	realName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
+	realNameKana: v.pipe(v.string(), v.nonEmpty("本名(カナ)を入力してください")),
+	displayId: v.pipe(
+		v.string(),
+		v.nonEmpty("表示IDを入力してください"),
+		v.regex(
+			/^[a-z0-9_]{3,16}$/,
+			"表示IDは3文字以上16文字以下の半角英小文字、半角数字、アンダースコア(_)で入力してください。",
+		),
+	),
 	email: v.pipe(
 		v.string(),
 		v.nonEmpty("メールアドレスを入力してください"),
 		v.email("メールアドレスの形式が正しくありません"),
+	),
+	academicEmail: v.pipe(
+		v.string(),
+		v.nonEmpty("大学のメールアドレスを入力してください"),
+		v.email("大学のメールアドレスの形式が正しくありません"),
 	),
 	studentId: v.pipe(
 		v.string(),
@@ -44,7 +59,11 @@ export const RegisterForm = () => {
 	const { userRepository } = useRepository();
 	const { user } = useAuth();
 	const displayNameId = useId();
+	const realNameId = useId();
+	const realNameKanaId = useId();
+	const displayIdId = useId();
 	const emailId = useId();
+	const academicEmailId = useId();
 	const studentId = useId();
 	const gradeId = useId();
 	const navigate = useNavigate();
@@ -55,13 +74,21 @@ export const RegisterForm = () => {
 			formData: FormData,
 		): Promise<RegisterFormStateType> => {
 			const displayName = formData.get("displayName");
+			const realName = formData.get("realName");
+			const realNameKana = formData.get("realNameKana");
+			const displayId = formData.get("displayId");
 			const email = formData.get("email");
+			const academicEmail = formData.get("academicEmail");
 			const studentId = formData.get("studentId");
 			const grade = formData.get("grade");
 
 			const result = v.safeParse(RegisterFormSchema, {
 				displayName,
+				realName,
+				realNameKana,
+				displayId,
 				email,
+				academicEmail,
 				studentId,
 				grade,
 			});
@@ -71,7 +98,11 @@ export const RegisterForm = () => {
 				return {
 					default: {
 						displayName: displayName?.toString() ?? undefined,
+						realName: realName?.toString() ?? undefined,
+						realNameKana: realNameKana?.toString() ?? undefined,
+						displayId: displayId?.toString() ?? undefined,
 						email: email?.toString() ?? undefined,
+						academicEmail: academicEmail?.toString() ?? undefined,
 						studentId: studentId?.toString() ?? undefined,
 						grade: grade?.toString() ?? undefined,
 					},
@@ -79,8 +110,20 @@ export const RegisterForm = () => {
 						displayName: errors.nested?.displayName
 							? errors.nested.displayName.join(", ")
 							: undefined,
+						realName: errors.nested?.realName
+							? errors.nested.realName.join(", ")
+							: undefined,
+						realNameKana: errors.nested?.realNameKana
+							? errors.nested.realNameKana.join(", ")
+							: undefined,
+						displayId: errors.nested?.displayId
+							? errors.nested.displayId.join(", ")
+							: undefined,
 						email: errors.nested?.email
 							? errors.nested.email.join(", ")
+							: undefined,
+						academicEmail: errors.nested?.academicEmail
+							? errors.nested.academicEmail.join(", ")
 							: undefined,
 						studentId: errors.nested?.studentId
 							? errors.nested.studentId.join(", ")
@@ -95,7 +138,11 @@ export const RegisterForm = () => {
 			try {
 				await userRepository.register(
 					result.output.displayName,
+					result.output.realName,
+					result.output.realNameKana,
+					result.output.displayId,
 					result.output.email,
+					result.output.academicEmail,
 					result.output.studentId,
 					result.output.grade,
 				);
@@ -109,10 +156,14 @@ export const RegisterForm = () => {
 			} catch (e) {
 				return {
 					default: {
-						displayName: displayName?.toString() ?? undefined,
-						email: email?.toString() ?? undefined,
-						studentId: studentId?.toString() ?? undefined,
-						grade: grade?.toString() ?? undefined,
+						displayName: result.output.displayName,
+						realName: result.output.realName,
+						realNameKana: result.output.realNameKana,
+						displayId: result.output.displayId,
+						email: result.output.email,
+						academicEmail: result.output.academicEmail,
+						studentId: result.output.studentId,
+						grade: result.output.grade,
 					},
 					error: { message: "ユーザー登録に失敗しました" },
 				};
@@ -122,7 +173,16 @@ export const RegisterForm = () => {
 	);
 
 	const [state, submitAction, isPending] = useActionState(RegisterFormAction, {
-		default: {},
+		default: {
+			displayName: user?.displayName,
+			realName: user?.realName,
+			realNameKana: user?.realNameKana,
+			displayId: user?.displayId,
+			email: user?.email,
+			academicEmail: user?.academicEmail,
+			studentId: user?.studentId,
+			grade: user?.grade,
+		},
 		error: {},
 	});
 
@@ -137,12 +197,32 @@ export const RegisterForm = () => {
 			action={submitAction}
 		>
 			<Form.FieldSet>
+				<label htmlFor={displayIdId}>
+					<Form.LabelText>ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)</Form.LabelText>
+				</label>
+				<Form.Input
+					id={displayIdId}
+					placeholder="maximum_taro"
+					required
+					name="displayId"
+					defaultValue={state.default.displayId}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.displayId}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
 				<label htmlFor={displayNameId}>
-					<Form.LabelText>表示名</Form.LabelText>
+					<Form.LabelText>ユーザー名</Form.LabelText>
 				</label>
 				<Form.Input
 					id={displayNameId}
-					placeholder="Maximum 太郎"
+					placeholder="Maximum"
 					required
 					name="displayName"
 					defaultValue={state.default.displayName}
@@ -157,8 +237,69 @@ export const RegisterForm = () => {
 				</p>
 			</Form.FieldSet>
 			<Form.FieldSet>
+				<label htmlFor={realNameId}>
+					<Form.LabelText>本名 (学生証に記載のもの)</Form.LabelText>
+				</label>
+				<Form.Input
+					id={realNameId}
+					placeholder="山田 太郎"
+					required
+					name="realName"
+					defaultValue={state.default.realName}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.realName}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<label htmlFor={realNameKanaId}>
+					<Form.LabelText>本名 (カナ)</Form.LabelText>
+				</label>
+				<Form.Input
+					id={realNameKanaId}
+					placeholder="ヤマダ タロウ"
+					required
+					name="realNameKana"
+					defaultValue={state.default.realNameKana}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.realNameKana}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<label htmlFor={academicEmailId}>
+					<Form.LabelText>大学のメールアドレス</Form.LabelText>
+				</label>
+				<Form.Input
+					id={academicEmailId}
+					placeholder="student@ms.saitama-u.ac.jp"
+					required
+					type="email"
+					name="academicEmail"
+					defaultValue={state.default.academicEmail}
+				/>
+				<p
+					className={css({
+						color: "red.600",
+						fontSize: "sm",
+					})}
+				>
+					{state.error.academicEmail}
+				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
 				<label htmlFor={emailId}>
-					<Form.LabelText>メールアドレス</Form.LabelText>
+					<Form.LabelText>大学以外で連絡の取れるメールアドレス</Form.LabelText>
 				</label>
 				<Form.Input
 					id={emailId}

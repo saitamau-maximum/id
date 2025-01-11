@@ -1,38 +1,37 @@
 import { css } from "styled-system/css";
+import { ProfileCard } from "~/components/feature/user/profile-card";
 
 import { useAuth } from "~/hooks/useAuth";
 
 export default function Home() {
 	const { user } = useAuth();
 
+	if (!user) {
+		return null;
+	}
+
 	return (
 		<div
 			className={css({
 				width: "100%",
+				maxWidth: "1200px",
 				height: "100%",
-				display: "flex",
+				display: "grid",
+				gridTemplateColumns: "1fr 1fr",
+				gridTemplateRows: "1fr 1fr",
 				justifyContent: "center",
-				alignItems: "center",
+				placeItems: "center",
 				gap: 8,
-				fontSize: "2xl",
-				fontWeight: "bold",
-				textAlign: "center",
+				padding: 4,
 			})}
 		>
-			<img
-				className={css({
-					width: "200px",
-					height: "200px",
-					borderRadius: "50%",
-				})}
-				src={user?.profileImageURL}
-				alt={user?.displayName}
+			<ProfileCard
+				displayName={user.displayName ?? ""}
+				realName={user.realName ?? ""}
+				displayId={user.displayId ?? ""}
+				profileImageURL={user.profileImageURL ?? ""}
+				grade={user.grade ?? ""}
 			/>
-			<div>
-				Authorized! Welcome to Maximum IDP!
-				<p>Your user id is {user?.id}</p>
-				<p>Your display name is {user?.displayName}</p>
-			</div>
 		</div>
 	);
 }
