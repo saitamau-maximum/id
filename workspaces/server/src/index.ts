@@ -8,6 +8,7 @@ import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflar
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
+import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { authRoute } from "./routes/auth";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
@@ -21,8 +22,15 @@ const route = app
 			"SessionRepository",
 			new CloudflareSessionRepository(c.env.IDP_SESSION),
 		);
+
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
 		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
+
+		c.set(
+			"ContributionCacheRepository",
+			new CloudflareContributionCacheRepository(c.env.CACHE),
+		);
+
 		const octokit = new Octokit({
 			authStrategy: createAppAuth,
 			auth: {
@@ -32,10 +40,8 @@ const route = app
 			},
 		});
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
-		c.set(
-			"ContributionCacheRepository",
-			new CloudflareContributionCacheRepository(c.env.CACHE),
-		);
+		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
+
 		await next();
 	})
 	.use((c, next) => {

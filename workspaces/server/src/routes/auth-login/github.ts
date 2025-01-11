@@ -1,5 +1,4 @@
 import { vValidator } from "@hono/valibot-validator";
-import { createAppAuth } from "@octokit/auth-app";
 import {
 	deleteCookie,
 	getCookie,
@@ -111,32 +110,13 @@ const route = app
 				return c.text("invalid code", 400);
 			}
 
-			// ----- メンバーの所属判定 ----- //
-			// TODO: #6 が merge されたら GithubRepository ができるのでそこから取得するようにする
+			// ここでしか使わないので user 側は特にリポジトリ抽象化しない
 			const userOctokit = new Octokit({ auth: access_token });
-			const appOctokit = new Octokit({
-				authStrategy: createAppAuth,
-				auth: {
-					appId: c.env.GITHUB_APP_ID,
-					privateKey: atob(c.env.GITHUB_APP_PRIVKEY),
-					installationId: c.env.GITHUB_APP_INSTALLID,
-				},
-			});
-
 			const { data: user } = await userOctokit.request("GET /user");
-			let isMember = false;
-			try {
-				const checkIsOrgMemberRes = await appOctokit.request(
-					"GET /orgs/{org}/members/{username}",
-					{
-						org: "saitamau-maximum",
-						username: user.login,
-					},
-				);
-				isMember = (checkIsOrgMemberRes.status as number) === 204;
-			} catch {
-				isMember = false;
-			}
+
+			const isMember = await c.var.OrganizationRepository.checkIsMember(
+				user.login,
+			);
 
 			if (!isMember) {
 				// いったん Maximum Member じゃない場合はログインさせないようにする
