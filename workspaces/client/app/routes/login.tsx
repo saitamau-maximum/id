@@ -5,6 +5,7 @@ import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
 import { useAuth } from "~/hooks/useAuth";
 import { env } from "~/utils/env";
+import { FLAG } from "~/utils/flag";
 
 export default function Login() {
 	const { isLoading, isAuthorized } = useAuth();
@@ -81,9 +82,13 @@ export default function Login() {
 				に所属している方であれば <br />
 				どなたでもログイン可能です。
 			</p>
-			<a href={`${env("SERVER_HOST")}/auth/login`}>
-				<ButtonLike>Login</ButtonLike>
-			</a>
+			{FLAG.ENABLE_LOGIN ? (
+				<a href={`${env("SERVER_HOST")}/auth/login`}>
+					<ButtonLike>Login</ButtonLike>
+				</a>
+			) : (
+				<ButtonLike disabled>Login</ButtonLike>
+			)}
 		</div>
 	);
 }

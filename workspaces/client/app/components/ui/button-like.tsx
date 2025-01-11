@@ -20,6 +20,7 @@ const buttonLikeStyle = cva({
 		transition: ["background", "colors"],
 		textDecoration: "none",
 		textAlign: "center",
+		userSelect: "none",
 	},
 	variants: {
 		variant: {
@@ -44,8 +45,9 @@ const buttonLikeStyle = cva({
 		},
 		disabled: {
 			true: {
-				opacity: 0.5,
-				cursor: "not-allowed",
+				pointerEvents: "none",
+				backgroundColor: "gray.300",
+				borderColor: "gray.300",
 			},
 		},
 	},
