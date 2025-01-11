@@ -85,6 +85,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
@@ -111,6 +113,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initialized: !!user.initializedAt,
 			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
@@ -125,6 +129,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			"id" | "userId"
 		> = {
 			displayName: payload.displayName,
+			displayId: payload.displayId,
+			realName: payload.realName,
 			profileImageURL: payload.profileImageURL,
 			email: payload.email,
 			studentId: payload.studentId,

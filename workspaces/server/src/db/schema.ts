@@ -32,6 +32,8 @@ export const userProfiles = sqliteTable(
 			.references(() => users.id)
 			.notNull(),
 		displayName: text("display_name"),
+		realName: text("real_name"),
+		displayId: text("display_id"),
 		profileImageURL: text("profile_image_url"),
 		email: text("email"),
 		studentId: text("student_id"),
