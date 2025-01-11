@@ -198,7 +198,7 @@ export const RegisterForm = () => {
 		>
 			<Form.FieldSet>
 				<label htmlFor={displayIdId}>
-					<Form.LabelText>ID (半角英数字と_が使えます)</Form.LabelText>
+					<Form.LabelText>ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)</Form.LabelText>
 				</label>
 				<Form.Input
 					id={displayIdId}
