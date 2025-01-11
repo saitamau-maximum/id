@@ -7,6 +7,7 @@ export type User = {
 	realNameKana?: string;
 	displayId?: string;
 	profileImageURL?: string;
+	academicEmail?: string;
 	email?: string;
 	studentId?: string;
 	grade?: string;

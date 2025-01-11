@@ -6,6 +6,7 @@ export type Profile = {
 	realNameKana: string;
 	displayId: string;
 	profileImageURL: string;
+	academicEmail: string;
 	email: string;
 	studentId: string;
 	grade: string;

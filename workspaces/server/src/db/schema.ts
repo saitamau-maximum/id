@@ -36,6 +36,7 @@ export const userProfiles = sqliteTable(
 		realNameKana: text("real_name_kana"),
 		displayId: text("display_id"),
 		profileImageURL: text("profile_image_url"),
+		academicEmail: text("academic_email"),
 		email: text("email"),
 		studentId: text("student_id"),
 		grade: text("grade"),

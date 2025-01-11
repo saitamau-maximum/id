@@ -1,3 +1,4 @@
 ALTER TABLE `user_profiles` ADD `real_name` text;--> statement-breakpoint
 ALTER TABLE `user_profiles` ADD `real_name_kana` text;--> statement-breakpoint
-ALTER TABLE `user_profiles` ADD `display_id` text;
+ALTER TABLE `user_profiles` ADD `display_id` text;--> statement-breakpoint
+ALTER TABLE `user_profiles` ADD `academic_email` text;

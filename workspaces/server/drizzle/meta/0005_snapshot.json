@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "a39f2abc-59c6-4ee2-a4bc-e52cf4abf3f8",
+  "id": "4d3a3cdc-c606-4cca-94e9-4c802f9c0a6b",
   "prevId": "a0942458-6480-4729-8daa-8357be48333a",
   "tables": {
     "oauth_client_callbacks": {
@@ -606,6 +606,13 @@
         },
         "profile_image_url": {
           "name": "profile_image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "academic_email": {
+          "name": "academic_email",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
