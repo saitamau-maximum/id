@@ -1,22 +1,28 @@
 import { client } from "~/utils/hono";
 
+type Member = {
+	id: string;
+	initialized: boolean;
+	displayName?: string;
+	realName?: string;
+	realNameKana?: string;
+	displayId?: string;
+	profileImageURL?: string;
+	grade?: string;
+};
+
 export interface IMemberRepository {
-	getMembers: () => Promise<
-		{
-			id: string;
-			initialized: boolean;
-			displayName?: string;
-			realName?: string;
-			realNameKana?: string;
-			displayId?: string;
-			profileImageURL?: string;
-			academicEmail?: string;
-			email?: string;
-			studentId?: string;
-			grade?: string;
-		}[]
-	>;
+	getMembers: () => Promise<Member[]>;
 	getMembers$$key(): unknown[];
+	getContributionsByUserDisplayID: (userDisplayId: string) => Promise<{
+		weeks: {
+			date: string;
+			rate: number;
+		}[][];
+	}>;
+	getContributionsByUserDisplayID$$key: (userDisplayId: string) => unknown[];
+	getProfileByUserDisplayID$$key: (userDisplayId: string) => unknown[];
+	getProfileByUserDisplayID: (userDisplayId: string) => Promise<Member>;
 }
 
 export class MemberRepositoryImpl implements IMemberRepository {
@@ -30,5 +36,49 @@ export class MemberRepositoryImpl implements IMemberRepository {
 
 	getMembers$$key() {
 		return ["members"];
+	}
+
+	async getContributionsByUserDisplayID(userDisplayId: string) {
+		const res = await client.member.contribution[":userDisplayId"].$get({
+			param: {
+				userDisplayId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch contributions");
+		}
+		return res.json();
+	}
+
+	getContributionsByUserDisplayID$$key(userDisplayId: string) {
+		return [
+			"contribution",
+			{
+				userDisplayId,
+			},
+		];
+	}
+
+	async getProfileByUserDisplayID(userDisplayId: string) {
+		const res = await client.member.profile[":userDisplayId"].$get({
+			param: {
+				userDisplayId,
+			},
+		});
+
+		if (!res.ok) {
+			throw new Error("Failed to fetch profile");
+		}
+
+		return res.json();
+	}
+
+	getProfileByUserDisplayID$$key(userDisplayId: string) {
+		return [
+			"profile",
+			{
+				userDisplayId,
+			},
+		];
 	}
 }

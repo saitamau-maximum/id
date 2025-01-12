@@ -20,7 +20,7 @@ const NAVIGATION = [
 	{
 		label: "Members",
 		to: "/members",
-		isActive: (location: string) => location === "/members",
+		isActive: (location: string) => location.startsWith("/members"),
 	},
 ];
 
