@@ -8,6 +8,7 @@ export default function Wrapper() {
 				margin: "6",
 				width: "calc(100vw - token(spacing.6) * 2)",
 				height: "calc(100dvh - token(spacing.6) * 2)",
+				overflow: "hidden",
 				background: "white",
 				borderRadius: "md",
 				lgDown: {

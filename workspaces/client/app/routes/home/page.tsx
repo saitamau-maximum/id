@@ -23,6 +23,9 @@ export default function Home() {
 				placeItems: "center",
 				gap: 8,
 				padding: 4,
+				lgDown: {
+					gridTemplateColumns: "1fr",
+				},
 			})}
 		>
 			<ProfileCard
