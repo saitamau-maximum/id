@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRepository } from "~/hooks/useRepository";
+import { useRepository } from "~/hooks/use-repository";
 
 export function useMembers() {
 	const { memberRepository } = useRepository();

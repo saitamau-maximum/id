@@ -6,11 +6,11 @@ compatibility_date = "2024-12-13"
 port = 8787
 
 [vars]
-CLIENT_REDIRECT_URL = "http://localhost:5173/verify"
-CLIENT_ORIGIN = "http://localhost:5173"
+ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
+ENV = "development"
 
 # IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく
 
@@ -34,11 +34,11 @@ migrations_dir = "drizzle"
 name = "idp-server-preview"
 
 [env.preview.vars]
-CLIENT_REDIRECT_URL = "https://id-preview.maximum.vc/verify"
-CLIENT_ORIGIN = "https://id-preview.maximum.vc"
+ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
+ENV = "preview"
 
 [[env.preview.routes]]
 pattern = "api-preview.id.maximum.vc"
@@ -64,11 +64,11 @@ id = "8566bd47321c43cab679ab65bb60e38b"
 name = "idp-server"
 
 [env.production.vars]
-CLIENT_REDIRECT_URL = "https://id.maximum.vc/verify"
-CLIENT_ORIGIN = "https://id.maximum.vc"
+ALLOW_ORIGIN = "https://id.maximum.vc"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
+ENV = "production"
 
 [[env.production.routes]]
 pattern = "api.id.maximum.vc"

@@ -13,6 +13,8 @@ export default function Login() {
 
 	const shouldProceed = !isLoading && isAuthorized;
 
+	const continueToURL = encodeURIComponent(`${window.location.origin}/verify`);
+
 	useEffect(() => {
 		if (shouldProceed) {
 			navigate("/");
@@ -83,7 +85,9 @@ export default function Login() {
 				どなたでもログイン可能です。
 			</p>
 			{FLAG.ENABLE_LOGIN ? (
-				<a href={`${env("SERVER_HOST")}/auth/login/github`}>
+				<a
+					href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
+				>
 					<ButtonLike>Login</ButtonLike>
 				</a>
 			) : (

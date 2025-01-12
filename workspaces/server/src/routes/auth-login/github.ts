@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	deleteCookie,
+	getCookie,
 	getSignedCookie,
 	setCookie,
 	setSignedCookie,
@@ -10,6 +11,7 @@ import type { CookieOptions } from "hono/utils/cookie";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
+import { PRODUCTION_HOSTNAME } from "../../constants/env";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
@@ -171,17 +173,31 @@ const route = app
 				getCookieOptions(requestUrl.protocol === "http:"),
 			);
 
+			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
+			if (continueTo === undefined) {
+				return c.text("Bad Request", 400);
+			}
+			if (!URL.canParse(continueTo)) {
+				return c.text("Bad Request", 400);
+			}
+
+			const continueToUrl = new URL(continueTo);
+
+			// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
+			if (
+				(c.env.ENV as string) === "production" &&
+				continueToUrl.hostname !== PRODUCTION_HOSTNAME
+			) {
+				return c.text("Bad Request", 400);
+			}
+
 			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
 
 			await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
 
-			const query = new URLSearchParams();
-			query.set("ott", ott);
+			continueToUrl.searchParams.set("ott", ott);
 
-			return c.redirect(
-				`${c.env.CLIENT_REDIRECT_URL}?${query.toString()}`,
-				302,
-			);
+			return c.redirect(continueToUrl.toString(), 302);
 		},
 	);
 

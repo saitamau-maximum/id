@@ -47,7 +47,7 @@ const route = app
 	})
 	.use((c, next) => {
 		return cors({
-			origin: c.env.CLIENT_ORIGIN,
+			origin: c.env.ALLOW_ORIGIN,
 		})(c, next);
 	})
 	.route("/auth", authRoute)
