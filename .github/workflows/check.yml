@@ -15,8 +15,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9.5.0
 
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -27,6 +25,9 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build
+        run: pnpm -C workspaces/server build
 
       - name: check
         run: pnpm check
