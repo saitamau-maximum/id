@@ -23,6 +23,10 @@ export const ContributionCard = ({ weeks, clip = 7 }: Props) => {
 				padding: 4,
 				backgroundColor: "gray.50",
 				borderRadius: 8,
+				lgDown: {
+					gap: 1,
+					padding: 2,
+				},
 			})}
 		>
 			{latestWeeks.map((week) =>
