@@ -1,5 +1,5 @@
 import type { Octokit } from "octokit";
-import type { IOrganizationRepository } from "../../../usecase/repository/organization";
+import type { IOrganizationRepository } from "../../../repository/organization";
 
 export class GithubOrganizationRepository implements IOrganizationRepository {
 	constructor(private readonly octokit: Octokit) {}

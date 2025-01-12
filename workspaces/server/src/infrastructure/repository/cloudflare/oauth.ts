@@ -1,10 +1,7 @@
 import { eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
-import type {
-	IOAuthRepository,
-	Scope,
-} from "./../../../usecase/repository/oauth";
+import type { IOAuthRepository, Scope } from "./../../../repository/oauth";
 
 export class CloudflareOAuthRepository implements IOAuthRepository {
 	private client: DrizzleD1Database<typeof schema>;

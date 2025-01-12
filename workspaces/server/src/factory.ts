@@ -1,11 +1,11 @@
 import { createFactory } from "hono/factory";
 import type { JwtVariables } from "hono/jwt";
-import type { IContributionCacheRepository } from "./usecase/repository/cache";
-import type { IContributionRepository } from "./usecase/repository/contribution";
-import type { IOAuthRepository } from "./usecase/repository/oauth";
-import type { IOrganizationRepository } from "./usecase/repository/organization";
-import type { ISessionRepository } from "./usecase/repository/session";
-import type { IUserRepository } from "./usecase/repository/user";
+import type { IContributionCacheRepository } from "./repository/cache";
+import type { IContributionRepository } from "./repository/contribution";
+import type { IOAuthRepository } from "./repository/oauth";
+import type { IOrganizationRepository } from "./repository/organization";
+import type { ISessionRepository } from "./repository/session";
+import type { IUserRepository } from "./repository/user";
 
 export type HonoEnv = {
 	Bindings: Env;

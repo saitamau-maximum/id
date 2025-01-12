@@ -1,5 +1,5 @@
-import type { IContributionCacheRepository } from "../../../usecase/repository/cache";
-import type { Contribitions } from "../../../usecase/repository/contribution";
+import type { IContributionCacheRepository } from "../../../repository/cache";
+import type { Contribitions } from "../../../repository/contribution";
 
 export class CloudflareContributionCacheRepository
 	implements IContributionCacheRepository

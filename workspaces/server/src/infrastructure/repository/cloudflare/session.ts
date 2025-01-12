@@ -1,4 +1,4 @@
-import type { ISessionRepository } from "../../../usecase/repository/session";
+import type { ISessionRepository } from "../../../repository/session";
 
 export class CloudflareSessionRepository implements ISessionRepository {
 	constructor(private readonly kv: KVNamespace) {}

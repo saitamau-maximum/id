@@ -7,7 +7,7 @@ import type {
 	Profile,
 	User,
 	UserWithOAuthConnection,
-} from "./../../../usecase/repository/user";
+} from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
 	private client: DrizzleD1Database<typeof schema>;
