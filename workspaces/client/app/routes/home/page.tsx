@@ -23,8 +23,7 @@ export default function Home() {
 				gridTemplateColumns: "repeat(2, max-content)",
 				justifyContent: "center",
 				placeItems: "center",
-				gap: 16,
-				padding: 4,
+				gap: 8,
 				lgDown: {
 					gridTemplateColumns: "repeat(1, 1fr)",
 				},

@@ -3,6 +3,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
+	Member,
 	Profile,
 	User,
 	UserWithOAuthConnection,
@@ -159,5 +160,24 @@ export class CloudflareUserRepository implements IUserRepository {
 		if (!res.success) {
 			throw new Error("Failed to update user");
 		}
+	}
+
+	async fetchMembers(): Promise<Member[]> {
+		const users = await this.client.query.users.findMany({
+			with: {
+				profile: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initialized: !!user.initializedAt,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			grade: user.profile.grade ?? undefined,
+		}));
 	}
 }

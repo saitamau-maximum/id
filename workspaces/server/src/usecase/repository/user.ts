@@ -21,6 +21,21 @@ export type UserWithOAuthConnection = User & {
 	oauthConnections: OAuthConnection[];
 };
 
+export type Member = {
+	id: string;
+	initialized: boolean;
+} & Partial<
+	Pick<
+		Profile,
+		| "displayName"
+		| "realName"
+		| "realNameKana"
+		| "displayId"
+		| "profileImageURL"
+		| "grade"
+	>
+>;
+
 export interface IUserRepository {
 	createUser: (
 		providerUserId: string,
@@ -35,5 +50,6 @@ export interface IUserRepository {
 	fetchUserWithOAuthConnectionById: (
 		userId: string,
 	) => Promise<UserWithOAuthConnection>;
+	fetchMembers: () => Promise<Member[]>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }

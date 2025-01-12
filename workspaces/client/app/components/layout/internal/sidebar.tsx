@@ -18,7 +18,6 @@ const NAVIGATION = [
 		isActive: (location: string) => location === "/calendar",
 	},
 	{
-		comingSoon: true,
 		label: "Members",
 		to: "/members",
 		isActive: (location: string) => location === "/members",
