@@ -10,10 +10,10 @@ const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
 	realName: v.pipe(v.string(), v.nonEmpty()),
 	realNameKana: v.pipe(v.string(), v.nonEmpty()),
-	displayId: v.pipe(v.string(), v.nonEmpty()),
-	academicEmail: v.pipe(v.string(), v.nonEmpty()),
+	displayId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^[a-z0-9_]{3,16}$/)),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
-	studentId: v.pipe(v.string(), v.nonEmpty()),
+	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
+	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 });
 
