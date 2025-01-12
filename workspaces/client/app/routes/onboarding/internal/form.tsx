@@ -82,6 +82,17 @@ export const RegisterForm = () => {
 			const studentId = formData.get("studentId");
 			const grade = formData.get("grade");
 
+			console.log("formData", {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				email,
+				academicEmail,
+				studentId,
+				grade,
+			});
+
 			const result = v.safeParse(RegisterFormSchema, {
 				displayName,
 				realName,
@@ -92,6 +103,8 @@ export const RegisterForm = () => {
 				studentId,
 				grade,
 			});
+
+			console.log("result", result);
 
 			if (!result.success) {
 				const errors = v.flatten<typeof RegisterFormSchema>(result.issues);
