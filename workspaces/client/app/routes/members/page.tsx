@@ -40,11 +40,12 @@ export default function Members() {
 				{data.map((user) => (
 					<ProfileCard
 						key={user.id}
-						displayName={user.displayName ?? ""}
-						realName={user.realName ?? ""}
-						displayId={user.displayId ?? ""}
-						profileImageURL={user.profileImageURL ?? ""}
-						grade={user.grade ?? ""}
+						displayName={user.displayName}
+						realName={user.realName}
+						displayId={user.displayId}
+						profileImageURL={user.profileImageURL || ""}
+						grade={user.grade}
+						initialized={user.initialized}
 					/>
 				))}
 			</div>

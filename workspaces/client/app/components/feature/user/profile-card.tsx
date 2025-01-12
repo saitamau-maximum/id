@@ -1,11 +1,12 @@
 import { css } from "styled-system/css";
 
 interface Props {
-	displayName: string;
-	realName: string;
-	displayId: string;
 	profileImageURL: string;
-	grade: string;
+	displayName?: string;
+	realName?: string;
+	displayId?: string;
+	grade?: string;
+	initialized: boolean;
 }
 
 export const ProfileCard: React.FC<Props> = ({
@@ -14,6 +15,7 @@ export const ProfileCard: React.FC<Props> = ({
 	displayId,
 	profileImageURL,
 	grade,
+	initialized,
 }) => {
 	return (
 		<div
@@ -42,19 +44,37 @@ export const ProfileCard: React.FC<Props> = ({
 				alt={displayName}
 			/>
 			<div>
-				<div className={css({ display: "flex", gap: 4 })}>
-					<span
-						className={css({
-							color: "gray.500",
-							fontWeight: "bold",
-							fontSize: "md",
-							mdDown: {
+				<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
+					{grade && (
+						<span
+							className={css({
+								color: "gray.500",
+								fontWeight: "bold",
+								fontSize: "md",
+								mdDown: {
+									fontSize: "sm",
+								},
+							})}
+						>
+							{grade}
+						</span>
+					)}
+					{!initialized && (
+						<div
+							className={css({
+								backgroundColor: "blue.100",
+								borderWidth: 2,
+								borderStyle: "solid",
+								borderColor: "blue.300",
+								color: "blue.500",
+								padding: "token(spacing.1) token(spacing.4)",
+								borderRadius: 8,
 								fontSize: "sm",
-							},
-						})}
-					>
-						{grade}
-					</span>
+							})}
+						>
+							初期登録中
+						</div>
+					)}
 				</div>
 				<div
 					className={css({
@@ -67,41 +87,47 @@ export const ProfileCard: React.FC<Props> = ({
 						},
 					})}
 				>
-					<h1
-						className={css({
-							fontSize: "3xl",
-							fontWeight: "bold",
-							color: "gray.600",
-							mdDown: {
-								fontSize: "2xl",
-							},
-						})}
-					>
-						{displayName}
-					</h1>
-					<span
-						className={css({
-							color: "gray.500",
-							fontSize: "xl",
-							mdDown: {
-								fontSize: "lg",
-							},
-						})}
-					>
-						{realName}
-					</span>
+					{displayName && (
+						<h1
+							className={css({
+								fontSize: "3xl",
+								fontWeight: "bold",
+								color: "gray.600",
+								mdDown: {
+									fontSize: "2xl",
+								},
+							})}
+						>
+							{displayName}
+						</h1>
+					)}
+					{realName && (
+						<span
+							className={css({
+								color: "gray.500",
+								fontSize: "xl",
+								mdDown: {
+									fontSize: "lg",
+								},
+							})}
+						>
+							{realName}
+						</span>
+					)}
 				</div>
-				<p
-					className={css({
-						color: "gray.600",
-						fontSize: "md",
-						mdDown: {
-							fontSize: "sm",
-						},
-					})}
-				>
-					@{displayId}
-				</p>
+				{displayId && (
+					<p
+						className={css({
+							color: "gray.600",
+							fontSize: "md",
+							mdDown: {
+								fontSize: "sm",
+							},
+						})}
+					>
+						@{displayId}
+					</p>
+				)}
 			</div>
 		</div>
 	);
