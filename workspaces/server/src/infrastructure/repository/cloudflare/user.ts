@@ -6,7 +6,6 @@ import type {
 	Member,
 	Profile,
 	User,
-	UserWithOAuthConnection,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -97,37 +96,6 @@ export class CloudflareUserRepository implements IUserRepository {
 		};
 	}
 
-	async fetchUserWithOAuthConnectionById(
-		userId: string,
-	): Promise<UserWithOAuthConnection> {
-		const user = await this.client.query.users.findFirst({
-			where: eq(schema.users.id, userId),
-			with: {
-				profile: true,
-				oauthConnections: true,
-			},
-		});
-
-		if (!user) {
-			throw new Error("User not found");
-		}
-
-		return {
-			id: user.id,
-			initialized: !!user.initializedAt,
-			displayName: user.profile.displayName ?? undefined,
-			realName: user.profile.realName ?? undefined,
-			realNameKana: user.profile.realNameKana ?? undefined,
-			displayId: user.profile.displayId ?? undefined,
-			profileImageURL: user.profile.profileImageURL ?? undefined,
-			academicEmail: user.profile.academicEmail ?? undefined,
-			email: user.profile.email ?? undefined,
-			studentId: user.profile.studentId ?? undefined,
-			grade: user.profile.grade ?? undefined,
-			oauthConnections: user.oauthConnections,
-		};
-	}
-
 	async registerUser(userId: string, payload: Partial<Profile>): Promise<void> {
 		// userが登録済みかどうか確認
 		const user = await this.client.query.users.findFirst({
@@ -191,5 +159,29 @@ export class CloudflareUserRepository implements IUserRepository {
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
 		}));
+	}
+
+	async fetchMemberByDisplayId(displayId: string): Promise<Member> {
+		const user = await this.client.query.userProfiles.findFirst({
+			where: eq(schema.userProfiles.displayId, displayId),
+			with: {
+				user: true,
+			},
+		});
+
+		if (!user) {
+			throw new Error("User not found");
+		}
+
+		return {
+			id: user.user.id,
+			initialized: !!user.user.initializedAt,
+			displayName: user.displayName ?? undefined,
+			realName: user.realName ?? undefined,
+			realNameKana: user.realNameKana ?? undefined,
+			displayId: user.displayId ?? undefined,
+			profileImageURL: user.profileImageURL ?? undefined,
+			grade: user.grade ?? undefined,
+		};
 	}
 }

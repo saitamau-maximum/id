@@ -52,14 +52,13 @@ const route = app
 		const {
 			ContributionRepository,
 			ContributionCacheRepository,
-			UserRepository,
+			OAuthRepository,
 		} = c.var;
 
-		const user = await UserRepository.fetchUserWithOAuthConnectionById(
-			payload.userId,
-		);
+		const oauthConnections =
+			await OAuthRepository.fetchOAuthConnectionsByUserId(payload.userId);
 
-		const githubConn = user.oauthConnections.find(
+		const githubConn = oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 

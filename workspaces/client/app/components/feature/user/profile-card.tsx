@@ -1,7 +1,7 @@
 import { css } from "styled-system/css";
 
 interface Props {
-	profileImageURL: string;
+	profileImageURL?: string;
 	displayName?: string;
 	realName?: string;
 	displayId?: string;
@@ -28,21 +28,47 @@ export const ProfileCard: React.FC<Props> = ({
 				},
 			})}
 		>
-			<img
+			<div
 				className={css({
 					width: "120px",
 					height: "120px",
 					borderRadius: "50%",
+					flexShrink: 0,
+					backgroundColor: "gray.100",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
 					mdDown: {
 						width: "80px",
 						height: "80px",
 					},
 				})}
-				width={120}
-				height={120}
-				src={profileImageURL}
-				alt={displayName}
-			/>
+			>
+				{profileImageURL ? (
+					<img
+						className={css({
+							width: "100%",
+							aspectRatio: "1 / 1",
+							objectFit: "cover",
+							borderRadius: "50%",
+						})}
+						src={profileImageURL}
+						alt={displayName}
+					/>
+				) : (
+					<span
+						className={css({
+							color: "gray.500",
+							fontSize: "4xl",
+							mdDown: {
+								fontSize: "3xl",
+							},
+						})}
+					>
+						{displayName?.charAt(0)}
+					</span>
+				)}
+			</div>
 			<div>
 				<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
 					{grade && (

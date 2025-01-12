@@ -32,7 +32,7 @@ export default function Home() {
 				displayName={user.displayName}
 				realName={user.realName}
 				displayId={user.displayId}
-				profileImageURL={user.profileImageURL || ""}
+				profileImageURL={user.profileImageURL}
 				grade={user.grade}
 				initialized={user.initialized}
 			/>

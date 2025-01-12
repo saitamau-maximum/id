@@ -87,4 +87,8 @@ export type IOAuthRepository = {
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
+	fetchOAuthConnectionsByUserId: (userId: string) => Promise<OAuthConnection[]>;
+	fetchOAuthConnectionsByUserDisplayId: (
+		displayId: string,
+	) => Promise<OAuthConnection[]>;
 };
