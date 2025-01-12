@@ -34,7 +34,7 @@ const route = app
 			grade,
 		} = c.req.valid("json");
 
-		await UserRepository.updateUser(payload.userId, {
+		await UserRepository.registerUser(payload.userId, {
 			displayName,
 			displayId,
 			realName,

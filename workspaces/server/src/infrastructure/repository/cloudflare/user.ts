@@ -128,7 +128,19 @@ export class CloudflareUserRepository implements IUserRepository {
 		};
 	}
 
-	async updateUser(userId: string, payload: Partial<Profile>): Promise<void> {
+	async registerUser(userId: string, payload: Partial<Profile>): Promise<void> {
+		// userが登録済みかどうか確認
+		const user = await this.client.query.users.findFirst({
+			where: eq(schema.users.id, userId),
+		});
+		if (!user) {
+			throw new Error("User not found");
+		}
+		if (user.initializedAt !== null) {
+			throw new Error("User already initialized");
+		}
+
+		// userが登録済みでない場合、userProfilesに登録
 		const value: Omit<
 			InferInsertModel<typeof schema.userProfiles>,
 			"id" | "userId"
