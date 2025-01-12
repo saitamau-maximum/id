@@ -35,7 +35,7 @@ pnpm apply:seed:local
 #### 開発環境の設定 (はじめに設定が必要)
 
 > [!IMPORTANT]
-> 機密情報は、 `.dev.vars` に設定します。
+> 機密情報は、 `workspaces/server/.dev.vars` に設定します。
 > このファイルは絶対に公開しないようにしてください。
 > なお、 `.dev.vars` は `.gitignore` に記載されているため、リポジトリには追加されないようになっています。
 
