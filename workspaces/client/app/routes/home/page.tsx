@@ -53,7 +53,7 @@ export default function Home() {
 						marginBottom: 4,
 					})}
 				>
-					Maximumの活動度によって色がつきます
+					Maximumでの活動度によって色がつきます
 				</p>
 				<ContributionCard
 					isLoading={isLoading}
