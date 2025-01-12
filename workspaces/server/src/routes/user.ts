@@ -13,7 +13,7 @@ const registerSchema = v.object({
 	displayId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^[a-z0-9_]{3,16}$/)),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
-	studentId: v.pipe(v.string(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
+	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 });
 
