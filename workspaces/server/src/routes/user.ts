@@ -47,6 +47,34 @@ const route = app
 
 		return c.text("ok", 200);
 	})
+	.put("/update", vValidator("json", registerSchema), async (c) => {
+		const payload = c.get("jwtPayload");
+		const { UserRepository } = c.var;
+
+		const {
+			displayName,
+			realName,
+			realNameKana,
+			displayId,
+			academicEmail,
+			email,
+			studentId,
+			grade,
+		} = c.req.valid("json");
+
+		await UserRepository.updateUser(payload.userId, {
+			displayName,
+			displayId,
+			realName,
+			realNameKana,
+			academicEmail,
+			email,
+			studentId,
+			grade,
+		});
+
+		return c.text("ok", 200);
+	})
 	.get("/contributions", async (c) => {
 		const payload = c.get("jwtPayload");
 		const {

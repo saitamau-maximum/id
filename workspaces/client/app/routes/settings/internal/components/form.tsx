@@ -14,7 +14,7 @@ const GRADE = [
 	{ label: "博士 (Doctor)", identifier: ["D1", "D2", "D3"] },
 ];
 
-const RegisterFormSchema = v.object({
+const UpdateFormSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty("ユーザー名を入力してください")),
 	realName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
 	realNameKana: v.pipe(v.string(), v.nonEmpty("本名(カナ)を入力してください")),
@@ -46,11 +46,11 @@ const RegisterFormSchema = v.object({
 	grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
 });
 
-type RegisterFormSchemaType = v.InferInput<typeof RegisterFormSchema>;
+type UpdateFormSchemaType = v.InferInput<typeof UpdateFormSchema>;
 
-type RegisterFormStateType = {
-	default: Partial<RegisterFormSchemaType>;
-	error: Partial<RegisterFormSchemaType> & {
+type UpdateFormStateType = {
+	default: Partial<UpdateFormSchemaType>;
+	error: Partial<UpdateFormSchemaType> & {
 		message?: string;
 	};
 };
@@ -68,11 +68,11 @@ export const ProfileUpdateForm = () => {
 	const gradeId = useId();
 	const navigate = useNavigate();
 
-	const RegisterFormAction = useCallback(
+	const UpdateFormAction = useCallback(
 		async (
-			_prevState: RegisterFormStateType,
+			_prevState: UpdateFormStateType,
 			formData: FormData,
-		): Promise<RegisterFormStateType> => {
+		): Promise<UpdateFormStateType> => {
 			const displayName = formData.get("displayName");
 			const realName = formData.get("realName");
 			const realNameKana = formData.get("realNameKana");
@@ -82,7 +82,7 @@ export const ProfileUpdateForm = () => {
 			const studentId = formData.get("studentId");
 			const grade = formData.get("grade");
 
-			const result = v.safeParse(RegisterFormSchema, {
+			const result = v.safeParse(UpdateFormSchema, {
 				displayName,
 				realName,
 				realNameKana,
@@ -94,7 +94,7 @@ export const ProfileUpdateForm = () => {
 			});
 
 			if (!result.success) {
-				const errors = v.flatten<typeof RegisterFormSchema>(result.issues);
+				const errors = v.flatten<typeof UpdateFormSchema>(result.issues);
 				return {
 					default: {
 						displayName: displayName?.toString() ?? undefined,
@@ -136,7 +136,7 @@ export const ProfileUpdateForm = () => {
 			}
 
 			try {
-				await userRepository.register(
+				await userRepository.update(
 					result.output.displayName,
 					result.output.realName,
 					result.output.realNameKana,
@@ -172,7 +172,7 @@ export const ProfileUpdateForm = () => {
 		[userRepository, navigate],
 	);
 
-	const [state, submitAction, isPending] = useActionState(RegisterFormAction, {
+	const [state, submitAction, isPending] = useActionState(UpdateFormAction, {
 		default: {
 			displayName: user?.displayName,
 			realName: user?.realName,

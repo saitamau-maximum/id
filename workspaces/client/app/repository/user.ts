@@ -11,6 +11,16 @@ export interface IUserRepository {
 		studentId: string,
 		grade: string,
 	) => Promise<void>;
+	update: (
+		displayName: string,
+		realName: string,
+		realNameKana: string,
+		displayId: string,
+		academicEmail: string,
+		email: string,
+		studentId: string,
+		grade: string,
+	) => Promise<void>;
 	getContributions: () => Promise<{
 		weeks: {
 			date: string;
@@ -45,6 +55,33 @@ export class UserRepositoryImpl implements IUserRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to register user");
+		}
+	}
+
+	async update(
+		displayName: string,
+		realName: string,
+		realNameKana: string,
+		displayId: string,
+		academicEmail: string,
+		email: string,
+		studentId: string,
+		grade: string,
+	) {
+		const res = await client.user.update.$put({
+			json: {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to update user");
 		}
 	}
 

@@ -52,4 +52,5 @@ export interface IUserRepository {
 	) => Promise<UserWithOAuthConnection>;
 	fetchMembers: () => Promise<Member[]>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
+	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }
