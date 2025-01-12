@@ -34,9 +34,10 @@ pnpm apply:seed:local
 
 #### 開発環境の設定 (はじめに設定が必要)
 
-機密情報は、 `.dev.vars` に設定します。
-このファイルは絶対に公開しないようにしてください。
-なお、 `.dev.vars` は `.gitignore` に記載されているため、リポジトリには追加されないようになっています。
+> [!IMPORTANT]
+> 機密情報は、 `workspaces/server/.dev.vars` に設定します。
+> このファイルは絶対に公開しないようにしてください。
+> なお、 `.dev.vars` は `.gitignore` に記載されているため、リポジトリには追加されないようになっています。
 
 `workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーし、変更してください。
 各変数の説明を以下に記載します。
@@ -51,8 +52,10 @@ pnpm apply:seed:local
   - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
   - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
 - `GITHUB_OAUTH_SECRET`:　 GitHub App の Client Secret
-  - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth)の「Generate a new client secret」から生成してください。
-  - GitHub OAuth の Client Secret として使用するため、この名前になっています。
+  - [GitHub OAuth Apps 設定画面](https://github.com/settings/developers) に行って、「New OAuth App」から自身の OAuth App を作成してください。
+  - Application name, Homepage URL は適当に設定してよいです。 Authorization callback URL には `http://localhost:8787/auth/login/github/callback` を設定してください。
+  - 作成できたら、 Client Secret を生成してコピーしてください。
+- `GITHUB_OAUTH_ID`: ↑ の OAuth App を作成した際に表示される Client ID を設定してください。
 
 #### 環境変数の設定 (基本的に触る必要なし)
 
@@ -62,9 +65,13 @@ pnpm apply:seed:local
 
 - `CLIENT_REDIRECT_URL`: ログイン後にクライアント側にリダイレクトされる URL。
 - `CLIENT_ORIGIN`: クライアント側の URL。
-- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth) から取得できます。 個人の GitHub App を使う場合には適宜変更してください (コミットしないようにお願いします)
+- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
 - `GITHUB_APP_INSTALLID`: GitHub App の Install ID。 GitHub の REST API を使って取得できます。 詳しくは [公式ドキュメント](https://docs.github.com/ja/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) を参照してください。
 - `GITHUB_OAUTH_ID`: GitHub App の Client ID。 GitHub OAuth の Client ID として使用するため、この名前になっています。 GitHub App 設定画面から取得できます。
+
+> [!NOTE]
+> `.dev.vars` に同じ変数名のものがあると、 `.dev.vars` の値が優先されます。
+> そのため、ローカル開発時にこちらの値を変更したい場合には、 `.dev.vars` に設定してください。
 
 ## 機密情報のメモ
 
@@ -74,9 +81,8 @@ Cloudflare に格納されている機密情報のメモです。
 ### Preview
 
 - `PRIVKEY_FOR_OAUTH`: 公開鍵 `eyJrdHkiOiJFQyIsImtleV9vcHMiOlsidmVyaWZ5Il0sImV4dCI6dHJ1ZSwiY3J2IjoiUC01MjEiLCJ4IjoiQUU1NnZaQnFZT0hXUHIwc3ZUNWtZYzY4dE91WGF2MHdETTZBWGgwakNUZWtkWlNLcVM5YkpUTVZrSW1FRGdTR0E4VV92VGpBZmkzUXhXdlFpcVZGU2Z1TyIsInkiOiJBY2VTUWJlWEk5aF91T3g3c3R6a09relZwMXJFY2pmei1KZm5BeGx2cHlla2tVc2xxZEVBc0x1UGREajhDUi14bEtWcnE4c0hubERtcmNvdWJWWTFhanFsIn0=` に対応する秘密鍵
-- `GITHUB_APP_PRIVKEY`: `SHA256:wowbG0gmps60OuYv+g7hCqxUN6cBA7RFWmR/VH4tShI=`
-- `GITHUB_OAUTH_SECRET`: `*****d68c2227`
-  - Production とは別にしたほうがよいが、 GitHub の制限で 5 個までしか Secrets を作成できないため妥協
+- `GITHUB_APP_PRIVKEY`: `SHA256:EFPNG0jKzbvrAs7bwo7KHlwBCaXSY2EZIGUx0mRjapM=`
+- `GITHUB_OAUTH_SECRET`: `*****4878cfc6`
 
 ### Production
 
