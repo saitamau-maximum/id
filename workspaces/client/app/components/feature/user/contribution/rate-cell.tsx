@@ -8,6 +8,7 @@ export const RateCell = ({ rate }: { rate: number }) => (
 			width: "16px",
 			height: "16px",
 			borderRadius: 4,
+			transition: "background",
 		})}
 		style={{
 			backgroundColor:

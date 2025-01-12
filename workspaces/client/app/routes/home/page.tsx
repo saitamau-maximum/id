@@ -1,7 +1,6 @@
 import { css } from "styled-system/css";
-import { ProfileCard } from "~/components/feature/user/profile-card";
-
 import { ContributionCard } from "~/components/feature/user/contribution/card";
+import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useAuth } from "~/hooks/use-auth";
 import { useContribution } from "./internal/hooks/use-contribution";
 
@@ -38,6 +37,7 @@ export default function Home() {
 				initialized={user.initialized}
 			/>
 			<ContributionCard
+				isLoading={isLoading}
 				weeks={
 					data?.weeks.map((week) =>
 						week.map((day) => ({
