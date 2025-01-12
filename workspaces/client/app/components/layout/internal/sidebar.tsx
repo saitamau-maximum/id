@@ -58,7 +58,7 @@ export const Sidebar = () => {
 				className={css({
 					position: "fixed",
 					top: 4,
-					left: 4,
+					right: 4,
 					display: "none",
 					zIndex: 3,
 					width: 12,
@@ -141,9 +141,9 @@ export const Sidebar = () => {
 					alignItems: "center",
 					mdDown: {
 						position: "fixed",
-						left: 0,
+						right: 0,
 						top: 0,
-						transform: isMenuOpen ? "translateX(0)" : "translateX(-100%)",
+						transform: isMenuOpen ? "translateX(0)" : "translateX(100%)",
 						transition: "transform 0.3s",
 						boxShadow: "0 0 16px rgba(0, 0, 0, 0.25)",
 						zIndex: 2,
