@@ -174,6 +174,7 @@ const route = app
 			);
 
 			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
+			deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
 			if (continueTo === undefined) {
 				return c.text("Bad Request", 400);
 			}
