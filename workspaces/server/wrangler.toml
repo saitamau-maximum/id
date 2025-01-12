@@ -9,7 +9,6 @@ port = 8787
 ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
-GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 ENV = "development"
 
 # IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく

@@ -6,11 +6,11 @@ interface Env {
 	ALLOW_ORIGIN: "*";
 	GITHUB_APP_ID: "387915";
 	GITHUB_APP_INSTALLID: "41674415";
-	GITHUB_OAUTH_ID: "Iv1.3fef0e17322d38ce";
 	ENV: "development";
 	SECRET: string;
 	PRIVKEY_FOR_OAUTH: string;
 	GITHUB_APP_PRIVKEY: string;
 	GITHUB_OAUTH_SECRET: string;
+	GITHUB_OAUTH_ID: string;
 	DB: D1Database;
 }
