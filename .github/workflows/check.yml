@@ -26,5 +26,8 @@ jobs:
         shell: bash
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Build
+        run: pnpm -C workspaces/server build
+
       - name: check
         run: pnpm check
