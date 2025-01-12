@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useRepository } from "./useRepository";
+import { useRepository } from "./use-repository";
 
 export function useAuth() {
 	const { authRepository } = useRepository();

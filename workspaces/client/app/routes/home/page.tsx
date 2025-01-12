@@ -1,7 +1,7 @@
 import { css } from "styled-system/css";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 
-import { useAuth } from "~/hooks/useAuth";
+import { useAuth } from "~/hooks/use-auth";
 
 export default function Home() {
 	const { user } = useAuth();

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
-import { useAuth } from "~/hooks/useAuth";
+import { useAuth } from "~/hooks/use-auth";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
 
