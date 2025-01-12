@@ -11,6 +11,13 @@ export interface IUserRepository {
 		studentId: string,
 		grade: string,
 	) => Promise<void>;
+	getContributions: () => Promise<{
+		weeks: {
+			date: string;
+			rate: number;
+		}[][];
+	}>;
+	getContributions$$key: () => unknown[];
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -39,5 +46,17 @@ export class UserRepositoryImpl implements IUserRepository {
 		if (!res.ok) {
 			throw new Error("Failed to register user");
 		}
+	}
+
+	async getContributions() {
+		const res = await client.user.contributions.$get();
+		if (!res.ok) {
+			throw new Error("Failed to fetch contributions");
+		}
+		return res.json();
+	}
+
+	getContributions$$key() {
+		return ["contribution"];
 	}
 }

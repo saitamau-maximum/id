@@ -5,8 +5,8 @@ import { Form } from "~/components/ui/form";
 
 import { useNavigate } from "react-router";
 import * as v from "valibot";
-import { useAuth } from "~/hooks/useAuth";
-import { useRepository } from "~/hooks/useRepository";
+import { useAuth } from "~/hooks/use-auth";
+import { useRepository } from "~/hooks/use-repository";
 
 const GRADE = [
 	{ label: "学部 (Bachelor)", identifier: ["B1", "B2", "B3", "B4"] },

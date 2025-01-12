@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { JWT_STORAGE_KEY } from "~/constant";
-import { useAuth } from "~/hooks/useAuth";
+import { useAuth } from "~/hooks/use-auth";
 
 const NAVIGATION = [
 	{
