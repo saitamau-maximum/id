@@ -279,6 +279,7 @@ export const Sidebar = () => {
 						},
 						padding: "3",
 					})}
+					onClick={() => setIsMenuOpen(false)}
 				>
 					<div
 						className={css({ display: "flex", gap: 4, alignItems: "center" })}
