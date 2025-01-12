@@ -29,7 +29,7 @@ export const LoginButtonLike = ({ disabled }: LoginButtonProps) => {
 			})}
 		>
 			<GitHub size={20} />
-			Githubでログイン
+			GitHubでログイン
 		</span>
 	);
 };
