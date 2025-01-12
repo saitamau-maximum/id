@@ -30,12 +30,6 @@ export default function Settings() {
 					margin: "auto",
 					padding: "token(spacing.8) token(spacing.4)",
 					gap: 8,
-					_after: {
-						content: "''",
-						display: "block",
-						width: "100%",
-						height: "token(spacing.8)", // スクロール時にパディング分が消えないようにするハック
-					},
 				})}
 			>
 				<ProfileUpdateForm />
