@@ -23,7 +23,6 @@ export const ProfileCard: React.FC<Props> = ({
 				display: "flex",
 				alignItems: "center",
 				gap: 8,
-				position: "relative",
 				mdDown: {
 					gap: 4,
 				},
@@ -45,7 +44,7 @@ export const ProfileCard: React.FC<Props> = ({
 				alt={displayName}
 			/>
 			<div>
-				<div className={css({ display: "flex", gap: 4 })}>
+				<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
 					{grade && (
 						<span
 							className={css({
@@ -59,6 +58,22 @@ export const ProfileCard: React.FC<Props> = ({
 						>
 							{grade}
 						</span>
+					)}
+					{!initialized && (
+						<div
+							className={css({
+								backgroundColor: "blue.100",
+								borderWidth: 2,
+								borderStyle: "solid",
+								borderColor: "blue.300",
+								color: "blue.500",
+								padding: "token(spacing.1) token(spacing.4)",
+								borderRadius: 8,
+								fontSize: "sm",
+							})}
+						>
+							初期登録中
+						</div>
 					)}
 				</div>
 				<div
@@ -114,25 +129,6 @@ export const ProfileCard: React.FC<Props> = ({
 					</p>
 				)}
 			</div>
-			{!initialized && (
-				<div
-					className={css({
-						position: "absolute",
-						top: 0,
-						right: 0,
-						backgroundColor: "gray.100",
-						borderWidth: 2,
-						borderStyle: "solid",
-						borderColor: "gray.300",
-						color: "gray.500",
-						padding: "token(spacing.1) token(spacing.4)",
-						borderRadius: 8,
-						fontSize: "sm",
-					})}
-				>
-					初期登録中
-				</div>
-			)}
 		</div>
 	);
 };
