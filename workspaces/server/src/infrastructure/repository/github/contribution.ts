@@ -2,7 +2,7 @@ import type { Octokit } from "octokit";
 import type {
 	Contribitions,
 	IContributionRepository,
-} from "../../../usecase/repository/contribution";
+} from "../../../repository/contribution";
 
 const queryGetContributions = `
 query ($username: String!, $organizationId: ID!) {
