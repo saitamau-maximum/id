@@ -5,20 +5,20 @@ import { Form } from "~/components/ui/form";
 
 import { useNavigate } from "react-router";
 import * as v from "valibot";
+import { GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-import { GRADE } from "~/constant";
 import { UserSchemas } from "~/schema/user";
 
 const UpdateFormSchema = v.object({
-    displayName: UserSchemas.DisplayName,
-    realName: UserSchemas.RealName,
-    realNameKana: UserSchemas.RealNameKana,
-    displayId: UserSchemas.DisplayId,
-    email: UserSchemas.Email,
-    academicEmail: UserSchemas.AcademicEmail,
-    studentId: UserSchemas.StudentId,
-    grade: UserSchemas.Grade,
+	displayName: UserSchemas.DisplayName,
+	realName: UserSchemas.RealName,
+	realNameKana: UserSchemas.RealNameKana,
+	displayId: UserSchemas.DisplayId,
+	email: UserSchemas.Email,
+	academicEmail: UserSchemas.AcademicEmail,
+	studentId: UserSchemas.StudentId,
+	grade: UserSchemas.Grade,
 });
 
 type UpdateFormSchemaType = v.InferInput<typeof UpdateFormSchema>;

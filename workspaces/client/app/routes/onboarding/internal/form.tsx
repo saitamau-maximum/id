@@ -5,9 +5,9 @@ import { Form } from "~/components/ui/form";
 
 import { useNavigate } from "react-router";
 import * as v from "valibot";
+import { GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-import { GRADE } from "~/constant";
 import { UserSchemas } from "~/schema/user";
 
 const RegisterFormSchema = v.object({
