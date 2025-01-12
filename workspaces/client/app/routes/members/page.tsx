@@ -47,21 +47,33 @@ export default function Members() {
 					gap: 8,
 				})}
 			>
-				{data.map((user) => (
-					<div
-						key={user.id}
-						onClick={() => handleProfileClick(user.displayId)}
-						onKeyDown={() => handleProfileClick(user.displayId)}
-						className={css({
-							cursor: "pointer",
-							borderRadius: "xl",
-							padding: 2,
-							transition: "background",
-							_hover: {
-								backgroundColor: "gray.100",
-							},
-						})}
-					>
+				{data.map((user) =>
+					user.initialized ? (
+						<div
+							key={user.id}
+							onClick={() => handleProfileClick(user.displayId)}
+							onKeyDown={() => handleProfileClick(user.displayId)}
+							className={css({
+								cursor: "pointer",
+								borderRadius: "xl",
+								padding: 2,
+								transition: "background",
+								_hover: {
+									backgroundColor: "gray.100",
+								},
+							})}
+						>
+							<ProfileCard
+								key={user.id}
+								displayName={user.displayName}
+								realName={user.realName}
+								displayId={user.displayId}
+								profileImageURL={user.profileImageURL}
+								grade={user.grade}
+								initialized={user.initialized}
+							/>
+						</div>
+					) : (
 						<ProfileCard
 							key={user.id}
 							displayName={user.displayName}
@@ -71,8 +83,8 @@ export default function Members() {
 							grade={user.grade}
 							initialized={user.initialized}
 						/>
-					</div>
-				))}
+					),
+				)}
 			</div>
 		</div>
 	);
