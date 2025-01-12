@@ -7,43 +7,18 @@ import { useNavigate } from "react-router";
 import * as v from "valibot";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-
-const GRADE = [
-	{ label: "学部 (Bachelor)", identifier: ["B1", "B2", "B3", "B4"] },
-	{ label: "修士 (Master)", identifier: ["M1", "M2"] },
-	{ label: "博士 (Doctor)", identifier: ["D1", "D2", "D3"] },
-];
+import { GRADE } from "~/constant";
+import { UserSchemas } from "~/schema/user";
 
 const UpdateFormSchema = v.object({
-	displayName: v.pipe(v.string(), v.nonEmpty("ユーザー名を入力してください")),
-	realName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
-	realNameKana: v.pipe(v.string(), v.nonEmpty("本名(カナ)を入力してください")),
-	displayId: v.pipe(
-		v.string(),
-		v.nonEmpty("表示IDを入力してください"),
-		v.regex(
-			/^[a-z0-9_]{3,16}$/,
-			"表示IDは3文字以上16文字以下の半角英小文字、半角数字、アンダースコア(_)で入力してください。",
-		),
-	),
-	email: v.pipe(
-		v.string(),
-		v.nonEmpty("メールアドレスを入力してください"),
-		v.email("メールアドレスの形式が正しくありません"),
-	),
-	academicEmail: v.pipe(
-		v.string(),
-		v.nonEmpty("大学のメールアドレスを入力してください"),
-		v.email("大学のメールアドレスの形式が正しくありません"),
-	),
-	studentId: v.pipe(
-		v.string(),
-		v.regex(
-			/^\d{2}[A-Z]{2}\d{3}$/,
-			"学籍番号の形式が正しくありません、半角数字と半角英大文字で00XX000の形式で入力してください。",
-		),
-	),
-	grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
+    displayName: UserSchemas.DisplayName,
+    realName: UserSchemas.RealName,
+    realNameKana: UserSchemas.RealNameKana,
+    displayId: UserSchemas.DisplayId,
+    email: UserSchemas.Email,
+    academicEmail: UserSchemas.AcademicEmail,
+    studentId: UserSchemas.StudentId,
+    grade: UserSchemas.Grade,
 });
 
 type UpdateFormSchemaType = v.InferInput<typeof UpdateFormSchema>;
