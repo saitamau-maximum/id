@@ -1,5 +1,5 @@
 import { html } from "hono/html";
-import { _Button } from "../../_templates/button";
+import { _Button } from "./button";
 
 interface AuthorizeProps {
 	appName: string;

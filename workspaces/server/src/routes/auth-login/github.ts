@@ -1,7 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	deleteCookie,
-	getCookie,
 	getSignedCookie,
 	setCookie,
 	setSignedCookie,
