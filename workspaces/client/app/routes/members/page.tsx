@@ -1,20 +1,10 @@
-import { useCallback } from "react";
-import { useNavigate } from "react-router";
+import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useMembers } from "./internal/hooks/use-members";
 
 export default function Members() {
 	const { data } = useMembers();
-	const navigate = useNavigate();
-
-	const handleProfileClick = useCallback(
-		(userDisplayId?: string) => {
-			if (!userDisplayId) return;
-			navigate(`/members/${userDisplayId}`);
-		},
-		[navigate],
-	);
 
 	if (!data) {
 		return null;
@@ -49,10 +39,9 @@ export default function Members() {
 			>
 				{data.map((user) =>
 					user.initialized ? (
-						<div
+						<Link
 							key={user.id}
-							onClick={() => handleProfileClick(user.displayId)}
-							onKeyDown={() => handleProfileClick(user.displayId)}
+							to={`/members/${user.displayId}`}
 							className={css({
 								cursor: "pointer",
 								borderRadius: "xl",
@@ -72,7 +61,7 @@ export default function Members() {
 								grade={user.grade}
 								initialized={user.initialized}
 							/>
-						</div>
+						</Link>
 					) : (
 						<ProfileCard
 							key={user.id}
