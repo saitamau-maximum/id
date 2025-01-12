@@ -46,6 +46,17 @@ export const userProfiles = sqliteTable(
 	}),
 );
 
+export const userProfilesRelations = relations(
+	userProfiles,
+	({ one, many }) => ({
+		user: one(users, {
+			fields: [userProfiles.userId],
+			references: [users.id],
+		}),
+		oauthConnections: many(oauthConnections),
+	}),
+);
+
 // ---------- OAuth 関連 ---------- //
 
 export const oauthClients = sqliteTable("oauth_clients", {
@@ -270,6 +281,10 @@ export const oauthConnectionsRelations = relations(
 		user: one(users, {
 			fields: [oauthConnections.userId],
 			references: [users.id],
+		}),
+		profile: one(userProfiles, {
+			fields: [oauthConnections.userId],
+			references: [userProfiles.userId],
 		}),
 	}),
 );

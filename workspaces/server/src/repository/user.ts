@@ -1,5 +1,3 @@
-import type { OAuthConnection } from "./oauth";
-
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -16,10 +14,6 @@ export type User = {
 	id: string;
 	initialized: boolean;
 } & Partial<Profile>;
-
-export type UserWithOAuthConnection = User & {
-	oauthConnections: OAuthConnection[];
-};
 
 export type Member = {
 	id: string;
@@ -47,9 +41,7 @@ export interface IUserRepository {
 		providerId: number,
 	) => Promise<string>;
 	fetchUserProfileById: (userId: string) => Promise<User>;
-	fetchUserWithOAuthConnectionById: (
-		userId: string,
-	) => Promise<UserWithOAuthConnection>;
 	fetchMembers: () => Promise<Member[]>;
+	fetchMemberByDisplayId: (displayId: string) => Promise<Member>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }
