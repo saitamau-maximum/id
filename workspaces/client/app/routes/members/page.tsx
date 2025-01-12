@@ -31,9 +31,8 @@ export default function Members() {
 			</div>
 			<div
 				className={css({
-					display: "grid",
-					gridTemplateColumns: "repeat(auto-fill, minmax(500px, 1fr))",
-					gridAutoRows: "auto",
+					display: "flex",
+					flexWrap: "wrap",
 					gap: 8,
 				})}
 			>
