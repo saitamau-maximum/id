@@ -34,9 +34,10 @@ pnpm apply:seed:local
 
 #### 開発環境の設定 (はじめに設定が必要)
 
-機密情報は、 `.dev.vars` に設定します。
-このファイルは絶対に公開しないようにしてください。
-なお、 `.dev.vars` は `.gitignore` に記載されているため、リポジトリには追加されないようになっています。
+> [!IMPORTANT]
+> 機密情報は、 `.dev.vars` に設定します。
+> このファイルは絶対に公開しないようにしてください。
+> なお、 `.dev.vars` は `.gitignore` に記載されているため、リポジトリには追加されないようになっています。
 
 `workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーし、変更してください。
 各変数の説明を以下に記載します。
@@ -60,7 +61,6 @@ pnpm apply:seed:local
 
 公開しても問題ない情報は `wrangler.toml` の `[vars]`, `[env.preview.vars]`, `[env.production.vars]` に設定します。
 `[vars]` がローカル開発用、 `[env.preview.vars]` が Preview 環境用、 `[env.production.vars]` が本番環境用です。
-
 各変数の説明を以下に記載します。
 
 - `CLIENT_REDIRECT_URL`: ログイン後にクライアント側にリダイレクトされる URL。
@@ -69,8 +69,9 @@ pnpm apply:seed:local
 - `GITHUB_APP_INSTALLID`: GitHub App の Install ID。 GitHub の REST API を使って取得できます。 詳しくは [公式ドキュメント](https://docs.github.com/ja/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) を参照してください。
 - `GITHUB_OAUTH_ID`: GitHub App の Client ID。 GitHub OAuth の Client ID として使用するため、この名前になっています。 GitHub App 設定画面から取得できます。
 
-`.dev.vars` に同じ変数名のものがあると、 `.dev.vars` の値が優先されます。
-そのため、ローカル開発時に値を変更したい場合には、 `.dev.vars` に設定してください。
+> [!NOTE]
+> `.dev.vars` に同じ変数名のものがあると、 `.dev.vars` の値が優先されます。
+> そのため、ローカル開発時にこちらの値を変更したい場合には、 `.dev.vars` に設定してください。
 
 ## 機密情報のメモ
 
