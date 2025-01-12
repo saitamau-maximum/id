@@ -22,7 +22,7 @@ export default function Home() {
 				gridTemplateColumns: "repeat(2, max-content)",
 				justifyContent: "center",
 				placeItems: "center",
-				gap: 8,
+				gap: 16,
 				lgDown: {
 					gridTemplateColumns: "repeat(1, 1fr)",
 				},
@@ -36,18 +36,38 @@ export default function Home() {
 				grade={user.grade}
 				initialized={user.initialized}
 			/>
-			<ContributionCard
-				isLoading={isLoading}
-				weeks={
-					data?.weeks.map((week) =>
-						week.map((day) => ({
-							...day,
-							date: new Date(day.date),
-						})),
-					) || []
-				}
-				clip={14}
-			/>
+			<div>
+				<h1
+					className={css({
+						fontSize: "2xl",
+						fontWeight: "bold",
+						color: "gray.600",
+					})}
+				>
+					Activities
+				</h1>
+				<p
+					className={css({
+						color: "gray.500",
+						fontSize: "sm",
+						marginBottom: 4,
+					})}
+				>
+					Maximumの活動度によって色がつきます
+				</p>
+				<ContributionCard
+					isLoading={isLoading}
+					weeks={
+						data?.weeks.map((week) =>
+							week.map((day) => ({
+								...day,
+								date: new Date(day.date),
+							})),
+						) || []
+					}
+					clip={14}
+				/>
+			</div>
 		</div>
 	);
 }
