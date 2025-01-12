@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { AnchorLike } from "~/components/ui/anchor-like";
-import { ButtonLike } from "~/components/ui/button-like";
 import { useAuth } from "~/hooks/use-auth";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
+import { LoginButtonLike } from "./internal/components/login-button";
 
 export default function Login() {
 	const { isLoading, isAuthorized } = useAuth();
@@ -88,10 +88,10 @@ export default function Login() {
 				<a
 					href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
 				>
-					<ButtonLike>Login</ButtonLike>
+					<LoginButtonLike />
 				</a>
 			) : (
-				<ButtonLike disabled>Login</ButtonLike>
+				<LoginButtonLike disabled />
 			)}
 		</div>
 	);

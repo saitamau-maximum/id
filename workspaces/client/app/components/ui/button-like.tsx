@@ -8,7 +8,10 @@ type Props = ComponentProps<"span"> & {
 
 const buttonLikeStyle = cva({
 	base: {
-		display: "inline-block",
+		display: "inline-flex",
+		alignItems: "center",
+		justifyContent: "center",
+		gap: 2,
 		padding: "token(spacing.1) token(spacing.4)",
 		borderRadius: 8,
 		borderStyle: "solid",
@@ -19,7 +22,6 @@ const buttonLikeStyle = cva({
 		cursor: "pointer",
 		transition: ["background", "colors"],
 		textDecoration: "none",
-		textAlign: "center",
 		userSelect: "none",
 	},
 	variants: {
