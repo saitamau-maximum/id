@@ -10,6 +10,7 @@ import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { authRoute } from "./routes/auth";
+import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
 
@@ -51,6 +52,7 @@ const route = app
 	})
 	.route("/auth", authRoute)
 	.route("/user", userRoute)
+	.route("/member", memberRoute)
 	.route("/oauth", oauthRoute);
 
 export default app;

@@ -33,6 +33,11 @@ export default function Dashboard() {
 			<div
 				className={css({
 					flex: 1,
+					padding: 8,
+					overflowY: "auto",
+					mdDown: {
+						padding: 4,
+					},
 				})}
 			>
 				<Outlet />
