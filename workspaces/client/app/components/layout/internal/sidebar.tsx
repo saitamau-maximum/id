@@ -269,15 +269,20 @@ export const Sidebar = () => {
 					</button>
 				</div>
 
-				<Link to="/settings" className={css({
-					_hover: {
-						background: "gray.200",
-						borderRadius: "8",
-						transition: "background 0.2s ease",
-					},
-					padding: "3",
-				})}>
-					<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
+				<Link
+					to="/settings"
+					className={css({
+						_hover: {
+							background: "gray.200",
+							borderRadius: "8",
+							transition: "background 0.2s ease",
+						},
+						padding: "3",
+					})}
+				>
+					<div
+						className={css({ display: "flex", gap: 4, alignItems: "center" })}
+					>
 						<img
 							className={css({
 								width: "48px",
