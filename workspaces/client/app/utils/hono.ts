@@ -1,4 +1,4 @@
-import type { AppType } from "@idp/server";
+import type { AppType } from "@idp/server/shared/client";
 import { hc } from "hono/client";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { env } from "./env";

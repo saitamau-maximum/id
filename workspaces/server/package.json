@@ -15,8 +15,9 @@
 		"check": "biome check ./src"
 	},
 	"exports": {
-		".": {
-			"types": "./dist/index.d.ts"
+		"./shared/*": {
+			"import": "./dist/shared/*.js",
+			"types": "./dist/shared/*.d.ts"
 		}
 	},
 	"dependencies": {
