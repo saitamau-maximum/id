@@ -2,6 +2,7 @@ import { FieldSet } from "./fieldset";
 import { Input } from "./input";
 import { LabelText } from "./label-text";
 import { Radio, RadioGroup } from "./radio";
+import { Select, SelectGroup } from "./select";
 
 export const Form = {
 	Input,
@@ -9,4 +10,6 @@ export const Form = {
 	Radio,
 	RadioGroup,
 	FieldSet,
+	Select,
+	SelectGroup,
 };
