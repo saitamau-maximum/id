@@ -74,6 +74,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
+				roles: true,
 				profile: true,
 			},
 		});
@@ -94,6 +95,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			rolesIds: user.roles.map((role) => role.roleId),
 		};
 	}
 
@@ -180,6 +182,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		const users = await this.client.query.users.findMany({
 			with: {
 				profile: true,
+				roles: true,
 			},
 		});
 
@@ -192,6 +195,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			rolesIds: user.roles.map((role) => role.roleId),
 		}));
 	}
 
@@ -199,7 +203,11 @@ export class CloudflareUserRepository implements IUserRepository {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
-				user: true,
+				user: {
+					with: {
+						roles: true,
+					},
+				},
 			},
 		});
 
@@ -216,6 +224,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.displayId ?? undefined,
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
+			rolesIds: user.user.roles.map((role) => role.roleId),
 		};
 	}
 

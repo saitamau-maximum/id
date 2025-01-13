@@ -10,25 +10,31 @@ export type Profile = {
 	grade: string;
 };
 
+export type Role = {
+	rolesIds: number[];
+};
+
 export type User = {
 	id: string;
 	initialized: boolean;
-} & Partial<Profile>;
+} & Role &
+	Partial<Profile>;
 
 export type Member = {
 	id: string;
 	initialized: boolean;
-} & Partial<
-	Pick<
-		Profile,
-		| "displayName"
-		| "realName"
-		| "realNameKana"
-		| "displayId"
-		| "profileImageURL"
-		| "grade"
-	>
->;
+} & Role &
+	Partial<
+		Pick<
+			Profile,
+			| "displayName"
+			| "realName"
+			| "realNameKana"
+			| "displayId"
+			| "profileImageURL"
+			| "grade"
+		>
+	>;
 
 export interface IUserRepository {
 	createUser: (
