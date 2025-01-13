@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm";
+import { unique } from "drizzle-orm/mysql-core";
 import {
 	index,
 	int,
@@ -34,7 +35,7 @@ export const userProfiles = sqliteTable(
 		displayName: text("display_name"),
 		realName: text("real_name"),
 		realNameKana: text("real_name_kana"),
-		displayId: text("display_id"),
+		displayId: text("display_id").unique(),
 		profileImageURL: text("profile_image_url"),
 		academicEmail: text("academic_email"),
 		email: text("email"),
