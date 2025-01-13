@@ -43,6 +43,13 @@
       "when": 1736608549670,
       "tag": "0005_conscious_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1736780031056,
+      "tag": "0006_late_cannonball",
+      "breakpoints": true
     }
   ]
 }
