@@ -66,6 +66,7 @@ export default function Profile() {
 				profileImageURL={memberProfile?.profileImageURL}
 				grade={memberProfile?.grade}
 				initialized={memberProfile?.initialized || false}
+				roles={memberProfile?.roles || []}
 			/>
 			<div>
 				<h1

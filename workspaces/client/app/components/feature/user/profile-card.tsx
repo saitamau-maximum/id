@@ -1,4 +1,5 @@
 import { css } from "styled-system/css";
+import { RoleBadge } from "./role-badge";
 
 interface Props {
 	profileImageURL?: string;
@@ -7,6 +8,10 @@ interface Props {
 	displayId?: string;
 	grade?: string;
 	initialized: boolean;
+	roles: {
+		name: string;
+		color: string;
+	}[];
 }
 
 export const ProfileCard: React.FC<Props> = ({
@@ -16,6 +21,7 @@ export const ProfileCard: React.FC<Props> = ({
 	profileImageURL,
 	grade,
 	initialized,
+	roles,
 }) => {
 	return (
 		<div
@@ -84,6 +90,22 @@ export const ProfileCard: React.FC<Props> = ({
 						>
 							{grade}
 						</span>
+					)}
+					{roles.length > 0 && (
+						<div
+							className={css({
+								display: "flex",
+								gap: 2,
+								alignItems: "center",
+								flexWrap: "wrap",
+							})}
+						>
+							{roles.map((role) => (
+								<RoleBadge key={role.name} color={role.color}>
+									{role.name}
+								</RoleBadge>
+							))}
+						</div>
 					)}
 					{!initialized && (
 						<div

@@ -1,6 +1,6 @@
 import { type InferInsertModel, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { ROLE_IDS } from "../../../constants/role";
+import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
@@ -95,7 +95,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			rolesIds: user.roles.map((role) => role.roleId),
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
 	}
 
@@ -195,7 +195,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			rolesIds: user.roles.map((role) => role.roleId),
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
 
@@ -224,7 +224,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.displayId ?? undefined,
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
-			rolesIds: user.user.roles.map((role) => role.roleId),
+			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
 	}
 

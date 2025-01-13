@@ -71,6 +71,13 @@ export const userRoles = sqliteTable(
 	}),
 );
 
+export const userRolesRelations = relations(userRoles, ({ one }) => ({
+	user: one(users, {
+		fields: [userRoles.userId],
+		references: [users.id],
+	}),
+}));
+
 // ---------- OAuth 関連 ---------- //
 
 export const oauthClients = sqliteTable("oauth_clients", {

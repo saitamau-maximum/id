@@ -2,6 +2,10 @@ import { client } from "~/utils/hono";
 export type User = {
 	id: string;
 	initialized: boolean;
+	roles: {
+		name: string;
+		color: string;
+	}[];
 	displayName?: string;
 	realName?: string;
 	realNameKana?: string;

@@ -1,3 +1,5 @@
+import type { Role } from "../constants/role";
+
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -10,31 +12,27 @@ export type Profile = {
 	grade: string;
 };
 
-export type Role = {
-	rolesIds: number[];
-};
-
 export type User = {
 	id: string;
 	initialized: boolean;
-} & Role &
-	Partial<Profile>;
+	roles: Role[];
+} & Partial<Profile>;
 
 export type Member = {
 	id: string;
 	initialized: boolean;
-} & Role &
-	Partial<
-		Pick<
-			Profile,
-			| "displayName"
-			| "realName"
-			| "realNameKana"
-			| "displayId"
-			| "profileImageURL"
-			| "grade"
-		>
-	>;
+	roles: Role[];
+} & Partial<
+	Pick<
+		Profile,
+		| "displayName"
+		| "realName"
+		| "realNameKana"
+		| "displayId"
+		| "profileImageURL"
+		| "grade"
+	>
+>;
 
 export interface IUserRepository {
 	createUser: (

@@ -35,6 +35,7 @@ export default function Home() {
 				profileImageURL={user.profileImageURL}
 				grade={user.grade}
 				initialized={user.initialized}
+				roles={user.roles}
 			/>
 			<div>
 				<h1
