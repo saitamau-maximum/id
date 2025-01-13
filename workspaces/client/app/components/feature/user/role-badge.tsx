@@ -11,7 +11,7 @@ export const RoleBadge = ({ color, children }: Props) => {
 			className={css({
 				display: "inline-block",
 				padding: "token(spacing.1) token(spacing.2)",
-        lineHeight: 1,
+				lineHeight: 1,
 				borderRadius: 8,
 				fontSize: 12,
 				fontWeight: 500,
