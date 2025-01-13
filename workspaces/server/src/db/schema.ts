@@ -1,5 +1,4 @@
 import { relations } from "drizzle-orm";
-import { unique } from "drizzle-orm/mysql-core";
 import {
 	index,
 	int,
