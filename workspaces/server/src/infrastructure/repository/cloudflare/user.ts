@@ -1,5 +1,6 @@
 import { type InferInsertModel, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import { ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
@@ -135,6 +136,13 @@ export class CloudflareUserRepository implements IUserRepository {
 					initializedAt: new Date(),
 				})
 				.where(eq(schema.users.id, userId)),
+			// とりあえず初期ユーザーはMEMBERにする
+			this.client
+				.insert(schema.userRoles)
+				.values({
+					userId: userId,
+					roleId: ROLE_IDS.MEMBER,
+				}),
 		]);
 
 		if (!res.success) {
@@ -209,5 +217,13 @@ export class CloudflareUserRepository implements IUserRepository {
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
 		};
+	}
+
+	async fetchRolesByUserId(userId: string): Promise<number[]> {
+		const roles = await this.client.query.userRoles.findMany({
+			where: eq(schema.userRoles.userId, userId),
+		});
+
+		return roles.map((role) => role.roleId);
 	}
 }

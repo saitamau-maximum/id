@@ -27,3 +27,24 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 		);
 	},
 );
+
+interface RoleAuthorizationMiddlewareOptions {
+	ALLOWED_ROLES: number[];
+}
+
+export const roleAuthorizatinMiddleware = (
+	options: Partial<RoleAuthorizationMiddlewareOptions> = {},
+) => {
+	return factory.createMiddleware(async (c, next) => {
+		const { userId } = c.get("jwtPayload");
+		const { UserRepository } = c.var;
+
+		const roleIds = await UserRepository.fetchRolesByUserId(userId);
+		const allowedRoles = options.ALLOWED_ROLES ?? [];
+		if (roleIds.some((roleId) => allowedRoles.includes(roleId))) {
+			return next();
+		}
+
+		return c.text("Forbidden", 403);
+	});
+};
