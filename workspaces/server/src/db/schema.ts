@@ -6,6 +6,7 @@ import {
 	primaryKey,
 	sqliteTable,
 	text,
+	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
@@ -44,6 +45,7 @@ export const userProfiles = sqliteTable(
 	},
 	(table) => ({
 		gradeIdx: index("grade_idx").on(table.grade),
+		displayIdUnique: uniqueIndex("display_id_unique").on(table.displayId),
 	}),
 );
 
