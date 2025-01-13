@@ -1,12 +1,10 @@
+import type { role } from "@idp/server/shared/role";
 import { client } from "~/utils/hono";
 
 type Member = {
 	id: string;
 	initialized: boolean;
-	roles: {
-		name: string;
-		color: string;
-	}[];
+	roles: role.Role[];
 	displayName?: string;
 	realName?: string;
 	realNameKana?: string;

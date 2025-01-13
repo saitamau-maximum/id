@@ -16,7 +16,7 @@ import { userRoute } from "./routes/user";
 
 const app = factory.createApp();
 
-const route = app
+export const route = app
 	.use(logger())
 	.use(async (c, next) => {
 		c.set(
@@ -56,5 +56,3 @@ const route = app
 	.route("/oauth", oauthRoute);
 
 export default app;
-
-export type AppType = typeof route;
