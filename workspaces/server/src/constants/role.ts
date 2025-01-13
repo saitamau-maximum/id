@@ -9,6 +9,8 @@ export type Role = {
 	color: string; // must be HEX 6-digit color code
 };
 
+export type RoleId = (typeof ROLE_IDS)[keyof typeof ROLE_IDS];
+
 export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.ADMIN]: {
 		id: ROLE_IDS.ADMIN,

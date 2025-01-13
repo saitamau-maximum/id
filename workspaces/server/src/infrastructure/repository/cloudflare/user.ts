@@ -235,4 +235,50 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return roles.map((role) => role.roleId);
 	}
+
+	async fetchAllUsers(): Promise<User[]> {
+		const users = await this.client.query.users.findMany({
+			with: {
+				roles: true,
+				profile: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initialized: !!user.initializedAt,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			academicEmail: user.profile.academicEmail ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+		}));
+	}
+
+	async updateUserRole(userId: string, roleIds: number[]): Promise<void> {
+		console.log("updateUserRole", userId, roleIds);
+		const res = await this.client
+			.delete(schema.userRoles)
+			.where(eq(schema.userRoles.userId, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to update user role");
+		}
+
+		const values = roleIds.map((roleId) => ({
+			userId,
+			roleId,
+		}));
+
+		const res2 = await this.client.insert(schema.userRoles).values(values);
+
+		if (!res2.success) {
+			throw new Error("Failed to update user role");
+		}
+	}
 }
