@@ -1,55 +1,62 @@
 {
-	"version": "7",
-	"dialect": "sqlite",
-	"entries": [
-		{
-			"idx": 0,
-			"version": "6",
-			"when": 1736191299733,
-			"tag": "0000_outgoing_lethal_legion",
-			"breakpoints": true
-		},
-		{
-			"idx": 1,
-			"version": "6",
-			"when": 1736240603047,
-			"tag": "0001_goofy_madelyne_pryor",
-			"breakpoints": true
-		},
-		{
-			"idx": 2,
-			"version": "6",
-			"when": 1736399558213,
-			"tag": "0002_fat_old_lace",
-			"breakpoints": true
-		},
-		{
-			"idx": 3,
-			"version": "6",
-			"when": 1736498261343,
-			"tag": "0003_peaceful_scrambler",
-			"breakpoints": true
-		},
-		{
-			"idx": 4,
-			"version": "6",
-			"when": 1736505071728,
-			"tag": "0004_loud_mockingbird",
-			"breakpoints": true
-		},
-		{
-			"idx": 5,
-			"version": "6",
-			"when": 1736608549670,
-			"tag": "0005_conscious_molten_man",
-			"breakpoints": true
-		},
-		{
-			"idx": 6,
-			"version": "6",
-			"when": 1736780031056,
-			"tag": "0006_late_cannonball",
-			"breakpoints": true
-		}
-	]
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1736191299733,
+      "tag": "0000_outgoing_lethal_legion",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1736240603047,
+      "tag": "0001_goofy_madelyne_pryor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1736399558213,
+      "tag": "0002_fat_old_lace",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1736498261343,
+      "tag": "0003_peaceful_scrambler",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1736505071728,
+      "tag": "0004_loud_mockingbird",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1736608549670,
+      "tag": "0005_conscious_molten_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1736780031056,
+      "tag": "0006_late_cannonball",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1736791737734,
+      "tag": "0007_seed_oauth",
+      "breakpoints": true
+    }
+  ]
 }
