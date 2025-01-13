@@ -1,5 +1,4 @@
 import { relations } from "drizzle-orm";
-import { uniqueIndex } from "drizzle-orm/sqlite-core";
 import {
 	index,
 	int,
@@ -7,6 +6,7 @@ import {
 	primaryKey,
 	sqliteTable,
 	text,
+	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 export const users = sqliteTable("users", {
