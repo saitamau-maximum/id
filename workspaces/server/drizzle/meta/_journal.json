@@ -43,6 +43,13 @@
       "when": 1736608549670,
       "tag": "0005_conscious_molten_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1736749667388,
+      "tag": "0006_seed_oauth",
+      "breakpoints": true
     }
   ]
 }
