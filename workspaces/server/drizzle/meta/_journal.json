@@ -57,6 +57,13 @@
       "when": 1736791737734,
       "tag": "0007_seed_oauth",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1736791775292,
+      "tag": "0008_dapper_shotgun",
+      "breakpoints": true
     }
   ]
 }
