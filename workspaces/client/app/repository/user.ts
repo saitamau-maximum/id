@@ -1,4 +1,5 @@
 import { client } from "~/utils/hono";
+import type { User } from "./auth";
 
 export interface IUserRepository {
 	register: (
@@ -28,6 +29,9 @@ export interface IUserRepository {
 		}[][];
 	}>;
 	getContributions$$key: () => unknown[];
+	getAllUsers: () => Promise<User[]>;
+	getAllUsers$$key: () => unknown[];
+	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -95,5 +99,31 @@ export class UserRepositoryImpl implements IUserRepository {
 
 	getContributions$$key() {
 		return ["contribution"];
+	}
+
+	async getAllUsers() {
+		const res = await client.admin.users.list.$get();
+		if (!res.ok) {
+			throw new Error("Failed to fetch users");
+		}
+		return res.json();
+	}
+
+	getAllUsers$$key() {
+		return ["users"];
+	}
+
+	async updateUserRole(userId: string, roleIds: number[]) {
+		const res = await client.admin.users[":userId"].role.$put({
+			param: {
+				userId,
+			},
+			json: {
+				roleIds,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to update user role");
+		}
 	}
 }

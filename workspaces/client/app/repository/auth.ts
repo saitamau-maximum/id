@@ -1,5 +1,6 @@
 import type { role } from "@idp/server/shared/role";
 import { client } from "~/utils/hono";
+
 export type User = {
 	id: string;
 	initialized: boolean;
