@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX `display_id_unique` ON `user_profiles` (`display_id`);
