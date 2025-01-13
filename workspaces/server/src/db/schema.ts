@@ -22,6 +22,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthIssuedSecrets: many(oauthClientSecrets),
 	oauthIssuedTokens: many(oauthTokens),
 	oauthConnections: many(oauthConnections),
+	roles: many(userRoles),
 }));
 
 export const userProfiles = sqliteTable(
@@ -54,6 +55,19 @@ export const userProfilesRelations = relations(
 			references: [users.id],
 		}),
 		oauthConnections: many(oauthConnections),
+	}),
+);
+
+export const userRoles = sqliteTable(
+	"user_roles",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		roleId: int("role_id", { mode: "number" }).notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.roleId] }),
 	}),
 );
 
