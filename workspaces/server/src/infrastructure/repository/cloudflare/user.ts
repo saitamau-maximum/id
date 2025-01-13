@@ -158,23 +158,13 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: payload.grade,
 		};
 
-		// displlayIdが変更された場合、userProfilesに重複がないか確認
-		if (payload.displayId) {
-			const user = await this.client.query.userProfiles.findFirst({
-				where: eq(schema.userProfiles.displayId, payload.displayId),
-			});
-			if (user && user.userId !== userId) {
-				throw new Error("DisplayId already exists");
-			}
+		const res = await this.client
+			.update(schema.userProfiles)
+			.set(value)
+			.where(eq(schema.userProfiles.userId, userId));
 
-			const res = await this.client
-				.update(schema.userProfiles)
-				.set(value)
-				.where(eq(schema.userProfiles.userId, userId));
-
-			if (!res.success) {
-				throw new Error("Failed to update user");
-			}
+		if (!res.success) {
+			throw new Error("Failed to update user");
 		}
 	}
 

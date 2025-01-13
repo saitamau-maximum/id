@@ -1,4 +1,5 @@
 import { relations } from "drizzle-orm";
+import { uniqueIndex } from "drizzle-orm/sqlite-core";
 import {
 	index,
 	int,
@@ -34,7 +35,7 @@ export const userProfiles = sqliteTable(
 		displayName: text("display_name"),
 		realName: text("real_name"),
 		realNameKana: text("real_name_kana"),
-		displayId: text("display_id").unique(),
+		displayId: text("display_id"),
 		profileImageURL: text("profile_image_url"),
 		academicEmail: text("academic_email"),
 		email: text("email"),
@@ -43,6 +44,7 @@ export const userProfiles = sqliteTable(
 	},
 	(table) => ({
 		gradeIdx: index("grade_idx").on(table.grade),
+		displayIdUnique: uniqueIndex("display_id_unique").on(table.displayId),
 	}),
 );
 
