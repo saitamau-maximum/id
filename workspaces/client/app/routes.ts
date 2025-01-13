@@ -11,6 +11,7 @@ export default [
 			index("routes/home/page.tsx"),
 			route("members/:userDisplayId", "routes/profile/page.tsx"),
 			route("members", "routes/members/page.tsx"),
+			route("settings", "routes/settings/page.tsx"),
 		]),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("verify", "routes/verify.tsx"),

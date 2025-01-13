@@ -44,4 +44,5 @@ export interface IUserRepository {
 	fetchMembers: () => Promise<Member[]>;
 	fetchMemberByDisplayId: (displayId: string) => Promise<Member>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
+	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 }

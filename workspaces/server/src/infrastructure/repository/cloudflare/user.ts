@@ -142,6 +142,32 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
+	async updateUser(userId: string, payload: Partial<Profile>): Promise<void> {
+		const value: Omit<
+			InferInsertModel<typeof schema.userProfiles>,
+			"id" | "userId"
+		> = {
+			displayName: payload.displayName,
+			displayId: payload.displayId,
+			realName: payload.realName,
+			realNameKana: payload.realNameKana,
+			profileImageURL: payload.profileImageURL,
+			academicEmail: payload.academicEmail,
+			email: payload.email,
+			studentId: payload.studentId,
+			grade: payload.grade,
+		};
+
+		const res = await this.client
+			.update(schema.userProfiles)
+			.set(value)
+			.where(eq(schema.userProfiles.userId, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to update user");
+		}
+	}
+
 	async fetchMembers(): Promise<Member[]> {
 		const users = await this.client.query.users.findMany({
 			with: {

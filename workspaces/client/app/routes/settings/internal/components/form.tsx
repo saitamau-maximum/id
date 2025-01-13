@@ -10,7 +10,7 @@ import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
 import { UserSchemas } from "~/schema/user";
 
-const RegisterFormSchema = v.object({
+const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
 	realName: UserSchemas.RealName,
 	realNameKana: UserSchemas.RealNameKana,
@@ -21,16 +21,16 @@ const RegisterFormSchema = v.object({
 	grade: UserSchemas.Grade,
 });
 
-type RegisterFormSchemaType = v.InferInput<typeof RegisterFormSchema>;
+type UpdateFormSchemaType = v.InferInput<typeof UpdateFormSchema>;
 
-type RegisterFormStateType = {
-	default: Partial<RegisterFormSchemaType>;
-	error: Partial<RegisterFormSchemaType> & {
+type UpdateFormStateType = {
+	default: Partial<UpdateFormSchemaType>;
+	error: Partial<UpdateFormSchemaType> & {
 		message?: string;
 	};
 };
 
-export const RegisterForm = () => {
+export const ProfileUpdateForm = () => {
 	const { userRepository } = useRepository();
 	const { user } = useAuth();
 	const displayNameId = useId();
@@ -43,11 +43,11 @@ export const RegisterForm = () => {
 	const gradeId = useId();
 	const navigate = useNavigate();
 
-	const RegisterFormAction = useCallback(
+	const UpdateFormAction = useCallback(
 		async (
-			_prevState: RegisterFormStateType,
+			_prevState: UpdateFormStateType,
 			formData: FormData,
-		): Promise<RegisterFormStateType> => {
+		): Promise<UpdateFormStateType> => {
 			const displayName = formData.get("displayName");
 			const realName = formData.get("realName");
 			const realNameKana = formData.get("realNameKana");
@@ -57,7 +57,7 @@ export const RegisterForm = () => {
 			const studentId = formData.get("studentId");
 			const grade = formData.get("grade");
 
-			const result = v.safeParse(RegisterFormSchema, {
+			const result = v.safeParse(UpdateFormSchema, {
 				displayName,
 				realName,
 				realNameKana,
@@ -69,7 +69,7 @@ export const RegisterForm = () => {
 			});
 
 			if (!result.success) {
-				const errors = v.flatten<typeof RegisterFormSchema>(result.issues);
+				const errors = v.flatten<typeof UpdateFormSchema>(result.issues);
 				return {
 					default: {
 						displayName: displayName?.toString() ?? undefined,
@@ -111,7 +111,7 @@ export const RegisterForm = () => {
 			}
 
 			try {
-				await userRepository.register(
+				await userRepository.update(
 					result.output.displayName,
 					result.output.realName,
 					result.output.realNameKana,
@@ -140,14 +140,14 @@ export const RegisterForm = () => {
 						studentId: result.output.studentId,
 						grade: result.output.grade,
 					},
-					error: { message: "ユーザー登録に失敗しました" },
+					error: { message: "ユーザー情報の更新に失敗しました" },
 				};
 			}
 		},
 		[userRepository, navigate],
 	);
 
-	const [state, submitAction, isPending] = useActionState(RegisterFormAction, {
+	const [state, submitAction, isPending] = useActionState(UpdateFormAction, {
 		default: {
 			displayName: user?.displayName,
 			realName: user?.realName,
@@ -365,7 +365,7 @@ export const RegisterForm = () => {
 			)}
 			<button type="submit" disabled={isPending}>
 				<ButtonLike variant="primary" disabled={isPending}>
-					はじめる
+					更新
 				</ButtonLike>
 			</button>
 		</form>

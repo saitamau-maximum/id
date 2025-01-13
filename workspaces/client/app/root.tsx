@@ -58,6 +58,10 @@ export function Layout({ children }: { children: React.ReactNode }) {
 				className={css({
 					backgroundGradient: "primary",
 					fontFamily: '"Inter", "Noto Sans JP", sans-serif',
+					backgroundRepeat: "no-repeat",
+					width: "100%",
+					height: "100dvh",
+					overflow: "hidden",
 				})}
 			>
 				{children}

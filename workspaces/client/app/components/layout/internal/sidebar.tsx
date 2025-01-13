@@ -269,35 +269,50 @@ export const Sidebar = () => {
 					</button>
 				</div>
 
-				<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
-					<img
-						className={css({
-							width: "48px",
-							height: "48px",
-							borderRadius: "50%",
-						})}
-						src={user.profileImageURL}
-						alt={user.displayName}
-					/>
-					<div>
-						<p
+				<Link
+					to="/settings"
+					className={css({
+						_hover: {
+							background: "gray.200",
+							borderRadius: "8",
+							transition: "background 0.2s ease",
+						},
+						padding: "3",
+					})}
+					onClick={() => setIsMenuOpen(false)}
+				>
+					<div
+						className={css({ display: "flex", gap: 4, alignItems: "center" })}
+					>
+						<img
 							className={css({
-								fontSize: "lg",
-								fontWeight: 500,
+								width: "48px",
+								height: "48px",
+								borderRadius: "50%",
 							})}
-						>
-							{user.displayName}
-						</p>
-						<p
-							className={css({
-								color: "gray.500",
-								fontSize: "xs",
-							})}
-						>
-							@{user.displayId}
-						</p>
+							src={user.profileImageURL}
+							alt={user.displayName}
+						/>
+						<div>
+							<p
+								className={css({
+									fontSize: "lg",
+									fontWeight: 500,
+								})}
+							>
+								{user.displayName}
+							</p>
+							<p
+								className={css({
+									color: "gray.500",
+									fontSize: "xs",
+								})}
+							>
+								@{user.displayId}
+							</p>
+						</div>
 					</div>
-				</div>
+				</Link>
 			</div>
 		</>
 	);

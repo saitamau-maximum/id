@@ -28,34 +28,30 @@ export default function Onboarding() {
 				overflowY: "auto",
 			})}
 		>
-			<div
-				className={css({
-					width: "100%",
-					height: "100%",
-					maxWidth: 400,
-					margin: "auto",
-					padding: "token(spacing.8) token(spacing.4)",
-					gap: 8,
-					_after: {
-						content: "''",
-						display: "block",
-						width: "100%",
-						height: "token(spacing.8)", // スクロール時にパディング分が消えないようにするハック
-					},
-				})}
-			>
-				<h1
+			<div>
+				<div
 					className={css({
-						fontSize: "2xl",
-						fontWeight: "bold",
-						color: "gray.700",
-						textAlign: "center",
-						marginBottom: 8,
+						width: "100%",
+						height: "100%",
+						maxWidth: 500,
+						margin: "auto",
+						padding: 8,
+						gap: 8,
 					})}
 				>
-					Maximum IDP 初期設定
-				</h1>
-				<RegisterForm />
+					<h1
+						className={css({
+							fontSize: "2xl",
+							fontWeight: "bold",
+							color: "gray.700",
+							textAlign: "center",
+							marginBottom: 8,
+						})}
+					>
+						Maximum IDP 初期設定
+					</h1>
+					<RegisterForm />
+				</div>
 			</div>
 		</div>
 	);
