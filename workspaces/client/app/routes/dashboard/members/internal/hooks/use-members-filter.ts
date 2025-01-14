@@ -7,6 +7,12 @@ export interface Filter {
 	selectedRoleIds: number[];
 }
 
+const katakanaToHiragana = (str: string) => {
+	return str.replace(/[\u30a1-\u30f6]/g, (match) =>
+		String.fromCharCode(match.charCodeAt(0) - 0x60),
+	);
+};
+
 export function useMembersFilter(members: Member[]) {
 	const [filter, setFilter] = useState<Filter>({
 		keyword: "",
@@ -26,6 +32,9 @@ export function useMembersFilter(members: Member[]) {
 						.includes(filter.keyword.toLowerCase()) &&
 					!member.realNameKana
 						?.toLowerCase()
+						.includes(filter.keyword.toLowerCase()) &&
+					!katakanaToHiragana(member.realNameKana ?? "")
+						.toLowerCase()
 						.includes(filter.keyword.toLowerCase()) &&
 					!member.displayId
 						?.toLowerCase()
