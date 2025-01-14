@@ -1,7 +1,7 @@
 import { Outlet } from "react-router";
 import { css } from "styled-system/css";
 
-export default function Wrapper() {
+export default function Root() {
 	return (
 		<div
 			className={css({

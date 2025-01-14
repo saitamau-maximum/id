@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { ProfileCard } from "~/components/feature/user/profile-card";
+import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useMembers } from "./internal/hooks/use-members";
 
 export default function Members() {
@@ -12,24 +13,10 @@ export default function Members() {
 
 	return (
 		<div>
-			<div
-				className={css({
-					marginBottom: 8,
-				})}
-			>
-				<h1
-					className={css({
-						fontSize: "4xl",
-						fontWeight: "bold",
-						color: "gray.600",
-					})}
-				>
-					Members
-				</h1>
-				<span className={css({ color: "gray.500", fontSize: "md" })}>
-					Maximum IDPに登録されているメンバーの一覧です
-				</span>
-			</div>
+			<DashboardHeader
+				title="Members"
+				subtitle="Maximum IDPに登録されているメンバーの一覧です"
+			/>
 			<div
 				className={css({
 					display: "flex",

@@ -7,16 +7,18 @@ import {
 } from "@react-router/dev/routes";
 
 export default [
-	layout("./components/layout/wrapper.tsx", [
-		layout("./components/layout/dashboard.tsx", [
-			index("routes/home/page.tsx"),
-			route("members/:userDisplayId", "routes/profile/page.tsx"),
-			route("members", "routes/members/page.tsx"),
-			route("settings", "routes/settings/page.tsx"),
+	layout("routes/layout.tsx", [
+		layout("routes/dashboard/layout.tsx", [
+			index("routes/dashboard/home/page.tsx"),
+			...prefix("members", [
+				index("routes/dashboard/members/page.tsx"),
+				route(":userDisplayId", "routes/dashboard/members/profile/page.tsx"),
+			]),
+			route("settings", "routes/dashboard/settings/page.tsx"),
 			...prefix("admin", [
-				layout("./routes/admin/layout.tsx", [
-					index("routes/admin/home/page.tsx"),
-					route("users", "routes/admin/users/page.tsx"),
+				layout("routes/dashboard/admin/layout.tsx", [
+					index("routes/dashboard/admin/home/page.tsx"),
+					route("users", "routes/dashboard/admin/users/page.tsx"),
 				]),
 			]),
 		]),

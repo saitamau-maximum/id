@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
-import { Sidebar } from "./internal/sidebar";
+import { Sidebar } from "./internal/components/sidebar";
 
 export default function Dashboard() {
 	const navigate = useNavigate();
