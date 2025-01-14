@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
+import { DashboardHeader } from "../internal/components/dashboard-title";
 
 const NAVIGATION = [
 	{
@@ -38,24 +39,7 @@ export default function AdminLayout() {
 
 	return (
 		<div>
-			<div
-				className={css({
-					marginBottom: 8,
-				})}
-			>
-				<h1
-					className={css({
-						fontSize: "4xl",
-						fontWeight: "bold",
-						color: "gray.600",
-					})}
-				>
-					Admin
-				</h1>
-				<span className={css({ color: "gray.500", fontSize: "md" })}>
-					Maximum IDPの管理画面です
-				</span>
-			</div>
+			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
 			<div
 				className={css({
 					display: "flex",
