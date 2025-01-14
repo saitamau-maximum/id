@@ -1,8 +1,11 @@
 import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
-import { Link, useLocation } from "react-router";
+
+import { Settings } from "react-feather";
+import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
+import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/repository/auth";
@@ -132,6 +135,7 @@ export const Sidebar = () => {
 	const { user, refetch } = useAuth();
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const navigate = useNavigate();
 
 	const handleLogout = useCallback(() => {
 		localStorage.removeItem(JWT_STORAGE_KEY);
@@ -289,50 +293,74 @@ export const Sidebar = () => {
 					</button>
 				</div>
 
-				<Link
-					to="/settings"
-					className={css({
-						_hover: {
-							background: "gray.200",
-							borderRadius: "8",
-							transition: "background 0.2s ease",
-						},
-						padding: "3",
-					})}
-					onClick={() => setIsMenuOpen(false)}
-				>
-					<div
-						className={css({ display: "flex", gap: 4, alignItems: "center" })}
+				<Menu.Trigger>
+					<Menu.Button
+						className={css({
+							borderRadius: 8,
+							padding: 3,
+							margin: -3,
+							cursor: "pointer",
+							transition: "background",
+							_hover: {
+								background: "gray.100",
+							},
+							_focusVisible: {
+								background: "gray.100",
+								outline: "none",
+							},
+						})}
 					>
-						<img
-							className={css({
-								width: "48px",
-								height: "48px",
-								borderRadius: "50%",
-							})}
-							src={user.profileImageURL}
-							alt={user.displayName}
-						/>
-						<div>
-							<p
+						<div
+							className={css({ display: "flex", gap: 4, alignItems: "center" })}
+						>
+							<img
 								className={css({
-									fontSize: "lg",
-									fontWeight: 500,
+									width: "48px",
+									height: "48px",
+									borderRadius: "50%",
 								})}
-							>
-								{user.displayName}
-							</p>
-							<p
-								className={css({
-									color: "gray.500",
-									fontSize: "xs",
-								})}
-							>
-								@{user.displayId}
-							</p>
+								src={user.profileImageURL}
+								alt={user.displayName}
+							/>
+							<div>
+								<p
+									className={css({
+										fontSize: "lg",
+										fontWeight: 500,
+									})}
+								>
+									{user.displayName}
+								</p>
+								<p
+									className={css({
+										color: "gray.500",
+										fontSize: "xs",
+									})}
+								>
+									@{user.displayId}
+								</p>
+							</div>
 						</div>
-					</div>
-				</Link>
+					</Menu.Button>
+					<Menu.Popover>
+						<Menu.Root>
+							<Menu.Item
+								onAction={() => {
+									setIsMenuOpen(false);
+									navigate("/settings");
+								}}
+							>
+								<Settings
+									size={20}
+									className={css({
+										color: "gray.500",
+									})}
+								/>
+								Settings
+							</Menu.Item>
+						</Menu.Root>
+					</Menu.Popover>
+				</Menu.Trigger>
 			</div>
 		</>
 	);
