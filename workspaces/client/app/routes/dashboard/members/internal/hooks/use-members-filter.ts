@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import type { Member } from "~/repository/member";
 
-interface Filter {
+export interface Filter {
 	keyword: string;
 	selectedGrades: string[];
 	selectedRoleIds: number[];
