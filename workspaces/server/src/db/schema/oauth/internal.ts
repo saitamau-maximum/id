@@ -2,6 +2,8 @@ import { relations } from "drizzle-orm";
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { userProfiles, users } from "../app";
 
+// 外部OAuthプロバイダを利用して IDP にログインするための、OAuth Clientとしてのスキーマ
+
 // さすがに client_secret とかは環境変数側に持たせるべき(見れちゃうので)
 // → たぶん各々の OAuth ページとかを作ることになりそう
 // OAuth の接続情報に対する Reference Provider ID として使う

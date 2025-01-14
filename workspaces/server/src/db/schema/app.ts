@@ -10,6 +10,8 @@ import {
 } from "drizzle-orm/sqlite-core";
 import { oauthClientSecrets, oauthConnections, oauthTokens } from "./oauth";
 
+// 認証以外のアプリケーション関連のスキーマ定義
+
 export const users = sqliteTable("users", {
 	id: text("id").primaryKey(),
 	/* 初期登録日時。NULLの場合は未初期化 */
