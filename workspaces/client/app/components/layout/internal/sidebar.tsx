@@ -1,26 +1,43 @@
+import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
+import type { User } from "~/repository/auth";
 
-const NAVIGATION = [
+type Navigation = {
+	label: string;
+	to: string;
+	isActive: (location: string) => boolean;
+	shouldDisplay?: (user: User) => boolean;
+	comingSoon?: boolean;
+};
+
+const NAVIGATION: Navigation[] = [
 	{
 		label: "Home",
 		to: "/",
 		isActive: (location: string) => location === "/",
 	},
 	{
+		label: "Members",
+		to: "/members",
+		isActive: (location: string) => location.startsWith("/members"),
+	},
+	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) => r.id === role.ROLE_IDS.ADMIN),
+		label: "Admin",
+		to: "/admin",
+		isActive: (location: string) => location.startsWith("/admin"),
+	},
+	{
 		comingSoon: true,
 		label: "Calendar",
 		to: "/calendar",
 		isActive: (location: string) => location === "/calendar",
-	},
-	{
-		label: "Members",
-		to: "/members",
-		isActive: (location: string) => location.startsWith("/members"),
 	},
 ];
 
@@ -201,67 +218,70 @@ export const Sidebar = () => {
 								gap: 4,
 							})}
 						>
-							{NAVIGATION.map((nav) => (
-								<li
-									key={nav.to}
-									className={css({
-										display: "flex",
-										alignItems: "center",
-										gap: 2,
-									})}
-								>
-									<Dot isActive={nav.isActive(location.pathname)} />
-									{nav.comingSoon ? (
-										<span
+							{NAVIGATION.map(
+								(nav) =>
+									(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
+										<li
+											key={nav.to}
 											className={css({
-												display: "block",
-												padding: "token(spacing.2) token(spacing.4)",
-												width: "100%",
-												borderRadius: 8,
-												color: "gray.500",
-												fontSize: "sm",
-												fontWeight: "600",
-												cursor: "not-allowed",
+												display: "flex",
+												alignItems: "center",
+												gap: 2,
 											})}
 										>
-											<span
-												className={css({
-													fontSize: "lg",
-													fontWeight: "normal",
-												})}
-											>
-												{nav.label}
-											</span>
-											<br />
-											Coming Soon ...
-										</span>
-									) : (
-										<Link
-											onClick={() => setIsMenuOpen(false)}
-											to={nav.to}
-											className={css({
-												display: "block",
-												padding: "token(spacing.2) token(spacing.4)",
-												width: "100%",
-												borderRadius: 8,
-												color: nav.isActive(location.pathname)
-													? "gray.800"
-													: "gray.500",
-												textDecoration: "none",
-												fontSize: "2xl",
-												fontWeight: "600",
-												transition: "colors",
-												_hover: {
-													color: "green.600",
-												},
-											})}
-										>
-											{nav.label}
-										</Link>
-									)}
-									<Dot />
-								</li>
-							))}
+											<Dot isActive={nav.isActive(location.pathname)} />
+											{nav.comingSoon ? (
+												<span
+													className={css({
+														display: "block",
+														padding: "token(spacing.2) token(spacing.4)",
+														width: "100%",
+														borderRadius: 8,
+														color: "gray.500",
+														fontSize: "sm",
+														fontWeight: "600",
+														cursor: "not-allowed",
+													})}
+												>
+													<span
+														className={css({
+															fontSize: "lg",
+															fontWeight: "normal",
+														})}
+													>
+														{nav.label}
+													</span>
+													<br />
+													Coming Soon ...
+												</span>
+											) : (
+												<Link
+													onClick={() => setIsMenuOpen(false)}
+													to={nav.to}
+													className={css({
+														display: "block",
+														padding: "token(spacing.2) token(spacing.4)",
+														width: "100%",
+														borderRadius: 8,
+														color: nav.isActive(location.pathname)
+															? "gray.800"
+															: "gray.500",
+														textDecoration: "none",
+														fontSize: "2xl",
+														fontWeight: "600",
+														transition: "colors",
+														_hover: {
+															color: "green.600",
+														},
+													})}
+												>
+													{nav.label}
+												</Link>
+											)}
+											<Dot />
+										</li>
+									),
+							)}
 						</ul>
 					</nav>
 					<button onClick={handleLogout} type="button">

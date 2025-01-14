@@ -9,6 +9,7 @@ import { CloudflareSessionRepository } from "./infrastructure/repository/cloudfl
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
+import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
@@ -16,7 +17,7 @@ import { userRoute } from "./routes/user";
 
 const app = factory.createApp();
 
-const route = app
+export const route = app
 	.use(logger())
 	.use(async (c, next) => {
 		c.set(
@@ -53,8 +54,7 @@ const route = app
 	.route("/auth", authRoute)
 	.route("/user", userRoute)
 	.route("/member", memberRoute)
-	.route("/oauth", oauthRoute);
+	.route("/oauth", oauthRoute)
+	.route("/admin", adminRoute);
 
 export default app;
-
-export type AppType = typeof route;

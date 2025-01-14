@@ -18,12 +18,11 @@ Server のスキーマの型更新を Client へ反映させるためは、一�
 pnpm build
 ```
 
-初期セットアップ時には、マイグレーションと初期データの投入を行う必要があります。
+初期セットアップ時には、マイグレーションを行う必要があります。
 
 ```bash
 cd workspaces/server
 pnpm apply:migrations:local
-pnpm apply:seed:local
 ```
 
 開発サーバーを立ち上げるには以下のコマンドを実行します。

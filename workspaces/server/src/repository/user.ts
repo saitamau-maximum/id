@@ -1,3 +1,5 @@
+import type { Role } from "../constants/role";
+
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -13,11 +15,13 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
+	roles: Role[];
 } & Partial<Profile>;
 
 export type Member = {
 	id: string;
 	initialized: boolean;
+	roles: Role[];
 } & Partial<
 	Pick<
 		Profile,
@@ -41,8 +45,11 @@ export interface IUserRepository {
 		providerId: number,
 	) => Promise<string>;
 	fetchUserProfileById: (userId: string) => Promise<User>;
+	fetchAllUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
 	fetchMemberByDisplayId: (displayId: string) => Promise<Member>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
+	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	fetchRolesByUserId: (userId: string) => Promise<number[]>;
 }

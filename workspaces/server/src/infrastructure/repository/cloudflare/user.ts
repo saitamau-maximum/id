@@ -1,5 +1,6 @@
 import { type InferInsertModel, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
@@ -73,6 +74,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
+				roles: true,
 				profile: true,
 			},
 		});
@@ -93,6 +95,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
 	}
 
@@ -135,6 +138,13 @@ export class CloudflareUserRepository implements IUserRepository {
 					initializedAt: new Date(),
 				})
 				.where(eq(schema.users.id, userId)),
+			// とりあえず初期ユーザーはMEMBERにする
+			this.client
+				.insert(schema.userRoles)
+				.values({
+					userId: userId,
+					roleId: ROLE_IDS.MEMBER,
+				}),
 		]);
 
 		if (!res.success) {
@@ -172,6 +182,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		const users = await this.client.query.users.findMany({
 			with: {
 				profile: true,
+				roles: true,
 			},
 		});
 
@@ -184,6 +195,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
 
@@ -191,7 +203,11 @@ export class CloudflareUserRepository implements IUserRepository {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
-				user: true,
+				user: {
+					with: {
+						roles: true,
+					},
+				},
 			},
 		});
 
@@ -208,6 +224,60 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.displayId ?? undefined,
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
+			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
+	}
+
+	async fetchRolesByUserId(userId: string): Promise<number[]> {
+		const roles = await this.client.query.userRoles.findMany({
+			where: eq(schema.userRoles.userId, userId),
+		});
+
+		return roles.map((role) => role.roleId);
+	}
+
+	async fetchAllUsers(): Promise<User[]> {
+		const users = await this.client.query.users.findMany({
+			with: {
+				roles: true,
+				profile: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initialized: !!user.initializedAt,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			academicEmail: user.profile.academicEmail ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+		}));
+	}
+
+	async updateUserRole(userId: string, roleIds: number[]): Promise<void> {
+		const res = await this.client
+			.delete(schema.userRoles)
+			.where(eq(schema.userRoles.userId, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to update user role");
+		}
+
+		const values = roleIds.map((roleId) => ({
+			userId,
+			roleId,
+		}));
+
+		const res2 = await this.client.insert(schema.userRoles).values(values);
+
+		if (!res2.success) {
+			throw new Error("Failed to update user role");
+		}
 	}
 }

@@ -1,11 +1,11 @@
 import { type ComponentProps, useId } from "react";
 import { css, cx } from "styled-system/css";
 
-type RadioProps = Exclude<ComponentProps<"input">, "type"> & {
+type SelectProps = Exclude<ComponentProps<"input">, "type"> & {
 	label: string;
 };
 
-export const Radio = ({ className, label, ...props }: RadioProps) => {
+export const Select = ({ className, label, ...props }: SelectProps) => {
 	const id = useId();
 	return (
 		<label
@@ -22,14 +22,14 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 				"&:hover": {
 					borderColor: "green.600",
 				},
-				"&:has(>input[type='radio']:checked)": {
+				"&:has(>input[type='checkbox']:checked)": {
 					borderColor: "green.600",
 				},
 			})}
 		>
 			<input
 				{...props}
-				type="radio"
+				type="checkbox"
 				id={id}
 				className={cx(
 					css({
@@ -52,7 +52,7 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 					marginRight: "token(spacing.2)",
 					width: 3,
 					height: 3,
-					borderRadius: "50%",
+					borderRadius: "sm",
 					borderWidth: 1,
 					borderStyle: "solid",
 					borderColor: "gray.300",
@@ -62,7 +62,7 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 					backgroundColor: "white",
 					transition: ["background"],
 
-					'input[type="radio"]:checked + &': {
+					'input[type="checkbox"]:checked + &': {
 						backgroundColor: "green.600",
 						borderColor: "white",
 						outlineColor: "green.600",
@@ -82,11 +82,11 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 	);
 };
 
-interface RadioGroupProps {
+interface SelectGroupProps {
 	children: React.ReactNode;
 }
 
-export const RadioGroup = ({ children }: RadioGroupProps) => {
+export const SelectGroup = ({ children }: SelectGroupProps) => {
 	return (
 		<div
 			className={css({

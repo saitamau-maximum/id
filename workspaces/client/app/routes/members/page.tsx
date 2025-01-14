@@ -60,6 +60,7 @@ export default function Members() {
 								profileImageURL={user.profileImageURL}
 								grade={user.grade}
 								initialized={user.initialized}
+								roles={user.roles}
 							/>
 						</Link>
 					) : (
@@ -71,6 +72,7 @@ export default function Members() {
 							profileImageURL={user.profileImageURL}
 							grade={user.grade}
 							initialized={user.initialized}
+							roles={user.roles}
 						/>
 					),
 				)}
