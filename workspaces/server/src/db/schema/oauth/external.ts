@@ -1,86 +1,8 @@
 import { relations } from "drizzle-orm";
-import {
-	index,
-	int,
-	integer,
-	primaryKey,
-	sqliteTable,
-	text,
-	uniqueIndex,
-} from "drizzle-orm/sqlite-core";
+import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { users } from "../app";
 
-export const users = sqliteTable("users", {
-	id: text("id").primaryKey(),
-	/* 初期登録日時。NULLの場合は未初期化 */
-	initializedAt: integer("initialized_at", { mode: "timestamp" }),
-});
-
-export const usersRelations = relations(users, ({ one, many }) => ({
-	profile: one(userProfiles, {
-		fields: [users.id],
-		references: [userProfiles.userId],
-	}),
-	oauthIssuedSecrets: many(oauthClientSecrets),
-	oauthIssuedTokens: many(oauthTokens),
-	oauthConnections: many(oauthConnections),
-	roles: many(userRoles),
-}));
-
-export const userProfiles = sqliteTable(
-	"user_profiles",
-	{
-		id: text("id").primaryKey(),
-		userId: text("user_id")
-			.references(() => users.id)
-			.notNull(),
-		displayName: text("display_name"),
-		realName: text("real_name"),
-		realNameKana: text("real_name_kana"),
-		displayId: text("display_id"),
-		profileImageURL: text("profile_image_url"),
-		academicEmail: text("academic_email"),
-		email: text("email"),
-		studentId: text("student_id"),
-		grade: text("grade"),
-	},
-	(table) => ({
-		gradeIdx: index("grade_idx").on(table.grade),
-		displayIdUnique: uniqueIndex("display_id_unique").on(table.displayId),
-	}),
-);
-
-export const userProfilesRelations = relations(
-	userProfiles,
-	({ one, many }) => ({
-		user: one(users, {
-			fields: [userProfiles.userId],
-			references: [users.id],
-		}),
-		oauthConnections: many(oauthConnections),
-	}),
-);
-
-export const userRoles = sqliteTable(
-	"user_roles",
-	{
-		userId: text("user_id")
-			.notNull()
-			.references(() => users.id),
-		roleId: int("role_id", { mode: "number" }).notNull(),
-	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.roleId] }),
-	}),
-);
-
-export const userRolesRelations = relations(userRoles, ({ one }) => ({
-	user: one(users, {
-		fields: [userRoles.userId],
-		references: [users.id],
-	}),
-}));
-
-// ---------- OAuth 関連 ---------- //
+// Maximum IDP OAuthプロバイダを利用して外部連携アプリにログインするための、OAuth Provider関連のスキーマ
 
 export const oauthClients = sqliteTable("oauth_clients", {
 	id: text("id").primaryKey(),
@@ -177,32 +99,6 @@ export const oauthTokenScopes = sqliteTable(
 	}),
 );
 
-// さすがに client_secret とかは環境変数側に持たせるべき(見れちゃうので)
-// → たぶん各々の OAuth ページとかを作ることになりそう
-// OAuth の接続情報に対する Reference Provider ID として使う
-export const oauthProviders = sqliteTable("oauth_providers", {
-	id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-});
-
-export const oauthConnections = sqliteTable(
-	"oauth_connections",
-	{
-		userId: text("user_id").notNull(),
-		providerId: int("provider_id", { mode: "number" })
-			.notNull()
-			.references(() => oauthProviders.id),
-		providerUserId: text("provider_user_id").notNull(), // OAuth Provider 側の User ID
-		// 以下取れそうな情報を書く
-		email: text("email"),
-		name: text("name"),
-		profileImageUrl: text("profile_image_url"),
-	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.providerId] }),
-	}),
-);
-
 // ---------- OAuth Relations ---------- //
 
 export const oauthClientsRelations = relations(
@@ -283,31 +179,6 @@ export const oauthTokenScopesRelations = relations(
 		scope: one(oauthScopes, {
 			fields: [oauthTokenScopes.scopeId],
 			references: [oauthScopes.id],
-		}),
-	}),
-);
-
-export const oauthProvidersRelations = relations(
-	oauthProviders,
-	({ many }) => ({
-		connections: many(oauthConnections),
-	}),
-);
-
-export const oauthConnectionsRelations = relations(
-	oauthConnections,
-	({ one }) => ({
-		provider: one(oauthProviders, {
-			fields: [oauthConnections.providerId],
-			references: [oauthProviders.id],
-		}),
-		user: one(users, {
-			fields: [oauthConnections.userId],
-			references: [users.id],
-		}),
-		profile: one(userProfiles, {
-			fields: [oauthConnections.userId],
-			references: [userProfiles.userId],
 		}),
 	}),
 );
