@@ -111,16 +111,16 @@ export const ProfileUpdateForm = () => {
 			}
 
 			try {
-				await userRepository.update(
-					result.output.displayName,
-					result.output.realName,
-					result.output.realNameKana,
-					result.output.displayId,
-					result.output.email,
-					result.output.academicEmail,
-					result.output.studentId,
-					result.output.grade,
-				);
+				await userRepository.update({
+					displayName: result.output.displayName,
+					realName: result.output.realName,
+					realNameKana: result.output.realNameKana,
+					displayId: result.output.displayId,
+					email: result.output.email,
+					academicEmail: result.output.academicEmail,
+					studentId: result.output.studentId,
+					grade: result.output.grade,
+				});
 
 				navigate("/");
 

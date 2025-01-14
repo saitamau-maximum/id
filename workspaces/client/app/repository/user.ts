@@ -1,26 +1,30 @@
 import { client } from "~/utils/hono";
 
+interface RegisterParams {
+	displayName: string;
+	realName: string;
+	realNameKana: string;
+	displayId: string;
+	academicEmail: string;
+	email: string;
+	studentId: string;
+	grade: string;
+}
+
+interface UpdateParams {
+	displayName: string;
+	realName: string;
+	realNameKana: string;
+	displayId: string;
+	academicEmail: string;
+	email: string;
+	studentId: string;
+	grade: string;
+}
+
 export interface IUserRepository {
-	register: (
-		displayName: string,
-		realName: string,
-		realNameKana: string,
-		displayId: string,
-		academicEmail: string,
-		email: string,
-		studentId: string,
-		grade: string,
-	) => Promise<void>;
-	update: (
-		displayName: string,
-		realName: string,
-		realNameKana: string,
-		displayId: string,
-		academicEmail: string,
-		email: string,
-		studentId: string,
-		grade: string,
-	) => Promise<void>;
+	register: (params: RegisterParams) => Promise<void>;
+	update: (params: UpdateParams) => Promise<void>;
 	getContributions: () => Promise<{
 		weeks: {
 			date: string;
@@ -31,16 +35,16 @@ export interface IUserRepository {
 }
 
 export class UserRepositoryImpl implements IUserRepository {
-	async register(
-		displayName: string,
-		realName: string,
-		realNameKana: string,
-		displayId: string,
-		academicEmail: string,
-		email: string,
-		studentId: string,
-		grade: string,
-	) {
+	async register({
+		displayName,
+		realName,
+		realNameKana,
+		displayId,
+		academicEmail,
+		email,
+		studentId,
+		grade,
+	}: RegisterParams) {
 		const res = await client.user.register.$post({
 			json: {
 				displayName,
@@ -58,16 +62,16 @@ export class UserRepositoryImpl implements IUserRepository {
 		}
 	}
 
-	async update(
-		displayName: string,
-		realName: string,
-		realNameKana: string,
-		displayId: string,
-		academicEmail: string,
-		email: string,
-		studentId: string,
-		grade: string,
-	) {
+	async update({
+		displayName,
+		realName,
+		realNameKana,
+		displayId,
+		academicEmail,
+		email,
+		studentId,
+		grade,
+	}: UpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
 				displayName,
