@@ -37,13 +37,13 @@ export const RoleEditor = ({ userId, roles }: Props) => {
 		>
 			{!editing && (
 				<div className={css({ display: "flex", gap: 2, alignItems: "center" })}>
-					{isPending && "Loading..."}
-					{!isPending &&
-						roles.map((role) => (
-							<RoleBadge key={role.id} color={role.color}>
-								{role.name}
-							</RoleBadge>
-						))}
+					{isPending
+						? "Loading..."
+						: roles.map((role) => (
+								<RoleBadge key={role.id} color={role.color}>
+									{role.name}
+								</RoleBadge>
+							))}
 					<button
 						type="button"
 						onClick={() => setEditing((editing) => !editing)}

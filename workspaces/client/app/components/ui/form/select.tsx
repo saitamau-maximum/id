@@ -41,7 +41,6 @@ export const Select = ({ className, label, ...props }: SelectProps) => {
 						position: "absolute",
 						whiteSpace: "nowrap",
 						width: 1,
-						// a11yを担保しつつデザインするためのかくし要素
 					}),
 					className,
 				)}

@@ -41,7 +41,6 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 						position: "absolute",
 						whiteSpace: "nowrap",
 						width: 1,
-						// a11yを担保しつつデザインするためのかくし要素
 					}),
 					className,
 				)}

@@ -32,7 +32,7 @@ interface RoleAuthorizationMiddlewareOptions {
 	ALLOWED_ROLES: number[];
 }
 
-export const roleAuthorizatinMiddleware = (
+export const roleAuthorizationMiddleware = (
 	options: Partial<RoleAuthorizationMiddlewareOptions> = {},
 ) => {
 	return factory.createMiddleware(async (c, next) => {

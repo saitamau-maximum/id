@@ -18,7 +18,7 @@ export const UsersTable = ({ users }: Props) => {
 					<Table.Th>本名</Table.Th>
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
-					<Table.Th>学位</Table.Th>
+					<Table.Th>学年</Table.Th>
 					<Table.Th>Role</Table.Th>
 				</Table.Tr>
 			</thead>

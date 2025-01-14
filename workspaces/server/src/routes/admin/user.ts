@@ -4,7 +4,7 @@ import { ROLE_BY_ID, ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
 	authMiddleware,
-	roleAuthorizatinMiddleware,
+	roleAuthorizationMiddleware,
 } from "../../middleware/auth";
 
 const app = factory.createApp();
@@ -16,7 +16,7 @@ const UpdateRoleRequestSchema = v.object({
 const route = app
 	.use(authMiddleware)
 	.use(
-		roleAuthorizatinMiddleware({
+		roleAuthorizationMiddleware({
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 	)

@@ -261,7 +261,6 @@ export class CloudflareUserRepository implements IUserRepository {
 	}
 
 	async updateUserRole(userId: string, roleIds: number[]): Promise<void> {
-		console.log("updateUserRole", userId, roleIds);
 		const res = await this.client
 			.delete(schema.userRoles)
 			.where(eq(schema.userRoles.userId, userId));
