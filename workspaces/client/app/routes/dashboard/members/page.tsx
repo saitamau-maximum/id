@@ -2,10 +2,19 @@ import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { DashboardHeader } from "../internal/components/dashboard-title";
+import { FilterForm } from "./internal/components/filter-form";
 import { useMembers } from "./internal/hooks/use-members";
+import { useMembersFilter } from "./internal/hooks/use-members-filter";
 
 export default function Members() {
 	const { data } = useMembers();
+	const {
+		filteredMembers,
+		filter,
+		handleGradeSelectChange,
+		handleRoleSelectChange,
+		handleKeywordChange,
+	} = useMembersFilter(data ?? []);
 
 	if (!data) {
 		return null;
@@ -17,6 +26,12 @@ export default function Members() {
 				title="Members"
 				subtitle="Maximum IDPに登録されているメンバーの一覧です"
 			/>
+			<FilterForm
+				filter={filter}
+				onKeywordChange={handleKeywordChange}
+				onGradeSelectChange={handleGradeSelectChange}
+				onRoleSelectChange={handleRoleSelectChange}
+			/>
 			<div
 				className={css({
 					display: "flex",
@@ -24,7 +39,7 @@ export default function Members() {
 					gap: 8,
 				})}
 			>
-				{data.map((user) =>
+				{filteredMembers.map((user) =>
 					user.initialized ? (
 						<Link
 							key={user.id}

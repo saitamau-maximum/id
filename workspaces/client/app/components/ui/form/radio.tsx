@@ -17,6 +17,7 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 				borderWidth: 1,
 				borderStyle: "solid",
 				borderColor: "gray.300",
+				backgroundColor: "white",
 				cursor: "pointer",
 				transition: "border-color 0.2s ease",
 				"&:hover": {

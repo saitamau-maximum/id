@@ -14,6 +14,7 @@ export const Input = ({ className, ...props }: Props) => {
 					borderWidth: 1,
 					borderStyle: "solid",
 					borderColor: "gray.300",
+					backgroundColor: "white",
 					outline: "none",
 					width: "100%",
 					transition: "border-color 0.2s ease",
