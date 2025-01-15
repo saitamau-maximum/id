@@ -322,7 +322,13 @@ export const Sidebar = () => {
 								src={user.profileImageURL}
 								alt={user.displayName}
 							/>
-							<div>
+							<div
+								className={css({
+									display: "flex",
+									flexDirection: "column",
+									alignItems: "flex-start",
+								})}
+							>
 								<p
 									className={css({
 										fontSize: "lg",
