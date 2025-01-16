@@ -1,10 +1,9 @@
 import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
 
-import { Settings } from "react-feather";
+import { LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
-import { ButtonLike } from "~/components/ui/button-like";
 import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
@@ -205,93 +204,80 @@ export const Sidebar = () => {
 					})}
 				/>
 
-				<div
-					className={css({
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						gap: 8,
-						width: "100%",
-					})}
-				>
-					<nav>
-						<ul
-							className={css({
-								display: "flex",
-								flexDirection: "column",
-								gap: 4,
-							})}
-						>
-							{NAVIGATION.map(
-								(nav) =>
-									(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
-										<li
-											key={nav.to}
-											className={css({
-												display: "flex",
-												alignItems: "center",
-												gap: 2,
-											})}
-										>
-											<Dot isActive={nav.isActive(location.pathname)} />
-											{nav.comingSoon ? (
+				<nav>
+					<ul
+						className={css({
+							display: "flex",
+							flexDirection: "column",
+							gap: 4,
+						})}
+					>
+						{NAVIGATION.map(
+							(nav) =>
+								(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
+									<li
+										key={nav.to}
+										className={css({
+											display: "flex",
+											alignItems: "center",
+											gap: 2,
+										})}
+									>
+										<Dot isActive={nav.isActive(location.pathname)} />
+										{nav.comingSoon ? (
+											<span
+												className={css({
+													display: "block",
+													padding: "token(spacing.2) token(spacing.4)",
+													width: "100%",
+													borderRadius: 8,
+													color: "gray.500",
+													fontSize: "sm",
+													fontWeight: "600",
+													cursor: "not-allowed",
+												})}
+											>
 												<span
 													className={css({
-														display: "block",
-														padding: "token(spacing.2) token(spacing.4)",
-														width: "100%",
-														borderRadius: 8,
-														color: "gray.500",
-														fontSize: "sm",
-														fontWeight: "600",
-														cursor: "not-allowed",
-													})}
-												>
-													<span
-														className={css({
-															fontSize: "lg",
-															fontWeight: "normal",
-														})}
-													>
-														{nav.label}
-													</span>
-													<br />
-													Coming Soon ...
-												</span>
-											) : (
-												<Link
-													onClick={() => setIsMenuOpen(false)}
-													to={nav.to}
-													className={css({
-														display: "block",
-														padding: "token(spacing.2) token(spacing.4)",
-														width: "100%",
-														borderRadius: 8,
-														color: nav.isActive(location.pathname)
-															? "gray.800"
-															: "gray.500",
-														textDecoration: "none",
-														fontSize: "2xl",
-														fontWeight: "600",
-														transition: "colors",
-														_hover: {
-															color: "green.600",
-														},
+														fontSize: "lg",
+														fontWeight: "normal",
 													})}
 												>
 													{nav.label}
-												</Link>
-											)}
-											<Dot />
-										</li>
-									),
-							)}
-						</ul>
-					</nav>
-					<button onClick={handleLogout} type="button">
-						<ButtonLike variant="secondary">Logout</ButtonLike>
-					</button>
-				</div>
+												</span>
+												<br />
+												Coming Soon ...
+											</span>
+										) : (
+											<Link
+												onClick={() => setIsMenuOpen(false)}
+												to={nav.to}
+												className={css({
+													display: "block",
+													padding: "token(spacing.2) token(spacing.4)",
+													width: "100%",
+													borderRadius: 8,
+													color: nav.isActive(location.pathname)
+														? "gray.800"
+														: "gray.500",
+													textDecoration: "none",
+													fontSize: "2xl",
+													fontWeight: "600",
+													transition: "colors",
+													_hover: {
+														color: "green.600",
+													},
+												})}
+											>
+												{nav.label}
+											</Link>
+										)}
+										<Dot />
+									</li>
+								),
+						)}
+					</ul>
+				</nav>
 
 				<Menu.Trigger>
 					<Menu.Button
@@ -363,6 +349,20 @@ export const Sidebar = () => {
 									})}
 								/>
 								Settings
+							</Menu.Item>
+							<Menu.Item
+								onAction={() => {
+									setIsMenuOpen(false);
+									handleLogout();
+								}}
+							>
+								<LogOut
+									size={20}
+									className={css({
+										color: "gray.500",
+									})}
+								/>
+								Logout
 							</Menu.Item>
 						</Menu.Root>
 					</Menu.Popover>
