@@ -64,6 +64,13 @@
       "when": 1736791775292,
       "tag": "0008_dapper_shotgun",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1737104816928,
+      "tag": "0009_aspiring_gunslinger",
+      "breakpoints": true
     }
   ]
 }

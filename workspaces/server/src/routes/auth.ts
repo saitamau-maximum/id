@@ -10,7 +10,6 @@ const verifyRequestQuerySchema = v.object({
 	ott: v.pipe(v.string(), v.nonEmpty()),
 });
 
-// oauth flow to maximum
 const route = app
 	.route("/login", authLoginRoute)
 	.get("/verify", vValidator("query", verifyRequestQuerySchema), async (c) => {
