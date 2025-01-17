@@ -4,21 +4,11 @@ import { userProfiles, users } from "../app";
 
 // 外部OAuthプロバイダを利用して IDP にログインするための、OAuth Clientとしてのスキーマ
 
-// さすがに client_secret とかは環境変数側に持たせるべき(見れちゃうので)
-// → たぶん各々の OAuth ページとかを作ることになりそう
-// OAuth の接続情報に対する Reference Provider ID として使う
-export const oauthProviders = sqliteTable("oauth_providers", {
-	id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	name: text("name").notNull(),
-});
-
 export const oauthConnections = sqliteTable(
 	"oauth_connections",
 	{
 		userId: text("user_id").notNull(),
-		providerId: int("provider_id", { mode: "number" })
-			.notNull()
-			.references(() => oauthProviders.id),
+		providerId: int("provider_id", { mode: "number" }).notNull(),
 		providerUserId: text("provider_user_id").notNull(), // OAuth Provider 側の User ID
 		// 以下取れそうな情報を書く
 		email: text("email"),
@@ -30,20 +20,9 @@ export const oauthConnections = sqliteTable(
 	}),
 );
 
-export const oauthProvidersRelations = relations(
-	oauthProviders,
-	({ many }) => ({
-		connections: many(oauthConnections),
-	}),
-);
-
 export const oauthConnectionsRelations = relations(
 	oauthConnections,
 	({ one }) => ({
-		provider: one(oauthProviders, {
-			fields: [oauthConnections.providerId],
-			references: [oauthProviders.id],
-		}),
 		user: one(users, {
 			fields: [oauthConnections.userId],
 			references: [users.id],

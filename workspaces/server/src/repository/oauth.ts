@@ -42,11 +42,6 @@ export type Token = {
 	accessTokenExpiresAt: Date;
 };
 
-export type OAuthProvider = {
-	id: number;
-	name: string;
-};
-
 export type OAuthConnection = {
 	userId: string;
 	providerId: number;
