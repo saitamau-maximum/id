@@ -18,64 +18,73 @@ const registerSchema = v.object({
 });
 
 const route = app
-	.use(authMiddleware)
-	.post("/register", vValidator("json", registerSchema), async (c) => {
-		const payload = c.get("jwtPayload");
-		const { UserRepository } = c.var;
+	.post(
+		"/register",
+		authMiddleware,
+		vValidator("json", registerSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { UserRepository } = c.var;
 
-		const {
-			displayName,
-			realName,
-			realNameKana,
-			displayId,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		} = c.req.valid("json");
+			const {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			} = c.req.valid("json");
 
-		await UserRepository.registerUser(payload.userId, {
-			displayName,
-			displayId,
-			realName,
-			realNameKana,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		});
+			await UserRepository.registerUser(payload.userId, {
+				displayName,
+				displayId,
+				realName,
+				realNameKana,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			});
 
-		return c.text("ok", 200);
-	})
-	.put("/update", vValidator("json", registerSchema), async (c) => {
-		const payload = c.get("jwtPayload");
-		const { UserRepository } = c.var;
+			return c.text("ok", 200);
+		},
+	)
+	.put(
+		"/update",
+		authMiddleware,
+		vValidator("json", registerSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { UserRepository } = c.var;
 
-		const {
-			displayName,
-			realName,
-			realNameKana,
-			displayId,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		} = c.req.valid("json");
+			const {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			} = c.req.valid("json");
 
-		await UserRepository.updateUser(payload.userId, {
-			displayName,
-			displayId,
-			realName,
-			realNameKana,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		});
+			await UserRepository.updateUser(payload.userId, {
+				displayName,
+				displayId,
+				realName,
+				realNameKana,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			});
 
-		return c.text("ok", 200);
-	})
-	.get("/contributions", async (c) => {
+			return c.text("ok", 200);
+		},
+	)
+	.get("/contributions", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const {
 			ContributionRepository,
