@@ -7,6 +7,7 @@ import { CloudflareContributionCacheRepository } from "./infrastructure/reposito
 import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
+import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
@@ -31,6 +32,10 @@ export const route = app
 		c.set(
 			"ContributionCacheRepository",
 			new CloudflareContributionCacheRepository(c.env.CACHE),
+		);
+		c.set(
+			"UserStorageRepository",
+			new CloudflareUserStorageRepository(c.env.STORAGE),
 		);
 
 		const octokit = new Octokit({

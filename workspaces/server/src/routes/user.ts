@@ -1,4 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
+import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
@@ -15,6 +16,10 @@ const registerSchema = v.object({
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
+});
+
+const updateProfileImageSchema = v.object({
+	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MB
 });
 
 const route = app
@@ -122,6 +127,43 @@ const route = app
 		);
 
 		return c.json(contributions, 200);
+	})
+	.put(
+		"/profile-image",
+		authMiddleware,
+		vValidator("form", updateProfileImageSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const serverOrigin = new URL(c.req.url).origin;
+			const { UserStorageRepository, UserRepository } = c.var;
+
+			const { image } = c.req.valid("form");
+
+			try {
+				await UserStorageRepository.uploadProfileImage(image, payload.userId);
+
+				await UserRepository.updateUser(payload.userId, {
+					profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
+				});
+
+				return c.text("ok", 200);
+			} catch (e) {
+				console.error(e);
+				return c.text("Failed to upload profile image", 500);
+			}
+		},
+	)
+	.get("/profile-image/:userId", async (c) => {
+		const { UserStorageRepository } = c.var;
+		const userId = c.req.param("userId");
+
+		try {
+			const body = await UserStorageRepository.getProfileImageURL(userId);
+			return stream(c, (s) => s.pipe(body));
+		} catch (e) {
+			console.error(e);
+			return c.text("Not found", 404);
+		}
 	});
 
 export { route as userRoute };
