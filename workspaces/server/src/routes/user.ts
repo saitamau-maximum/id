@@ -172,11 +172,13 @@ const route = app
 		},
 	)
 	.get("/profile-image/:userId", async (c) => {
+		// TODO 画像のキャッシュを考慮する
 		const { UserStorageRepository } = c.var;
 		const userId = c.req.param("userId");
 
 		try {
 			const body = await UserStorageRepository.getProfileImageURL(userId);
+			c.header("Content-Type", "image/webp");
 			return stream(c, (s) => s.pipe(body));
 		} catch (e) {
 			console.error(e);
