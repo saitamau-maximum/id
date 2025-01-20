@@ -26,7 +26,8 @@
 		"drizzle-orm": "^0.36.1",
 		"hono": "^4.6.13",
 		"octokit": "^4.1.0",
-		"valibot": "0.42.1"
+		"valibot": "0.42.1",
+		"wasm-image-optimization": "^1.1.2"
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20241112.0",

@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
+import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
@@ -140,7 +141,24 @@ const route = app
 			const { image } = c.req.valid("form");
 
 			try {
-				await UserStorageRepository.uploadProfileImage(image, payload.userId);
+				const optimizedImageArrayBuffer = await optimizeImage({
+					image: await image.arrayBuffer(),
+					width: 256,
+					height: 256,
+					format: "webp",
+				});
+				if (!optimizedImageArrayBuffer) {
+					throw new Error("Failed to optimize image");
+				}
+
+				const optimizedImageUint8Array = new Uint8Array(
+					optimizedImageArrayBuffer,
+				);
+
+				await UserStorageRepository.uploadProfileImage(
+					new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+					payload.userId,
+				);
 
 				await UserRepository.updateUser(payload.userId, {
 					profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
