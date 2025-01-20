@@ -24,6 +24,24 @@ export default defineConfig({
 					},
 				},
 			},
+			keyframes: {
+				zoom: {
+					"0%": {
+						transform: "scale(0.8)",
+					},
+					"100%": {
+						transform: "scale(1)",
+					},
+				},
+				fadein: {
+					from: {
+						opacity: 0,
+					},
+					to: {
+						opacity: 1,
+					},
+				},
+			},
 		},
 	},
 

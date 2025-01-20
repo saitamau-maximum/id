@@ -50,6 +50,9 @@ importers:
       react-feather:
         specifier: ^2.0.10
         version: 2.0.10(react@19.0.0)
+      react-image-crop:
+        specifier: ^11.0.7
+        version: 11.0.7(react@19.0.0)
       react-router:
         specifier: ^7.1.1
         version: 7.1.1(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -107,6 +110,9 @@ importers:
       valibot:
         specifier: 0.42.1
         version: 0.42.1(typescript@5.7.2)
+      wasm-image-optimization:
+        specifier: ^1.1.2
+        version: 1.1.2
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20241112.0
@@ -3239,6 +3245,11 @@ packages:
     peerDependencies:
       react: '>=16.8.6'
 
+  react-image-crop@11.0.7:
+    resolution: {integrity: sha512-ZciKWHDYzmm366JDL18CbrVyjnjH0ojufGDmScfS4ZUqLHg4nm6ATY+K62C75W4ZRNt4Ii+tX0bSjNk9LQ2xzQ==}
+    peerDependencies:
+      react: '>=16.13.1'
+
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
 
@@ -3644,6 +3655,9 @@ packages:
         optional: true
       terser:
         optional: true
+
+  wasm-image-optimization@1.1.2:
+    resolution: {integrity: sha512-GQqo7vFZyEVenGPJNf6mcRa/ZkVGGFKnZrjQJ6+DX0aCNn6UKvTFCmwq/1vOTbM625poMyZJI/9KVkyAz8JETQ==}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -7195,6 +7209,10 @@ snapshots:
       prop-types: 15.8.1
       react: 19.0.0
 
+  react-image-crop@11.0.7(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+
   react-is@16.13.1: {}
 
   react-refresh@0.14.2: {}
@@ -7617,6 +7635,8 @@ snapshots:
       '@types/node': 20.17.12
       fsevents: 2.3.3
       lightningcss: 1.25.1
+
+  wasm-image-optimization@1.1.2: {}
 
   which@2.0.2:
     dependencies:

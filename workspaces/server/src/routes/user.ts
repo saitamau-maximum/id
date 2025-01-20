@@ -1,5 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { stream } from "hono/streaming";
 import * as v from "valibot";
+import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
@@ -17,65 +19,78 @@ const registerSchema = v.object({
 	grade: v.pipe(v.string(), v.nonEmpty()),
 });
 
+const updateProfileImageSchema = v.object({
+	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
+});
+
 const route = app
-	.use(authMiddleware)
-	.post("/register", vValidator("json", registerSchema), async (c) => {
-		const payload = c.get("jwtPayload");
-		const { UserRepository } = c.var;
+	.post(
+		"/register",
+		authMiddleware,
+		vValidator("json", registerSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { UserRepository } = c.var;
 
-		const {
-			displayName,
-			realName,
-			realNameKana,
-			displayId,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		} = c.req.valid("json");
+			const {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			} = c.req.valid("json");
 
-		await UserRepository.registerUser(payload.userId, {
-			displayName,
-			displayId,
-			realName,
-			realNameKana,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		});
+			await UserRepository.registerUser(payload.userId, {
+				displayName,
+				displayId,
+				realName,
+				realNameKana,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			});
 
-		return c.text("ok", 200);
-	})
-	.put("/update", vValidator("json", registerSchema), async (c) => {
-		const payload = c.get("jwtPayload");
-		const { UserRepository } = c.var;
+			return c.text("ok", 200);
+		},
+	)
+	.put(
+		"/update",
+		authMiddleware,
+		vValidator("json", registerSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { UserRepository } = c.var;
 
-		const {
-			displayName,
-			realName,
-			realNameKana,
-			displayId,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		} = c.req.valid("json");
+			const {
+				displayName,
+				realName,
+				realNameKana,
+				displayId,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			} = c.req.valid("json");
 
-		await UserRepository.updateUser(payload.userId, {
-			displayName,
-			displayId,
-			realName,
-			realNameKana,
-			academicEmail,
-			email,
-			studentId,
-			grade,
-		});
+			await UserRepository.updateUser(payload.userId, {
+				displayName,
+				displayId,
+				realName,
+				realNameKana,
+				academicEmail,
+				email,
+				studentId,
+				grade,
+			});
 
-		return c.text("ok", 200);
-	})
-	.get("/contributions", async (c) => {
+			return c.text("ok", 200);
+		},
+	)
+	.get("/contributions", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const {
 			ContributionRepository,
@@ -113,6 +128,62 @@ const route = app
 		);
 
 		return c.json(contributions, 200);
+	})
+	.put(
+		"/profile-image",
+		authMiddleware,
+		vValidator("form", updateProfileImageSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const serverOrigin = new URL(c.req.url).origin;
+			const { UserStorageRepository, UserRepository } = c.var;
+
+			const { image } = c.req.valid("form");
+
+			try {
+				const optimizedImageArrayBuffer = await optimizeImage({
+					image: await image.arrayBuffer(),
+					width: 256,
+					height: 256,
+					format: "webp",
+				});
+				if (!optimizedImageArrayBuffer) {
+					throw new Error("Failed to optimize image");
+				}
+
+				const optimizedImageUint8Array = new Uint8Array(
+					optimizedImageArrayBuffer,
+				);
+
+				await UserStorageRepository.uploadProfileImage(
+					new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+					payload.userId,
+				);
+
+				await UserRepository.updateUser(payload.userId, {
+					profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
+				});
+
+				return c.text("ok", 200);
+			} catch (e) {
+				console.error(e);
+				return c.text("Failed to upload profile image", 500);
+			}
+		},
+	)
+	.get("/profile-image/:userId", async (c) => {
+		// TODO 画像のキャッシュを考慮する
+		const { UserStorageRepository } = c.var;
+		const userId = c.req.param("userId");
+
+		try {
+			const body = await UserStorageRepository.getProfileImageURL(userId);
+			c.header("Content-Type", "image/webp");
+			return stream(c, (s) => s.pipe(body));
+		} catch (e) {
+			console.error(e);
+			return c.text("Not found", 404);
+		}
 	});
 
 export { route as userRoute };

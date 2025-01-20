@@ -1,5 +1,6 @@
 import { css } from "styled-system/css";
 import { ProfileUpdateForm } from "./internal/components/form";
+import { ProfileImageEditor } from "./internal/components/profile-image-editor";
 
 export default function Settings() {
 	return (
@@ -26,12 +27,15 @@ export default function Settings() {
 				className={css({
 					width: "100%",
 					height: "100%",
-					maxWidth: 1200,
-					margin: "auto",
-					padding: "token(spacing.8) token(spacing.4)",
 					gap: 8,
+					display: "flex",
+
+					lgDown: {
+						flexDirection: "column",
+					},
 				})}
 			>
+				<ProfileImageEditor />
 				<ProfileUpdateForm />
 			</div>
 		</div>

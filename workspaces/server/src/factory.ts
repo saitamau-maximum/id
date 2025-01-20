@@ -5,6 +5,7 @@ import type { IContributionRepository } from "./repository/contribution";
 import type { IOAuthRepository } from "./repository/oauth";
 import type { IOrganizationRepository } from "./repository/organization";
 import type { ISessionRepository } from "./repository/session";
+import type { IUserStorageRepository } from "./repository/storage";
 import type { IUserRepository } from "./repository/user";
 
 export type HonoEnv = {
@@ -16,6 +17,7 @@ export type HonoEnv = {
 		ContributionCacheRepository: IContributionCacheRepository;
 		OAuthRepository: IOAuthRepository;
 		OrganizationRepository: IOrganizationRepository;
+		UserStorageRepository: IUserStorageRepository;
 		tokenInfo?: Awaited<ReturnType<IOAuthRepository["getTokenByAccessToken"]>>;
 	} & JwtVariables<{ userId: string }>;
 };

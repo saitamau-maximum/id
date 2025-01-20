@@ -36,6 +36,7 @@ export interface IUserRepository {
 	getAllUsers: () => Promise<User[]>;
 	getAllUsers$$key: () => unknown[];
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	updateUserProfileImage: (file: File) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -128,6 +129,17 @@ export class UserRepositoryImpl implements IUserRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to update user role");
+		}
+	}
+
+	async updateUserProfileImage(file: File) {
+		const res = await client.user["profile-image"].$put({
+			form: {
+				image: file,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to update user profile image");
 		}
 	}
 }
