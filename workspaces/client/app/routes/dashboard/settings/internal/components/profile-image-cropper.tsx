@@ -175,7 +175,7 @@ export const ProfileImageCropper = ({
 						marginBottom: 4,
 					})}
 				>
-					アップロードに失敗しました。切り抜き後の画像が5MiB以下を超えている可能性があります。
+					アップロードに失敗しました。切り抜き後の画像が5MiBを超えている可能性があります。
 				</p>
 			)}
 			<div
