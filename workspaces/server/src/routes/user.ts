@@ -20,7 +20,7 @@ const registerSchema = v.object({
 });
 
 const updateProfileImageSchema = v.object({
-	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MB
+	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
 });
 
 const route = app
