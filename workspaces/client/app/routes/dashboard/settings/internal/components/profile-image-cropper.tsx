@@ -186,7 +186,7 @@ export const ProfileImageCropper = ({
 				})}
 			>
 				<button type="button" onClick={handleCancel}>
-					<ButtonLike variant="secondary">Cancel</ButtonLike>
+					<ButtonLike variant="secondary">キャンセル</ButtonLike>
 				</button>
 				<button type="button" onClick={onCrop}>
 					<ButtonLike>
