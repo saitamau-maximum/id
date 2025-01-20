@@ -12,6 +12,7 @@ import ReactCrop, {
 
 import "react-image-crop/dist/ReactCrop.css";
 
+import { UploadCloud } from "react-feather";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
@@ -188,7 +189,10 @@ export const ProfileImageCropper = ({
 					<ButtonLike variant="secondary">Cancel</ButtonLike>
 				</button>
 				<button type="button" onClick={onCrop}>
-					<ButtonLike>確定</ButtonLike>
+					<ButtonLike>
+						<UploadCloud size={20} />
+						更新
+					</ButtonLike>
 				</button>
 			</div>
 		</Dialog>
