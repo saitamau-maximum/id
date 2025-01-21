@@ -11,6 +11,7 @@
 		"apply:migrations:prod": "wrangler d1 migrations apply --env production --remote idp-db",
 		"deploy:preview": "wrangler deploy --env preview",
 		"deploy:prod": "wrangler deploy --env production",
+		"seed": "NODE_NO_WARNINGS=1 tsx ./src/db/seed/main.ts --url $(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit)",
 		"fix": "biome check --write ./src",
 		"check": "biome check ./src"
 	},
@@ -31,7 +32,15 @@
 	},
 	"devDependencies": {
 		"@cloudflare/workers-types": "^4.20241112.0",
+		"@miniflare/d1": "^2.14.4",
+		"@miniflare/shared": "^2.14.4",
+		"@types/minimist": "^1.2.5",
+		"@types/prompts": "^2.4.9",
+		"better-sqlite3": "^11.8.1",
 		"drizzle-kit": "^0.28.0",
+		"minimist": "^1.2.8",
+		"prompts": "^2.4.2",
+		"tsx": "^4.19.2",
 		"typescript": "^5.7.2",
 		"wrangler": "^3.95.0"
 	}
