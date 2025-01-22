@@ -1,7 +1,7 @@
 import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
 
-import { LogOut, Settings } from "react-feather";
+import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { Menu } from "~/components/ui/menu";
@@ -349,6 +349,20 @@ export const Sidebar = () => {
 									})}
 								/>
 								Settings
+							</Menu.Item>
+							<Menu.Item
+								onAction={() => {
+									setIsMenuOpen(false);
+									navigate("/oauth-apps");
+								}}
+							>
+								<Key
+									size={20}
+									className={css({
+										color: "gray.500",
+									})}
+								/>
+								OAuth Apps
 							</Menu.Item>
 							<Menu.Item
 								onAction={() => {

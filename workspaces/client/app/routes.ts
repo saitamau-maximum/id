@@ -21,6 +21,12 @@ export default [
 					route("users", "routes/dashboard/admin/users/page.tsx"),
 				]),
 			]),
+			...prefix("oauth-apps", [
+				layout("routes/dashboard/oauth-apps/layout.tsx", [
+					index("routes/dashboard/oauth-apps/home/page.tsx"),
+					route("list", "routes/dashboard/oauth-apps/list/page.tsx"),
+				]),
+			]),
 		]),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("verify", "routes/verify.tsx"),
