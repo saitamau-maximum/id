@@ -15,12 +15,8 @@ const generateHash = async (secret: string) => {
 	return hashHex;
 };
 
-const route = app
-	.use(authMiddleware)
-	.get("/list", async (c) =>
-		c.json(await c.var.OAuthExternalRepository.getClients()),
-	)
-	.get("/:id", async (c) => {
+const getClientWithAuthMiddleware = factory.createMiddleware(
+	async (c, next) => {
 		const { id: clientId } = c.req.param();
 		const { userId } = c.get("jwtPayload");
 
@@ -31,6 +27,19 @@ const route = app
 		if (client.managers.every((manager) => manager.id !== userId))
 			return c.text("Forbidden", 403);
 
+		c.set("oauthClientInfo", client);
+		return next();
+	},
+);
+
+const route = app
+	.use(authMiddleware)
+	.get("/list", async (c) =>
+		c.json(await c.var.OAuthExternalRepository.getClients()),
+	)
+	.get("/:id", getClientWithAuthMiddleware, async (c) => {
+		const client = c.get("oauthClientInfo");
+		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
 
 		return c.json({
@@ -46,16 +55,10 @@ const route = app
 			),
 		});
 	})
-	.delete("/:id/secrets/:hash", async (c) => {
+	.delete("/:id/secrets/:hash", getClientWithAuthMiddleware, async (c) => {
 		const { id: clientId, hash: secretHash } = c.req.param();
-		const { userId } = c.get("jwtPayload");
-
-		const client = await c.var.OAuthExternalRepository.getClientById(clientId);
-
+		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
-
-		if (client.managers.every((manager) => manager.id !== userId))
-			return c.text("Forbidden", 403);
 
 		for (const secret of client.secrets) {
 			if ((await generateHash(secret.secret)) === secretHash) {
