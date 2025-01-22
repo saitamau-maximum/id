@@ -17,7 +17,7 @@ const NAVIGATION = [
 	},
 ];
 
-export default function AdminLayout() {
+export default function OAuthLayout() {
 	const location = useLocation();
 
 	const { isLoading, isAuthorized } = useAuth();

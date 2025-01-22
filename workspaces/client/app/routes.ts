@@ -26,6 +26,7 @@ export default [
 					index("routes/dashboard/oauth-apps/home/page.tsx"),
 					route("list", "routes/dashboard/oauth-apps/list/page.tsx"),
 				]),
+				route(":oauthAppId", "routes/dashboard/oauth-apps/config/page.tsx"),
 			]),
 		]),
 		route("onboarding", "routes/onboarding/page.tsx"),
