@@ -70,23 +70,38 @@ export class CloudflareOAuthExternalRepository
 		const res = await this.client.query.oauthClients.findFirst({
 			where: (client, { eq }) => eq(client.id, clientId),
 			with: {
+				secrets: {
+					orderBy({ issuedAt }, { asc }) {
+						return asc(issuedAt);
+					},
+				},
 				callbacks: true,
 				scopes: {
 					with: {
 						scope: true,
 					},
 				},
+				managers: {
+					with: {
+						user: USER_BASIC_INFO_COLUMNS_GETTER,
+					},
+				},
+				owner: USER_BASIC_INFO_COLUMNS_GETTER,
 			},
 		});
 
 		if (!res) return undefined;
 
-		const { callbacks, scopes, ...client } = res;
+		const { callbacks, scopes, managers, owner, ...client } = res;
 
 		return {
 			...client,
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes.map((clientScope) => clientScope.scope),
+			managers: managers
+				.map((manager) => manager.user)
+				.map(USER_BASIC_INFO_TRANSFORMER),
+			owner: USER_BASIC_INFO_TRANSFORMER(owner),
 		};
 	}
 

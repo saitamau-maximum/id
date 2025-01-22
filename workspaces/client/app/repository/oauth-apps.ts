@@ -1,27 +1,51 @@
 import { client } from "~/utils/hono";
 import type { User } from "./auth";
 
-interface OAuthApp {
+interface Client {
 	id: string;
 	name: string;
 	description: string | null;
 	logoUrl: string | null;
 	ownerId: string;
 }
-
-type UserBasicInfo = Pick<
+export type UserBasicInfo = Pick<
 	User,
 	"id" | "displayId" | "displayName" | "profileImageURL"
 >;
+type Scope = {
+	id: number;
+	name: string;
+	description: string | null;
+};
+type ClientSecret = {
+	secret: string;
+	description: string | null;
+	issuedBy: string;
+	issuedAt: string;
+};
+type ClientCallback = {
+	clientId: Client["id"];
+	callbackUrl: string;
+};
 
-type GetAppsRes = (OAuthApp & {
+type GetAppsRes = (Client & {
 	managers: UserBasicInfo[];
 	owner: UserBasicInfo;
 })[];
 
+type GetAppByIdRes = Client & {
+	callbackUrls: ClientCallback["callbackUrl"][];
+	scopes: Scope[];
+	managers: UserBasicInfo[];
+	owner: UserBasicInfo;
+	secrets: ClientSecret[];
+};
+
 export interface IOAuthAppsRepository {
 	getApps: () => Promise<GetAppsRes>;
 	getApps$$key: () => unknown[];
+	getAppById: (appId: string) => Promise<GetAppByIdRes>;
+	getAppById$$key: (appId: string) => unknown[];
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -35,5 +59,19 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 	getApps$$key() {
 		return ["apps"];
+	}
+
+	async getAppById(appId: string) {
+		const res = await client.oauth.manage[":id"].$get({
+			param: { id: appId },
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch app");
+		}
+		return res.json();
+	}
+
+	getAppById$$key(appId: string) {
+		return ["app", { id: appId }];
 	}
 }

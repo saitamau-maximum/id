@@ -1,5 +1,5 @@
 import { Table } from "~/components/ui/table";
-import { useAllApps } from "./internal/hooks/use-all-apps";
+import { useAllApps } from "../internal/hooks/use-apps";
 
 export default function List() {
 	const apps = useAllApps();

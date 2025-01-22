@@ -8,3 +8,11 @@ export const useAllApps = () => {
 		queryFn: oauthAppsRepository.getApps,
 	});
 };
+
+export const useApp = (appId: string) => {
+	const { oauthAppsRepository } = useRepository();
+	return useQuery({
+		queryKey: oauthAppsRepository.getAppById$$key(appId),
+		queryFn: () => oauthAppsRepository.getAppById(appId),
+	});
+};

@@ -56,7 +56,10 @@ type GetClientsRes = Client & {
 
 type GetClientByIdRes = Client & {
 	callbackUrls: ClientCallback["callbackUrl"][];
+	secrets: ClientSecret[];
 	scopes: Scope[];
+	managers: UserBasicInfo[];
+	owner: UserBasicInfo;
 };
 
 type GetTokenByCodeRes = Token & {
