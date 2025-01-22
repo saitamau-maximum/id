@@ -1,3 +1,5 @@
+import type { User } from "./user";
+
 export type Client = {
 	id: string;
 	name: string;
@@ -42,6 +44,16 @@ export type Token = {
 	accessTokenExpiresAt: Date;
 };
 
+type UserBasicInfo = Pick<
+	User,
+	"id" | "displayId" | "displayName" | "profileImageURL"
+>;
+
+type GetClientsRes = Client & {
+	managers: UserBasicInfo[];
+	owner: UserBasicInfo;
+};
+
 type GetClientByIdRes = Client & {
 	callbackUrls: ClientCallback["callbackUrl"][];
 	scopes: Scope[];
@@ -58,6 +70,7 @@ type GetTokenByATRes = Token & {
 };
 
 export type IOAuthExternalRepository = {
+	getClients: () => Promise<GetClientsRes[]>;
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
 	createAccessToken: (
 		clientId: string,

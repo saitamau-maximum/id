@@ -6,6 +6,36 @@ import type {
 	Scope,
 } from "./../../../repository/oauth-external";
 
+// user table から基本的な情報を取得するためのやつ
+const USER_BASIC_INFO_COLUMNS_GETTER = {
+	columns: {
+		id: true,
+	},
+	with: {
+		profile: {
+			columns: {
+				displayId: true,
+				displayName: true,
+				profileImageURL: true,
+			},
+		},
+	},
+} as const;
+type UserBasicInfoRawData = {
+	id: string;
+	profile: {
+		displayId: string | null;
+		displayName: string | null;
+		profileImageURL: string | null;
+	};
+};
+const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
+	id: user.id,
+	displayId: user.profile.displayId ?? undefined,
+	displayName: user.profile.displayName ?? undefined,
+	profileImageURL: user.profile.profileImageURL ?? undefined,
+});
+
 export class CloudflareOAuthExternalRepository
 	implements IOAuthExternalRepository
 {
@@ -13,6 +43,27 @@ export class CloudflareOAuthExternalRepository
 
 	constructor(db: D1Database) {
 		this.client = drizzle(db, { schema });
+	}
+
+	async getClients() {
+		const res = await this.client.query.oauthClients.findMany({
+			with: {
+				managers: {
+					with: {
+						user: USER_BASIC_INFO_COLUMNS_GETTER,
+					},
+				},
+				owner: USER_BASIC_INFO_COLUMNS_GETTER,
+			},
+		});
+
+		return res.map((client) => ({
+			...client,
+			managers: client.managers
+				.map((manager) => manager.user)
+				.map(USER_BASIC_INFO_TRANSFORMER),
+			owner: USER_BASIC_INFO_TRANSFORMER(client.owner),
+		}));
 	}
 
 	async getClientById(clientId: string) {
