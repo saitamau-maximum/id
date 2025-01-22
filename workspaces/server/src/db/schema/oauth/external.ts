@@ -14,6 +14,21 @@ export const oauthClients = sqliteTable("oauth_clients", {
 		.references(() => users.id),
 });
 
+export const oauthClientManagers = sqliteTable(
+	"oauth_client_managers",
+	{
+		clientId: text("client_id")
+			.notNull()
+			.references(() => oauthClients.id),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.clientId, table.userId] }),
+	}),
+);
+
 export const oauthClientSecrets = sqliteTable(
 	"oauth_client_secrets",
 	{
@@ -108,9 +123,24 @@ export const oauthClientsRelations = relations(
 			fields: [oauthClients.ownerId],
 			references: [users.id],
 		}),
+		managers: many(oauthClientManagers),
 		secrets: many(oauthClientSecrets),
 		callbacks: many(oauthClientCallbacks),
 		scopes: many(oauthClientScopes),
+	}),
+);
+
+export const oauthClientManagersRelations = relations(
+	oauthClientManagers,
+	({ one }) => ({
+		client: one(oauthClients, {
+			fields: [oauthClientManagers.clientId],
+			references: [oauthClients.id],
+		}),
+		user: one(users, {
+			fields: [oauthClientManagers.userId],
+			references: [users.id],
+		}),
 	}),
 );
 

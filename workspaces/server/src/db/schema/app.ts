@@ -8,7 +8,12 @@ import {
 	text,
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import { oauthClientSecrets, oauthConnections, oauthTokens } from "./oauth";
+import {
+	oauthClientSecrets,
+	oauthClients,
+	oauthConnections,
+	oauthTokens,
+} from "./oauth";
 
 // 認証以外のアプリケーション関連のスキーマ定義
 
@@ -23,6 +28,8 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 		fields: [users.id],
 		references: [userProfiles.userId],
 	}),
+	oauthOwningClients: many(oauthClients),
+	oauthManagingClients: many(oauthClients),
 	oauthIssuedSecrets: many(oauthClientSecrets),
 	oauthIssuedTokens: many(oauthTokens),
 	oauthConnections: many(oauthConnections),
