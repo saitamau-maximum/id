@@ -19,6 +19,7 @@ type Scope = {
 };
 type ClientSecret = {
 	secret: string;
+	secretHash: string;
 	description: string | null;
 	issuedBy: string;
 	issuedAt: string;
@@ -46,6 +47,7 @@ export interface IOAuthAppsRepository {
 	getApps$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
+	deleteSecretByHash: (appId: string, secretHash: string) => Promise<void>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -73,5 +75,12 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 	getAppById$$key(appId: string) {
 		return ["app", { id: appId }];
+	}
+
+	async deleteSecretByHash(appId: string, secretHash: string) {
+		const res = await client.oauth.manage[":id"].secrets[":hash"].$delete({
+			param: { id: appId, hash: secretHash },
+		});
+		if (!res.ok) throw new Error("Failed to delete secret");
 	}
 }

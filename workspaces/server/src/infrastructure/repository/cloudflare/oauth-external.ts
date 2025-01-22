@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -45,27 +45,6 @@ export class CloudflareOAuthExternalRepository
 		this.client = drizzle(db, { schema });
 	}
 
-	async getClients() {
-		const res = await this.client.query.oauthClients.findMany({
-			with: {
-				managers: {
-					with: {
-						user: USER_BASIC_INFO_COLUMNS_GETTER,
-					},
-				},
-				owner: USER_BASIC_INFO_COLUMNS_GETTER,
-			},
-		});
-
-		return res.map((client) => ({
-			...client,
-			managers: client.managers
-				.map((manager) => manager.user)
-				.map(USER_BASIC_INFO_TRANSFORMER),
-			owner: USER_BASIC_INFO_TRANSFORMER(client.owner),
-		}));
-	}
-
 	async getClientById(clientId: string) {
 		const res = await this.client.query.oauthClients.findFirst({
 			where: (client, { eq }) => eq(client.id, clientId),
@@ -104,6 +83,44 @@ export class CloudflareOAuthExternalRepository
 			owner: USER_BASIC_INFO_TRANSFORMER(owner),
 		};
 	}
+
+	// ----- management ----- //
+
+	async getClients() {
+		const res = await this.client.query.oauthClients.findMany({
+			with: {
+				managers: {
+					with: {
+						user: USER_BASIC_INFO_COLUMNS_GETTER,
+					},
+				},
+				owner: USER_BASIC_INFO_COLUMNS_GETTER,
+			},
+		});
+
+		return res.map((client) => ({
+			...client,
+			managers: client.managers
+				.map((manager) => manager.user)
+				.map(USER_BASIC_INFO_TRANSFORMER),
+			owner: USER_BASIC_INFO_TRANSFORMER(client.owner),
+		}));
+	}
+
+	async deleteClientSecret(clientId: string, secret: string) {
+		const res = await this.client
+			.delete(schema.oauthClientSecrets)
+			.where(
+				and(
+					eq(schema.oauthClientSecrets.clientId, clientId),
+					eq(schema.oauthClientSecrets.secret, secret),
+				),
+			);
+
+		if (!res.success) throw new Error("Failed to delete secret");
+	}
+
+	// ----- OAuth flow に関する処理 ----- //
 
 	async createAccessToken(
 		clientId: string,

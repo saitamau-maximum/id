@@ -73,8 +73,14 @@ type GetTokenByATRes = Token & {
 };
 
 export type IOAuthExternalRepository = {
-	getClients: () => Promise<GetClientsRes[]>;
+	// common
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
+
+	// management
+	getClients: () => Promise<GetClientsRes[]>;
+	deleteClientSecret: (clientId: string, secret: string) => Promise<void>;
+
+	// OAuth flow
 	createAccessToken: (
 		clientId: string,
 		userId: string,

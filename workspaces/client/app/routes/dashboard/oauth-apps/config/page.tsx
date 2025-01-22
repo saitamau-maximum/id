@@ -5,6 +5,7 @@ import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { useAuth } from "~/hooks/use-auth";
+import { useRepository } from "~/hooks/use-repository";
 import type { UserBasicInfo } from "~/repository/oauth-apps";
 import { useApp } from "../internal/hooks/use-apps";
 
@@ -20,6 +21,8 @@ export default function Config() {
 	const appDescriptionId = useId();
 	const appScopesId = useId();
 	const appCallbackUrlsId = useId();
+
+	const { oauthAppsRepository } = useRepository();
 
 	// このページで使うユーザー情報は owner と managers のみなので、使いまわす
 	const userId2userInfo = useMemo(() => {
@@ -41,6 +44,16 @@ export default function Config() {
 	// サーバー側でチェックしているはずだが念のため
 	if (oauthApp.managers.every((manager) => manager.id !== user.id))
 		return <div>権限がありません</div>;
+
+	const handleDeleteSecret = (secretHash: string) => async () => {
+		try {
+			await oauthAppsRepository.deleteSecretByHash(oauthAppId, secretHash);
+			// TODO: reload
+		} catch {
+			// TODO
+			alert("削除に失敗しました");
+		}
+	};
 
 	return (
 		<div>
@@ -116,7 +129,10 @@ export default function Config() {
 							on
 							{issuedAt.toLocaleString()}
 						</p>
-						<button type="button">
+						<button
+							type="button"
+							onClick={handleDeleteSecret(secret.secretHash)}
+						>
 							<ButtonLike>削除</ButtonLike>
 						</button>
 					</div>
