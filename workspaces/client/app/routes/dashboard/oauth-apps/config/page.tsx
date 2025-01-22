@@ -1,19 +1,25 @@
-import { useMemo } from "react";
+import { useId, useMemo } from "react";
 import { ChevronLeft } from "react-feather";
 import { Link, useParams } from "react-router";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
+import { Form } from "~/components/ui/form";
 import { useAuth } from "~/hooks/use-auth";
 import type { UserBasicInfo } from "~/repository/oauth-apps";
 import { useApp } from "../internal/hooks/use-apps";
 
 export default function Config() {
 	const { oauthAppId } = useParams<{ oauthAppId: string }>();
-
 	if (!oauthAppId) return null;
 
 	const { user } = useAuth();
 	const { data: oauthApp, isLoading: isLoadingApp } = useApp(oauthAppId);
+
+	const appLogoId = useId();
+	const appNameId = useId();
+	const appDescriptionId = useId();
+	const appScopesId = useId();
+	const appCallbackUrlsId = useId();
 
 	// このページで使うユーザー情報は owner と managers のみなので、使いまわす
 	const userId2userInfo = useMemo(() => {
@@ -29,9 +35,7 @@ export default function Config() {
 	}, [oauthApp]);
 
 	if (!user) return null;
-
 	if (isLoadingApp) return <div>読み込み中...</div>;
-
 	if (!oauthApp) return <div>権限がありません</div>;
 
 	// サーバー側でチェックしているはずだが念のため
@@ -123,40 +127,57 @@ export default function Config() {
 			</button>
 			<h2>Edit</h2>
 			<form>
-				Application Logo
-				{oauthApp.logoUrl ? (
-					<img src={oauthApp.logoUrl} alt="Logo" width={100} height={100} />
-				) : (
-					"No Image"
-				)}
-				<button type="button">
-					<ButtonLike>Upload new logo</ButtonLike>
-				</button>
-				<br />
-				Application Name
-				<input name="name" type="text" value={oauthApp.name} required />
-				<br />
-				Application Description
-				<textarea name="description" value={oauthApp.description ?? ""} />
-				<br />
-				Scopes
-				<ul>
-					{oauthApp.scopes.map((scope) => (
-						<li key={scope.id}>
-							{scope.name}
-							{scope.description && <span> ({scope.description})</span>}
-						</li>
-					))}
-				</ul>
-				(追加するボタン)
-				<br />
-				Callback URLs
-				<ul>
+				<Form.FieldSet>
+					<label htmlFor={appLogoId}>
+						<Form.LabelText>Application Logo</Form.LabelText>
+					</label>
+					{oauthApp.logoUrl ? (
+						<img src={oauthApp.logoUrl} alt="Logo" width={100} height={100} />
+					) : (
+						"No Image"
+					)}
+					<Form.Input type="file" name="logo" />
+				</Form.FieldSet>
+				<Form.FieldSet>
+					<label htmlFor={appNameId}>
+						<Form.LabelText>Application Name</Form.LabelText>
+					</label>
+					<Form.Input
+						id={appNameId}
+						type="text"
+						value={oauthApp.name}
+						required
+					/>
+				</Form.FieldSet>
+				<Form.FieldSet>
+					<label htmlFor={appDescriptionId}>
+						<Form.LabelText>Application Description</Form.LabelText>
+					</label>
+					<Form.Input
+						id={appDescriptionId}
+						value={oauthApp.description ?? ""}
+					/>
+				</Form.FieldSet>
+				<Form.FieldSet>
+					<label htmlFor={appScopesId}>
+						<Form.LabelText>Scopes</Form.LabelText>
+					</label>
+					<Form.SelectGroup>
+						{/* TODO: 全 scopes から読みだすべき */}
+						{oauthApp.scopes.map((scope) => (
+							<Form.Select key={scope.id} value={scope.id} label={scope.name} />
+						))}
+					</Form.SelectGroup>
+				</Form.FieldSet>
+				<Form.FieldSet>
+					<label htmlFor={appCallbackUrlsId}>
+						<Form.LabelText>Callback URLs</Form.LabelText>
+					</label>
 					{oauthApp.callbackUrls.map((callbackUrl) => (
-						<li key={callbackUrl}>{callbackUrl}</li>
+						<Form.Input key={callbackUrl} value={callbackUrl} />
 					))}
-				</ul>
-				(編集と追加)
+					[callback url 追加ボタン]
+				</Form.FieldSet>
 				<button type="submit">
 					<ButtonLike>Save</ButtonLike>
 				</button>
