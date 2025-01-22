@@ -35,6 +35,9 @@ async function init() {
 	const DATABASE_URL = argv.url;
 	if (!DATABASE_URL) {
 		console.error("DATABASE_URL is required");
+		console.log(
+			"`pnpm apply:migrations:local` を実行していない可能性があります",
+		);
 		return;
 	}
 

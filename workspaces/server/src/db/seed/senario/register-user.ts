@@ -3,9 +3,17 @@ import { OAUTH_PROVIDER_IDS } from "../../../constants/oauth";
 import { ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../schema";
 
-const DUMMY_INITIALIZED_USERS = [
+export const DUMMY_USER_IDS = {
+	USER1: "user1",
+	USER2: "user2",
+	USER3: "user3",
+	USER4: "user4",
+	USER5: "user5",
+};
+
+export const DUMMY_INITIALIZED_USERS = [
 	{
-		id: "user1",
+		id: DUMMY_USER_IDS.USER1,
 		profile: {
 			id: "profile1",
 			displayName: "User One",
@@ -21,7 +29,7 @@ const DUMMY_INITIALIZED_USERS = [
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
 	},
 	{
-		id: "user2",
+		id: DUMMY_USER_IDS.USER2,
 		profile: {
 			id: "profile2",
 			displayName: "User Two",
@@ -37,7 +45,7 @@ const DUMMY_INITIALIZED_USERS = [
 		roles: [ROLE_IDS.MEMBER],
 	},
 	{
-		id: "user3",
+		id: DUMMY_USER_IDS.USER3,
 		profile: {
 			id: "profile3",
 			displayName: "User Three",
@@ -54,9 +62,9 @@ const DUMMY_INITIALIZED_USERS = [
 	},
 ];
 
-const DUMMY_UNINITIALIZED_USERS = [
+export const DUMMY_UNINITIALIZED_USERS = [
 	{
-		id: "user4",
+		id: DUMMY_USER_IDS.USER4,
 		profile: {
 			id: "profile4",
 			profileImageURL: "https://i.pravatar.cc/300?img=4",
@@ -65,7 +73,7 @@ const DUMMY_UNINITIALIZED_USERS = [
 		},
 	},
 	{
-		id: "user5",
+		id: DUMMY_USER_IDS.USER5,
 		profile: {
 			id: "profile5",
 			profileImageURL: "https://i.pravatar.cc/300?img=5",
@@ -76,42 +84,41 @@ const DUMMY_UNINITIALIZED_USERS = [
 ];
 
 // user1~5まで全てのユーザーがGitHubでログインしているとする
-const DUMMY_OAUTH_CONNECTIONS = [
+export const DUMMY_OAUTH_CONNECTIONS = [
 	{
 		userId: "user1",
 		providerId: OAUTH_PROVIDER_IDS.GITHUB,
 		providerUserId: "github-user1",
 		login: "userone",
 		email: "user1@example.com",
-		avatar_url: "https://i.pravatar.cc/300?img=1",
 	},
 	{
 		userId: "user2",
 		providerId: OAUTH_PROVIDER_IDS.GITHUB,
 		providerUserId: "github-user2",
 		login: "usertwo",
-		email: "https://i.pravatar.cc/300?img=2",
+		email: "user2@example.com",
 	},
 	{
 		userId: "user3",
 		providerId: OAUTH_PROVIDER_IDS.GITHUB,
 		providerUserId: "github-user3",
 		login: "userthree",
-		email: "https://i.pravatar.cc/300?img=3",
+		email: "user3@example.com",
 	},
 	{
 		userId: "user4",
 		providerId: OAUTH_PROVIDER_IDS.GITHUB,
 		providerUserId: "github-user4",
 		login: "userfour",
-		email: "https://i.pravatar.cc/300?img=4",
+		email: "user4@example.com",
 	},
 	{
 		userId: "user5",
 		providerId: OAUTH_PROVIDER_IDS.GITHUB,
 		providerUserId: "github-user5",
 		login: "userfive",
-		email: "https://i.pravatar.cc/300?img=5",
+		email: "user5@example.com",
 	},
 ];
 
@@ -137,6 +144,12 @@ export const registerUserSeed = async (
 				studentId: user.profile.studentId,
 				grade: user.profile.grade,
 			}),
+			client.insert(schema.userRoles).values(
+				user.roles.map((role) => ({
+					userId: user.id,
+					roleId: role,
+				})),
+			),
 		]);
 	}
 
@@ -156,6 +169,12 @@ export const registerUserSeed = async (
 	}
 
 	for (const connection of DUMMY_OAUTH_CONNECTIONS) {
-		await client.insert(schema.oauthConnections).values(connection);
+		await client.insert(schema.oauthConnections).values({
+			userId: connection.userId,
+			providerId: connection.providerId,
+			providerUserId: connection.providerUserId,
+			email: connection.email,
+			name: connection.login,
+		});
 	}
 };
