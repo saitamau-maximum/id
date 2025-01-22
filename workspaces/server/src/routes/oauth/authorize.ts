@@ -30,7 +30,8 @@ const route = app
 			}
 
 			// client_id が DB にあるか
-			const client = await c.var.OAuthRepository.getClientById(clientId);
+			const client =
+				await c.var.OAuthExternalRepository.getClientById(clientId);
 			if (!client) return c.text("Bad Request: client_id not registered", 400);
 
 			// redirect_uri が複数ないことをチェック

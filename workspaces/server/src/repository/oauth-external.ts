@@ -42,15 +42,6 @@ export type Token = {
 	accessTokenExpiresAt: Date;
 };
 
-export type OAuthConnection = {
-	userId: string;
-	providerId: number;
-	providerUserId: string;
-	email: string | null;
-	name: string | null;
-	profileImageUrl: string | null;
-};
-
 type GetClientByIdRes = Client & {
 	callbackUrls: ClientCallback["callbackUrl"][];
 	scopes: Scope[];
@@ -66,7 +57,7 @@ type GetTokenByATRes = Token & {
 	scopes: Scope[];
 };
 
-export type IOAuthRepository = {
+export type IOAuthExternalRepository = {
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
 	createAccessToken: (
 		clientId: string,
@@ -82,8 +73,4 @@ export type IOAuthRepository = {
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
-	fetchOAuthConnectionsByUserId: (userId: string) => Promise<OAuthConnection[]>;
-	fetchOAuthConnectionsByUserDisplayId: (
-		displayId: string,
-	) => Promise<OAuthConnection[]>;
 };

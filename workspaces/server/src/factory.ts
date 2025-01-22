@@ -2,7 +2,8 @@ import { createFactory } from "hono/factory";
 import type { JwtVariables } from "hono/jwt";
 import type { IContributionCacheRepository } from "./repository/cache";
 import type { IContributionRepository } from "./repository/contribution";
-import type { IOAuthRepository } from "./repository/oauth";
+import type { IOAuthExternalRepository } from "./repository/oauth-external";
+import type { IOAuthInternalRepository } from "./repository/oauth-internal";
 import type { IOrganizationRepository } from "./repository/organization";
 import type { ISessionRepository } from "./repository/session";
 import type { IUserStorageRepository } from "./repository/storage";
@@ -15,10 +16,13 @@ export type HonoEnv = {
 		UserRepository: IUserRepository;
 		ContributionRepository: IContributionRepository;
 		ContributionCacheRepository: IContributionCacheRepository;
-		OAuthRepository: IOAuthRepository;
+		OAuthExternalRepository: IOAuthExternalRepository;
+		OAuthInternalRepository: IOAuthInternalRepository;
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
-		tokenInfo?: Awaited<ReturnType<IOAuthRepository["getTokenByAccessToken"]>>;
+		tokenInfo?: Awaited<
+			ReturnType<IOAuthExternalRepository["getTokenByAccessToken"]>
+		>;
 	} & JwtVariables<{ userId: string }>;
 };
 

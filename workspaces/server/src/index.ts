@@ -4,7 +4,8 @@ import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
-import { CloudflareOAuthRepository } from "./infrastructure/repository/cloudflare/oauth";
+import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
+import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
@@ -27,7 +28,14 @@ export const route = app
 		);
 
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
-		c.set("OAuthRepository", new CloudflareOAuthRepository(c.env.DB));
+		c.set(
+			"OAuthExternalRepository",
+			new CloudflareOAuthExternalRepository(c.env.DB),
+		);
+		c.set(
+			"OAuthInternalRepository",
+			new CloudflareOAuthInternalRepository(c.env.DB),
+		);
 
 		c.set(
 			"ContributionCacheRepository",
