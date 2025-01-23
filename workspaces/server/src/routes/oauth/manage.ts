@@ -15,29 +15,27 @@ const generateHash = async (secret: string) => {
 	return hashHex;
 };
 
-const getClientWithAuthMiddleware = factory.createMiddleware(
-	async (c, next) => {
-		const { id: clientId } = c.req.param();
-		const { userId } = c.get("jwtPayload");
+const getClientMiddleware = factory.createMiddleware(async (c, next) => {
+	const { id: clientId } = c.req.param();
+	const { userId } = c.get("jwtPayload");
 
-		const client = await c.var.OAuthExternalRepository.getClientById(clientId);
+	const client = await c.var.OAuthExternalRepository.getClientById(clientId);
 
-		if (!client) return c.text("Not found", 404);
+	if (!client) return c.text("Not found", 404);
 
-		if (client.managers.every((manager) => manager.id !== userId))
-			return c.text("Forbidden", 403);
+	if (client.managers.every((manager) => manager.id !== userId))
+		return c.text("Forbidden", 403);
 
-		c.set("oauthClientInfo", client);
-		return next();
-	},
-);
+	c.set("oauthClientInfo", client);
+	return next();
+});
 
 const route = app
 	.use(authMiddleware)
 	.get("/list", async (c) =>
 		c.json(await c.var.OAuthExternalRepository.getClients()),
 	)
-	.get("/:id", getClientWithAuthMiddleware, async (c) => {
+	.get("/:id", getClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
@@ -55,7 +53,24 @@ const route = app
 			),
 		});
 	})
-	.delete("/:id/secrets/:hash", getClientWithAuthMiddleware, async (c) => {
+	.post("/:id/secrets/generate", getClientMiddleware, async (c) => {
+		const { id: clientId } = c.req.param();
+		const { userId } = c.get("jwtPayload");
+
+		const client = c.get("oauthClientInfo");
+		if (!client) return c.text("Not found", 404);
+
+		const secret = await c.var.OAuthExternalRepository.generateClientSecret(
+			clientId,
+			userId,
+		);
+
+		return c.json({
+			secret,
+			secretHash: await generateHash(secret),
+		});
+	})
+	.delete("/:id/secrets/:hash", getClientMiddleware, async (c) => {
 		const { id: clientId, hash: secretHash } = c.req.param();
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);

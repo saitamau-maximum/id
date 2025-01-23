@@ -47,6 +47,9 @@ export interface IOAuthAppsRepository {
 	getApps$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
+	generateSecret: (
+		appId: string,
+	) => Promise<{ secret: string; secretHash: string }>;
 	deleteSecretByHash: (appId: string, secretHash: string) => Promise<void>;
 }
 
@@ -75,6 +78,14 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 	getAppById$$key(appId: string) {
 		return ["app", { id: appId }];
+	}
+
+	async generateSecret(appId: string) {
+		const res = await client.oauth.manage[":id"].secrets.generate.$post({
+			param: { id: appId },
+		});
+		if (!res.ok) throw new Error("Failed to generate secret");
+		return res.json();
 	}
 
 	async deleteSecretByHash(appId: string, secretHash: string) {

@@ -1,6 +1,7 @@
 import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
+import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
 import type {
 	IOAuthExternalRepository,
 	Scope,
@@ -105,6 +106,21 @@ export class CloudflareOAuthExternalRepository
 				.map(USER_BASIC_INFO_TRANSFORMER),
 			owner: USER_BASIC_INFO_TRANSFORMER(client.owner),
 		}));
+	}
+
+	async generateClientSecret(clientId: string, userId: string) {
+		const secret = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
+
+		const res = await this.client.insert(schema.oauthClientSecrets).values({
+			clientId,
+			secret,
+			description: "",
+			issuedAt: new Date(),
+			issuedBy: userId,
+		});
+
+		if (!res.success) throw new Error("Failed to insert secret");
+		return secret;
 	}
 
 	async deleteClientSecret(clientId: string, secret: string) {

@@ -45,6 +45,18 @@ export default function Config() {
 	if (oauthApp.managers.every((manager) => manager.id !== user.id))
 		return <div>権限がありません</div>;
 
+	const handleGenerateSecret = async () => {
+		try {
+			const { secret, secretHash } =
+				await oauthAppsRepository.generateSecret(oauthAppId);
+			// TODO
+			alert(`新しい secret を追加しました: ${secret}`);
+		} catch {
+			// TODO
+			alert("生成に失敗しました");
+		}
+	};
+
 	const handleDeleteSecret = (secretHash: string) => async () => {
 		try {
 			await oauthAppsRepository.deleteSecretByHash(oauthAppId, secretHash);
@@ -129,6 +141,9 @@ export default function Config() {
 							on
 							{issuedAt.toLocaleString()}
 						</p>
+						<button type="button">
+							<ButtonLike>説明を変更</ButtonLike>
+						</button>
 						<button
 							type="button"
 							onClick={handleDeleteSecret(secret.secretHash)}
@@ -138,7 +153,7 @@ export default function Config() {
 					</div>
 				);
 			})}
-			<button type="button">
+			<button type="button" onClick={handleGenerateSecret}>
 				<ButtonLike>新しい secret を追加する</ButtonLike>
 			</button>
 			<h2>Edit</h2>
