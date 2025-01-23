@@ -179,6 +179,24 @@ export class CloudflareOAuthExternalRepository
 		return secret;
 	}
 
+	async updateClientSecretDescription(
+		clientId: string,
+		secret: string,
+		description: string,
+	) {
+		const res = await this.client
+			.update(schema.oauthClientSecrets)
+			.set({ description })
+			.where(
+				and(
+					eq(schema.oauthClientSecrets.clientId, clientId),
+					eq(schema.oauthClientSecrets.secret, secret),
+				),
+			);
+
+		if (!res.success) throw new Error("Failed to update secret description");
+	}
+
 	async deleteClientSecret(clientId: string, secret: string) {
 		const res = await this.client
 			.delete(schema.oauthClientSecrets)

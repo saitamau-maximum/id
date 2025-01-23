@@ -52,7 +52,12 @@ export interface IOAuthAppsRepository {
 	generateSecret: (
 		appId: string,
 	) => Promise<{ secret: string; secretHash: string }>;
-	deleteSecretByHash: (appId: string, secretHash: string) => Promise<void>;
+	updateSecretDescription: (
+		appId: string,
+		secretHash: string,
+		description: string,
+	) => Promise<void>;
+	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -108,10 +113,21 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		return res.json();
 	}
 
-	async deleteSecretByHash(appId: string, secretHash: string) {
-		const res = await client.oauth.manage[":id"].secrets.$delete({
-			param: { id: appId },
-			json: { hash: secretHash },
+	async updateSecretDescription(
+		appId: string,
+		secretHash: string,
+		description: string,
+	) {
+		const res = await client.oauth.manage[":id"].secrets[":hash"].$put({
+			param: { id: appId, hash: secretHash },
+			json: { description },
+		});
+		if (!res.ok) throw new Error("Failed to update secret description");
+	}
+
+	async deleteSecret(appId: string, secretHash: string) {
+		const res = await client.oauth.manage[":id"].secrets[":hash"].$delete({
+			param: { id: appId, hash: secretHash },
 		});
 		if (!res.ok) throw new Error("Failed to delete secret");
 	}

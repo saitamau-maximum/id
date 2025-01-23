@@ -81,6 +81,11 @@ export type IOAuthExternalRepository = {
 	addManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
 	deleteManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
 	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
+	updateClientSecretDescription: (
+		clientId: string,
+		secret: string,
+		description: string,
+	) => Promise<void>;
 	deleteClientSecret: (clientId: string, secret: string) => Promise<void>;
 
 	// OAuth flow

@@ -80,9 +80,25 @@ export default function Config() {
 		}
 	};
 
+	const handleUpdateSecretDescription = (secretHash: string) => async () => {
+		const description = prompt("Enter description");
+		if (!description) return;
+		try {
+			await oauthAppsRepository.updateSecretDescription(
+				oauthAppId,
+				secretHash,
+				description,
+			);
+			alert("説明を変更しました");
+		} catch {
+			// TODO
+			alert("説明の変更に失敗しました");
+		}
+	};
+
 	const handleDeleteSecret = (secretHash: string) => async () => {
 		try {
-			await oauthAppsRepository.deleteSecretByHash(oauthAppId, secretHash);
+			await oauthAppsRepository.deleteSecret(oauthAppId, secretHash);
 			alert("削除しました");
 		} catch {
 			// TODO
@@ -173,7 +189,10 @@ export default function Config() {
 							on
 							{issuedAt.toLocaleString()}
 						</p>
-						<button type="button">
+						<button
+							type="button"
+							onClick={handleUpdateSecretDescription(secret.secretHash)}
+						>
 							<ButtonLike>説明を変更</ButtonLike>
 						</button>
 						<button

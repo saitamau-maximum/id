@@ -38,8 +38,8 @@ const managersSchema = v.object({
 	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
 
-const secretDeleteSchema = v.object({
-	hash: v.pipe(v.string(), v.nonEmpty()),
+const secretDescriptionSchema = v.object({
+	description: v.string(),
 });
 
 const route = app
@@ -120,22 +120,24 @@ const route = app
 			secretHash: await generateHash(secret),
 		});
 	})
-	.delete(
-		"/:id/secrets",
+	.put(
+		"/:id/secrets/:hash",
 		getClientMiddleware,
-		vValidator("json", secretDeleteSchema),
+		vValidator("json", secretDescriptionSchema),
 		async (c) => {
-			const { id: clientId } = c.req.param();
-			const { hash: secretHash } = c.req.valid("json");
+			// memo: secret 情報のうち変更できるのは description のみ
+			const { id: clientId, hash: secretHash } = c.req.param();
+			const { description } = c.req.valid("json");
 
 			const client = c.get("oauthClientInfo");
 			if (!client) return c.text("Not found", 404);
 
 			for (const secret of client.secrets) {
 				if ((await generateHash(secret.secret)) === secretHash) {
-					await c.var.OAuthExternalRepository.deleteClientSecret(
+					await c.var.OAuthExternalRepository.updateClientSecretDescription(
 						clientId,
 						secret.secret,
+						description,
 					);
 					return c.text("OK");
 				}
@@ -143,6 +145,23 @@ const route = app
 
 			return c.text("Not found", 404);
 		},
-	);
+	)
+	.delete("/:id/secrets/:hash", getClientMiddleware, async (c) => {
+		const { id: clientId, hash: secretHash } = c.req.param();
+		const client = c.get("oauthClientInfo");
+		if (!client) return c.text("Not found", 404);
+
+		for (const secret of client.secrets) {
+			if ((await generateHash(secret.secret)) === secretHash) {
+				await c.var.OAuthExternalRepository.deleteClientSecret(
+					clientId,
+					secret.secret,
+				);
+				return c.text("OK");
+			}
+		}
+
+		return c.text("Not found", 404);
+	});
 
 export { route as oauthManageRoute };
