@@ -47,8 +47,6 @@ pnpm dev
 - `SECRET`: JWT の署名や Cookie の暗号化に使用する鍵
   - `openssl rand -base64 32` が便利です。
   - 適当な文字列を設定してください。
-- `PRIVKEY_FOR_OAUTH`: OAuth で使用する秘密鍵
-  - `pnpm dev` でサーバーを立ち上げ、<http://localhost:8787/oauth/util/keygen> へブラウザでアクセスして生成してください。
 - `GITHUB_APP_PRIVKEY`: GitHub App の秘密鍵
   - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth)の「Generate a private key」で取得し、以下のコードで変換してください。
   - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
@@ -58,6 +56,9 @@ pnpm dev
   - Application name, Homepage URL は適当に設定してよいです。 Authorization callback URL には `http://localhost:8787/auth/login/github/callback` を設定してください。
   - 作成できたら、 Client Secret を生成してコピーしてください。
 - `GITHUB_OAUTH_ID`: ↑ の OAuth App を作成した際に表示される Client ID を設定してください。
+- `PRIVKEY_FOR_OAUTH`: OAuth で使用する秘密鍵
+  - `pnpm dev` でサーバーを立ち上げ、<http://localhost:8787/oauth/util/keygen> へブラウザでアクセスして生成してください。
+  - 上記の `GITHUB_APP_PRIVKEY` が設定されてないと、このページにアクセスできません。
 
 #### 環境変数の設定 (基本的に触る必要なし)
 
