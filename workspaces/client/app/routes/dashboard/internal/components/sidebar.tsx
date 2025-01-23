@@ -1,6 +1,5 @@
 import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
-
 import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
@@ -8,6 +7,7 @@ import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/repository/auth";
+import { FLAG } from "~/utils/flag";
 
 type Navigation = {
 	label: string;
@@ -350,20 +350,22 @@ export const Sidebar = () => {
 								/>
 								Settings
 							</Menu.Item>
-							<Menu.Item
-								onAction={() => {
-									setIsMenuOpen(false);
-									navigate("/oauth-apps");
-								}}
-							>
-								<Key
-									size={20}
-									className={css({
-										color: "gray.500",
-									})}
-								/>
-								OAuth Apps
-							</Menu.Item>
+							{FLAG.ENABLE_OAUTH_REGISTRATION && (
+								<Menu.Item
+									onAction={() => {
+										setIsMenuOpen(false);
+										navigate("/oauth-apps");
+									}}
+								>
+									<Key
+										size={20}
+										className={css({
+											color: "gray.500",
+										})}
+									/>
+									OAuth Apps
+								</Menu.Item>
+							)}
 							<Menu.Item
 								onAction={() => {
 									setIsMenuOpen(false);
