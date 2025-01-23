@@ -65,11 +65,16 @@ const route = app
 			),
 		});
 	})
+	.post("/register", vValidator("json", registerSchema), async (c) => {
+		// TODO
+	})
 	.put(
 		"/:id/update",
 		getClientMiddleware,
 		vValidator("json", registerSchema),
-		async (c) => {},
+		async (c) => {
+			// TODO
+		},
 	)
 	.put(
 		"/:id/managers",

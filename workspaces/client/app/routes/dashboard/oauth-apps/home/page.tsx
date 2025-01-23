@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router";
 import { AnchorLike } from "~/components/ui/anchor-like";
+import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import { useAuth } from "~/hooks/use-auth";
 import { useAllApps } from "../internal/hooks/use-apps";
@@ -17,6 +18,9 @@ export default function Home() {
 	return (
 		<div>
 			<p>あなたが管理している OAuth アプリケーション一覧</p>
+			<Link to="/oauth-apps/register">
+				<ButtonLike>新しいアプリケーションを登録</ButtonLike>
+			</Link>
 			<Table.Root>
 				<thead>
 					<Table.Tr>
