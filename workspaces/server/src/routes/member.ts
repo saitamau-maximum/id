@@ -30,11 +30,13 @@ const route = app
 		const {
 			ContributionRepository,
 			ContributionCacheRepository,
-			OAuthRepository,
+			OAuthInternalRepository,
 		} = c.var;
 
 		const oauthConnections =
-			await OAuthRepository.fetchOAuthConnectionsByUserDisplayId(userDisplayId);
+			await OAuthInternalRepository.fetchOAuthConnectionsByUserDisplayId(
+				userDisplayId,
+			);
 
 		const githubConn = oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,

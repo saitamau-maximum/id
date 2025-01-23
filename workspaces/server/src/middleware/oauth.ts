@@ -11,7 +11,7 @@ export const authByAccessTokenMiddleware = factory.createMiddleware(
 		}
 
 		const tokenInfo =
-			await c.var.OAuthRepository.getTokenByAccessToken(accessToken);
+			await c.var.OAuthExternalRepository.getTokenByAccessToken(accessToken);
 
 		if (!tokenInfo) {
 			return c.text("Unauthorized", 401);

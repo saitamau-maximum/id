@@ -53,7 +53,8 @@ const route = app
 
 			const nowUnixMs = Date.now();
 
-			const tokenInfo = await c.var.OAuthRepository.getTokenByCode(code);
+			const tokenInfo =
+				await c.var.OAuthExternalRepository.getTokenByCode(code);
 
 			// Token が見つからない場合
 			if (!tokenInfo) {
@@ -113,7 +114,7 @@ const route = app
 			if (tokenInfo.codeUsed) {
 				// そのレコードを削除
 				// delete に失敗していても response は変わらないので結果は無視する
-				await c.var.OAuthRepository.deleteTokenById(tokenInfo.id);
+				await c.var.OAuthExternalRepository.deleteTokenById(tokenInfo.id);
 				return c.json(
 					{
 						error: "invalid_grant",
@@ -126,7 +127,7 @@ const route = app
 
 			// token が使われたことを記録
 			try {
-				await c.var.OAuthRepository.setCodeUsed(code);
+				await c.var.OAuthExternalRepository.setCodeUsed(code);
 			} catch {
 				return c.json(
 					{

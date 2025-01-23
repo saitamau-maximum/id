@@ -1,3 +1,5 @@
+import type { User } from "./user";
+
 export type Client = {
 	id: string;
 	name: string;
@@ -42,18 +44,22 @@ export type Token = {
 	accessTokenExpiresAt: Date;
 };
 
-export type OAuthConnection = {
-	userId: string;
-	providerId: number;
-	providerUserId: string;
-	email: string | null;
-	name: string | null;
-	profileImageUrl: string | null;
+type UserBasicInfo = Pick<
+	User,
+	"id" | "displayId" | "displayName" | "profileImageURL"
+>;
+
+type GetClientsRes = Client & {
+	managers: UserBasicInfo[];
+	owner: UserBasicInfo;
 };
 
 type GetClientByIdRes = Client & {
 	callbackUrls: ClientCallback["callbackUrl"][];
+	secrets: ClientSecret[];
 	scopes: Scope[];
+	managers: UserBasicInfo[];
+	owner: UserBasicInfo;
 };
 
 type GetTokenByCodeRes = Token & {
@@ -66,8 +72,23 @@ type GetTokenByATRes = Token & {
 	scopes: Scope[];
 };
 
-export type IOAuthRepository = {
+export type IOAuthExternalRepository = {
+	// common
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
+
+	// management
+	getClients: () => Promise<GetClientsRes[]>;
+	addManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
+	deleteManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
+	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
+	updateClientSecretDescription: (
+		clientId: string,
+		secret: string,
+		description: string,
+	) => Promise<void>;
+	deleteClientSecret: (clientId: string, secret: string) => Promise<void>;
+
+	// OAuth flow
 	createAccessToken: (
 		clientId: string,
 		userId: string,
@@ -82,8 +103,4 @@ export type IOAuthRepository = {
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
-	fetchOAuthConnectionsByUserId: (userId: string) => Promise<OAuthConnection[]>;
-	fetchOAuthConnectionsByUserDisplayId: (
-		displayId: string,
-	) => Promise<OAuthConnection[]>;
 };

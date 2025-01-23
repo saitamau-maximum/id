@@ -2,12 +2,14 @@ import { createContext, useContext } from "react";
 import { DefaultRepositories } from "~/repository";
 import type { IAuthRepository } from "~/repository/auth";
 import type { IMemberRepository } from "~/repository/member";
+import type { IOAuthAppsRepository } from "~/repository/oauth-apps";
 import type { IUserRepository } from "~/repository/user";
 
 export interface RepositoryContextProps {
 	authRepository: IAuthRepository;
 	userRepository: IUserRepository;
 	memberRepository: IMemberRepository;
+	oauthAppsRepository: IOAuthAppsRepository;
 }
 
 export const RepositoryContext =
