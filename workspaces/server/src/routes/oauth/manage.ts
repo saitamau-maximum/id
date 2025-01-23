@@ -34,7 +34,7 @@ const getClientMiddleware = factory.createMiddleware(async (c, next) => {
 
 const registerSchema = v.object({});
 
-const managersAddSchema = v.object({
+const managersSchema = v.object({
 	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
 
@@ -68,14 +68,30 @@ const route = app
 		async (c) => {},
 	)
 	.put(
-		"/:id/managers/add",
+		"/:id/managers",
 		getClientMiddleware,
-		vValidator("json", managersAddSchema),
+		vValidator("json", managersSchema),
 		async (c) => {
 			const { id: clientId } = c.req.param();
 			const { managers: managerDisplayIds } = c.req.valid("json");
 
 			await c.var.OAuthExternalRepository.addManagers(
+				clientId,
+				managerDisplayIds,
+			);
+
+			return c.text("OK");
+		},
+	)
+	.delete(
+		"/:id/managers",
+		getClientMiddleware,
+		vValidator("json", managersSchema),
+		async (c) => {
+			const { id: clientId } = c.req.param();
+			const { managers: managerDisplayIds } = c.req.valid("json");
+
+			await c.var.OAuthExternalRepository.deleteManagers(
 				clientId,
 				managerDisplayIds,
 			);

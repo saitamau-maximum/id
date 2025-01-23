@@ -57,6 +57,16 @@ export default function Config() {
 		}
 	};
 
+	const handleDeleteManager = (managerDisplayId: string) => async () => {
+		try {
+			await oauthAppsRepository.deleteManagers(oauthAppId, [managerDisplayId]);
+			alert("削除しました");
+		} catch {
+			// TODO
+			alert("削除に失敗しました");
+		}
+	};
+
 	const handleGenerateSecret = async () => {
 		try {
 			const { secret, secretHash } =
@@ -113,6 +123,12 @@ export default function Config() {
 							/>
 						)}{" "}
 						{manager.displayName} (@{manager.displayId})
+						<button
+							type="button"
+							onClick={handleDeleteManager(manager.displayId ?? "")}
+						>
+							<ButtonLike>Remove</ButtonLike>
+						</button>
 					</span>
 				))}
 				<button type="button" onClick={handleAddManager}>

@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
@@ -129,6 +129,39 @@ export class CloudflareOAuthExternalRepository
 		);
 
 		if (!res.success) throw new Error("Failed to insert managers");
+	}
+
+	async deleteManagers(clientId: string, userDisplayIds: string[]) {
+		const users = await this.client.query.userProfiles.findMany({
+			where: (profile, { inArray }) =>
+				inArray(profile.displayId, userDisplayIds),
+			columns: {
+				userId: true,
+			},
+		});
+		if (users.length !== userDisplayIds.length)
+			throw new Error("Some users not found");
+
+		const client = await this.client.query.oauthClients.findFirst({
+			where: (client, { eq }) => eq(client.id, clientId),
+		});
+		if (!client) throw new Error("Client not found");
+
+		// owner は削除させない
+		if (users.some((user) => user.userId === client.ownerId))
+			throw new Error("Cannot delete owner");
+
+		const res = await this.client.delete(schema.oauthClientManagers).where(
+			and(
+				eq(schema.oauthClientManagers.clientId, clientId),
+				inArray(
+					schema.oauthClientManagers.userId,
+					users.map((u) => u.userId),
+				),
+			),
+		);
+
+		if (!res.success) throw new Error("Failed to delete managers");
 	}
 
 	async generateClientSecret(clientId: string, userId: string) {

@@ -48,6 +48,7 @@ export interface IOAuthAppsRepository {
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
 	addManagers: (appId: string, managers: string[]) => Promise<void>;
+	deleteManagers: (appId: string, managers: string[]) => Promise<void>;
 	generateSecret: (
 		appId: string,
 	) => Promise<{ secret: string; secretHash: string }>;
@@ -82,11 +83,21 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 	}
 
 	async addManagers(appId: string, managers: string[]) {
-		const res = await client.oauth.manage[":id"].managers.add.$put({
+		const res = await client.oauth.manage[":id"].managers.$put({
 			param: { id: appId },
 			json: { managers },
 		});
 		if (!res.ok) throw new Error("Failed to add managers");
+	}
+
+	async deleteManagers(appId: string, managers: string[]) {
+		const res = await client.oauth.manage[":id"].managers.$delete({
+			param: { id: appId },
+			json: { managers },
+		});
+		if (!res.ok) throw new Error("Failed to delete managers");
+
+		// TODO: もし自分が含まれていたらどうにかする
 	}
 
 	async generateSecret(appId: string) {
