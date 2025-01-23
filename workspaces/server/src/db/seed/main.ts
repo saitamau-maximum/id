@@ -5,6 +5,7 @@ import { D1Database, D1DatabaseAPI } from "@miniflare/d1";
 import { createSQLiteDB } from "@miniflare/shared";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
+import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
 
@@ -52,6 +53,7 @@ async function init() {
 			message: "Seedするシナリオを選択してください",
 			choices: [
 				{ title: "ユーザー登録", value: "register-user" },
+				{ title: "OAuth アプリケーション登録", value: "register-oauth-app" },
 				{ title: "DBリセット", value: "reset" },
 			],
 		},
@@ -71,6 +73,9 @@ async function init() {
 		switch (result.senario) {
 			case "register-user":
 				await registerUserSeed(client);
+				break;
+			case "register-oauth-app":
+				await registerOAuthAppSeed(client);
 				break;
 			case "reset":
 				await reset(client);
