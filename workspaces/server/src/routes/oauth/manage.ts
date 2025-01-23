@@ -1,3 +1,5 @@
+import { vValidator } from "@hono/valibot-validator";
+import * as v from "valibot";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 
@@ -30,6 +32,12 @@ const getClientMiddleware = factory.createMiddleware(async (c, next) => {
 	return next();
 });
 
+const registerSchema = v.object({});
+
+const managersAddSchema = v.object({
+	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
+});
+
 const route = app
 	.use(authMiddleware)
 	.get("/list", async (c) =>
@@ -53,7 +61,29 @@ const route = app
 			),
 		});
 	})
-	.post("/:id/secrets/generate", getClientMiddleware, async (c) => {
+	.put(
+		"/:id/update",
+		getClientMiddleware,
+		vValidator("json", registerSchema),
+		async (c) => {},
+	)
+	.put(
+		"/:id/managers/add",
+		getClientMiddleware,
+		vValidator("json", managersAddSchema),
+		async (c) => {
+			const { id: clientId } = c.req.param();
+			const { managers: managerDisplayIds } = c.req.valid("json");
+
+			await c.var.OAuthExternalRepository.addManagers(
+				clientId,
+				managerDisplayIds,
+			);
+
+			return c.text("OK");
+		},
+	)
+	.put("/:id/secrets/generate", getClientMiddleware, async (c) => {
 		const { id: clientId } = c.req.param();
 		const { userId } = c.get("jwtPayload");
 

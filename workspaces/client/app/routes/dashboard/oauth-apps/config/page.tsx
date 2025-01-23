@@ -45,6 +45,18 @@ export default function Config() {
 	if (oauthApp.managers.every((manager) => manager.id !== user.id))
 		return <div>権限がありません</div>;
 
+	const handleAddManager = async () => {
+		// TODO
+		const userId = prompt("Enter user display ID");
+		if (!userId) return;
+		try {
+			await oauthAppsRepository.addManagers(oauthAppId, [userId]);
+		} catch {
+			// TODO
+			alert("追加に失敗しました");
+		}
+	};
+
 	const handleGenerateSecret = async () => {
 		try {
 			const { secret, secretHash } =
@@ -103,6 +115,9 @@ export default function Config() {
 						{manager.displayName} (@{manager.displayId})
 					</span>
 				))}
+				<button type="button" onClick={handleAddManager}>
+					<ButtonLike>Add managers</ButtonLike>
+				</button>
 			</p>
 			<button type="button">
 				<ButtonLike>Revoke all access tokens</ButtonLike>

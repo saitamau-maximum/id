@@ -108,6 +108,29 @@ export class CloudflareOAuthExternalRepository
 		}));
 	}
 
+	async addManagers(clientId: string, userDisplayIds: string[]) {
+		// userDisplayId -> userId
+		const users = await this.client.query.userProfiles.findMany({
+			where: (profile, { inArray }) =>
+				inArray(profile.displayId, userDisplayIds),
+			columns: {
+				userId: true,
+			},
+		});
+		if (users.length !== userDisplayIds.length)
+			throw new Error("Some users not found");
+
+		// 同じ user を複数追加しようとした場合は unique 制約でエラーになる
+		const res = await this.client.insert(schema.oauthClientManagers).values(
+			users.map((user) => ({
+				clientId,
+				userId: user.userId,
+			})),
+		);
+
+		if (!res.success) throw new Error("Failed to insert managers");
+	}
+
 	async generateClientSecret(clientId: string, userId: string) {
 		const secret = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
 

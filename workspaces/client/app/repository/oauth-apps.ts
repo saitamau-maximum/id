@@ -47,6 +47,7 @@ export interface IOAuthAppsRepository {
 	getApps$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
+	addManagers: (appId: string, managers: string[]) => Promise<void>;
 	generateSecret: (
 		appId: string,
 	) => Promise<{ secret: string; secretHash: string }>;
@@ -80,8 +81,16 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		return ["app", { id: appId }];
 	}
 
+	async addManagers(appId: string, managers: string[]) {
+		const res = await client.oauth.manage[":id"].managers.add.$put({
+			param: { id: appId },
+			json: { managers },
+		});
+		if (!res.ok) throw new Error("Failed to add managers");
+	}
+
 	async generateSecret(appId: string) {
-		const res = await client.oauth.manage[":id"].secrets.generate.$post({
+		const res = await client.oauth.manage[":id"].secrets.generate.$put({
 			param: { id: appId },
 		});
 		if (!res.ok) throw new Error("Failed to generate secret");
