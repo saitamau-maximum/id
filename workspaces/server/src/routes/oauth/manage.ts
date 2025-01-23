@@ -38,6 +38,10 @@ const managersSchema = v.object({
 	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
 
+const secretDeleteSchema = v.object({
+	hash: v.pipe(v.string(), v.nonEmpty()),
+});
+
 const route = app
 	.use(authMiddleware)
 	.get("/list", async (c) =>
@@ -99,7 +103,7 @@ const route = app
 			return c.text("OK");
 		},
 	)
-	.put("/:id/secrets/generate", getClientMiddleware, async (c) => {
+	.put("/:id/secrets", getClientMiddleware, async (c) => {
 		const { id: clientId } = c.req.param();
 		const { userId } = c.get("jwtPayload");
 
@@ -116,22 +120,29 @@ const route = app
 			secretHash: await generateHash(secret),
 		});
 	})
-	.delete("/:id/secrets/:hash", getClientMiddleware, async (c) => {
-		const { id: clientId, hash: secretHash } = c.req.param();
-		const client = c.get("oauthClientInfo");
-		if (!client) return c.text("Not found", 404);
+	.delete(
+		"/:id/secrets",
+		getClientMiddleware,
+		vValidator("json", secretDeleteSchema),
+		async (c) => {
+			const { id: clientId } = c.req.param();
+			const { hash: secretHash } = c.req.valid("json");
 
-		for (const secret of client.secrets) {
-			if ((await generateHash(secret.secret)) === secretHash) {
-				await c.var.OAuthExternalRepository.deleteClientSecret(
-					clientId,
-					secret.secret,
-				);
-				return c.text("OK");
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+
+			for (const secret of client.secrets) {
+				if ((await generateHash(secret.secret)) === secretHash) {
+					await c.var.OAuthExternalRepository.deleteClientSecret(
+						clientId,
+						secret.secret,
+					);
+					return c.text("OK");
+				}
 			}
-		}
 
-		return c.text("Not found", 404);
-	});
+			return c.text("Not found", 404);
+		},
+	);
 
 export { route as oauthManageRoute };

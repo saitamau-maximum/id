@@ -51,6 +51,7 @@ export default function Config() {
 		if (!userId) return;
 		try {
 			await oauthAppsRepository.addManagers(oauthAppId, [userId]);
+			alert("追加しました");
 		} catch {
 			// TODO
 			alert("追加に失敗しました");
@@ -82,7 +83,7 @@ export default function Config() {
 	const handleDeleteSecret = (secretHash: string) => async () => {
 		try {
 			await oauthAppsRepository.deleteSecretByHash(oauthAppId, secretHash);
-			// TODO: reload
+			alert("削除しました");
 		} catch {
 			// TODO
 			alert("削除に失敗しました");

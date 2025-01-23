@@ -101,7 +101,7 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 	}
 
 	async generateSecret(appId: string) {
-		const res = await client.oauth.manage[":id"].secrets.generate.$put({
+		const res = await client.oauth.manage[":id"].secrets.$put({
 			param: { id: appId },
 		});
 		if (!res.ok) throw new Error("Failed to generate secret");
@@ -109,8 +109,9 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 	}
 
 	async deleteSecretByHash(appId: string, secretHash: string) {
-		const res = await client.oauth.manage[":id"].secrets[":hash"].$delete({
-			param: { id: appId, hash: secretHash },
+		const res = await client.oauth.manage[":id"].secrets.$delete({
+			param: { id: appId },
+			json: { hash: secretHash },
 		});
 		if (!res.ok) throw new Error("Failed to delete secret");
 	}
