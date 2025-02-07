@@ -1,11 +1,10 @@
 import { useId } from "react";
-import { ChevronLeft } from "react-feather";
 import { Link } from "react-router";
-import { AnchorLike } from "~/components/ui/anchor-like";
+import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { useAuth } from "~/hooks/use-auth";
-import { useRepository } from "~/hooks/use-repository";
+import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 
 export default function Register() {
 	const { user } = useAuth();
@@ -16,20 +15,22 @@ export default function Register() {
 	const appScopesId = useId();
 	const appCallbackUrlsId = useId();
 
-	const { oauthAppsRepository } = useRepository();
-
-	if (!user) return null;
-
 	return (
 		<div>
-			<h1>Register a new OAuth App</h1>
-			<Link to="/oauth-apps">
-				<AnchorLike>
-					<ChevronLeft /> 戻る
-				</AnchorLike>
-			</Link>
-			{/* TODO: component 化 */}
-			<form>
+			<OAuthSectionHeader
+				title="新規 OAuth アプリケーション登録"
+				breadcrumb={[
+					{ label: "アプリケーション一覧", to: "/oauth-apps" },
+					{ label: "新規作成" },
+				]}
+			/>
+			<form
+				className={css({
+					display: "flex",
+					flexDirection: "column",
+					gap: 6,
+				})}
+			>
 				<Form.FieldSet>
 					<label htmlFor={appLogoId}>
 						<Form.LabelText>Application Logo (後で変えられます)</Form.LabelText>
@@ -60,9 +61,20 @@ export default function Register() {
 					</label>
 					[callback url 追加ボタン]
 				</Form.FieldSet>
-				<button type="submit">
-					<ButtonLike>Save</ButtonLike>
-				</button>
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "center",
+						gap: 4,
+					})}
+				>
+					<Link to="/oauth-apps">
+						<ButtonLike variant="secondary">キャンセル</ButtonLike>
+					</Link>
+					<button type="submit">
+						<ButtonLike>Save</ButtonLike>
+					</button>
+				</div>
 			</form>
 		</div>
 	);

@@ -26,10 +26,15 @@ export default [
 				? prefix("oauth-apps", [
 						layout("routes/dashboard/oauth-apps/layout.tsx", [
 							index("routes/dashboard/oauth-apps/home/page.tsx"),
-							route("list", "routes/dashboard/oauth-apps/list/page.tsx"),
+							route(
+								":oauthAppId",
+								"routes/dashboard/oauth-apps/config/page.tsx",
+							),
+							route(
+								"register",
+								"routes/dashboard/oauth-apps/register/page.tsx",
+							),
 						]),
-						route(":oauthAppId", "routes/dashboard/oauth-apps/config/page.tsx"),
-						route("register", "routes/dashboard/oauth-apps/register/page.tsx"),
 					])
 				: []),
 		]),
