@@ -1,9 +1,12 @@
 import * as v from "valibot";
 
+const RESERVED_WORDS = ["maximum", "home", "calender", "members", "logout", "login", "meline", "merin", "idp"];
+
 export const UserSchemas = {
 	DisplayId: v.pipe(
 		v.string(),
 		v.nonEmpty("表示IDを入力してください"),
+		v.not(v.in(RESERVED_WORDS), "その表示IDは使用できません"),
 		v.regex(
 			/^[a-z0-9_]{3,16}$/,
 			"表示IDは3文字以上16文字以下の半角英小文字、半角数字、アンダースコア(_)で入力してください。",
