@@ -4,12 +4,15 @@ import { BIO_MAX_LENGTH, BIO_MAX_NEWLINE } from "~/constant";
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
+const RESERVED_WORDS = ["maximum", "home", "calender", "members", "logout", "login", "meline", "merin", "idp"];
+
 export const UserSchemas = {
 	DisplayId: v.pipe(
 		v.string(),
 		v.nonEmpty("表示IDを入力してください"),
 		v.minLength(3, "表示IDは3文字以上16文字以下で入力してください"),
 		v.maxLength(16, "表示IDは3文字以上16文字以下で入力してください"),
+		v.not(v.in(RESERVED_WORDS), "その表示IDは使用できません"),
 		v.regex(
 			/^[a-z0-9_]+$/,
 			"表示IDは半角英小文字、半角数字、アンダースコア(_)で入力してください",
