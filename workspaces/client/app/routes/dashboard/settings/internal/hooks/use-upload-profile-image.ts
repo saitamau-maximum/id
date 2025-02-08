@@ -20,7 +20,7 @@ export const useUploadProfileImage = ({ onSuccess }: UseUploadProfileImage) => {
 			userRepository.updateUserProfileImage(payload.file),
 		onSuccess: () => {
 			pushToast({
-				type: "info",
+				type: "success",
 				title: "プロフィール画像を更新しました",
 				to: "/",
 			});

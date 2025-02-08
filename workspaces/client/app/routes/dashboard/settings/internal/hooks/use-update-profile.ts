@@ -23,7 +23,7 @@ export const useUpdateProfile = () => {
 			userRepository.update(payload),
 		onSuccess: () => {
 			pushToast({
-				type: "info",
+				type: "success",
 				title: "プロフィールを更新しました",
 				to: "/",
 			});

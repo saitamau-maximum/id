@@ -9,8 +9,8 @@ export const ToastStack = ({ children }: ToastStackProps) => {
 		<div
 			className={css({
 				position: "fixed",
-				top: "0",
-				right: "0",
+				bottom: 0,
+				right: 0,
 				padding: 4,
 				zIndex: 1,
 				display: "flex",

@@ -25,7 +25,7 @@ export const useRegister = () => {
 			userRepository.register(payload),
 		onSuccess: () => {
 			pushToast({
-				type: "info",
+				type: "success",
 				title: "初期登録が完了しました",
 				description: "ようこそ、Maximumへ！",
 			});
