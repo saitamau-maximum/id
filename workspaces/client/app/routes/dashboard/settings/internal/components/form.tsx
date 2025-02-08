@@ -168,6 +168,7 @@ export const ProfileUpdateForm = () => {
 				display: "flex",
 				flexDirection: "column",
 				gap: 6,
+				alignItems: "center",
 			})}
 			action={submitAction}
 		>

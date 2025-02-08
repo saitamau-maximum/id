@@ -168,6 +168,7 @@ export const RegisterForm = () => {
 				display: "flex",
 				flexDirection: "column",
 				gap: 6,
+				alignItems: "center",
 			})}
 			action={submitAction}
 		>
