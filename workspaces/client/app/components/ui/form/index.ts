@@ -1,3 +1,5 @@
+import { ErrorDisplay } from "./error-display";
+import { Field } from "./field";
 import { FieldSet } from "./fieldset";
 import { Input } from "./input";
 import { LabelText } from "./label-text";
@@ -12,4 +14,6 @@ export const Form = {
 	FieldSet,
 	Select,
 	SelectGroup,
+	ErrorDisplay,
+	Field,
 };

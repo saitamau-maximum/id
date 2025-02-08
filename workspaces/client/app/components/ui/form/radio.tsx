@@ -23,6 +23,9 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 				"&:hover": {
 					borderColor: "green.600",
 				},
+				"&:focus-within": {
+					borderColor: "green.600",
+				},
 				"&:has(>input[type='radio']:checked)": {
 					borderColor: "green.600",
 				},
