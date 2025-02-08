@@ -4,23 +4,39 @@ export const UserSchemas = {
 	DisplayId: v.pipe(
 		v.string(),
 		v.nonEmpty("表示IDを入力してください"),
+		v.minLength(3, "表示IDは3文字以上16文字以下で入力してください"),
+		v.maxLength(16, "表示IDは3文字以上16文字以下で入力してください"),
 		v.regex(
-			/^[a-z0-9_]{3,16}$/,
-			"表示IDは3文字以上16文字以下の半角英小文字、半角数字、アンダースコア(_)で入力してください。",
+			/^[a-z0-9_]+$/,
+			"表示IDは半角英小文字、半角数字、アンダースコア(_)で入力してください",
 		),
 	),
-	DisplayName: v.pipe(v.string(), v.nonEmpty("ユーザー名を入力してください")),
-	RealName: v.pipe(v.string(), v.nonEmpty("本名を入力してください")),
-	RealNameKana: v.pipe(v.string(), v.nonEmpty("本名(カナ)を入力してください")),
+	DisplayName: v.pipe(
+		v.string(),
+		v.nonEmpty("ユーザー名を入力してください"),
+		v.maxLength(16, "ユーザー名は16文字以下で入力してください"),
+	),
+	RealName: v.pipe(
+		v.string(),
+		v.nonEmpty("本名を入力してください"),
+		v.maxLength(16, "本名は16文字以下で入力してください"),
+	),
+	RealNameKana: v.pipe(
+		v.string(),
+		v.nonEmpty("本名(カナ)を入力してください"),
+		v.maxLength(16, "本名(カナ)は16文字以下で入力してください"),
+	),
 	Email: v.pipe(
 		v.string(),
 		v.nonEmpty("メールアドレスを入力してください"),
 		v.email("メールアドレスの形式が正しくありません"),
+		v.maxLength(255, "メールアドレスは255文字以下で入力してください"),
 	),
 	AcademicEmail: v.pipe(
 		v.string(),
 		v.nonEmpty("大学のメールアドレスを入力してください"),
 		v.email("大学のメールアドレスの形式が正しくありません"),
+		v.maxLength(255, "大学のメールアドレスは255文字以下で入力してください"),
 	),
 	StudentId: v.pipe(
 		v.string(),
