@@ -1,79 +1,121 @@
 import { useMemo } from "react";
-import { Link } from "react-router";
-import { AnchorLike } from "~/components/ui/anchor-like";
+import { Plus } from "react-feather";
+import { Link, useNavigate } from "react-router";
+import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import { useAuth } from "~/hooks/use-auth";
+import { NotFoundMessage } from "../internal/components/not-found-message";
+import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
+import { UserDisplay } from "../internal/components/user-display";
 import { useAllApps } from "../internal/hooks/use-apps";
 
 export default function Home() {
+	const navigate = useNavigate();
 	const { user } = useAuth();
-	const { data: oauthApps } = useAllApps();
+	const { data: oauthApps = [] } = useAllApps();
 	const filteredApps = useMemo(() => {
-		return (oauthApps ?? []).filter((app) =>
+		return oauthApps.filter((app) =>
 			app.managers.some((manager) => manager.id === user?.id),
 		);
 	}, [oauthApps, user]);
 
 	return (
 		<div>
-			<p>あなたが管理している OAuth アプリケーション一覧</p>
-			<Link to="/oauth-apps/register">
-				<ButtonLike>新しいアプリケーションを登録</ButtonLike>
-			</Link>
-			<Table.Root>
-				<thead>
-					<Table.Tr>
-						<Table.Th>アプリケーション名</Table.Th>
-						<Table.Th>説明</Table.Th>
-						<Table.Th>作成者</Table.Th>
-						<Table.Th>管理者</Table.Th>
-						<Table.Th>編集</Table.Th>
-					</Table.Tr>
-				</thead>
-				<tbody>
-					{filteredApps.map((app) => (
-						<Table.Tr key={app.id}>
-							<Table.Td>
-								{app.logoUrl && <img src={app.logoUrl} alt={app.name} />}
-								{app.name}
-							</Table.Td>
-							<Table.Td>{app.description}</Table.Td>
-							<Table.Td>
-								{app.owner.profileImageURL && (
-									<img
-										src={app.owner.profileImageURL}
-										alt={app.owner.displayName}
-										width={20}
-										height={20}
-									/>
-								)}
-								{app.owner.displayName ?? "owner が初期設定未済はなんか変だよ"}
-							</Table.Td>
-							<Table.Td>
-								{app.managers.map((manager) => (
-									<span key={manager.id}>
-										{manager.profileImageURL && (
-											<img
-												src={manager.profileImageURL}
-												alt={manager.displayName}
-												width={20}
-												height={20}
-											/>
-										)}
-										{manager.displayName}
-									</span>
-								))}
-							</Table.Td>
-							<Table.Td>
-								<Link to={`/oauth-apps/${app.id}`}>
-									<AnchorLike>編集</AnchorLike>
-								</Link>
-							</Table.Td>
+			<OAuthSectionHeader
+				title="OAuth アプリケーション一覧"
+				breadcrumb={[{ label: "アプリケーション一覧" }]}
+			>
+				<Link to="/oauth-apps/register">
+					<ButtonLike>
+						<Plus />
+						新規作成
+					</ButtonLike>
+				</Link>
+			</OAuthSectionHeader>
+			{filteredApps.length === 0 && (
+				<NotFoundMessage>
+					管理しているアプリケーションはありません
+				</NotFoundMessage>
+			)}
+			{filteredApps.length > 0 && (
+				<Table.Root>
+					<thead style={{ width: "100%" }}>
+						<Table.Tr>
+							<Table.Th>アイコン</Table.Th>
+							<Table.Th>アプリ名</Table.Th>
+							<Table.Th>説明</Table.Th>
+							<Table.Th>作成者</Table.Th>
+							<Table.Th>管理者</Table.Th>
 						</Table.Tr>
-					))}
-				</tbody>
-			</Table.Root>
+					</thead>
+					<tbody style={{ width: "100%" }}>
+						{filteredApps.map((app) => (
+							<Table.Tr
+								key={app.id}
+								onClick={() => navigate(`/oauth-apps/${app.id}`)}
+							>
+								<Table.Td>
+									{app.logoUrl && (
+										<img
+											src={app.logoUrl}
+											alt={app.name}
+											width={64}
+											height={64}
+											className={css({
+												borderRadius: "full",
+												width: "64px",
+												height: "64px",
+												objectFit: "cover",
+											})}
+										/>
+									)}
+								</Table.Td>
+								<Table.Td>
+									<p className={css({ fontWeight: "bold" })}>{app.name}</p>
+								</Table.Td>
+								<Table.Td>
+									<p
+										className={css({
+											display: "-webkit-box",
+											lineClamp: 3,
+											boxOrient: "vertical",
+											overflow: "hidden",
+										})}
+									>
+										{app.description}
+									</p>
+								</Table.Td>
+								<Table.Td>
+									<UserDisplay
+										displayId={app.owner.displayId ?? ""}
+										name={app.owner.displayName ?? ""}
+										iconURL={app.owner.profileImageURL ?? ""}
+									/>
+								</Table.Td>
+								<Table.Td>
+									<div
+										className={css({
+											display: "flex",
+											gap: "token(spacing.1) token(spacing.4)",
+											flexWrap: "wrap",
+										})}
+									>
+										{app.managers.map((manager) => (
+											<UserDisplay
+												key={manager.id}
+												displayId={manager.displayId ?? ""}
+												name={manager.displayName ?? ""}
+												iconURL={manager.profileImageURL ?? ""}
+											/>
+										))}
+									</div>
+								</Table.Td>
+							</Table.Tr>
+						))}
+					</tbody>
+				</Table.Root>
+			)}
 		</div>
 	);
 }
