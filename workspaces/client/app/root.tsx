@@ -12,6 +12,7 @@ import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
 import { RepositoryProvider } from "./hooks/use-repository";
+import { ToastProvider } from "./hooks/use-toast/toast-provider";
 import { initializeEnv } from "./utils/env";
 
 initializeEnv();
@@ -84,7 +85,9 @@ export default function App() {
 	return (
 		<RepositoryProvider>
 			<QueryClientProvider client={queryClient}>
-				<Outlet />
+				<ToastProvider>
+					<Outlet />
+				</ToastProvider>
 			</QueryClientProvider>
 		</RepositoryProvider>
 	);

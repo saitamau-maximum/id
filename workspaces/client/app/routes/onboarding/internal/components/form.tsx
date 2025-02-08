@@ -9,9 +9,9 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
-import { useUpdateProfile } from "../hooks/use-update-profile";
+import { useRegister } from "../hooks/use-register";
 
-const UpdateFormSchema = v.object({
+const RegisterFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
 	realName: UserSchemas.RealName,
 	realNameKana: UserSchemas.RealNameKana,
@@ -22,10 +22,10 @@ const UpdateFormSchema = v.object({
 	grade: UserSchemas.Grade,
 });
 
-type FormValues = v.InferInput<typeof UpdateFormSchema>;
+type FormValues = v.InferInput<typeof RegisterFormSchema>;
 
-export const ProfileUpdateForm = () => {
-	const { mutate, isPending } = useUpdateProfile();
+export const RegisterForm = () => {
+	const { mutate, isPending } = useRegister();
 	const { user } = useAuth();
 
 	const {
@@ -33,7 +33,7 @@ export const ProfileUpdateForm = () => {
 		handleSubmit,
 		formState: { errors },
 	} = useForm<FormValues>({
-		resolver: valibotResolver(UpdateFormSchema),
+		resolver: valibotResolver(RegisterFormSchema),
 		defaultValues: {
 			displayName: user?.displayName,
 			realName: user?.realName,
@@ -147,7 +147,7 @@ export const ProfileUpdateForm = () => {
 
 			<button type="submit" disabled={isPending}>
 				<ButtonLike variant="primary" disabled={isPending}>
-					更新
+					はじめる
 				</ButtonLike>
 			</button>
 		</form>

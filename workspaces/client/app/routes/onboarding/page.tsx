@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 
 import { useAuth } from "~/hooks/use-auth";
-import { RegisterForm } from "./internal/form";
+import { RegisterForm } from "./internal/components/form";
 
 export default function Onboarding() {
 	const { isLoading, isInitialized, isAuthorized } = useAuth();

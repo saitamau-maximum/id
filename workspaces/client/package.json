@@ -12,6 +12,7 @@
 		"check": "biome check ./app && pnpm run typecheck"
 	},
 	"dependencies": {
+		"@hookform/resolvers": "^3.10.0",
 		"@idp/flag": "workspace:*",
 		"@idp/server": "workspace:*",
 		"@react-router/node": "^7.1.1",
@@ -24,6 +25,7 @@
 		"react-aria-components": "^1.5.0",
 		"react-dom": "^19.0.0",
 		"react-feather": "^2.0.10",
+		"react-hook-form": "^7.54.2",
 		"react-image-crop": "^11.0.7",
 		"react-router": "^7.1.1",
 		"valibot": "0.42.1"

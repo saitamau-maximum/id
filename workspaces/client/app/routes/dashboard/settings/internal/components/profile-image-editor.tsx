@@ -100,6 +100,11 @@ export const ProfileImageEditor = () => {
 							width: "160px",
 							height: "160px",
 						},
+
+						mdDown: {
+							width: "120px",
+							height: "120px",
+						},
 					})}
 				/>
 			</label>
