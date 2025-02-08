@@ -24,7 +24,7 @@ export const useUpdateProfile = () => {
 		onSuccess: () => {
 			pushToast({
 				type: "info",
-				title: "プロフィール画像を更新しました",
+				title: "プロフィールを更新しました",
 				to: "/",
 			});
 			queryClient.invalidateQueries({
