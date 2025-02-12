@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment, useCallback } from "react";
+import { Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -29,7 +29,11 @@ interface Props {
 }
 
 export const RegisterForm = ({ onComplete }: Props) => {
-	const { mutate, isPending } = useRegister();
+	const { mutate, isPending } = useRegister({
+		onSuccess: (v) => {
+			onComplete(v.displayId);
+		},
+	});
 	const { user } = useAuth();
 
 	const {
@@ -50,23 +54,9 @@ export const RegisterForm = ({ onComplete }: Props) => {
 		},
 	});
 
-	const onSubmit = useCallback(
-		(data: FormValues) => {
-			onComplete(data.displayId);
-		},
-		[onComplete],
-	);
-	// const onSubmit = useCallback(
-	// 	(data: FormValues) => {
-	// 		mutate(data);
-	// 		onComplete();
-	// 	},
-	// 	[mutate, onComplete],
-	// );
-
 	return (
 		<form
-			onSubmit={handleSubmit(onSubmit)}
+			onSubmit={handleSubmit((d) => mutate(d))}
 			className={css({
 				width: "100%",
 				display: "flex",
