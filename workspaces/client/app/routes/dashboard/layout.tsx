@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { WrapContainer } from "~/components/layout/wrap-container";
 import { useAuth } from "~/hooks/use-auth";
 import { Sidebar } from "./internal/components/sidebar";
 
@@ -28,20 +29,22 @@ export default function Dashboard() {
 	}
 
 	return (
-		<div className={css({ display: "flex", height: "100%" })}>
-			<Sidebar />
-			<div
-				className={css({
-					flex: 1,
-					padding: 8,
-					overflowY: "auto",
-					mdDown: {
-						padding: 4,
-					},
-				})}
-			>
-				<Outlet />
+		<WrapContainer>
+			<div className={css({ display: "flex", height: "100%" })}>
+				<Sidebar />
+				<div
+					className={css({
+						flex: 1,
+						padding: 8,
+						overflowY: "auto",
+						mdDown: {
+							padding: 4,
+						},
+					})}
+				>
+					<Outlet />
+				</div>
 			</div>
-		</div>
+		</WrapContainer>
 	);
 }
