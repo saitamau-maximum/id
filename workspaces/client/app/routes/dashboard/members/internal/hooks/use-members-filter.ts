@@ -1,10 +1,11 @@
 import { useCallback, useMemo, useState } from "react";
-import type { Member } from "~/repository/member";
+import type { Role } from "~/types/role";
+import type { Member } from "~/types/user";
 
 export interface Filter {
 	keyword: string;
 	selectedGrades: string[];
-	selectedRoleIds: number[];
+	selectedRoleIds: Role["id"][];
 }
 
 const katakanaToHiragana = (str: string) => {

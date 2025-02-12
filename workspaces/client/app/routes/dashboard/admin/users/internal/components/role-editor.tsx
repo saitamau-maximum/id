@@ -4,10 +4,11 @@ import { Edit, Save } from "react-feather";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
 import { Select, SelectGroup } from "~/components/ui/form/select";
+import type { User } from "~/types/user";
 import { useUpdateRole } from "../hooks/use-update-role";
 
 interface Props {
-	userId: string;
+	userId: User['id'];
 	roles: role.Role[];
 }
 
@@ -39,11 +40,7 @@ export const RoleEditor = ({ userId, roles }: Props) => {
 				<div className={css({ display: "flex", gap: 2, alignItems: "center" })}>
 					{isPending
 						? "Loading..."
-						: roles.map((role) => (
-								<RoleBadge key={role.id} color={role.color}>
-									{role.name}
-								</RoleBadge>
-							))}
+						: roles.map((role) => <RoleBadge key={role.id} role={role} />)}
 					<button
 						type="button"
 						onClick={() => setEditing((editing) => !editing)}

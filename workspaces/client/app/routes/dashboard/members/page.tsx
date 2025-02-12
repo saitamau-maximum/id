@@ -56,6 +56,7 @@ export default function Members() {
 						>
 							<ProfileCard
 								key={user.id}
+								id={user.id}
 								displayName={user.displayName}
 								realName={user.realName}
 								displayId={user.displayId}
@@ -68,6 +69,7 @@ export default function Members() {
 					) : (
 						<ProfileCard
 							key={user.id}
+							id={user.id}
 							displayName={user.displayName}
 							realName={user.realName}
 							displayId={user.displayId}

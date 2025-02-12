@@ -1,7 +1,7 @@
 import { css } from "styled-system/css";
 import { Table } from "~/components/ui/table";
-import type { User } from "~/repository/auth";
 
+import type { User } from "~/types/user";
 import { RoleEditor } from "./role-editor";
 
 interface Props {

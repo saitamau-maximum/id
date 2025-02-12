@@ -2,17 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-
-type UploadProfilePayload = {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail: string;
-	email: string;
-	studentId: string;
-	grade: string;
-};
+import type { UserRegisterParams } from "~/repository/user";
 
 export const useRegister = () => {
 	const queryClient = useQueryClient();
@@ -21,7 +11,7 @@ export const useRegister = () => {
 	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (payload: UploadProfilePayload) =>
+		mutationFn: (payload: UserRegisterParams) =>
 			userRepository.register(payload),
 		onSuccess: () => {
 			pushToast({

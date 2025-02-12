@@ -1,6 +1,6 @@
 import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
 import { useEffect } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
 import { DashboardHeader } from "../internal/components/dashboard-title";
@@ -19,7 +19,6 @@ const NAVIGATION = [
 ];
 
 export default function AdminLayout() {
-	const location = useLocation();
 	const navigate = useNavigate();
 
 	const { user, isLoading, isAuthorized } = useAuth();
