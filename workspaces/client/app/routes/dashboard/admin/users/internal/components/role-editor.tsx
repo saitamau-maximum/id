@@ -8,7 +8,7 @@ import type { User } from "~/types/user";
 import { useUpdateRole } from "../hooks/use-update-role";
 
 interface Props {
-	userId: User['id'];
+	userId: User["id"];
 	roles: role.Role[];
 }
 
