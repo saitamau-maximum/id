@@ -1,45 +1,23 @@
+import type {
+	OAuthClient,
+	OAuthClientCallback,
+	OAuthClientSecret,
+	OAuthScope,
+} from "~/types/oauth";
+import type { UserBasicInfo } from "~/types/user";
 import { client } from "~/utils/hono";
-import type { User } from "./auth";
 
-interface Client {
-	id: string;
-	name: string;
-	description: string | null;
-	logoUrl: string | null;
-	ownerId: string;
-}
-export type UserBasicInfo = Pick<
-	User,
-	"id" | "displayId" | "displayName" | "profileImageURL"
->;
-type Scope = {
-	id: number;
-	name: string;
-	description: string | null;
-};
-type ClientSecret = {
-	secret: string;
-	secretHash: string;
-	description: string | null;
-	issuedBy: string;
-	issuedAt: string;
-};
-type ClientCallback = {
-	clientId: Client["id"];
-	callbackUrl: string;
-};
-
-type GetAppsRes = (Client & {
+type GetAppsRes = (OAuthClient & {
 	managers: UserBasicInfo[];
 	owner: UserBasicInfo;
 })[];
 
-type GetAppByIdRes = Client & {
-	callbackUrls: ClientCallback["callbackUrl"][];
-	scopes: Scope[];
+type GetAppByIdRes = OAuthClient & {
+	callbackUrls: OAuthClientCallback["callbackUrl"][];
+	scopes: OAuthScope[];
 	managers: UserBasicInfo[];
 	owner: UserBasicInfo;
-	secrets: ClientSecret[];
+	secrets: OAuthClientSecret[];
 };
 
 export interface IOAuthAppsRepository {

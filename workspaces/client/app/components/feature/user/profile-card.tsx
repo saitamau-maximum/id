@@ -1,18 +1,11 @@
 import { css } from "styled-system/css";
+import type { Role } from "~/types/role";
+import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
-interface Props {
-	profileImageURL?: string;
-	displayName?: string;
-	realName?: string;
-	displayId?: string;
-	grade?: string;
-	initialized: boolean;
-	roles: {
-		name: string;
-		color: string;
-	}[];
-}
+type Props = Member & {
+	roles: Role[];
+};
 
 export const ProfileCard: React.FC<Props> = ({
 	displayName,
@@ -101,9 +94,7 @@ export const ProfileCard: React.FC<Props> = ({
 							})}
 						>
 							{roles.map((role) => (
-								<RoleBadge key={role.name} color={role.color}>
-									{role.name}
-								</RoleBadge>
+								<RoleBadge key={role.name} role={role} />
 							))}
 						</div>
 					)}

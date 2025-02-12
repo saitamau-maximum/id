@@ -1,11 +1,11 @@
 import { css } from "styled-system/css";
+import type { Role } from "~/types/role";
 
 interface Props {
-	color: string;
-	children: React.ReactNode;
+	role: Role;
 }
 
-export const RoleBadge = ({ color, children }: Props) => {
+export const RoleBadge = ({ role }: Props) => {
 	return (
 		<span
 			className={css({
@@ -17,12 +17,12 @@ export const RoleBadge = ({ color, children }: Props) => {
 				fontWeight: 500,
 			})}
 			style={{
-				backgroundColor: `${color}22`,
-				border: `1px solid ${color}`,
-				color,
+				backgroundColor: `${role.color}22`,
+				border: `1px solid ${role.color}`,
+				color: role.color,
 			}}
 		>
-			{children}
+			{role.name}
 		</span>
 	);
 };

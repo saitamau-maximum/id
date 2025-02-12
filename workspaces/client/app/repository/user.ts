@@ -1,7 +1,7 @@
+import type { User } from "~/types/user";
 import { client } from "~/utils/hono";
-import type { User } from "./auth";
 
-interface RegisterParams {
+export interface UserRegisterParams {
 	displayName: string;
 	realName: string;
 	realNameKana: string;
@@ -12,7 +12,7 @@ interface RegisterParams {
 	grade: string;
 }
 
-interface UpdateParams {
+export interface ProfileUpdateParams {
 	displayName: string;
 	realName: string;
 	realNameKana: string;
@@ -24,8 +24,8 @@ interface UpdateParams {
 }
 
 export interface IUserRepository {
-	register: (params: RegisterParams) => Promise<void>;
-	update: (params: UpdateParams) => Promise<void>;
+	register: (params: UserRegisterParams) => Promise<void>;
+	update: (params: ProfileUpdateParams) => Promise<void>;
 	getContributions: () => Promise<{
 		weeks: {
 			date: string;
@@ -49,7 +49,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
-	}: RegisterParams) {
+	}: UserRegisterParams) {
 		const res = await client.user.register.$post({
 			json: {
 				displayName,
@@ -76,7 +76,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
-	}: UpdateParams) {
+	}: ProfileUpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
 				displayName,

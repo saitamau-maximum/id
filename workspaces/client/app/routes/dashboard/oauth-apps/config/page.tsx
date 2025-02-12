@@ -7,7 +7,7 @@ import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-import type { UserBasicInfo } from "~/repository/oauth-apps";
+import type { UserBasicInfo } from "~/types/user";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 import { UserDisplay } from "../internal/components/user-display";
 import { useApp } from "../internal/hooks/use-apps";

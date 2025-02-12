@@ -6,7 +6,7 @@ import { css } from "styled-system/css";
 import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import type { User } from "~/repository/auth";
+import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 
 type Navigation = {

@@ -1,17 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-
-type UploadProfilePayload = {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail: string;
-	email: string;
-	studentId: string;
-	grade: string;
-};
+import type { ProfileUpdateParams } from "~/repository/user";
 
 export const useUpdateProfile = () => {
 	const queryClient = useQueryClient();
@@ -19,7 +9,7 @@ export const useUpdateProfile = () => {
 	const { pushToast } = useToast();
 
 	return useMutation({
-		mutationFn: (payload: UploadProfilePayload) =>
+		mutationFn: (payload: ProfileUpdateParams) =>
 			userRepository.update(payload),
 		onSuccess: () => {
 			pushToast({

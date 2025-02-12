@@ -1,20 +1,5 @@
-import type { role } from "@idp/server/shared/role";
+import type { User } from "~/types/user";
 import { client } from "~/utils/hono";
-
-export type User = {
-	id: string;
-	initialized: boolean;
-	roles: role.Role[];
-	displayName?: string;
-	realName?: string;
-	realNameKana?: string;
-	displayId?: string;
-	profileImageURL?: string;
-	academicEmail?: string;
-	email?: string;
-	studentId?: string;
-	grade?: string;
-};
 
 export interface IAuthRepository {
 	me: () => Promise<User>;

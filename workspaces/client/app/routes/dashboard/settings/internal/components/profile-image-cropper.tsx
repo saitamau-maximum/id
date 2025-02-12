@@ -110,7 +110,7 @@ export const ProfileImageCropper = ({
 			const file = new File([blob], `${displayName}.png`, {
 				type: "image/png",
 			});
-			uploadProfileImage({ file });
+			uploadProfileImage(file);
 		} catch (error) {
 			alert("Something went wrong!");
 		}

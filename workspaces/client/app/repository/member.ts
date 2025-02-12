@@ -1,17 +1,5 @@
-import type { role } from "@idp/server/shared/role";
+import type { Member } from "~/types/user";
 import { client } from "~/utils/hono";
-
-export type Member = {
-	id: string;
-	initialized: boolean;
-	roles: role.Role[];
-	displayName?: string;
-	realName?: string;
-	realNameKana?: string;
-	displayId?: string;
-	profileImageURL?: string;
-	grade?: string;
-};
 
 export interface IMemberRepository {
 	getMembers: () => Promise<Member[]>;

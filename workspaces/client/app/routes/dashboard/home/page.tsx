@@ -29,6 +29,7 @@ export default function Home() {
 			})}
 		>
 			<ProfileCard
+				id={user.id}
 				displayName={user.displayName}
 				realName={user.realName}
 				displayId={user.displayId}

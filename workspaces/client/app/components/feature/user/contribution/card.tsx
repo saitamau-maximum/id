@@ -1,13 +1,11 @@
 import { useMemo } from "react";
 import { css } from "styled-system/css";
+import type { Contribution } from "~/types/contribution";
 import { RateCell } from "./rate-cell";
 
 interface Props {
 	isLoading?: boolean;
-	weeks: {
-		date: Date;
-		rate: number;
-	}[][];
+	weeks: Contribution;
 	clip?: number;
 }
 

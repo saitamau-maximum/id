@@ -60,6 +60,7 @@ export default function Profile() {
 			})}
 		>
 			<ProfileCard
+				id={memberProfile?.id || ""}
 				displayName={memberProfile?.displayName}
 				realName={memberProfile?.realName}
 				displayId={memberProfile?.displayId}
