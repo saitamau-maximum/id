@@ -34,11 +34,6 @@ export const resetRegister = async (
 		return;
 	}
 
-	// ユーザーに紐づくロールを削除
-	await client
-		.delete(schema.userRoles)
-		.where(eq(schema.userRoles.userId, user.userId));
-
 	// ユーザーの初期登録時間を削除 (未初期化状態にするが、プロフィール情報は残す)
 	// こうすることで、デバッグ時に初期登録リセットをしてもプロフィール情報が補完されるので便利
 	await client
