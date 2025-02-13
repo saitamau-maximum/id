@@ -145,7 +145,7 @@ export class CloudflareUserRepository implements IUserRepository {
 					userId: userId,
 					roleId: ROLE_IDS.MEMBER,
 				})
-				// メンバー登録時に既にメンバ０ーが付与されているケース（初期登録フローのやり直し）を考慮して、UNIQUE制約違反時は無視する
+				// メンバー登録時に既にメンバーが付与されているケース（初期登録フローのやり直し）を考慮して、UNIQUE制約違反時は無視する
 				.onConflictDoNothing(),
 		]);
 
