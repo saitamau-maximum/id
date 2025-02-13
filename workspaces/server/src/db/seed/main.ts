@@ -8,6 +8,7 @@ import * as schema from "../schema";
 import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
+import { resetRegister } from "./senario/reset-register";
 
 const argv = minimist<{
 	help?: boolean;
@@ -54,6 +55,7 @@ async function init() {
 			choices: [
 				{ title: "ユーザー登録", value: "register-user" },
 				{ title: "OAuth アプリケーション登録", value: "register-oauth-app" },
+				{ title: "ユーザー初期登録リセット", value: "reset-register" },
 				{ title: "DBリセット", value: "reset" },
 			],
 		},
@@ -76,6 +78,9 @@ async function init() {
 				break;
 			case "register-oauth-app":
 				await registerOAuthAppSeed(client);
+				break;
+			case "reset-register":
+				await resetRegister(client);
 				break;
 			case "reset":
 				await reset(client);
