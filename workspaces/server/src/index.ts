@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
+import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
@@ -36,6 +37,7 @@ export const route = app
 			"OAuthInternalRepository",
 			new CloudflareOAuthInternalRepository(c.env.DB),
 		);
+		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
 
 		c.set(
 			"ContributionCacheRepository",
