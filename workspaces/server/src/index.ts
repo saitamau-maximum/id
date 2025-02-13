@@ -17,6 +17,7 @@ import { authRoute } from "./routes/auth";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
+import { calendarRoute } from "./routes/calendar";
 
 const app = factory.createApp();
 
@@ -70,6 +71,7 @@ export const route = app
 	.route("/user", userRoute)
 	.route("/member", memberRoute)
 	.route("/oauth", oauthRoute)
-	.route("/admin", adminRoute);
+	.route("/admin", adminRoute)
+	.route("/calendar", calendarRoute);
 
 export default app;
