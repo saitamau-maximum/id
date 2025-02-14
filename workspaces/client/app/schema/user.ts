@@ -1,5 +1,13 @@
 import * as v from "valibot";
 
+const validateName = v.pipe(
+	v.string(),
+	v.regex(/^[\S ]+$/, "半角スペース以外の空白文字は使用できません"),
+	v.includes(" ", "苗字、名前、ミドルネーム等は半角スペースで区切ってください"),
+	v.regex(/^(?! ).*(?<! )$/, "先頭または末尾にスペースは使用できません"),
+	v.regex(/^(?!.* {2,}).*$/, "連続するスペースは使用できません"),
+);
+
 export const UserSchemas = {
 	DisplayId: v.pipe(
 		v.string(),
@@ -17,12 +25,12 @@ export const UserSchemas = {
 		v.maxLength(16, "ユーザー名は16文字以下で入力してください"),
 	),
 	RealName: v.pipe(
-		v.string(),
+		validateName,
 		v.nonEmpty("本名を入力してください"),
 		v.maxLength(16, "本名は16文字以下で入力してください"),
 	),
 	RealNameKana: v.pipe(
-		v.string(),
+		validateName,
 		v.nonEmpty("本名(カナ)を入力してください"),
 		v.maxLength(16, "本名(カナ)は16文字以下で入力してください"),
 	),
