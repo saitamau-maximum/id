@@ -1,6 +1,6 @@
 import * as v from "valibot";
 
-const validateName = v.pipe(
+const ValidateName = v.pipe(
 	v.string(),
 	v.regex(/^[\S ]+$/, "半角スペース以外の空白文字は使用できません"),
 	v.includes(" ", "苗字、名前、ミドルネーム等は半角スペースで区切ってください"),
@@ -25,12 +25,12 @@ export const UserSchemas = {
 		v.maxLength(16, "ユーザー名は16文字以下で入力してください"),
 	),
 	RealName: v.pipe(
-		validateName,
+		ValidateName,
 		v.nonEmpty("本名を入力してください"),
 		v.maxLength(16, "本名は16文字以下で入力してください"),
 	),
 	RealNameKana: v.pipe(
-		validateName,
+		ValidateName,
 		v.nonEmpty("本名(カナ)を入力してください"),
 		v.maxLength(16, "本名(カナ)は16文字以下で入力してください"),
 	),
