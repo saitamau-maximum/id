@@ -4,8 +4,9 @@ const ValidateName = v.pipe(
 	v.string(),
 	v.regex(/^[\S ]+$/, "半角スペース以外の空白文字は使用できません"),
 	v.includes(" ", "苗字、名前、ミドルネーム等は半角スペースで区切ってください"),
-	v.regex(/^(?! ).*(?<! )$/, "先頭または末尾にスペースは使用できません"),
-	v.regex(/^(?!.* {2,}).*$/, "連続するスペースは使用できません"),
+	v.startsWith(" ", "先頭にスペースを使用することはできません"),
+	v.endsWith(" ", "末尾にスペースを使用することはできません"),
+	v.includes("  "),
 );
 
 export const UserSchemas = {
