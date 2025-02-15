@@ -95,6 +95,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
 	}
@@ -125,6 +126,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			bio: payload.bio,
 		};
 
 		const [_, res] = await this.client.batch([
@@ -144,9 +146,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				.values({
 					userId: userId,
 					roleId: ROLE_IDS.MEMBER,
-				})
-				// メンバー登録時に既にメンバーが付与されているケース（初期登録フローのやり直し）を考慮して、UNIQUE制約違反時は無視する
-				.onConflictDoNothing(),
+				}),
 		]);
 
 		if (!res.success) {
@@ -168,6 +168,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			bio: payload.bio,
 		};
 
 		const res = await this.client
@@ -197,6 +198,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
@@ -226,6 +228,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.displayId ?? undefined,
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
+			bio: user.bio ?? undefined,
 			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		};
 	}
@@ -259,6 +262,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			bio: user.profile.bio ?? undefined,
 		}));
 	}
 
