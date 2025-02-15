@@ -1,32 +1,29 @@
-import { css } from "styled-system/css";
+import { DashboardHeader } from "../internal/components/dashboard-title";
+import { useCalendar } from "./hooks/use-calendar";
 
 export default function Calendar() {
+	const { data } = useCalendar();
+
+	if (!data) {
+		return null;
+	}
 
 	return (
-		<div
-			className={css({
-				width: "100%",
-				maxWidth: "1200px",
-				marginTop: 32,
-				display: "grid",
-				gridTemplateColumns: "repeat(2, max-content)",
-				justifyContent: "center",
-				placeItems: "center",
-				gap: 16,
-				lgDown: {
-					gridTemplateColumns: "repeat(1, 1fr)",
-				},
-			})}
-		>
-			<h1
-				className={css({
-					fontSize: "2xl",
-					fontWeight: "bold",
-					color: "gray.600",
-				})}
-			>
-				Calendar
-			</h1>
+		<div>
+			<DashboardHeader
+				title="Maximum Calendar"
+				subtitle="サークルの講習会やイベントなどの予定を確認できます"
+			/>
+			<div>
+				{data.map((event) => (
+					<div key={event.id}>
+						<p>{event.title}</p>
+						<p>{event.description}</p>
+						<p>{event.startAt}</p>
+						<p>{event.endAt}</p>
+					</div>
+				))}
+			</div>
 		</div>
 	);
 }
