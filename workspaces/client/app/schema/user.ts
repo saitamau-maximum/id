@@ -46,4 +46,5 @@ export const UserSchemas = {
 		),
 	),
 	Grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
+	Bio: v.pipe(v.string(), v.maxLength(200, "自己紹介は200文字以下で入力してください")),
 };
