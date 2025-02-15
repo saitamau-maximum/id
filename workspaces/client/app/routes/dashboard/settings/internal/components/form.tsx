@@ -20,6 +20,7 @@ const UpdateFormSchema = v.object({
 	academicEmail: UserSchemas.AcademicEmail,
 	studentId: UserSchemas.StudentId,
 	grade: UserSchemas.Grade,
+	bio: UserSchemas.Bio,
 });
 
 type FormValues = v.InferInput<typeof UpdateFormSchema>;
@@ -43,6 +44,7 @@ export const ProfileUpdateForm = () => {
 			academicEmail: user?.academicEmail,
 			studentId: user?.studentId,
 			grade: user?.grade,
+			bio: user?.bio,
 		},
 	});
 
@@ -143,6 +145,13 @@ export const ProfileUpdateForm = () => {
 					))}
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<Form.LabelText>自己紹介</Form.LabelText>
+				<Form.Input
+					placeholder="自己紹介を200文字以内で入力してください"
+					{...register("bio")}
+				/>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>
