@@ -68,6 +68,7 @@ export default function Profile() {
 				grade={memberProfile?.grade}
 				initialized={memberProfile?.initialized || false}
 				roles={memberProfile?.roles || []}
+				bio={memberProfile?.bio}
 			/>
 			<div>
 				<h1
