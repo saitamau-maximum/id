@@ -14,10 +14,10 @@ import { GithubContributionRepository } from "./infrastructure/repository/github
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
+import { calendarRoute } from "./routes/calendar";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
-import { calendarRoute } from "./routes/calendar";
 
 const app = factory.createApp();
 

@@ -94,7 +94,9 @@ export const calendarEvents = sqliteTable(
 	"calendar_events",
 	{
 		id: text("id").primaryKey(),
-		userId: text("user_id").references(() => users.id).notNull(),
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
 		title: text("title").notNull(),
 		description: text("description").notNull(),
 		startAt: integer("start_at", { mode: "timestamp" }).notNull(),
