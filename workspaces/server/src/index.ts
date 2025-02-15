@@ -19,7 +19,6 @@ import { calendarRoute } from "./routes/calendar";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
-import { calendarRoute } from "./routes/calendar";
 
 const app = factory.createApp();
 
