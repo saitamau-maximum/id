@@ -20,6 +20,7 @@ const RegisterFormSchema = v.object({
 	academicEmail: UserSchemas.AcademicEmail,
 	studentId: UserSchemas.StudentId,
 	grade: UserSchemas.Grade,
+	bio: UserSchemas.Bio,
 });
 
 type FormValues = v.InferInput<typeof RegisterFormSchema>;
@@ -43,6 +44,7 @@ export const RegisterForm = () => {
 			academicEmail: user?.academicEmail,
 			studentId: user?.studentId,
 			grade: user?.grade,
+			bio: user?.bio,
 		},
 	});
 
@@ -143,6 +145,15 @@ export const RegisterForm = () => {
 					))}
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<legend>
+					<Form.LabelText>自己紹介</Form.LabelText>
+				</legend>
+				<Form.Input
+					placeholder="自己紹介を200文字以内で入力してください（後から変更可能）"
+					{...register("bio")}
+				/>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>
