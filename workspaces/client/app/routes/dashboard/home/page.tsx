@@ -37,6 +37,7 @@ export default function Home() {
 				grade={user.grade}
 				initialized={user.initialized}
 				roles={user.roles}
+				bio={user.bio}
 			/>
 			<div>
 				<h1

@@ -15,6 +15,7 @@ export const ProfileCard: React.FC<Props> = ({
 	grade,
 	initialized,
 	roles,
+	bio,
 }) => {
 	return (
 		<div
@@ -165,6 +166,23 @@ export const ProfileCard: React.FC<Props> = ({
 						})}
 					>
 						@{displayId}
+					</p>
+				)}
+				{bio && (
+					<p
+						className={css({
+							color: "gray.500",
+							fontSize: "md",
+							mdDown: {
+								fontSize: "sm",
+							},
+							maxWidth: "100%",  // 親要素にフィットさせる
+							overflowWrap: "break-word",  // 単語が長すぎる場合に折り返す
+							wordBreak: "break-word",  // 単語内でも折り返しを行う
+							lineHeight: "1.5",  // 行間の調整
+						})}
+					>
+						{bio}
 					</p>
 				)}
 			</div>
