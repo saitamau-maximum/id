@@ -153,7 +153,7 @@ export const ProfileUpdateForm = () => {
 				<div
 					className={css({
 						display: "flex",
-						justifyContent: "space-between"
+						justifyContent: "space-between",
 					})}
 				>
 					<Form.LabelText>自己紹介</Form.LabelText>
@@ -163,7 +163,7 @@ export const ProfileUpdateForm = () => {
 							fontSize: "sm",
 							color: "gray.600",
 						})}
-					> 
+					>
 						{bioLentgh} / {BIO_MAX_LENGTH}
 					</p>
 				</div>

@@ -77,7 +77,9 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 				<div>
-					<div className={css({ display: "flex", gap: 4, alignItems: "center" })}>
+					<div
+						className={css({ display: "flex", gap: 4, alignItems: "center" })}
+					>
 						{grade && (
 							<span
 								className={css({

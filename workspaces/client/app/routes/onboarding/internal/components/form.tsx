@@ -151,7 +151,7 @@ export const RegisterForm = () => {
 				<div
 					className={css({
 						display: "flex",
-						justifyContent: "space-between"
+						justifyContent: "space-between",
 					})}
 				>
 					<legend>
@@ -163,7 +163,7 @@ export const RegisterForm = () => {
 							fontSize: "sm",
 							color: "gray.600",
 						})}
-					> 
+					>
 						{watch("bio", "").length} / {BIO_MAX_LENGTH}
 					</p>
 				</div>

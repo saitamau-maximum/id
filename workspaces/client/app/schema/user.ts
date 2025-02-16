@@ -49,11 +49,14 @@ export const UserSchemas = {
 	Grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
 	Bio: v.pipe(
 		v.string(),
-		v.maxLength(BIO_MAX_LENGTH, `自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`),
+		v.maxLength(
+			BIO_MAX_LENGTH,
+			`自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`,
+		),
 		v.custom((value) => {
 			const newlineCount = (value as string).match(/\n/g)?.length || 0;
 			if (newlineCount > BIO_MAX_NEWLINE) {
-			  return false;
+				return false;
 			}
 			return true;
 		}),

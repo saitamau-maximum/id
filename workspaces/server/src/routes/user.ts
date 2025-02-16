@@ -3,9 +3,9 @@ import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { BIO_MAX_LENGTH } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
-import { BIO_MAX_LENGTH } from "../constants/validation";
 
 const app = factory.createApp();
 
