@@ -32,6 +32,7 @@ export const ProfileUpdateForm = () => {
 	const {
 		register,
 		handleSubmit,
+		watch,
 		formState: { errors },
 	} = useForm<FormValues>({
 		resolver: valibotResolver(UpdateFormSchema),
@@ -147,7 +148,23 @@ export const ProfileUpdateForm = () => {
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
 			<Form.FieldSet>
-				<Form.LabelText>自己紹介</Form.LabelText>
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "space-between"
+					})}
+				>
+					<Form.LabelText>自己紹介</Form.LabelText>
+					<p
+						className={css({
+							display: "block",
+							fontSize: "sm",
+							color: "gray.600",
+						})}
+					> 
+						{watch("bio", "").length} / {BIO_MAX_LENGTH}
+					</p>
+				</div>
 				<Form.Input
 					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
 					{...register("bio")}
