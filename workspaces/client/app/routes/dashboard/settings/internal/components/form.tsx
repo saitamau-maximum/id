@@ -49,6 +49,8 @@ export const ProfileUpdateForm = () => {
 		},
 	});
 
+	const bioLentgh = watch("bio")?.length || 0;
+
 	return (
 		<form
 			onSubmit={handleSubmit((d) => mutate(d))}
@@ -162,11 +164,14 @@ export const ProfileUpdateForm = () => {
 							color: "gray.600",
 						})}
 					> 
-						{watch("bio", "").length} / {BIO_MAX_LENGTH}
+						{bioLentgh} / {BIO_MAX_LENGTH}
 					</p>
 				</div>
-				<Form.Input
+				<Form.Textarea
 					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
+					className={css({
+						height: "240px",
+					})}
 					{...register("bio")}
 				/>
 			</Form.FieldSet>
