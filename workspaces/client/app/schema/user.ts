@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { BIO_MAX_LENGTH } from "~/constant";
+import { BIO_MAX_LENGTH, BIO_MAX_NEWLINE } from "~/constant";
 
 export const UserSchemas = {
 	DisplayId: v.pipe(
@@ -50,5 +50,12 @@ export const UserSchemas = {
 	Bio: v.pipe(
 		v.string(),
 		v.maxLength(BIO_MAX_LENGTH, `自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`),
+		v.custom((value) => {
+			const newlineCount = (value as string).match(/\n/g)?.length || 0;
+			if (newlineCount > BIO_MAX_NEWLINE) {
+			  return false;
+			}
+			return true;
+		}),
 	),
 };
