@@ -169,9 +169,7 @@ export const ProfileUpdateForm = () => {
 				</div>
 				<Form.Textarea
 					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
-					className={css({
-						height: "240px",
-					})}
+					rows={10}
 					{...register("bio")}
 				/>
 			</Form.FieldSet>
