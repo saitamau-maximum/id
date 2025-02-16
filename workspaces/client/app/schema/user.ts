@@ -53,12 +53,12 @@ export const UserSchemas = {
 			BIO_MAX_LENGTH,
 			`自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`,
 		),
-		v.custom((value) => {
-			const newlineCount = (value as string).match(/\n/g)?.length || 0;
+		v.custom((input) => {
+			const newlineCount = (input as string).match(/\n/g)?.length || 0;
 			if (newlineCount > BIO_MAX_NEWLINE) {
 				return false;
 			}
 			return true;
-		}),
+		}, `自己紹介は${BIO_MAX_NEWLINE}行以下で入力してください`),
 	),
 };
