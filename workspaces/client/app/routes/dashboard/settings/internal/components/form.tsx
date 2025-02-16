@@ -49,7 +49,7 @@ export const ProfileUpdateForm = () => {
 		},
 	});
 
-	const bioLentgh = watch("bio")?.length || 0;
+	const bioLength = watch("bio")?.length || 0;
 
 	return (
 		<form
@@ -164,7 +164,7 @@ export const ProfileUpdateForm = () => {
 							color: "gray.600",
 						})}
 					>
-						{bioLentgh} / {BIO_MAX_LENGTH}
+						{bioLength} / {BIO_MAX_LENGTH}
 					</p>
 				</div>
 				<Form.Textarea
