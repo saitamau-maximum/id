@@ -5,6 +5,7 @@ import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
+import { BIO_MAX_LENGTH } from "../constants/validation";
 
 const app = factory.createApp();
 
@@ -17,7 +18,7 @@ const registerSchema = v.object({
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
-	bio: v.pipe(v.string(), v.maxLength(200)),
+	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
 });
 
 const updateProfileImageSchema = v.object({

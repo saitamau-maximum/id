@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { GRADE } from "~/constant";
+import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
@@ -151,7 +151,7 @@ export const RegisterForm = () => {
 					<Form.LabelText>自己紹介</Form.LabelText>
 				</legend>
 				<Form.Input
-					placeholder="自己紹介を200文字以内で入力してください（後から変更可能）"
+					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（後から変更可能）`}
 					{...register("bio")}
 				/>
 			</Form.FieldSet>
