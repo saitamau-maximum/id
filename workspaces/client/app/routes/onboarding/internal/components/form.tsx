@@ -155,7 +155,7 @@ export const RegisterForm = () => {
 					})}
 				>
 					<legend>
-						<Form.LabelText>自己紹介</Form.LabelText>
+						<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
 					</legend>
 					<p
 						className={css({

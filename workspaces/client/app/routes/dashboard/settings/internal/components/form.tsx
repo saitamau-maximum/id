@@ -156,7 +156,7 @@ export const ProfileUpdateForm = () => {
 						justifyContent: "space-between",
 					})}
 				>
-					<Form.LabelText>自己紹介</Form.LabelText>
+					<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
 					<p
 						className={css({
 							display: "block",
