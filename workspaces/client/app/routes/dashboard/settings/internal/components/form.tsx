@@ -157,21 +157,23 @@ export const ProfileUpdateForm = () => {
 					})}
 				>
 					<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
-					<p
-						className={css({
-							display: "block",
-							fontSize: "sm",
-							color: "gray.600",
-						})}
-					>
-						{bioLength} / {BIO_MAX_LENGTH}
-					</p>
+					<ErrorDisplay error={errors.bio?.message} />
 				</div>
 				<Form.Textarea
 					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
 					rows={10}
 					{...register("bio")}
 				/>
+				<p
+					className={css({
+						display: "block",
+						fontSize: "sm",
+						color: "gray.600",
+						textAlign: "right",
+					})}
+				>
+					{bioLength} / {BIO_MAX_LENGTH}
+				</p>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>
