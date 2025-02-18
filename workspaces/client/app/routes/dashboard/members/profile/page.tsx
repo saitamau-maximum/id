@@ -50,7 +50,7 @@ export default function Profile() {
 				maxWidth: "1200px",
 				marginTop: 32,
 				display: "grid",
-				gridTemplateColumns: "repeat(2, max-content)",
+				gridTemplateColumns: "470px max-content",
 				justifyContent: "center",
 				placeItems: "center",
 				gap: 16,
