@@ -15,6 +15,7 @@ export default function Calendar() {
 				subtitle="サークルの講習会やイベントなどの予定を確認できます"
 			/>
 			<div>
+				{/* TODO: イベントの取得はできているが、日時でのソートやデザインをあてる必要あり */}
 				{data.map((event) => (
 					<div key={event.id}>
 						<p>{event.title}</p>
