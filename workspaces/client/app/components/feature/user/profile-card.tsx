@@ -179,14 +179,14 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			<div
-				className={css({
-					display: "flex",
-					justifyContent: "flex-end",
-					gap: 4,
-				})}
-			>
-				{bio && (
+			{bio && (
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "center",
+						gap: 4,
+					})}
+				>
 					<p
 						className={css({
 							color: "gray.500",
@@ -194,8 +194,6 @@ export const ProfileCard: React.FC<Props> = ({
 							mdDown: {
 								fontSize: "sm",
 							},
-							width: "100%",
-							maxWidth: "300px",
 							overflowWrap: "break-word",
 							lineHeight: "1.5",
 							whiteSpace: "pre-wrap",
@@ -203,8 +201,8 @@ export const ProfileCard: React.FC<Props> = ({
 					>
 						{bio}
 					</p>
-				)}
-			</div>
+				</div>
+			)}
 		</div>
 	);
 };
