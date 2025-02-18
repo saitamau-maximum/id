@@ -9,7 +9,7 @@ export interface ICalendarEvent {
 	endAt: string;
 }
 
-export interface CreateEventPayload {
+export interface ICreateEventPayload {
 	userId: string;
 	title: string;
 	description: string;
@@ -20,7 +20,7 @@ export interface CreateEventPayload {
 export interface ICalendarRepository {
 	getAllEvents: () => Promise<ICalendarEvent[]>;
 	getAllEvents$$key: () => string;
-	createEvent: (event: CreateEventPayload) => Promise<void>;
+	createEvent: (event: ICreateEventPayload) => Promise<void>;
 	updateEvent: (event: ICalendarEvent) => Promise<void>;
 	deleteEvent: (eventId: ICalendarEvent["id"]) => Promise<void>;
 }
@@ -38,7 +38,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		return "calendar-events";
 	}
 
-	async createEvent(event: CreateEventPayload) {
+	async createEvent(event: ICreateEventPayload) {
 		const res = await client.calendar.events.$post({
 			json: event,
 		});
