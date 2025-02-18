@@ -129,7 +129,8 @@ export const ProfileCard: React.FC<Props> = ({
 						className={css({
 							display: "flex",
 							alignItems: "center",
-							gap: 4,
+							gap: "0 token(spacing.4)",
+							flexWrap: "wrap",
 							marginBottom: 1,
 							mdDown: {
 								marginBottom: 0,
