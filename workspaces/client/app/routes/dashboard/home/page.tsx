@@ -19,7 +19,7 @@ export default function Home() {
 				maxWidth: "1200px",
 				marginTop: 32,
 				display: "grid",
-				gridTemplateColumns: "470px max-content",
+				gridTemplateColumns: "480px max-content",
 				justifyContent: "center",
 				placeItems: "center",
 				gap: 16,
