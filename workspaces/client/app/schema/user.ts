@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { BIO_MAX_LENGTH, BIO_MAX_NEWLINE } from "~/constant";
 
 export const UserSchemas = {
 	DisplayId: v.pipe(
@@ -46,4 +47,18 @@ export const UserSchemas = {
 		),
 	),
 	Grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
+	Bio: v.pipe(
+		v.string(),
+		v.maxLength(
+			BIO_MAX_LENGTH,
+			`自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`,
+		),
+		v.custom((input) => {
+			const newlineCount = (input as string).match(/\n/g)?.length || 0;
+			if (newlineCount > BIO_MAX_NEWLINE) {
+				return false;
+			}
+			return true;
+		}, `自己紹介は${BIO_MAX_NEWLINE}行以下で入力してください`),
+	),
 };

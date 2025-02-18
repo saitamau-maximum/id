@@ -19,7 +19,7 @@ export default function Home() {
 				maxWidth: "1200px",
 				marginTop: 32,
 				display: "grid",
-				gridTemplateColumns: "repeat(2, max-content)",
+				gridTemplateColumns: "480px max-content",
 				justifyContent: "center",
 				placeItems: "center",
 				gap: 16,
@@ -37,6 +37,7 @@ export default function Home() {
 				grade={user.grade}
 				initialized={user.initialized}
 				roles={user.roles}
+				bio={user.bio}
 			/>
 			<div>
 				<h1

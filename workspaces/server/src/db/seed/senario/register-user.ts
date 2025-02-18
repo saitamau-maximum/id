@@ -25,6 +25,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			email: "user1@example.com",
 			studentId: "12AB001",
 			grade: "B1",
+			bio: "Hello, I'm User One!",
 		},
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
 	},
@@ -41,6 +42,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			email: "user2@example.com",
 			studentId: "12AC002",
 			grade: "B2",
+			bio: "Hello, I'm User Two!",
 		},
 		roles: [ROLE_IDS.MEMBER],
 	},
@@ -57,6 +59,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			email: "user3@example.com",
 			studentId: "12AD003",
 			grade: "B3",
+			bio: "Hello, I'm User Three!",
 		},
 		roles: [ROLE_IDS.MEMBER],
 	},
@@ -143,6 +146,7 @@ export const registerUserSeed = async (
 				email: user.profile.email,
 				studentId: user.profile.studentId,
 				grade: user.profile.grade,
+				bio: user.profile.bio,
 			}),
 			client.insert(schema.userRoles).values(
 				user.roles.map((role) => ({

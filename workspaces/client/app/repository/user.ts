@@ -10,6 +10,7 @@ export interface UserRegisterParams {
 	email: string;
 	studentId: string;
 	grade: string;
+	bio: string;
 }
 
 export interface ProfileUpdateParams {
@@ -21,6 +22,7 @@ export interface ProfileUpdateParams {
 	email: string;
 	studentId: string;
 	grade: string;
+	bio: string;
 }
 
 export interface IUserRepository {
@@ -49,6 +51,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
+		bio,
 	}: UserRegisterParams) {
 		const res = await client.user.register.$post({
 			json: {
@@ -60,6 +63,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				email,
 				studentId,
 				grade,
+				bio,
 			},
 		});
 		if (!res.ok) {
@@ -76,6 +80,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
+		bio,
 	}: ProfileUpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
@@ -87,6 +92,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				email,
 				studentId,
 				grade,
+				bio,
 			},
 		});
 		if (!res.ok) {

@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { GRADE } from "~/constant";
+import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
@@ -20,6 +20,7 @@ const RegisterFormSchema = v.object({
 	academicEmail: UserSchemas.AcademicEmail,
 	studentId: UserSchemas.StudentId,
 	grade: UserSchemas.Grade,
+	bio: UserSchemas.Bio,
 });
 
 type FormValues = v.InferInput<typeof RegisterFormSchema>;
@@ -31,6 +32,7 @@ export const RegisterForm = () => {
 	const {
 		register,
 		handleSubmit,
+		watch,
 		formState: { errors },
 	} = useForm<FormValues>({
 		resolver: valibotResolver(RegisterFormSchema),
@@ -43,6 +45,7 @@ export const RegisterForm = () => {
 			academicEmail: user?.academicEmail,
 			studentId: user?.studentId,
 			grade: user?.grade,
+			bio: user?.bio,
 		},
 	});
 
@@ -143,6 +146,34 @@ export const RegisterForm = () => {
 					))}
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "space-between",
+					})}
+				>
+					<legend>
+						<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
+					</legend>
+					<ErrorDisplay error={errors.bio?.message} />
+				</div>
+				<Form.Textarea
+					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（後から変更可能）`}
+					rows={10}
+					{...register("bio")}
+				/>
+				<p
+					className={css({
+						display: "block",
+						fontSize: "sm",
+						color: "gray.600",
+						textAlign: "right",
+					})}
+				>
+					{watch("bio", "").length} / {BIO_MAX_LENGTH}
+				</p>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>

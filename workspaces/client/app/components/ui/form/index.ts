@@ -5,9 +5,11 @@ import { Input } from "./input";
 import { LabelText } from "./label-text";
 import { Radio, RadioGroup } from "./radio";
 import { Select, SelectGroup } from "./select";
+import { Textarea } from "./textarea";
 
 export const Form = {
 	Input,
+	Textarea,
 	LabelText,
 	Radio,
 	RadioGroup,
