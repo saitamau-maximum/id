@@ -104,5 +104,7 @@ export const calendarEvents = sqliteTable(
 	},
 	(table) => ({
 		userIdx: index("user_idx").on(table.userId),
+		startAtIdx: index("start_at_idx").on(table.startAt),
+		endAtIdx: index("end_at_idx").on(table.endAt),
 	}),
 );
