@@ -4,6 +4,7 @@ import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
+import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
@@ -13,6 +14,7 @@ import { GithubContributionRepository } from "./infrastructure/repository/github
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
+import { calendarRoute } from "./routes/calendar";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
@@ -36,6 +38,7 @@ export const route = app
 			"OAuthInternalRepository",
 			new CloudflareOAuthInternalRepository(c.env.DB),
 		);
+		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
 
 		c.set(
 			"ContributionCacheRepository",
@@ -68,6 +71,7 @@ export const route = app
 	.route("/user", userRoute)
 	.route("/member", memberRoute)
 	.route("/oauth", oauthRoute)
-	.route("/admin", adminRoute);
+	.route("/admin", adminRoute)
+	.route("/calendar", calendarRoute);
 
 export default app;
