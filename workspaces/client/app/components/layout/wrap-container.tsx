@@ -1,7 +1,10 @@
-import { Outlet } from "react-router";
 import { css } from "styled-system/css";
 
-export default function Root() {
+interface Props {
+	children: React.ReactNode;
+}
+
+export const WrapContainer = ({ children }: Props) => {
 	return (
 		<div
 			className={css({
@@ -23,7 +26,7 @@ export default function Root() {
 				},
 			})}
 		>
-			<Outlet />
+			{children}
 		</div>
 	);
-}
+};

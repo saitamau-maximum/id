@@ -25,8 +25,16 @@ const RegisterFormSchema = v.object({
 
 type FormValues = v.InferInput<typeof RegisterFormSchema>;
 
-export const RegisterForm = () => {
-	const { mutate, isPending } = useRegister();
+interface Props {
+	onComplete: (displayId: string) => void;
+}
+
+export const RegisterForm = ({ onComplete }: Props) => {
+	const { mutate, isPending } = useRegister({
+		onSuccess: (v) => {
+			onComplete(v.displayId);
+		},
+	});
 	const { user } = useAuth();
 
 	const {
