@@ -23,6 +23,7 @@ export const ProfileCard: React.FC<Props> = ({
 				display: "flex",
 				flexDirection: "column",
 				gap: 4,
+				width: "100%",
 			})}
 		>
 			<div
@@ -181,28 +182,20 @@ export const ProfileCard: React.FC<Props> = ({
 				</div>
 			</div>
 			{bio && (
-				<div
+				<p
 					className={css({
-						display: "flex",
-						justifyContent: "center",
-						gap: 4,
+						color: "gray.500",
+						fontSize: "md",
+						mdDown: {
+							fontSize: "sm",
+						},
+						overflowWrap: "break-word",
+						lineHeight: "1.5",
+						whiteSpace: "pre-wrap",
 					})}
 				>
-					<p
-						className={css({
-							color: "gray.500",
-							fontSize: "md",
-							mdDown: {
-								fontSize: "sm",
-							},
-							overflowWrap: "break-word",
-							lineHeight: "1.5",
-							whiteSpace: "pre-wrap",
-						})}
-					>
-						{bio}
-					</p>
-				</div>
+					{bio}
+				</p>
 			)}
 		</div>
 	);
