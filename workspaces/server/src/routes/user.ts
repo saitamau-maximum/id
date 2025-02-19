@@ -13,10 +13,12 @@ const normalizeRealName = (text: string) => {
 
 const app = factory.createApp();
 
+const ValidateName = v.pipe(v.string(), v.regex(/^[\S ]+$/), v.includes(" "));
+
 const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
-	realName: v.pipe(v.string(), v.nonEmpty()),
-	realNameKana: v.pipe(v.string(), v.nonEmpty()),
+	realName: v.pipe(ValidateName, v.nonEmpty(), v.maxLength(16)),
+	realNameKana: v.pipe(ValidateName, v.nonEmpty(), v.maxLength(16)),
 	displayId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^[a-z0-9_]{3,16}$/)),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
