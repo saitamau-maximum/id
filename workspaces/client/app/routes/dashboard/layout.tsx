@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
-import { css } from "styled-system/css";
+import { css, cx } from "styled-system/css";
+import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
 import { Sidebar } from "./internal/components/sidebar";
 
@@ -31,14 +32,19 @@ export default function Dashboard() {
 		<div className={css({ display: "flex", height: "100%" })}>
 			<Sidebar />
 			<div
-				className={css({
-					flex: 1,
-					padding: 8,
-					overflowY: "auto",
-					mdDown: {
-						padding: 4,
-					},
-				})}
+				className={cx(
+					css({
+						flex: 1,
+						padding: 8,
+						overflowY: "auto",
+						mdDown: {
+							padding: 4,
+						},
+					}),
+					cq({
+						name: "dashboard",
+					}),
+				)}
 			>
 				<Outlet />
 			</div>

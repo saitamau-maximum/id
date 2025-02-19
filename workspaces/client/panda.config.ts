@@ -12,6 +12,7 @@ export default defineConfig({
 
 	// Useful for theme customization
 	theme: {
+		containerNames: ["dashboard"],
 		extend: {
 			tokens: {
 				gradients: {
