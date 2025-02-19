@@ -6,6 +6,11 @@ import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 
+// 本名を"姓 名"の形式に正規化する
+const normalizeRealName = (text: string) => {
+	return text.trim().replace(/\s+/g, " ");
+};
+
 const app = factory.createApp();
 
 const registerSchema = v.object({
@@ -43,11 +48,15 @@ const route = app
 				grade,
 			} = c.req.valid("json");
 
+			const normalizedDisplayName = normalizeRealName(displayName);
+			const normalizedRealName = normalizeRealName(realName);
+			const normalizedRealNameKana = normalizeRealName(realNameKana);
+
 			await UserRepository.registerUser(payload.userId, {
-				displayName,
+				displayName: normalizedDisplayName,
 				displayId,
-				realName,
-				realNameKana,
+				realName: normalizedRealName,
+				realNameKana: normalizedRealNameKana,
 				academicEmail,
 				email,
 				studentId,
@@ -76,11 +85,15 @@ const route = app
 				grade,
 			} = c.req.valid("json");
 
+			const normalizedDisplayName = normalizeRealName(displayName);
+			const normalizedRealName = normalizeRealName(realName);
+			const normalizedRealNameKana = normalizeRealName(realNameKana);
+
 			await UserRepository.updateUser(payload.userId, {
-				displayName,
+				displayName: normalizedDisplayName,
 				displayId,
-				realName,
-				realNameKana,
+				realName: normalizedRealName,
+				realNameKana: normalizedRealNameKana,
 				academicEmail,
 				email,
 				studentId,
