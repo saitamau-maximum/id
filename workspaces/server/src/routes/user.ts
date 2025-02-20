@@ -16,12 +16,20 @@ const normalizeRealName = (text: string) => {
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
-const ValidateName = v.pipe(v.string(), v.regex(realNamePattern));
-
 const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
-	realName: v.pipe(ValidateName, v.nonEmpty(), v.maxLength(16)),
-	realNameKana: v.pipe(ValidateName, v.nonEmpty(), v.maxLength(16)),
+	realName: v.pipe(
+		v.string(),
+		v.regex(realNamePattern),
+		v.nonEmpty(),
+		v.maxLength(16),
+	),
+	realNameKana: v.pipe(
+		v.string(),
+		v.regex(realNamePattern),
+		v.nonEmpty(),
+		v.maxLength(16),
+	),
 	displayId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^[a-z0-9_]{3,16}$/)),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
