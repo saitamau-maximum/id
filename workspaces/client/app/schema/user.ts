@@ -1,9 +1,14 @@
 import * as v from "valibot";
 
+// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
+const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
+
 const ValidateName = v.pipe(
 	v.string(),
-	v.regex(/^[\S ]+$/, "半角スペース以外の空白文字は使用できません"),
-	v.includes(" ", "苗字、名前、ミドルネーム等は半角スペースで区切ってください"),
+	v.regex(
+		realNamePattern,
+		"苗字、名前、ミドルネーム等はスペースで区切って入力してください",
+	),
 );
 
 export const UserSchemas = {

@@ -6,14 +6,17 @@ import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 
+const app = factory.createApp();
+
 // 本名を"姓 名"の形式に正規化する
 const normalizeRealName = (text: string) => {
 	return text.trim().replace(/\s+/g, " ");
 };
 
-const app = factory.createApp();
+// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
+const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
-const ValidateName = v.pipe(v.string(), v.regex(/^[\S ]+$/), v.includes(" "));
+const ValidateName = v.pipe(v.string(), v.regex(realNamePattern));
 
 const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
