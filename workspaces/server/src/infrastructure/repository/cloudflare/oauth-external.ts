@@ -204,6 +204,45 @@ export class CloudflareOAuthExternalRepository
 		if (!res.success) throw new Error("Failed to delete secret");
 	}
 
+	async registerClient(
+		clientId: string,
+		userId: string,
+		name: string,
+		description: string,
+		scopeIds: number[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) {
+		const res = await this.client.batch([
+			this.client.insert(schema.oauthClients).values({
+				id: clientId,
+				ownerId: userId,
+				name,
+				description,
+				logoUrl,
+			}),
+			this.client.insert(schema.oauthClientManagers).values({
+				clientId,
+				userId,
+			}),
+			this.client.insert(schema.oauthClientCallbacks).values(
+				callbackUrls.map((callbackUrl) => ({
+					clientId,
+					callbackUrl,
+				})),
+			),
+			this.client.insert(schema.oauthClientScopes).values(
+				scopeIds.map((scopeId) => ({
+					clientId,
+					scopeId,
+				})),
+			),
+		]);
+
+		if (!res.every((r) => r.success))
+			throw new Error("Failed to register client");
+	}
+
 	// ----- OAuth flow に関する処理 ----- //
 
 	async createAccessToken(
