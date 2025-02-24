@@ -412,7 +412,9 @@ export default function Config() {
 							{oauthApp.callbackUrls.map((callbackUrl) => (
 								<Form.Input key={callbackUrl} value={callbackUrl} />
 							))}
-							[callback url 追加ボタン]
+							<button type="button">
+								<ButtonLike variant="secondary">Add</ButtonLike>
+							</button>
 						</Form.FieldSet>
 						<button type="submit">
 							<ButtonLike>Save</ButtonLike>

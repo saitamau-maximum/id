@@ -6,7 +6,7 @@ type Props = Exclude<ComponentProps<"button">, "aria-label"> & {
 	label: string;
 };
 
-export const IconButton = ({ children, label, ...props }: Props) => (
+export const 	IconButton = ({ children, label, ...props }: Props) => (
 	<button
 		type="submit"
 		className={css({

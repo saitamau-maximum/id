@@ -60,21 +60,13 @@ export const oauthClientCallbacks = sqliteTable(
 	}),
 );
 
-export const oauthScopes = sqliteTable("oauth_scopes", {
-	id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	name: text("name").notNull().unique(),
-	description: text("description"),
-});
-
 export const oauthClientScopes = sqliteTable(
 	"oauth_client_scopes",
 	{
 		clientId: text("client_id")
 			.notNull()
 			.references(() => oauthClients.id),
-		scopeId: int("scope_id", { mode: "number" })
-			.notNull()
-			.references(() => oauthScopes.id),
+		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
 	(table) => ({
 		pk: primaryKey({ columns: [table.clientId, table.scopeId] }),
@@ -105,9 +97,7 @@ export const oauthTokenScopes = sqliteTable(
 		tokenId: int("token_id", { mode: "number" })
 			.notNull()
 			.references(() => oauthTokens.id),
-		scopeId: int("scope_id", { mode: "number" })
-			.notNull()
-			.references(() => oauthScopes.id),
+		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
 	(table) => ({
 		pk: primaryKey({ columns: [table.tokenId, table.scopeId] }),
@@ -168,25 +158,6 @@ export const oauthClientCallbacksRelations = relations(
 	}),
 );
 
-export const oauthScopesRelations = relations(oauthScopes, ({ many }) => ({
-	clients: many(oauthClientScopes),
-	tokens: many(oauthTokenScopes),
-}));
-
-export const oauthClientScopesRelations = relations(
-	oauthClientScopes,
-	({ one }) => ({
-		client: one(oauthClients, {
-			fields: [oauthClientScopes.clientId],
-			references: [oauthClients.id],
-		}),
-		scope: one(oauthScopes, {
-			fields: [oauthClientScopes.scopeId],
-			references: [oauthScopes.id],
-		}),
-	}),
-);
-
 export const oauthTokensRelations = relations(oauthTokens, ({ one, many }) => ({
 	client: one(oauthClients, {
 		fields: [oauthTokens.clientId],
@@ -198,17 +169,3 @@ export const oauthTokensRelations = relations(oauthTokens, ({ one, many }) => ({
 	}),
 	scopes: many(oauthTokenScopes),
 }));
-
-export const oauthTokenScopesRelations = relations(
-	oauthTokenScopes,
-	({ one }) => ({
-		token: one(oauthTokens, {
-			fields: [oauthTokenScopes.tokenId],
-			references: [oauthTokens.id],
-		}),
-		scope: one(oauthScopes, {
-			fields: [oauthTokenScopes.scopeId],
-			references: [oauthScopes.id],
-		}),
-	}),
-);

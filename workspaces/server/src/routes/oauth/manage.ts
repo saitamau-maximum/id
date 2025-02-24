@@ -32,7 +32,13 @@ const getClientMiddleware = factory.createMiddleware(async (c, next) => {
 	return next();
 });
 
-const registerSchema = v.object({});
+const registerSchema = v.object({
+	name: v.pipe(v.string(), v.nonEmpty()),
+	description: v.string(),
+	scopeIds: v.array(v.number()),
+	callbackUrls: v.array(v.pipe(v.string(), v.url())),
+	icon: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
+});
 
 const managersSchema = v.object({
 	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
@@ -65,8 +71,27 @@ const route = app
 			),
 		});
 	})
-	.post("/register", vValidator("json", registerSchema), async (c) => {
-		// TODO
+	.get("/scopes", async (c) =>
+		c.json(await c.var.OAuthExternalRepository.getScopes()),
+	)
+	.post("/register", vValidator("form", registerSchema), async (c) => {
+		// 画像を含むので、multipart/form-data で受け取る
+		const { userId } = c.get("jwtPayload");
+		const { name, description, scopeIds, callbackUrls, icon } =
+			c.req.valid("form");
+
+		try {
+			await c.var.OAuthExternalRepository.registerClient(
+				userId,
+				name,
+				description,
+				scopeIds,
+				callbackUrls,
+			);
+			await c.var.OAuthAppStorageRepository.uploadAppIcon(icon, name);
+		} catch (e) {
+			return c.text("Failed to register client", 500);
+		}
 	})
 	.put(
 		"/:id/update",

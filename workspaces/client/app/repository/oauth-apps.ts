@@ -20,9 +20,19 @@ type GetAppByIdRes = OAuthClient & {
 	secrets: OAuthClientSecret[];
 };
 
+export interface IRegisterAppParams {
+	name: string;
+	description: string;
+	scopeIds: number[];
+	callbackUrls: string[];
+	icon: File;
+}
+
 export interface IOAuthAppsRepository {
 	getApps: () => Promise<GetAppsRes>;
 	getApps$$key: () => unknown[];
+	getScopes: () => Promise<OAuthScope[]>;
+	getScopes$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
 	addManagers: (appId: string, managers: string[]) => Promise<void>;
@@ -36,6 +46,10 @@ export interface IOAuthAppsRepository {
 		description: string,
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
+	registerApp: (params: IRegisterAppParams) => Promise<{
+		title: string;
+		description: string;
+	}>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -49,6 +63,18 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 	getApps$$key() {
 		return ["apps"];
+	}
+
+	async getScopes() {
+		const res = await client.oauth.manage.scopes.$get();
+		if (!res.ok) {
+			throw new Error("Failed to fetch scopes");
+		}
+		return res.json();
+	}
+
+	getScopes$$key() {
+		return ["scopes"];
 	}
 
 	async getAppById(appId: string) {
@@ -108,5 +134,29 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 			param: { id: appId, hash: secretHash },
 		});
 		if (!res.ok) throw new Error("Failed to delete secret");
+	}
+
+	async registerApp({
+		name,
+		description,
+		scopeIds,
+		callbackUrls,
+		icon,
+	}: IRegisterAppParams) {
+		const res = await client.oauth.manage.register.$post({
+			form: {
+				name,
+				description,
+				scopeIds: scopeIds.join(","),
+				callbackUrls: callbackUrls.join(","),
+				icon,
+			},
+		});
+		if (!res.ok) throw new Error("Failed to register app");
+
+		return {
+			title: name,
+			description,
+		};
 	}
 }
