@@ -2,6 +2,7 @@ import { css } from "styled-system/css";
 import type { Role } from "~/types/role";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
+import { useMarkdown } from "~/hooks/use-markdown";
 
 type Props = Member & {
 	roles: Role[];
@@ -17,6 +18,7 @@ export const ProfileCard: React.FC<Props> = ({
 	roles,
 	bio,
 }) => {
+	const { reactContent } = useMarkdown(bio);
 	return (
 		<div
 			className={css({
@@ -182,7 +184,7 @@ export const ProfileCard: React.FC<Props> = ({
 				</div>
 			</div>
 			{bio && (
-				<p
+				<div
 					className={css({
 						color: "gray.500",
 						fontSize: "md",
@@ -194,8 +196,8 @@ export const ProfileCard: React.FC<Props> = ({
 						whiteSpace: "pre-wrap",
 					})}
 				>
-					{bio}
-				</p>
+					{reactContent}
+				</div>
 			)}
 		</div>
 	);
