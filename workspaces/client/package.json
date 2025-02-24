@@ -28,6 +28,12 @@
 		"react-hook-form": "^7.54.2",
 		"react-image-crop": "^11.0.7",
 		"react-router": "^7.1.1",
+		"rehype-react": "^8.0.0",
+		"rehype-sanitize": "^6.0.0",
+		"rehype-stringify": "^10.0.1",
+		"remark-parse": "^11.0.0",
+		"remark-rehype": "^11.1.1",
+		"unified": "^11.0.5",
 		"valibot": "0.42.1"
 	},
 	"devDependencies": {
