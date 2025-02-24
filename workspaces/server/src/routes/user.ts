@@ -3,20 +3,40 @@ import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { BIO_MAX_LENGTH } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
+// 本名を"姓 名"の形式に正規化する
+const normalizeRealName = (text: string) => {
+	return text.trim().replace(/\s+/g, " ");
+};
+
+// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
+const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
+
 const registerSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
-	realName: v.pipe(v.string(), v.nonEmpty()),
-	realNameKana: v.pipe(v.string(), v.nonEmpty()),
+	realName: v.pipe(
+		v.string(),
+		v.regex(realNamePattern),
+		v.nonEmpty(),
+		v.maxLength(16),
+	),
+	realNameKana: v.pipe(
+		v.string(),
+		v.regex(realNamePattern),
+		v.nonEmpty(),
+		v.maxLength(16),
+	),
 	displayId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^[a-z0-9_]{3,16}$/)),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
 	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
+	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
 });
 
 const updateProfileImageSchema = v.object({
@@ -41,17 +61,23 @@ const route = app
 				email,
 				studentId,
 				grade,
+				bio,
 			} = c.req.valid("json");
 
+			const normalizedDisplayName = normalizeRealName(displayName);
+			const normalizedRealName = normalizeRealName(realName);
+			const normalizedRealNameKana = normalizeRealName(realNameKana);
+
 			await UserRepository.registerUser(payload.userId, {
-				displayName,
+				displayName: normalizedDisplayName,
 				displayId,
-				realName,
-				realNameKana,
+				realName: normalizedRealName,
+				realNameKana: normalizedRealNameKana,
 				academicEmail,
 				email,
 				studentId,
 				grade,
+				bio,
 			});
 
 			return c.text("ok", 200);
@@ -74,17 +100,23 @@ const route = app
 				email,
 				studentId,
 				grade,
+				bio,
 			} = c.req.valid("json");
 
+			const normalizedDisplayName = normalizeRealName(displayName);
+			const normalizedRealName = normalizeRealName(realName);
+			const normalizedRealNameKana = normalizeRealName(realNameKana);
+
 			await UserRepository.updateUser(payload.userId, {
-				displayName,
+				displayName: normalizedDisplayName,
 				displayId,
-				realName,
-				realNameKana,
+				realName: normalizedRealName,
+				realNameKana: normalizedRealNameKana,
 				academicEmail,
 				email,
 				studentId,
 				grade,
+				bio,
 			});
 
 			return c.text("ok", 200);

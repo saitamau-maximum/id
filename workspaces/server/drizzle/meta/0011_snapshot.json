@@ -78,6 +78,9 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+  "id": "f2f388e8-151d-407c-b438-703bccf2a9bf",
+  "prevId": "731501cd-af7f-4b11-a86a-704d80bcc9da",
+  "tables": {
     "user_profiles": {
       "name": "user_profiles",
       "columns": {
@@ -153,6 +156,13 @@
         },
         "grade": {
           "name": "grade",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "bio": {
+          "name": "bio",
           "type": "text",
           "primaryKey": false,
           "notNull": false,

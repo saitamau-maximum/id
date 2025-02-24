@@ -1,4 +1,8 @@
 import * as v from "valibot";
+import { BIO_MAX_LENGTH, BIO_MAX_NEWLINE } from "~/constant";
+
+// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
+const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
 export const UserSchemas = {
 	DisplayId: v.pipe(
@@ -18,11 +22,19 @@ export const UserSchemas = {
 	),
 	RealName: v.pipe(
 		v.string(),
+		v.regex(
+			realNamePattern,
+			"苗字、名前、ミドルネーム等はスペースで区切って入力してください",
+		),
 		v.nonEmpty("本名を入力してください"),
 		v.maxLength(16, "本名は16文字以下で入力してください"),
 	),
 	RealNameKana: v.pipe(
 		v.string(),
+		v.regex(
+			realNamePattern,
+			"苗字、名前、ミドルネーム等はスペースで区切って入力してください",
+		),
 		v.nonEmpty("本名(カナ)を入力してください"),
 		v.maxLength(16, "本名(カナ)は16文字以下で入力してください"),
 	),
@@ -46,4 +58,18 @@ export const UserSchemas = {
 		),
 	),
 	Grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
+	Bio: v.pipe(
+		v.string(),
+		v.maxLength(
+			BIO_MAX_LENGTH,
+			`自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`,
+		),
+		v.custom((input) => {
+			const newlineCount = (input as string).match(/\n/g)?.length || 0;
+			if (newlineCount > BIO_MAX_NEWLINE) {
+				return false;
+			}
+			return true;
+		}, `自己紹介は${BIO_MAX_NEWLINE}行以下で入力してください`),
+	),
 };

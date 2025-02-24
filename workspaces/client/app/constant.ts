@@ -5,3 +5,6 @@ export const GRADE = [
 	{ label: "修士 (Master)", identifier: ["M1", "M2"] },
 	{ label: "博士 (Doctor)", identifier: ["D1", "D2", "D3"] },
 ];
+
+export const BIO_MAX_LENGTH = 255; // Bioは255文字まで許容
+export const BIO_MAX_NEWLINE = 10; // Bioは10行まで許容

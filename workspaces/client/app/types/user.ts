@@ -16,6 +16,7 @@ export type User = {
 	email?: string;
 	studentId?: string;
 	grade?: string;
+	bio?: string;
 };
 
 /**
@@ -40,4 +41,5 @@ export type Member = Pick<
 	| "displayId"
 	| "profileImageURL"
 	| "grade"
+	| "bio"
 >;

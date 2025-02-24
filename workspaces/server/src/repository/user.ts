@@ -10,6 +10,7 @@ export type Profile = {
 	email: string;
 	studentId: string;
 	grade: string;
+	bio: string;
 };
 
 export type User = {
@@ -31,6 +32,7 @@ export type Member = {
 		| "displayId"
 		| "profileImageURL"
 		| "grade"
+		| "bio"
 	>
 >;
 

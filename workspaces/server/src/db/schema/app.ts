@@ -52,6 +52,7 @@ export const userProfiles = sqliteTable(
 		email: text("email"),
 		studentId: text("student_id"),
 		grade: text("grade"),
+		bio: text("bio"),
 	},
 	(table) => ({
 		gradeIdx: index("grade_idx").on(table.grade),

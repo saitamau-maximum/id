@@ -7,12 +7,14 @@ interface Props {
 	isLoading?: boolean;
 	weeks: Contribution;
 	clip?: number;
+	size?: "sm" | "md";
 }
 
 export const ContributionCard = ({
 	isLoading = false,
 	weeks,
 	clip = 7,
+	size = "md",
 }: Props) => {
 	const latestWeeks = useMemo(() => {
 		if (weeks.length >= clip) {
@@ -31,16 +33,12 @@ export const ContributionCard = ({
 				gridTemplateColumns: "repeat((auto-fill, 1fr)",
 				gridTemplateRows: "repeat(7, 1fr)",
 				gridAutoFlow: "column",
-				gap: 2,
-				padding: 4,
+				gap: size === "sm" ? 1 : 2,
+				padding: size === "sm" ? 2 : 4,
 				backgroundColor: "gray.50",
 				borderRadius: 8,
 				position: "relative",
 				overflow: "hidden",
-				lgDown: {
-					gap: 1,
-					padding: 2,
-				},
 			})}
 		>
 			{latestWeeks.map((week) =>
