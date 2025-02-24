@@ -8,7 +8,6 @@ type Props = Exclude<ComponentProps<"button">, "aria-label"> & {
 
 export const IconButton = ({ children, label, ...props }: Props) => (
 	<button
-		type="submit"
 		className={css({
 			display: "inline-flex",
 			verticalAlign: "middle",
