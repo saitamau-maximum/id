@@ -1,11 +1,9 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
-import type {
-	IOAuthExternalRepository,
-	Scope,
-} from "./../../../repository/oauth-external";
+import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 
 // user table から基本的な情報を取得するためのやつ
 const USER_BASIC_INFO_COLUMNS_GETTER = {
@@ -56,11 +54,7 @@ export class CloudflareOAuthExternalRepository
 					},
 				},
 				callbacks: true,
-				scopes: {
-					with: {
-						scope: true,
-					},
-				},
+				scopes: true,
 				managers: {
 					with: {
 						user: USER_BASIC_INFO_COLUMNS_GETTER,
@@ -77,7 +71,7 @@ export class CloudflareOAuthExternalRepository
 		return {
 			...client,
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
-			scopes: scopes.map((clientScope) => clientScope.scope),
+			scopes: scopes.map((clientScope) => getScopeById(clientScope.scopeId)),
 			managers: managers
 				.map((manager) => manager.user)
 				.map(USER_BASIC_INFO_TRANSFORMER),
@@ -267,11 +261,7 @@ export class CloudflareOAuthExternalRepository
 						secrets: true,
 					},
 				},
-				scopes: {
-					with: {
-						scope: true,
-					},
-				},
+				scopes: true,
 			},
 		});
 
@@ -281,7 +271,7 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => scope.scope),
+			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
 		};
 	}
 
@@ -323,11 +313,7 @@ export class CloudflareOAuthExternalRepository
 				),
 			with: {
 				client: true,
-				scopes: {
-					with: {
-						scope: true,
-					},
-				},
+				scopes: true,
 			},
 		});
 
@@ -337,7 +323,7 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => scope.scope),
+			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
 		};
 	}
 }

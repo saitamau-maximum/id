@@ -1,3 +1,4 @@
+import type { Scope } from "../constants/scope";
 import type { User } from "./user";
 
 export type Client = {
@@ -19,12 +20,6 @@ export type ClientSecret = {
 export type ClientCallback = {
 	clientId: Client["id"];
 	callbackUrl: string;
-};
-
-export type Scope = {
-	id: number;
-	name: string;
-	description: string | null;
 };
 
 export type ClientScope = {
