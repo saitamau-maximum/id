@@ -1,4 +1,5 @@
 import { AuthRepositoryImpl } from "./auth";
+import { CalendarRepositoryImpl } from "./calendar";
 import { MemberRepositoryImpl } from "./member";
 import { OAuthAppsRepositoryImpl } from "./oauth-apps";
 import { UserRepositoryImpl } from "./user";
@@ -8,4 +9,5 @@ export const DefaultRepositories = {
 	userRepository: new UserRepositoryImpl(),
 	memberRepository: new MemberRepositoryImpl(),
 	oauthAppsRepository: new OAuthAppsRepositoryImpl(),
+	calendarRepository: new CalendarRepositoryImpl(),
 };
