@@ -6,12 +6,12 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { TabSwitch } from "~/components/ui/tab-swtch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
+import { useMarkdown } from "~/hooks/use-markdown";
 import { UserSchemas } from "~/schema/user";
 import { useUpdateProfile } from "../hooks/use-update-profile";
-import { useMarkdown } from "~/hooks/use-markdown";
-import { TabSwitch } from "~/components/ui/tab-swtch";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -53,7 +53,7 @@ export const ProfileUpdateForm = () => {
 	});
 
 	const bio = watch("bio");
-	const {reactContent} = useMarkdown(isPreview ? bio : undefined);
+	const { reactContent } = useMarkdown(isPreview ? bio : undefined);
 	const bioLength = watch("bio")?.length || 0;
 
 	return (

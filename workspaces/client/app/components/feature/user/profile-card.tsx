@@ -1,8 +1,8 @@
 import { css } from "styled-system/css";
+import { useMarkdown } from "~/hooks/use-markdown";
 import type { Role } from "~/types/role";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
-import { useMarkdown } from "~/hooks/use-markdown";
 
 type Props = Member & {
 	roles: Role[];
