@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -10,6 +10,8 @@ import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
+import { useMarkdown } from "~/hooks/use-markdown";
+import { TabSwitch } from "~/components/ui/tab-swtch";
 
 const RegisterFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -28,6 +30,7 @@ type FormValues = v.InferInput<typeof RegisterFormSchema>;
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
 	const { user } = useAuth();
+	const [isPreview, setIsPreview] = useState(false);
 
 	const {
 		register,
@@ -48,6 +51,10 @@ export const RegisterForm = () => {
 			bio: user?.bio,
 		},
 	});
+
+	const bio = watch("bio");
+	const {reactContent} = useMarkdown(isPreview ? bio : undefined);
+	const bioLength = watch("bio")?.length || 0;
 
 	return (
 		<form
@@ -159,11 +166,42 @@ export const RegisterForm = () => {
 					</legend>
 					<ErrorDisplay error={errors.bio?.message} />
 				</div>
-				<Form.Textarea
-					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（後から変更可能）`}
-					rows={10}
-					{...register("bio")}
+				<TabSwitch
+					checked={isPreview}
+					onChange={() => setIsPreview(!isPreview)}
+					onText="Preview"
+					offText="Edit"
 				/>
+				{isPreview ? (
+					<div
+						className={css({
+							color: "gray.500",
+							fontSize: "md",
+							mdDown: {
+								fontSize: "sm",
+							},
+							overflowWrap: "break-word",
+							lineHeight: "1.5",
+							whiteSpace: "pre-wrap",
+							height: "257px",
+							padding: "token(spacing.2) token(spacing.4)",
+							borderRadius: 6,
+							borderWidth: 1,
+							borderStyle: "solid",
+							borderColor: "gray.300",
+							outline: "none",
+							width: "100%",
+						})}
+					>
+						{reactContent}
+					</div>
+				) : (
+					<Form.Textarea
+						placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
+						rows={10}
+						{...register("bio")}
+					/>
+				)}
 				<p
 					className={css({
 						display: "block",
@@ -172,7 +210,7 @@ export const RegisterForm = () => {
 						textAlign: "right",
 					})}
 				>
-					{watch("bio", "").length} / {BIO_MAX_LENGTH}
+					{bioLength} / {BIO_MAX_LENGTH}
 				</p>
 			</Form.FieldSet>
 
