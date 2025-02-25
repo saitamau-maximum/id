@@ -24,7 +24,7 @@ export const useMarkdown = (markdownContent: string | undefined) => {
 				const file = await unified()
 					.use(remarkParse)
 					.use(remarkRehype)
-					.use(rehypeSanitize) // XXS対策
+					.use(rehypeSanitize) // XSS対策
 					.use(rehypeReact, { jsx, jsxs, Fragment })
 					.process(markdownContent);
 
