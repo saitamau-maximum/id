@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkRehype from "remark-rehype";
@@ -10,6 +10,7 @@ export const useMarkdown = (markdownContent: string | undefined) => {
     const [reactContent, setReactContent] = useState<React.ReactNode>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
+	const isMounted = useRef(true);
 
     const parseMarkdown = useCallback(async () => {
         if (!markdownContent) {
@@ -26,9 +27,11 @@ export const useMarkdown = (markdownContent: string | undefined) => {
                 .use(rehypeSanitize)
                 .use(rehypeReact, { jsx, jsxs, Fragment })
                 .process(markdownContent);
-
-            setReactContent(file.result);
-            setError(null);
+			
+			if (isMounted.current) {
+				setReactContent(file.result);
+				setError(null);
+			}
         } catch (err: unknown) {
             setReactContent(null);
             setError(
@@ -40,7 +43,12 @@ export const useMarkdown = (markdownContent: string | undefined) => {
     }, [markdownContent]);
 
     useEffect(() => {
+        isMounted.current = true;
         parseMarkdown();
+
+        return () => {
+            isMounted.current = false;
+        };
     }, [parseMarkdown]);
 
     return { reactContent, isLoading, error };
