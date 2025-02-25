@@ -195,7 +195,7 @@ export const ProfileUpdateForm = () => {
 					</div>
 				) : (
 					<Form.Textarea
-						placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
+						placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
 						rows={10}
 						{...register("bio")}
 					/>
