@@ -100,8 +100,8 @@ export const calendarEvents = sqliteTable(
 			.notNull(),
 		title: text("title").notNull(),
 		description: text("description").notNull(),
-		startAt: integer("start_at", { mode: "timestamp" }).notNull(),
-		endAt: integer("end_at", { mode: "timestamp" }).notNull(),
+		startAt: text("start_at").notNull(),
+		endAt: text("end_at").notNull(),
 	},
 	(table) => ({
 		userIdx: index("user_idx").on(table.userId),

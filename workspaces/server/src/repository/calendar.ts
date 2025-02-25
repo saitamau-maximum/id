@@ -3,8 +3,8 @@ export interface ICalendarEvent {
 	userId: string;
 	title: string;
 	description: string;
-	startAt: Date;
-	endAt: Date;
+	startAt: string;
+	endAt: string;
 }
 export type CreateEventPayload = Omit<ICalendarEvent, "id">;
 

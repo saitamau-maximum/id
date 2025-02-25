@@ -8,8 +8,8 @@ const createEventSchema = v.object({
 	userId: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
 	description: v.pipe(v.string(), v.nonEmpty()),
-	startAt: v.date(),
-	endAt: v.date(),
+	startAt: v.pipe(v.string(), v.nonEmpty()),
+	endAt: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const updateEventSchema = v.object({
@@ -17,8 +17,8 @@ const updateEventSchema = v.object({
 	userId: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
 	description: v.pipe(v.string(), v.nonEmpty()),
-	startAt: v.date(),
-	endAt: v.date(),
+	startAt: v.pipe(v.string(), v.nonEmpty()),
+	endAt: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const deleteEventSchema = v.object({
