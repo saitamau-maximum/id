@@ -1,4 +1,4 @@
-import { type JSX, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { Fragment, jsx, jsxs } from "react/jsx-runtime";
 import rehypeReact from "rehype-react";
 import rehypeSanitize from "rehype-sanitize";
@@ -7,7 +7,7 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
 export const useMarkdown = (markdownContent: string | undefined) => {
-	const [reactContent, setReactContent] = useState<JSX.Element | null>(null);
+	const [reactContent, setReactContent] = useState<ReactNode>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<Error | null>(null);
 
@@ -28,7 +28,7 @@ export const useMarkdown = (markdownContent: string | undefined) => {
 					.use(rehypeReact, { jsx, jsxs, Fragment })
 					.process(markdownContent);
 
-				setReactContent(file.result as JSX.Element);
+				setReactContent(file.result);
 			} catch (err: unknown) {
 				setError(
 					err instanceof Error ? err : new Error("Unknown error occurred"),
