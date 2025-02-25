@@ -52,6 +52,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 			param: {
 				eventId: event.id,
 			},
+			json: event,
 		});
 		if (!res.ok) {
 			throw new Error("Failed to update event");
@@ -61,7 +62,10 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 	async deleteEvent(eventId: ICalendarEvent["id"]) {
 		const res = await client.calendar.events[":eventId"].$delete({
 			param: {
-				eventId,
+				eventId: eventId,
+			},
+			json: {
+				id: eventId,
 			},
 		});
 		if (!res.ok) {
