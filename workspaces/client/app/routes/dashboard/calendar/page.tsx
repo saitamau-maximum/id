@@ -1,6 +1,7 @@
 import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useCalendar } from "./hooks/use-calendar";
+import { FLAG } from "~/utils/flag";
 
 export default function Calendar() {
 	const { data } = useCalendar();
@@ -17,15 +18,14 @@ export default function Calendar() {
 			/>
 			<div>
 				{/* TODO: イベントの取得はできているが、日時でのソートやデザインをあてる必要あり */}
-				{FLAG.CALENDAR_FLAGS &&
-					data.map((event) => (
-						<div key={event.id}>
-							<p>{event.title}</p>
-							<p>{event.description}</p>
-							<p>{event.startAt}</p>
-							<p>{event.endAt}</p>
-						</div>
-					))}
+				{FLAG && data.map((event) => (
+					<div key={event.id}>
+						<p>{event.title}</p>
+						<p>{event.description}</p>
+						<p>{event.startAt}</p>
+						<p>{event.endAt}</p>
+					</div>
+				))}
 			</div>
 		</div>
 	);
