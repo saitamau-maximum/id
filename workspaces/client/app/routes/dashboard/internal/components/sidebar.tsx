@@ -37,7 +37,8 @@ const NAVIGATION: Navigation[] = [
 	},
 	{
 		label: "Calendar",
-		to: "/calendar",
+		to: FLAG ? "/calendar" : "#",
+		comingSoon: FLAG ? false : true,
 		isActive: (location: string) => location.startsWith("/calendar"),
 	},
 ];
