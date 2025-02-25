@@ -31,6 +31,7 @@ export const useMarkdown = (markdownContent: string | undefined) => {
 				setReactContent(file.result);
 				setError(null);
 			} catch (err: unknown) {
+				setReactContent(null);
 				setError(
 					err instanceof Error ? err : new Error("Unknown error occurred"),
 				);
