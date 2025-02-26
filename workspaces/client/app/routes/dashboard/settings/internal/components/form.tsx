@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { TabSwitch } from "~/components/ui/tab-swtch";
+import { Switch } from "~/components/ui/swtch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
@@ -163,12 +163,18 @@ export const ProfileUpdateForm = () => {
 					<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
 					<ErrorDisplay error={errors.bio?.message} />
 				</div>
-				<TabSwitch
-					checked={isPreview}
-					onChange={() => setIsPreview(!isPreview)}
-					onText="Preview"
-					offText="Edit"
-				/>
+				<Switch.List>
+					<Switch.Item
+						isActive={!isPreview}
+						text="Edit"
+						onClick={() => setIsPreview(!isPreview)}
+					/>
+					<Switch.Item
+						isActive={isPreview}
+						text="Preview"
+						onClick={() => setIsPreview(!isPreview)}
+					/>
+				</Switch.List>
 				{isPreview ? (
 					<BioPreview bio={bio} />
 				) : (

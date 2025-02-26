@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { TabSwitch } from "~/components/ui/tab-swtch";
+import { Switch } from "~/components/ui/swtch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BioPreview } from "~/routes/onboarding/internal/components/bio-preview";
@@ -165,12 +165,18 @@ export const RegisterForm = () => {
 					</legend>
 					<ErrorDisplay error={errors.bio?.message} />
 				</div>
-				<TabSwitch
-					checked={isPreview}
-					onChange={() => setIsPreview(!isPreview)}
-					onText="Preview"
-					offText="Edit"
-				/>
+				<Switch.List>
+					<Switch.Item
+						isActive={!isPreview}
+						onClick={() => setIsPreview(!isPreview)}
+						text="Edit"
+					/>
+					<Switch.Item
+						isActive={isPreview}
+						onClick={() => setIsPreview(!isPreview)}
+						text="Preview"
+					/>
+				</Switch.List>
 				{isPreview ? (
 					<BioPreview bio={bio} />
 				) : (
