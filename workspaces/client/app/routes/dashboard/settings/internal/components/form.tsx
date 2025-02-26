@@ -6,7 +6,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { Switch } from "~/components/ui/swtch";
+import { Switch } from "~/components/ui/switch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
