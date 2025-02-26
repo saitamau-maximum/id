@@ -8,10 +8,6 @@ type BioPreviewProps = {
 export const BioPreview = ({ bio }: BioPreviewProps) => {
 	const { reactContent: BioPreviewContent } = useMarkdown(bio);
 
-	if (!BioPreviewContent) {
-		return null;
-	}
-
 	return (
 		<div
 			className={css({
@@ -37,7 +33,7 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 					height: "240px",
 				})}
 			>
-				{BioPreviewContent}
+				{BioPreviewContent ? BioPreviewContent : ""}
 			</div>
 		</div>
 	);
