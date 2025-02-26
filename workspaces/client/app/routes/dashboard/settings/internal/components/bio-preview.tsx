@@ -6,7 +6,7 @@ type BioPreviewProps = {
 };
 
 export const BioPreview = ({ bio }: BioPreviewProps) => {
-	const { reactContent: BioPreviewContent } = useMarkdown(bio);
+	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
 	return (
 		<div
