@@ -21,7 +21,7 @@ export const SwitchItem = ({
 				cursor: "pointer",
 				padding: "token(spacing.2) token(spacing.4)",
 				color: isActive ? "green.700" : "gray.500",
-				backgroundColor: isActive ? "green.100" : "inherit",
+				backgroundColor: isActive ? "green.100" : "transparent",
 				borderRadius: "xl",
 				_hover: {
 					backgroundColor: isActive ? "green.100" : "gray.100",
