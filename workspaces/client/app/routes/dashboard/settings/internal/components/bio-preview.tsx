@@ -33,7 +33,7 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 					height: "240px",
 				})}
 			>
-				{BioPreviewContent ? BioPreviewContent : ""}
+				{BioPreviewContent}
 			</div>
 		</div>
 	);
