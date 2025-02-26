@@ -14,6 +14,10 @@ export const UserSchemas = {
 			(value) => !RESERVED_WORDS.includes(value),
 			"この表示IDは使用できません",
 		),
+		v.check(
+			(value) => !value.match(/^_+$/),
+			"この表示IDは使用できません",
+		),
 		v.regex(
 			/^[a-z0-9_]+$/,
 			"表示IDは半角英小文字、半角数字、アンダースコア(_)で入力してください",
