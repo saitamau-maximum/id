@@ -53,7 +53,7 @@ export const RegisterForm = () => {
 	});
 
 	const bio = watch("bio");
-	const { reactContent } = useMarkdown(isPreview ? bio : undefined);
+	const { reactContent: bioPreviewContent } = useMarkdown(isPreview ? bio : undefined);
 	const bioLength = bio?.length || 0;
 
 	return (
@@ -193,7 +193,7 @@ export const RegisterForm = () => {
 							width: "100%",
 						})}
 					>
-						{reactContent}
+						{bioPreviewContent}
 					</div>
 				) : (
 					<Form.Textarea

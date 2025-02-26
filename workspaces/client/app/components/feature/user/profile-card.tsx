@@ -18,7 +18,7 @@ export const ProfileCard: React.FC<Props> = ({
 	roles,
 	bio,
 }) => {
-	const { reactContent } = useMarkdown(bio);
+	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 	return (
 		<div
 			className={css({
@@ -196,7 +196,7 @@ export const ProfileCard: React.FC<Props> = ({
 						whiteSpace: "pre-wrap",
 					})}
 				>
-					{reactContent}
+					{bioPreviewContent}
 				</div>
 			)}
 		</div>
