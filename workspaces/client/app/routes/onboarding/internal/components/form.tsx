@@ -9,7 +9,7 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { TabSwitch } from "~/components/ui/tab-swtch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { useMarkdown } from "~/hooks/use-markdown";
+import { BioPreview } from "~/routes/onboarding/internal/components/bio-preview";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
 
@@ -53,9 +53,6 @@ export const RegisterForm = () => {
 	});
 
 	const bio = watch("bio");
-	const { reactContent: bioPreviewContent } = useMarkdown(
-		isPreview ? bio : undefined,
-	);
 	const bioLength = bio?.length || 0;
 
 	return (
@@ -175,28 +172,7 @@ export const RegisterForm = () => {
 					offText="Edit"
 				/>
 				{isPreview ? (
-					<div
-						className={css({
-							color: "gray.500",
-							fontSize: "md",
-							mdDown: {
-								fontSize: "sm",
-							},
-							overflowWrap: "break-word",
-							lineHeight: "1.5",
-							whiteSpace: "pre-wrap",
-							height: "257px",
-							padding: "token(spacing.2) token(spacing.4)",
-							borderRadius: 6,
-							borderWidth: 1,
-							borderStyle: "solid",
-							borderColor: "gray.300",
-							outline: "none",
-							width: "100%",
-						})}
-					>
-						{bioPreviewContent}
-					</div>
+					<BioPreview bio={bio} />
 				) : (
 					<Form.Textarea
 						placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
