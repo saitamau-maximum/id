@@ -20,6 +20,7 @@ export const SwitchItem = ({
 			className={css({
 				cursor: "pointer",
 				padding: "token(spacing.2) token(spacing.4)",
+				lineHeight: 1,
 				color: isActive ? "green.700" : "gray.500",
 				backgroundColor: isActive ? "green.100" : "transparent",
 				borderRadius: "xl",
