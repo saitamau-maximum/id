@@ -20,6 +20,14 @@ type GetAppByIdRes = OAuthClient & {
 	secrets: OAuthClientSecret[];
 };
 
+export interface IRegisterAppParams {
+	name: string;
+	description: string;
+	scopeIds: number[];
+	callbackUrls: string[];
+	icon: File;
+}
+
 export interface IOAuthAppsRepository {
 	getApps: () => Promise<GetAppsRes>;
 	getApps$$key: () => unknown[];
@@ -36,6 +44,10 @@ export interface IOAuthAppsRepository {
 		description: string,
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
+	registerApp: (params: IRegisterAppParams) => Promise<{
+		title: string;
+		description: string;
+	}>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -108,5 +120,29 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 			param: { id: appId, hash: secretHash },
 		});
 		if (!res.ok) throw new Error("Failed to delete secret");
+	}
+
+	async registerApp({
+		name,
+		description,
+		scopeIds,
+		callbackUrls,
+		icon,
+	}: IRegisterAppParams) {
+		const res = await client.oauth.manage.register.$post({
+			form: {
+				name,
+				description,
+				scopeIds: scopeIds.join(","),
+				callbackUrls: callbackUrls.join(","),
+				icon,
+			},
+		});
+		if (!res.ok) throw new Error("Failed to register app");
+
+		return {
+			title: name,
+			description,
+		};
 	}
 }
