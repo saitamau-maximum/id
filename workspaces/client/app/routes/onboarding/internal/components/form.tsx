@@ -1,15 +1,13 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { Switch } from "~/components/ui/switch";
-import { BIO_MAX_LENGTH, GRADE } from "~/constant";
+import { GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { BioPreview } from "~/routes/onboarding/internal/components/bio-preview";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
 
@@ -30,7 +28,6 @@ type FormValues = v.InferInput<typeof RegisterFormSchema>;
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
 	const { user } = useAuth();
-	const [isPreview, setIsPreview] = useState(false);
 
 	const {
 		register,
@@ -152,50 +149,6 @@ export const RegisterForm = () => {
 					))}
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
-			</Form.FieldSet>
-			<Form.FieldSet>
-				<div
-					className={css({
-						display: "flex",
-						justifyContent: "space-between",
-					})}
-				>
-					<legend>
-						<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
-					</legend>
-					<ErrorDisplay error={errors.bio?.message} />
-				</div>
-				<Switch.List>
-					<Switch.Item
-						isActive={!isPreview}
-						onClick={() => setIsPreview(!isPreview)}
-						text="Edit"
-					/>
-					<Switch.Item
-						isActive={isPreview}
-						onClick={() => setIsPreview(!isPreview)}
-						text="Preview"
-					/>
-				</Switch.List>
-				{isPreview ? (
-					<BioPreview bio={bio} />
-				) : (
-					<Form.Textarea
-						placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
-						rows={10}
-						{...register("bio")}
-					/>
-				)}
-				<p
-					className={css({
-						display: "block",
-						fontSize: "sm",
-						color: "gray.600",
-						textAlign: "right",
-					})}
-				>
-					{bioLength} / {BIO_MAX_LENGTH}
-				</p>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>
