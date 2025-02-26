@@ -10,7 +10,7 @@ export const SwitchList = ({ children }: Props) => {
 			className={css({
 				display: "flex",
 				padding: "token(spacing.1) token(spacing.2)",
-				gap: "token(spacing.2)",
+				gap: 2,
 			})}
 		>
 			{children}
