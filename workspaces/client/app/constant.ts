@@ -12,7 +12,8 @@ export const BIO_MAX_NEWLINE = 10; // Bioは10行まで許容
 export const RESERVED_WORDS = [
 	"maximum",
 	"home",
-	"calender",
+	"calendar",
+	"member",
 	"members",
 	"logout",
 	"login",
