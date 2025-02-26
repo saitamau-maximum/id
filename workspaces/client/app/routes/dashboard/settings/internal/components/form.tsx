@@ -53,7 +53,9 @@ export const ProfileUpdateForm = () => {
 	});
 
 	const bio = watch("bio");
-	const { reactContent: bioPreviewContent } = useMarkdown(isPreview ? bio : undefined);
+	const { reactContent: bioPreviewContent } = useMarkdown(
+		isPreview ? bio : undefined,
+	);
 	const bioLength = bio?.length || 0;
 
 	return (
