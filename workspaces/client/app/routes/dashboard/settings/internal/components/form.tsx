@@ -166,14 +166,16 @@ export const ProfileUpdateForm = () => {
 				<Switch.List>
 					<Switch.Item
 						isActive={!isPreview}
-						text="Edit"
 						onClick={() => setIsPreview(!isPreview)}
-					/>
+					>
+						Edit
+					</Switch.Item>
 					<Switch.Item
 						isActive={isPreview}
-						text="Preview"
 						onClick={() => setIsPreview(!isPreview)}
-					/>
+					>
+						Preview
+					</Switch.Item>
 				</Switch.List>
 				{isPreview ? (
 					<BioPreview bio={bio} />

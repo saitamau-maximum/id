@@ -1,15 +1,16 @@
+import type React from "react";
 import type { JSX } from "react";
 import { css } from "styled-system/css";
 
 type TabItemProps = {
 	isActive: boolean;
-	text: string;
+	children: React.ReactNode;
 	onClick?: () => void;
 };
 
 export const SwitchItem = ({
 	isActive,
-	text,
+	children,
 	onClick,
 }: TabItemProps): JSX.Element => {
 	return (
@@ -24,12 +25,15 @@ export const SwitchItem = ({
 				color: isActive ? "green.700" : "gray.500",
 				backgroundColor: isActive ? "green.100" : "transparent",
 				borderRadius: "xl",
+				display: "flex",
+				alignItems: "center",
+				gap: 1,
 				_hover: {
 					backgroundColor: isActive ? "green.100" : "gray.100",
 				},
 			})}
 		>
-			{text}
+			{children}
 		</button>
 	);
 };
