@@ -17,7 +17,7 @@ export default function Calendar() {
 			/>
 			<div>
 				{/* TODO: イベントの取得はできているが、日時でのソートやデザインをあてる必要あり */}
-				{FLAG &&
+				{FLAG.CALENDAR_FLAGS &&
 					data.map((event) => (
 						<div key={event.id}>
 							<p>{event.title}</p>
