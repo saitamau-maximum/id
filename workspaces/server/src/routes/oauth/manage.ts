@@ -1,5 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
+import { stream } from "hono/streaming";
 import * as v from "valibot";
+import { optimizeImage } from "wasm-image-optimization";
+import { type ScopeId, isScopeId } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 
@@ -32,7 +35,28 @@ const getClientMiddleware = factory.createMiddleware(async (c, next) => {
 	return next();
 });
 
-const registerSchema = v.object({});
+const registerSchema = v.object({
+	name: v.pipe(v.string(), v.nonEmpty()),
+	description: v.string(),
+	// formなので配列はカンマ区切りの文字列として受け取る
+	scopeIds: v.pipe(
+		v.string(),
+		v.transform((input) => input.split(",")),
+		v.array(
+			v.pipe(
+				v.string(),
+				v.transform((input) => Number(input)),
+				v.custom<ScopeId>(isScopeId),
+			),
+		),
+	),
+	callbackUrls: v.pipe(
+		v.string(),
+		v.transform((input) => input.split(",")),
+		v.array(v.pipe(v.string(), v.url())),
+	),
+	icon: v.optional(v.pipe(v.file(), v.maxSize(1024 * 1024 * 5))), // 5MiB
+});
 
 const managersSchema = v.object({
 	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
@@ -43,11 +67,10 @@ const secretDescriptionSchema = v.object({
 });
 
 const route = app
-	.use(authMiddleware)
-	.get("/list", async (c) =>
+	.get("/list", authMiddleware, async (c) =>
 		c.json(await c.var.OAuthExternalRepository.getClients()),
 	)
-	.get("/:id", getClientMiddleware, async (c) => {
+	.get("/:id", authMiddleware, getClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
@@ -65,11 +88,73 @@ const route = app
 			),
 		});
 	})
-	.post("/register", vValidator("json", registerSchema), async (c) => {
-		// TODO
+	.post(
+		"/register",
+		authMiddleware,
+		vValidator("form", registerSchema),
+		async (c) => {
+			// 画像を含むので、multipart/form-data で受け取る
+			const { userId } = c.get("jwtPayload");
+			const { name, description, scopeIds, callbackUrls, icon } =
+				c.req.valid("form");
+			const serverOrigin = new URL(c.req.url).origin;
+
+			try {
+				const clientId = crypto.randomUUID();
+				if (icon) {
+					const optimizedImageArrayBuffer = await optimizeImage({
+						image: await icon.arrayBuffer(),
+						width: 256,
+						height: 256,
+						format: "webp",
+					});
+
+					if (!optimizedImageArrayBuffer) {
+						throw new Error("Failed to optimize image");
+					}
+
+					const optimizedImageUint8Array = new Uint8Array(
+						optimizedImageArrayBuffer,
+					);
+
+					await c.var.OAuthAppStorageRepository.uploadAppIcon(
+						new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+						clientId,
+					);
+				}
+				await c.var.OAuthExternalRepository.registerClient(
+					clientId,
+					userId,
+					name,
+					description,
+					scopeIds,
+					callbackUrls,
+					icon
+						? `${serverOrigin}/oauth/manage/${clientId}/icon?${Date.now()}`
+						: null,
+				);
+				return c.text("OK");
+			} catch (e) {
+				return c.text("Failed to register client", 500);
+			}
+		},
+	)
+	.get("/:appId/icon", async (c) => {
+		const { OAuthAppStorageRepository } = c.var;
+		const appId = c.req.param("appId");
+
+		try {
+			const body = await OAuthAppStorageRepository.getAppIconURL(appId);
+			c.header("Content-Type", "image/webp");
+			return stream(c, (s) => s.pipe(body));
+		} catch (e) {
+			console.error(e);
+			return c.text("Not found", 404);
+		}
 	})
 	.put(
 		"/:id/update",
+		authMiddleware,
 		getClientMiddleware,
 		vValidator("json", registerSchema),
 		async (c) => {
@@ -78,6 +163,7 @@ const route = app
 	)
 	.put(
 		"/:id/managers",
+		authMiddleware,
 		getClientMiddleware,
 		vValidator("json", managersSchema),
 		async (c) => {
@@ -94,6 +180,7 @@ const route = app
 	)
 	.delete(
 		"/:id/managers",
+		authMiddleware,
 		getClientMiddleware,
 		vValidator("json", managersSchema),
 		async (c) => {
@@ -108,7 +195,7 @@ const route = app
 			return c.text("OK");
 		},
 	)
-	.put("/:id/secrets", getClientMiddleware, async (c) => {
+	.put("/:id/secrets", authMiddleware, getClientMiddleware, async (c) => {
 		const { id: clientId } = c.req.param();
 		const { userId } = c.get("jwtPayload");
 
@@ -127,6 +214,7 @@ const route = app
 	})
 	.put(
 		"/:id/secrets/:hash",
+		authMiddleware,
 		getClientMiddleware,
 		vValidator("json", secretDescriptionSchema),
 		async (c) => {
@@ -151,22 +239,27 @@ const route = app
 			return c.text("Not found", 404);
 		},
 	)
-	.delete("/:id/secrets/:hash", getClientMiddleware, async (c) => {
-		const { id: clientId, hash: secretHash } = c.req.param();
-		const client = c.get("oauthClientInfo");
-		if (!client) return c.text("Not found", 404);
+	.delete(
+		"/:id/secrets/:hash",
+		authMiddleware,
+		getClientMiddleware,
+		async (c) => {
+			const { id: clientId, hash: secretHash } = c.req.param();
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
 
-		for (const secret of client.secrets) {
-			if ((await generateHash(secret.secret)) === secretHash) {
-				await c.var.OAuthExternalRepository.deleteClientSecret(
-					clientId,
-					secret.secret,
-				);
-				return c.text("OK");
+			for (const secret of client.secrets) {
+				if ((await generateHash(secret.secret)) === secretHash) {
+					await c.var.OAuthExternalRepository.deleteClientSecret(
+						clientId,
+						secret.secret,
+					);
+					return c.text("OK");
+				}
 			}
-		}
 
-		return c.text("Not found", 404);
-	});
+			return c.text("Not found", 404);
+		},
+	);
 
 export { route as oauthManageRoute };
