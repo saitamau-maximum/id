@@ -26,15 +26,10 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 				borderColor: "gray.300",
 				outline: "none",
 				width: "100%",
+				height: "240px",
 			})}
 		>
-			<div
-				className={css({
-					height: "240px",
-				})}
-			>
-				{bioPreviewContent}
-			</div>
+			{bioPreviewContent}
 		</div>
 	);
 };
