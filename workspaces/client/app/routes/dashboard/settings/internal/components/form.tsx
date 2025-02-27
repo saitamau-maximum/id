@@ -1,15 +1,17 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { Switch } from "~/components/ui/switch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useUpdateProfile } from "../hooks/use-update-profile";
+import { BioPreview } from "./bio-preview";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -28,6 +30,7 @@ type FormValues = v.InferInput<typeof UpdateFormSchema>;
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
 	const { user } = useAuth();
+	const [isPreview, setIsPreview] = useState(false);
 
 	const {
 		register,
@@ -49,7 +52,8 @@ export const ProfileUpdateForm = () => {
 		},
 	});
 
-	const bioLength = watch("bio")?.length || 0;
+	const bio = watch("bio");
+	const bioLength = bio?.length || 0;
 
 	return (
 		<form
@@ -159,11 +163,31 @@ export const ProfileUpdateForm = () => {
 					<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
 					<ErrorDisplay error={errors.bio?.message} />
 				</div>
-				<Form.Textarea
-					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください`}
-					rows={10}
-					{...register("bio")}
-				/>
+				<Switch.List>
+					<Switch.Item
+						isActive={!isPreview}
+						onClick={() => setIsPreview(!isPreview)}
+					>
+						Edit
+					</Switch.Item>
+					<Switch.Item
+						isActive={isPreview}
+						onClick={() => setIsPreview(!isPreview)}
+					>
+						Preview
+					</Switch.Item>
+				</Switch.List>
+				{isPreview ? (
+					<BioPreview bio={bio} />
+				) : (
+					<div className={css({ height: "240px" })}>
+						<Form.Textarea
+							placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
+							rows={10}
+							{...register("bio")}
+						/>
+					</div>
+				)}
 				<p
 					className={css({
 						display: "block",
