@@ -12,3 +12,18 @@ export interface IUserStorageRepository {
 	 */
 	getProfileImageURL: (userId: string) => Promise<ReadableStream>;
 }
+
+export interface IOAuthAppStorageRepository {
+	/**
+	 * Uploads a OAuth app icon.
+	 * @param blob - The image blob to upload.
+	 * @param appId - The app ID.
+	 */
+	uploadAppIcon: (blob: Blob, appId: string) => Promise<void>;
+	/**
+	 * Gets the URL of the OAuth app icon.
+	 * @param appId - The app ID.
+	 * @returns A readable stream of the app icon.
+	 */
+	getAppIconURL: (appId: string) => Promise<ReadableStream>;
+}

@@ -5,6 +5,7 @@ import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
+import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
@@ -47,6 +48,10 @@ export const route = app
 		c.set(
 			"UserStorageRepository",
 			new CloudflareUserStorageRepository(c.env.STORAGE),
+		);
+		c.set(
+			"OAuthAppStorageRepository",
+			new CloudflareOAuthAppRepository(c.env.STORAGE),
 		);
 
 		const octokit = new Octokit({

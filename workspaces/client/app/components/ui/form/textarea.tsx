@@ -18,6 +18,7 @@ export const Textarea = ({ className, ...props }: Props) => {
 					backgroundColor: "white",
 					outline: "none",
 					width: "100%",
+					maxHeight: "100%",
 					transition: "border-color 0.2s ease",
 					"&:focus": {
 						borderColor: "green",

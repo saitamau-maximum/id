@@ -92,6 +92,9 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+  "id": "8907c6b6-21b1-47e6-9fa2-aecdea7b5268",
+  "prevId": "f2f388e8-151d-407c-b438-703bccf2a9bf",
+  "tables": {
     "user_profiles": {
       "name": "user_profiles",
       "columns": {
@@ -410,19 +413,6 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "oauth_client_scopes_client_id_oauth_clients_id_fk": {
-          "name": "oauth_client_scopes_client_id_oauth_clients_id_fk",
-          "tableFrom": "oauth_client_scopes",
-          "tableTo": "oauth_clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
         "oauth_client_scopes_scope_id_oauth_scopes_id_fk": {
           "name": "oauth_client_scopes_scope_id_oauth_scopes_id_fk",
           "tableFrom": "oauth_client_scopes",

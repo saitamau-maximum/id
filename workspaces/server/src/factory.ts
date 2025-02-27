@@ -7,7 +7,10 @@ import type { IOAuthExternalRepository } from "./repository/oauth-external";
 import type { IOAuthInternalRepository } from "./repository/oauth-internal";
 import type { IOrganizationRepository } from "./repository/organization";
 import type { ISessionRepository } from "./repository/session";
-import type { IUserStorageRepository } from "./repository/storage";
+import type {
+	IOAuthAppStorageRepository,
+	IUserStorageRepository,
+} from "./repository/storage";
 import type { IUserRepository } from "./repository/user";
 
 export type HonoEnv = {
@@ -19,6 +22,7 @@ export type HonoEnv = {
 		ContributionCacheRepository: IContributionCacheRepository;
 		OAuthExternalRepository: IOAuthExternalRepository;
 		OAuthInternalRepository: IOAuthInternalRepository;
+		OAuthAppStorageRepository: IOAuthAppStorageRepository;
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
 		CalendarRepository: ICalendarRepository;

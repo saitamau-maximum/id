@@ -1,3 +1,4 @@
+import type { Scope, ScopeId } from "../constants/scope";
 import type { User } from "./user";
 
 export type Client = {
@@ -19,12 +20,6 @@ export type ClientSecret = {
 export type ClientCallback = {
 	clientId: Client["id"];
 	callbackUrl: string;
-};
-
-export type Scope = {
-	id: number;
-	name: string;
-	description: string | null;
 };
 
 export type ClientScope = {
@@ -87,6 +82,15 @@ export type IOAuthExternalRepository = {
 		description: string,
 	) => Promise<void>;
 	deleteClientSecret: (clientId: string, secret: string) => Promise<void>;
+	registerClient: (
+		clientId: string,
+		userId: string,
+		name: string,
+		description: string,
+		scopeIds: ScopeId[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) => Promise<void>;
 
 	// OAuth flow
 	createAccessToken: (
