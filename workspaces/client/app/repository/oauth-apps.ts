@@ -129,16 +129,16 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: IRegisterAppParams) {
-		const form = {
+		const form: Parameters<
+			typeof client.oauth.manage.register.$post
+		>[0]["form"] = {
 			name,
 			description,
 			scopeIds: scopeIds.join(","),
 			callbackUrls: callbackUrls.join(","),
-			icon,
 		};
 
-		// biome-ignore lint/performance/noDelete: delete しないと undefined が送られてしまって 400 が返ってきて困る
-		if (!icon) delete form.icon;
+		if (icon) form.icon = icon;
 
 		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
