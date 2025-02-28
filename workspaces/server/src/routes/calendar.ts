@@ -37,9 +37,16 @@ const route = app
 	})
 	.post("/events", vValidator("json", createEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
-		const event = c.req.valid("json");
+		const { userId, title, description, startAt, endAt } = c.req.valid("json");
+		const eventPayload = {
+			userId,
+			title,
+			description,
+			startAt: new Date(startAt),
+			endAt: new Date(endAt),
+		};
 		try {
-			await CalendarRepository.createEvent(event);
+			await CalendarRepository.createEvent(eventPayload);
 			return c.json({ message: "event created" });
 		} catch (e) {
 			return c.json({ error: "event not created" }, 404);
@@ -47,9 +54,17 @@ const route = app
 	})
 	.put("/events/:eventId", vValidator("json", updateEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
-		const event = c.req.valid("json");
+		const { id, userId, title, description, startAt, endAt } = c.req.valid("json");
+		const eventPayload = {
+			id,
+			userId,
+			title,
+			description,
+			startAt: new Date(startAt),
+			endAt: new Date(endAt),
+		};
 		try {
-			await CalendarRepository.updateEvent(event);
+			await CalendarRepository.updateEvent(eventPayload);
 			return c.json({ message: "event updated" });
 		} catch (e) {
 			return c.json({ error: "event not updated" }, 500);
