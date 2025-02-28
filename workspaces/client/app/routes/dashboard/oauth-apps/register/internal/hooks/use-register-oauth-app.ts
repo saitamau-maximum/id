@@ -23,7 +23,10 @@ export function useRegisterOAuthApp() {
 			return oauthAppsRepository.registerApp({
 				...payload,
 				scopeIds: payload.scopeIds.map(Number),
-				callbackUrls: payload.callbackUrls.map((url) => url.value),
+				callbackUrls: payload.callbackUrls.map((url) =>
+					// URL に , が含まれるかもしれないのでエンコードする
+					encodeURIComponent(url.value),
+				),
 				icon: payload.icon.length > 0 ? payload.icon[0] : undefined,
 			});
 		},
