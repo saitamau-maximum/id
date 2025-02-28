@@ -35,6 +35,7 @@ export default function Register() {
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる
 			scopeIds: [],
+			callbackUrls: [{ value: "" }], // 1 つは必ず表示
 		},
 	});
 
@@ -70,14 +71,10 @@ export default function Register() {
 				<div
 					className={css({ display: "flex", flexDirection: "column", gap: 6 })}
 				>
-					<Form.Field.WithLabel
-						label="Application Logo (後で変えられます)"
-						required
-					>
+					<Form.Field.WithLabel label="Application Logo (後で変えられます)">
 						{(id) => (
 							<>
 								<Form.Input
-									required
 									id={id}
 									type="file"
 									accept="image/*"
@@ -145,12 +142,17 @@ export default function Register() {
 											placeholder={`https://example.com/callback/${index + 1}`}
 											{...register(`callbackUrls.${index}.value`)}
 										/>
-										<IconButton
-											label={`Remove callback URL ${index + 1}`}
-											onClick={() => removeCallbackUrl(index)}
-										>
-											<X size={16} />
-										</IconButton>
+										{
+											// 2 つ目以降の callback URL には削除ボタンを表示
+											index > 0 && (
+												<IconButton
+													label={`Remove callback URL ${index + 1}`}
+													onClick={() => removeCallbackUrl(index)}
+												>
+													<X size={16} />
+												</IconButton>
+											)
+										}
 									</div>
 								))}
 								<button

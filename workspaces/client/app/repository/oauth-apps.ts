@@ -25,7 +25,7 @@ export interface IRegisterAppParams {
 	description: string;
 	scopeIds: number[];
 	callbackUrls: string[];
-	icon: File;
+	icon?: File;
 }
 
 export interface IOAuthAppsRepository {
@@ -129,15 +129,18 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: IRegisterAppParams) {
-		const res = await client.oauth.manage.register.$post({
-			form: {
-				name,
-				description,
-				scopeIds: scopeIds.join(","),
-				callbackUrls: callbackUrls.join(","),
-				icon,
-			},
-		});
+		const form: Parameters<
+			typeof client.oauth.manage.register.$post
+		>[0]["form"] = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+		};
+
+		if (icon) form.icon = icon;
+
+		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
 
 		return {

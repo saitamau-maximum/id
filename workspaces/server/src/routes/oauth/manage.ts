@@ -52,8 +52,18 @@ const registerSchema = v.object({
 	),
 	callbackUrls: v.pipe(
 		v.string(),
-		v.transform((input) => input.split(",")),
-		v.array(v.pipe(v.string(), v.url())),
+		v.transform((input) => input.split(",").map(decodeURIComponent)),
+		v.array(
+			v.pipe(
+				v.string(),
+				v.url(),
+				v.custom((input) => {
+					if (typeof input !== "string") return false;
+					const url = new URL(input);
+					return url.search === "";
+				}),
+			),
+		),
 	),
 	icon: v.optional(v.pipe(v.file(), v.maxSize(1024 * 1024 * 5))), // 5MiB
 });
