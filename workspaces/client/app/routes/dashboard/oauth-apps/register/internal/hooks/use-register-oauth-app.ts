@@ -24,7 +24,7 @@ export function useRegisterOAuthApp() {
 				...payload,
 				scopeIds: payload.scopeIds.map(Number),
 				callbackUrls: payload.callbackUrls.map((url) => url.value),
-				icon: payload.icon[0],
+				icon: payload.icon.length > 0 ? payload.icon[0] : undefined,
 			});
 		},
 		onSuccess: (data) => {

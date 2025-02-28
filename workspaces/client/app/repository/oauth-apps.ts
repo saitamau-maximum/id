@@ -25,7 +25,7 @@ export interface IRegisterAppParams {
 	description: string;
 	scopeIds: number[];
 	callbackUrls: string[];
-	icon: File;
+	icon?: File;
 }
 
 export interface IOAuthAppsRepository {
@@ -129,15 +129,18 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: IRegisterAppParams) {
-		const res = await client.oauth.manage.register.$post({
-			form: {
-				name,
-				description,
-				scopeIds: scopeIds.join(","),
-				callbackUrls: callbackUrls.join(","),
-				icon,
-			},
-		});
+		const form = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+			icon,
+		};
+
+		// biome-ignore lint/performance/noDelete: delete しないと undefined が送られてしまって 400 が返ってきて困る
+		if (!icon) delete form.icon;
+
+		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
 
 		return {

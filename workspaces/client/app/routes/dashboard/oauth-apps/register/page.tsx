@@ -71,14 +71,10 @@ export default function Register() {
 				<div
 					className={css({ display: "flex", flexDirection: "column", gap: 6 })}
 				>
-					<Form.Field.WithLabel
-						label="Application Logo (後で変えられます)"
-						required
-					>
+					<Form.Field.WithLabel label="Application Logo (後で変えられます)">
 						{(id) => (
 							<>
 								<Form.Input
-									required
 									id={id}
 									type="file"
 									accept="image/*"
