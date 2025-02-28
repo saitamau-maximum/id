@@ -54,7 +54,8 @@ const route = app
 	})
 	.put("/events/:eventId", vValidator("json", updateEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
-		const { id, userId, title, description, startAt, endAt } = c.req.valid("json");
+		const { id, userId, title, description, startAt, endAt } =
+			c.req.valid("json");
 		const eventPayload = {
 			id,
 			userId,
