@@ -10,7 +10,7 @@ interface IMutationParams {
 	callbackUrls: {
 		value: string;
 	}[];
-	icon: FileList;
+	icon?: File;
 }
 
 export function useRegisterOAuthApp() {
@@ -27,14 +27,13 @@ export function useRegisterOAuthApp() {
 					// URL に , が含まれるかもしれないのでエンコードする
 					encodeURIComponent(url.value),
 				),
-				icon: payload.icon.length > 0 ? payload.icon[0] : undefined,
+				icon: payload.icon,
 			});
 		},
 		onSuccess: (data) => {
 			pushToast({
 				type: "success",
 				title: `OAuth アプリケーション「${data.title}」の登録が完了しました`,
-				description: data.description,
 			});
 			navigate("/oauth-apps");
 		},

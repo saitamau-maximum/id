@@ -19,8 +19,9 @@ const toastItemContainerStyle = cva({
 		overflow: "hidden",
 		borderWidth: 2,
 		borderStyle: "solid",
-		display: "flex",
-		alignItems: "center",
+		display: "grid",
+		gridTemplateColumns: "auto 1fr",
+		placeItems: "center",
 		gap: 4,
 	},
 	variants: {
@@ -56,13 +57,12 @@ export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
 		return (
 			<>
 				{ICONS[type]}
-				<div>
+				<div className={css({ width: "100%" })}>
 					<span
 						className={css({
 							fontSize: "md",
 							fontWeight: "bold",
 							textWrap: "balance",
-							wordBreak: "auto-phrase",
 							color: "inherit",
 						})}
 					>
@@ -73,7 +73,6 @@ export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
 							className={css({
 								fontSize: "sm",
 								textWrap: "balance",
-								wordBreak: "auto-phrase",
 								color: "inherit",
 							})}
 						>

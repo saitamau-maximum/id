@@ -45,17 +45,10 @@ export const OAuthSchemas = {
 		),
 		v.minLength(1, "コールバック URL を入力してください"),
 	),
-	// input[type=file] は、何も選択していない場合は空の FileList が返る
-	Icon: v.pipe(
-		v.custom<FileList>(
-			// filelistには実体がないので v.instance に引数として渡すことができない
-			(input) => input instanceof FileList,
-			"アイコンを選択してください",
+	Icon: v.optional(
+		v.pipe(
+			v.file("アイコンを選択してください"),
+			v.maxSize(1024 * 1024 * 5, "アイコンは5MB以下で選択してください"),
 		),
-		v.check((input) => input.length <= 1),
-		v.check(
-			(input) => input.length === 0 || input[0].type.startsWith("image/"),
-		),
-		v.check((input) => input.length === 0 || input[0].size < 1024 * 1024 * 5), // 5MiB
 	),
 };
