@@ -141,10 +141,6 @@ export class CloudflareOAuthExternalRepository
 		});
 		if (!client) throw new Error("Client not found");
 
-		// owner は削除させない
-		if (users.some((user) => user.userId === client.ownerId))
-			throw new Error("Cannot delete owner");
-
 		const res = await this.client.delete(schema.oauthClientManagers).where(
 			and(
 				eq(schema.oauthClientManagers.clientId, clientId),

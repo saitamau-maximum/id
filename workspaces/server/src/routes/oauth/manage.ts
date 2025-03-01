@@ -240,6 +240,15 @@ const route = app
 			const { id: clientId } = c.req.param();
 			const { managers: managerDisplayIds } = c.req.valid("json");
 
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+			if (!client.owner.displayId) return c.text("Internal Server Error", 500); // owner が displayId を持っていないのはおかしい
+
+			// その App の owner は manager から削除できない
+			if (managerDisplayIds.includes(client.owner.displayId)) {
+				return c.text("Forbidden", 403);
+			}
+
 			await c.var.OAuthExternalRepository.deleteManagers(
 				clientId,
 				managerDisplayIds,
