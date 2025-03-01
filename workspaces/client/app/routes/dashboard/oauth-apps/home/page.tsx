@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { Plus } from "react-feather";
 import { Link, useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { UserDisplay } from "~/components/feature/user/user-display";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import { useAuth } from "~/hooks/use-auth";
 import { NotFoundMessage } from "../internal/components/not-found-message";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
-import { UserDisplay } from "../internal/components/user-display";
 import { useAllApps } from "../internal/hooks/use-apps";
 
 export default function Home() {
