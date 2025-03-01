@@ -34,7 +34,6 @@ export function useUpdateOAuthApp({ id }: { id: string }) {
 				type: "success",
 				title: `${data.title} の更新に成功しました`,
 			});
-			navigate("/oauth-apps");
 		},
 		onError: () => {
 			pushToast({

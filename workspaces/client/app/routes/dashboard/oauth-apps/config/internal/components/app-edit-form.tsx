@@ -312,7 +312,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 					<ButtonLike variant="secondary">キャンセル</ButtonLike>
 				</Link>
 				<button type="submit" disabled={isPending}>
-					<ButtonLike disabled={isPending}>登録</ButtonLike>
+					<ButtonLike disabled={isPending}>更新</ButtonLike>
 				</button>
 			</div>
 		</form>

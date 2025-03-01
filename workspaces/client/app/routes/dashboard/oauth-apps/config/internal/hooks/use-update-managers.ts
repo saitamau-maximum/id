@@ -17,7 +17,7 @@ export function useUpdateManagers({ id }: { id: string }) {
 		onSuccess: () => {
 			pushToast({
 				type: "success",
-				title: "マネージャーの更新に成功しました",
+				title: "マネージャーを更新しました",
 			});
 			queryClient.invalidateQueries({
 				queryKey: oauthAppsRepository.getAppById$$key(id),
