@@ -42,6 +42,14 @@ export default defineConfig({
 						opacity: 1,
 					},
 				},
+				skeleton: {
+					"0%": {
+						backgroundPosition: "100% 50%",
+					},
+					"100%": {
+						backgroundPosition: "0 50%",
+					},
+				},
 			},
 		},
 	},
