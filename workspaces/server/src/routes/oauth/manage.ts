@@ -69,7 +69,7 @@ const registerSchema = v.object({
 });
 
 const managersSchema = v.object({
-	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
+	managerUserIds: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
 
 const secretDescriptionSchema = v.object({
@@ -221,37 +221,18 @@ const route = app
 		vValidator("json", managersSchema),
 		async (c) => {
 			const { id: clientId } = c.req.param();
-			const { managers: managerDisplayIds } = c.req.valid("json");
-
-			await c.var.OAuthExternalRepository.addManagers(
-				clientId,
-				managerDisplayIds,
-			);
-
-			return c.text("OK");
-		},
-	)
-	.delete(
-		"/:id/managers",
-		authMiddleware,
-		getClientMiddleware,
-		vValidator("json", managersSchema),
-		async (c) => {
-			const { id: clientId } = c.req.param();
-			const { managers: managerDisplayIds } = c.req.valid("json");
+			const { managerUserIds } = c.req.valid("json");
 
 			const client = c.get("oauthClientInfo");
 			if (!client) return c.text("Not found", 404);
-			if (!client.owner.displayId) return c.text("Internal Server Error", 500); // owner が displayId を持っていないのはおかしい
 
-			// その App の owner は manager から削除できない
-			if (managerDisplayIds.includes(client.owner.displayId)) {
+			// managerUserIds に client.ownerId が含まれているか確認
+			if (!managerUserIds.includes(client.ownerId))
 				return c.text("Forbidden", 403);
-			}
 
-			await c.var.OAuthExternalRepository.deleteManagers(
+			await c.var.OAuthExternalRepository.updateManagers(
 				clientId,
-				managerDisplayIds,
+				managerUserIds,
 			);
 
 			return c.text("OK");

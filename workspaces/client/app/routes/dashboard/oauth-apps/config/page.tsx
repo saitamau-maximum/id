@@ -2,16 +2,17 @@ import { useMemo } from "react";
 import { Copy, Edit, Plus, Trash2 } from "react-feather";
 import { useParams } from "react-router";
 import { css, cx } from "styled-system/css";
+import { UserDisplay } from "~/components/feature/user/user-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
 import type { UserBasicInfo } from "~/types/user";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
-import { UserDisplay } from "../internal/components/user-display";
 import { useApp } from "../internal/hooks/use-apps";
 import { AppEditForm } from "./internal/components/app-edit-form";
 import { ConfigSectionHeader } from "./internal/components/config-section-header";
 import { ConfigSectionSubHeader } from "./internal/components/config-section-sub-header";
+import { ManagerEditor } from "./internal/components/manager-editor";
 
 const configSectionStyle = css({
 	backgroundColor: "gray.100",
@@ -48,29 +49,6 @@ export default function Config() {
 	// サーバー側でチェックしているはずだが念のため
 	if (oauthApp.managers.every((manager) => manager.id !== user.id))
 		return <div>権限がありません</div>;
-
-	const handleAddManager = async () => {
-		// TODO
-		const userId = prompt("Enter user display ID");
-		if (!userId) return;
-		try {
-			await oauthAppsRepository.addManagers(oauthAppId, [userId]);
-			alert("追加しました");
-		} catch {
-			// TODO
-			alert("追加に失敗しました");
-		}
-	};
-
-	const handleDeleteManager = (managerDisplayId: string) => async () => {
-		try {
-			await oauthAppsRepository.deleteManagers(oauthAppId, [managerDisplayId]);
-			alert("削除しました");
-		} catch {
-			// TODO
-			alert("削除に失敗しました");
-		}
-	};
 
 	const handleGenerateSecret = async () => {
 		try {
@@ -146,43 +124,13 @@ export default function Config() {
 						displayId={oauthApp.owner.displayId ?? ""}
 						name={`${oauthApp.owner.displayName} (@${oauthApp.owner.displayId})`}
 						iconURL={oauthApp.owner.profileImageURL ?? ""}
+						link
 					/>
-					<ConfigSectionSubHeader title="Managers">
-						<IconButton type="button" onClick={handleAddManager} label="Add">
-							<Plus size={16} />
-						</IconButton>
-					</ConfigSectionSubHeader>
-					<div
-						className={css({
-							display: "flex",
-							flexWrap: "wrap",
-							gap: "token(spacing.1) token(spacing.4)",
-						})}
-					>
-						{oauthApp.managers.map((manager) => (
-							<div
-								key={manager.id}
-								className={css({
-									display: "flex",
-									alignItems: "center",
-									gap: 2,
-								})}
-							>
-								<UserDisplay
-									displayId={manager.displayId ?? ""}
-									name={`${manager.displayName} (@${manager.displayId})`}
-									iconURL={manager.profileImageURL ?? ""}
-								/>
-								<IconButton
-									type="button"
-									onClick={handleDeleteManager(manager.displayId ?? "")}
-									label="Remove"
-								>
-									<Trash2 size={16} className={css({ color: "red.400" })} />
-								</IconButton>
-							</div>
-						))}
-					</div>
+					<ManagerEditor
+						id={oauthApp.id}
+						ownerId={oauthApp.owner.id}
+						managers={oauthApp.managers}
+					/>
 				</section>
 				<section
 					className={cx(
@@ -302,6 +250,7 @@ export default function Config() {
 												displayId={issuedUser.displayId ?? ""}
 												name={issuedUser.displayName ?? ""}
 												iconURL={issuedUser.profileImageURL ?? ""}
+												link
 											/>
 										) : (
 											"なんかへんだよ"

@@ -5,7 +5,12 @@ type SelectProps = Exclude<ComponentProps<"input">, "type"> & {
 	label: string;
 };
 
-export const Select = ({ className, label, ...props }: SelectProps) => {
+export const Select = ({
+	className,
+	label,
+	children,
+	...props
+}: SelectProps) => {
 	const id = useId();
 	return (
 		<label
@@ -75,9 +80,11 @@ export const Select = ({ className, label, ...props }: SelectProps) => {
 					fontSize: "sm",
 					color: "gray.600",
 					userSelect: "none",
+					display: "inline-flex",
+					alignItems: "center",
 				})}
 			>
-				{label}
+				{children ?? label}
 			</span>
 		</label>
 	);

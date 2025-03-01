@@ -73,8 +73,7 @@ export type IOAuthExternalRepository = {
 
 	// management
 	getClients: () => Promise<GetClientsRes[]>;
-	addManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
-	deleteManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
+	updateManagers: (clientId: string, userIds: string[]) => Promise<void>;
 	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
 	updateClientSecretDescription: (
 		clientId: string,
