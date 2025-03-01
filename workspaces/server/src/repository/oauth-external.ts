@@ -91,6 +91,14 @@ export type IOAuthExternalRepository = {
 		callbackUrls: string[],
 		logoUrl: string | null,
 	) => Promise<void>;
+	updateClient: (
+		clientId: string,
+		name: string,
+		description: string,
+		scopeIds: ScopeId[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) => Promise<void>;
 
 	// OAuth flow
 	createAccessToken: (

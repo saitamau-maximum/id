@@ -1,9 +1,7 @@
-import { useId, useMemo } from "react";
+import { useMemo } from "react";
 import { Copy, Edit, Plus, Trash2 } from "react-feather";
 import { useParams } from "react-router";
 import { css, cx } from "styled-system/css";
-import { ButtonLike } from "~/components/ui/button-like";
-import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
@@ -11,6 +9,7 @@ import type { UserBasicInfo } from "~/types/user";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 import { UserDisplay } from "../internal/components/user-display";
 import { useApp } from "../internal/hooks/use-apps";
+import { AppEditForm } from "./internal/components/app-edit-form";
 import { ConfigSectionHeader } from "./internal/components/config-section-header";
 import { ConfigSectionSubHeader } from "./internal/components/config-section-sub-header";
 
@@ -26,11 +25,6 @@ export default function Config() {
 
 	const { user } = useAuth();
 	const { data: oauthApp, isLoading: isLoadingApp } = useApp(oauthAppId);
-	const appLogoId = useId();
-	const appNameId = useId();
-	const appDescriptionId = useId();
-	const appScopesId = useId();
-	const appCallbackUrlsId = useId();
 
 	const { oauthAppsRepository } = useRepository();
 
@@ -189,11 +183,6 @@ export default function Config() {
 							</div>
 						))}
 					</div>
-					<button type="button" className={css({ marginTop: 4 })}>
-						<ButtonLike size="sm" variant="danger">
-							Revoke all access tokens
-						</ButtonLike>
-					</button>
 				</section>
 				<section
 					className={cx(
@@ -347,77 +336,7 @@ export default function Config() {
 					)}
 				>
 					<ConfigSectionHeader>Edit</ConfigSectionHeader>
-					<form
-						className={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: 6,
-						})}
-					>
-						<Form.FieldSet>
-							<label htmlFor={appLogoId}>
-								<Form.LabelText>Application Logo</Form.LabelText>
-							</label>
-							{oauthApp.logoUrl ? (
-								<img
-									src={oauthApp.logoUrl}
-									alt="Logo"
-									width={100}
-									height={100}
-								/>
-							) : (
-								"No Image"
-							)}
-							<Form.Input type="file" name="logo" />
-						</Form.FieldSet>
-						<Form.FieldSet>
-							<label htmlFor={appNameId}>
-								<Form.LabelText>Application Name</Form.LabelText>
-							</label>
-							<Form.Input
-								id={appNameId}
-								type="text"
-								value={oauthApp.name}
-								required
-							/>
-						</Form.FieldSet>
-						<Form.FieldSet>
-							<label htmlFor={appDescriptionId}>
-								<Form.LabelText>Application Description</Form.LabelText>
-							</label>
-							<Form.Input
-								id={appDescriptionId}
-								value={oauthApp.description ?? ""}
-							/>
-						</Form.FieldSet>
-						<Form.FieldSet>
-							<label htmlFor={appScopesId}>
-								<Form.LabelText>Scopes</Form.LabelText>
-							</label>
-							<Form.SelectGroup>
-								{/* TODO: 全 scopes から読みだすべき */}
-								{oauthApp.scopes.map((scope) => (
-									<Form.Select
-										key={scope.id}
-										value={scope.id}
-										label={scope.name}
-									/>
-								))}
-							</Form.SelectGroup>
-						</Form.FieldSet>
-						<Form.FieldSet>
-							<label htmlFor={appCallbackUrlsId}>
-								<Form.LabelText>Callback URLs</Form.LabelText>
-							</label>
-							{oauthApp.callbackUrls.map((callbackUrl) => (
-								<Form.Input key={callbackUrl} value={callbackUrl} />
-							))}
-							[callback url 追加ボタン]
-						</Form.FieldSet>
-						<button type="submit">
-							<ButtonLike>Save</ButtonLike>
-						</button>
-					</form>
+					<AppEditForm id={oauthAppId} appData={oauthApp} />
 				</section>
 			</div>
 		</div>

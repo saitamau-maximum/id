@@ -48,6 +48,13 @@ export interface IOAuthAppsRepository {
 		title: string;
 		description: string;
 	}>;
+	updateApp: (
+		appId: string,
+		params: IRegisterAppParams,
+	) => Promise<{
+		title: string;
+		description: string;
+	}>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -142,6 +149,34 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
+
+		return {
+			title: name,
+			description,
+		};
+	}
+
+	async updateApp(
+		appId: string,
+		{ name, description, scopeIds, callbackUrls, icon }: IRegisterAppParams,
+	) {
+		const form: Parameters<
+			(typeof client.oauth.manage)[":id"]["$put"]
+		>[0]["form"] = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+		};
+
+		if (icon) form.icon = icon;
+
+		const res = await client.oauth.manage[":id"].$put({
+			param: { id: appId },
+			form,
+		});
+
+		if (!res.ok) throw new Error("Failed to update app");
 
 		return {
 			title: name,

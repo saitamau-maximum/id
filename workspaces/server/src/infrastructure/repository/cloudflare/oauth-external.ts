@@ -243,6 +243,53 @@ export class CloudflareOAuthExternalRepository
 			throw new Error("Failed to register client");
 	}
 
+	async updateClient(
+		clientId: string,
+		name: string,
+		description: string,
+		scopeIds: number[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) {
+		const oauthClientParams: {
+			name: string;
+			description: string;
+			logoUrl?: string;
+		} = {
+			name,
+			description,
+		};
+		if (logoUrl) oauthClientParams.logoUrl = logoUrl;
+
+		const res = await this.client.batch([
+			this.client
+				.update(schema.oauthClients)
+				.set(oauthClientParams)
+				.where(eq(schema.oauthClients.id, clientId)),
+			this.client
+				.delete(schema.oauthClientCallbacks)
+				.where(eq(schema.oauthClientCallbacks.clientId, clientId)),
+			this.client.insert(schema.oauthClientCallbacks).values(
+				callbackUrls.map((callbackUrl) => ({
+					clientId,
+					callbackUrl,
+				})),
+			),
+			this.client
+				.delete(schema.oauthClientScopes)
+				.where(eq(schema.oauthClientScopes.clientId, clientId)),
+			this.client.insert(schema.oauthClientScopes).values(
+				scopeIds.map((scopeId) => ({
+					clientId,
+					scopeId,
+				})),
+			),
+		]);
+
+		if (!res.every((r) => r.success))
+			throw new Error("Failed to update client");
+	}
+
 	// ----- OAuth flow に関する処理 ----- //
 
 	async createAccessToken(

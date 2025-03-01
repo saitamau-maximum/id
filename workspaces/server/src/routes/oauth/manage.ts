@@ -163,12 +163,55 @@ const route = app
 		}
 	})
 	.put(
-		"/:id/update",
+		"/:id",
 		authMiddleware,
 		getClientMiddleware,
-		vValidator("json", registerSchema),
+		vValidator("form", registerSchema),
 		async (c) => {
-			// TODO
+			const { id: clientId } = c.req.param();
+			const { name, description, scopeIds, callbackUrls, icon } =
+				c.req.valid("form");
+			const serverOrigin = new URL(c.req.url).origin;
+
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+
+			try {
+				if (icon) {
+					const optimizedImageArrayBuffer = await optimizeImage({
+						image: await icon.arrayBuffer(),
+						width: 256,
+						height: 256,
+						format: "webp",
+					});
+
+					if (!optimizedImageArrayBuffer) {
+						throw new Error("Failed to optimize image");
+					}
+
+					const optimizedImageUint8Array = new Uint8Array(
+						optimizedImageArrayBuffer,
+					);
+
+					await c.var.OAuthAppStorageRepository.uploadAppIcon(
+						new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+						clientId,
+					);
+				}
+				await c.var.OAuthExternalRepository.updateClient(
+					clientId,
+					name,
+					description,
+					scopeIds,
+					callbackUrls,
+					icon
+						? `${serverOrigin}/oauth/manage/${clientId}/icon?${Date.now()}`
+						: null,
+				);
+				return c.text("OK");
+			} catch (e) {
+				return c.text("Failed to update client", 500);
+			}
 		},
 	)
 	.put(
