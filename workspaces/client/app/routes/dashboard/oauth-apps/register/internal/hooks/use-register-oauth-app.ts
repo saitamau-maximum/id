@@ -33,8 +33,7 @@ export function useRegisterOAuthApp() {
 		onSuccess: (data) => {
 			pushToast({
 				type: "success",
-				title: "OAuth アプリケーションを登録しました",
-				timeout: 1000000,
+				title: `OAuth アプリケーション「${data.title}」の登録が完了しました`,
 			});
 			navigate("/oauth-apps");
 		},

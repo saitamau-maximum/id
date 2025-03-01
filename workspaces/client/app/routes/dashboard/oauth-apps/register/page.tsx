@@ -302,7 +302,7 @@ export default function Register() {
 						<ButtonLike variant="secondary">キャンセル</ButtonLike>
 					</Link>
 					<button type="submit" disabled={isPending}>
-						<ButtonLike disabled={isPending}>登録する</ButtonLike>
+						<ButtonLike disabled={isPending}>登録</ButtonLike>
 					</button>
 				</div>
 			</form>
