@@ -33,8 +33,7 @@ export interface IOAuthAppsRepository {
 	getApps$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
-	addManagers: (appId: string, managers: string[]) => Promise<void>;
-	deleteManagers: (appId: string, managers: string[]) => Promise<void>;
+	updateManagers: (appId: string, managerUserIds: string[]) => Promise<void>;
 	generateSecret: (
 		appId: string,
 	) => Promise<{ secret: string; secretHash: string }>;
@@ -45,6 +44,13 @@ export interface IOAuthAppsRepository {
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
 	registerApp: (params: IRegisterAppParams) => Promise<{
+		title: string;
+		description: string;
+	}>;
+	updateApp: (
+		appId: string,
+		params: IRegisterAppParams,
+	) => Promise<{
 		title: string;
 		description: string;
 	}>;
@@ -77,22 +83,12 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		return ["app", { id: appId }];
 	}
 
-	async addManagers(appId: string, managers: string[]) {
+	async updateManagers(appId: string, managerUserIds: string[]) {
 		const res = await client.oauth.manage[":id"].managers.$put({
 			param: { id: appId },
-			json: { managers },
+			json: { managerUserIds },
 		});
-		if (!res.ok) throw new Error("Failed to add managers");
-	}
-
-	async deleteManagers(appId: string, managers: string[]) {
-		const res = await client.oauth.manage[":id"].managers.$delete({
-			param: { id: appId },
-			json: { managers },
-		});
-		if (!res.ok) throw new Error("Failed to delete managers");
-
-		// TODO: もし自分が含まれていたらどうにかする
+		if (!res.ok) throw new Error("Failed to update managers");
 	}
 
 	async generateSecret(appId: string) {
@@ -142,6 +138,34 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
+
+		return {
+			title: name,
+			description,
+		};
+	}
+
+	async updateApp(
+		appId: string,
+		{ name, description, scopeIds, callbackUrls, icon }: IRegisterAppParams,
+	) {
+		const form: Parameters<
+			(typeof client.oauth.manage)[":id"]["$put"]
+		>[0]["form"] = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+		};
+
+		if (icon) form.icon = icon;
+
+		const res = await client.oauth.manage[":id"].$put({
+			param: { id: appId },
+			form,
+		});
+
+		if (!res.ok) throw new Error("Failed to update app");
 
 		return {
 			title: name,

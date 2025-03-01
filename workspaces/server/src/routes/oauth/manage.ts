@@ -69,7 +69,7 @@ const registerSchema = v.object({
 });
 
 const managersSchema = v.object({
-	managers: v.array(v.pipe(v.string(), v.nonEmpty())),
+	managerUserIds: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
 
 const secretDescriptionSchema = v.object({
@@ -163,12 +163,55 @@ const route = app
 		}
 	})
 	.put(
-		"/:id/update",
+		"/:id",
 		authMiddleware,
 		getClientMiddleware,
-		vValidator("json", registerSchema),
+		vValidator("form", registerSchema),
 		async (c) => {
-			// TODO
+			const { id: clientId } = c.req.param();
+			const { name, description, scopeIds, callbackUrls, icon } =
+				c.req.valid("form");
+			const serverOrigin = new URL(c.req.url).origin;
+
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+
+			try {
+				if (icon) {
+					const optimizedImageArrayBuffer = await optimizeImage({
+						image: await icon.arrayBuffer(),
+						width: 256,
+						height: 256,
+						format: "webp",
+					});
+
+					if (!optimizedImageArrayBuffer) {
+						throw new Error("Failed to optimize image");
+					}
+
+					const optimizedImageUint8Array = new Uint8Array(
+						optimizedImageArrayBuffer,
+					);
+
+					await c.var.OAuthAppStorageRepository.uploadAppIcon(
+						new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+						clientId,
+					);
+				}
+				await c.var.OAuthExternalRepository.updateClient(
+					clientId,
+					name,
+					description,
+					scopeIds,
+					callbackUrls,
+					icon
+						? `${serverOrigin}/oauth/manage/${clientId}/icon?${Date.now()}`
+						: null,
+				);
+				return c.text("OK");
+			} catch (e) {
+				return c.text("Failed to update client", 500);
+			}
 		},
 	)
 	.put(
@@ -178,28 +221,18 @@ const route = app
 		vValidator("json", managersSchema),
 		async (c) => {
 			const { id: clientId } = c.req.param();
-			const { managers: managerDisplayIds } = c.req.valid("json");
+			const { managerUserIds } = c.req.valid("json");
 
-			await c.var.OAuthExternalRepository.addManagers(
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+
+			// managerUserIds に client.ownerId が含まれているか確認
+			if (!managerUserIds.includes(client.ownerId))
+				return c.text("Forbidden", 403);
+
+			await c.var.OAuthExternalRepository.updateManagers(
 				clientId,
-				managerDisplayIds,
-			);
-
-			return c.text("OK");
-		},
-	)
-	.delete(
-		"/:id/managers",
-		authMiddleware,
-		getClientMiddleware,
-		vValidator("json", managersSchema),
-		async (c) => {
-			const { id: clientId } = c.req.param();
-			const { managers: managerDisplayIds } = c.req.valid("json");
-
-			await c.var.OAuthExternalRepository.deleteManagers(
-				clientId,
-				managerDisplayIds,
+				managerUserIds,
 			);
 
 			return c.text("OK");

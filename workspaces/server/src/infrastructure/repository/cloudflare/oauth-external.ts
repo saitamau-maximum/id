@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
@@ -102,60 +102,26 @@ export class CloudflareOAuthExternalRepository
 		}));
 	}
 
-	async addManagers(clientId: string, userDisplayIds: string[]) {
-		// userDisplayId -> userId
-		const users = await this.client.query.userProfiles.findMany({
-			where: (profile, { inArray }) =>
-				inArray(profile.displayId, userDisplayIds),
-			columns: {
-				userId: true,
-			},
-		});
-		if (users.length !== userDisplayIds.length)
-			throw new Error("Some users not found");
-
-		// 同じ user を複数追加しようとした場合は unique 制約でエラーになる
-		const res = await this.client.insert(schema.oauthClientManagers).values(
-			users.map((user) => ({
-				clientId,
-				userId: user.userId,
-			})),
-		);
-
-		if (!res.success) throw new Error("Failed to insert managers");
-	}
-
-	async deleteManagers(clientId: string, userDisplayIds: string[]) {
-		const users = await this.client.query.userProfiles.findMany({
-			where: (profile, { inArray }) =>
-				inArray(profile.displayId, userDisplayIds),
-			columns: {
-				userId: true,
-			},
-		});
-		if (users.length !== userDisplayIds.length)
-			throw new Error("Some users not found");
-
+	async updateManagers(clientId: string, userIds: string[]) {
 		const client = await this.client.query.oauthClients.findFirst({
 			where: (client, { eq }) => eq(client.id, clientId),
 		});
 		if (!client) throw new Error("Client not found");
 
-		// owner は削除させない
-		if (users.some((user) => user.userId === client.ownerId))
-			throw new Error("Cannot delete owner");
+		const res1 = await this.client
+			.delete(schema.oauthClientManagers)
+			.where(eq(schema.oauthClientManagers.clientId, clientId));
 
-		const res = await this.client.delete(schema.oauthClientManagers).where(
-			and(
-				eq(schema.oauthClientManagers.clientId, clientId),
-				inArray(
-					schema.oauthClientManagers.userId,
-					users.map((u) => u.userId),
-				),
-			),
+		if (!res1.success) throw new Error("Failed to delete managers");
+
+		const res2 = await this.client.insert(schema.oauthClientManagers).values(
+			userIds.map((userId) => ({
+				clientId,
+				userId,
+			})),
 		);
 
-		if (!res.success) throw new Error("Failed to delete managers");
+		if (!res2.success) throw new Error("Failed to insert managers");
 	}
 
 	async generateClientSecret(clientId: string, userId: string) {
@@ -241,6 +207,53 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res.every((r) => r.success))
 			throw new Error("Failed to register client");
+	}
+
+	async updateClient(
+		clientId: string,
+		name: string,
+		description: string,
+		scopeIds: number[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) {
+		const oauthClientParams: {
+			name: string;
+			description: string;
+			logoUrl?: string;
+		} = {
+			name,
+			description,
+		};
+		if (logoUrl) oauthClientParams.logoUrl = logoUrl;
+
+		const res = await this.client.batch([
+			this.client
+				.update(schema.oauthClients)
+				.set(oauthClientParams)
+				.where(eq(schema.oauthClients.id, clientId)),
+			this.client
+				.delete(schema.oauthClientCallbacks)
+				.where(eq(schema.oauthClientCallbacks.clientId, clientId)),
+			this.client.insert(schema.oauthClientCallbacks).values(
+				callbackUrls.map((callbackUrl) => ({
+					clientId,
+					callbackUrl,
+				})),
+			),
+			this.client
+				.delete(schema.oauthClientScopes)
+				.where(eq(schema.oauthClientScopes.clientId, clientId)),
+			this.client.insert(schema.oauthClientScopes).values(
+				scopeIds.map((scopeId) => ({
+					clientId,
+					scopeId,
+				})),
+			),
+		]);
+
+		if (!res.every((r) => r.success))
+			throw new Error("Failed to update client");
 	}
 
 	// ----- OAuth flow に関する処理 ----- //

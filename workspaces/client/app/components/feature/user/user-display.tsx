@@ -4,41 +4,51 @@ import { css } from "styled-system/css";
 interface Props {
 	name: string;
 	displayId: string;
-	iconURL: string;
+	iconURL?: string;
+	link?: boolean;
 }
 
-export const UserDisplay = ({ name, displayId, iconURL }: Props) => {
+export const UserDisplay = ({
+	name,
+	displayId,
+	iconURL,
+	link = false,
+}: Props) => {
+	const Component = link ? Link : "div";
+
 	return (
-		<Link
+		<Component
 			to={`/members/${displayId}`}
 			className={css({
 				display: "inline-flex",
-				verticalAlign: "middle",
-				marginLeft: 2,
-				marginRight: 2,
 				alignItems: "center",
+				verticalAlign: "middle",
 				gap: 2,
 				width: "max-content",
 				color: "gray.700",
 				transition: "all",
 
-				"&:hover": {
-					textDecoration: "underline",
-					color: "gray.800",
-				},
+				"&:hover": link
+					? {
+							textDecoration: "underline",
+							color: "gray.800",
+						}
+					: {},
 			})}
 		>
 			{iconURL && (
 				<img
 					src={iconURL}
 					alt={name}
-					width={20}
-					height={20}
+					width={24}
+					height={24}
 					className={css({
 						borderRadius: "full",
-						width: "20px",
-						height: "20px",
+						width: "24px",
+						height: "24px",
 						objectFit: "cover",
+						border: "1px solid",
+						borderColor: "gray.200",
 					})}
 				/>
 			)}
@@ -49,6 +59,6 @@ export const UserDisplay = ({ name, displayId, iconURL }: Props) => {
 			>
 				{name}
 			</span>
-		</Link>
+		</Component>
 	);
 };
