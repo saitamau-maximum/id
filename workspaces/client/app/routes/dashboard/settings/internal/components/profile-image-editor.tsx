@@ -2,33 +2,35 @@ import type React from "react";
 import { useCallback, useState } from "react";
 
 import { css } from "styled-system/css";
+import { ImageCropper } from "~/components/ui/image-cropper";
+import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { useAuth } from "~/hooks/use-auth";
-import {
-	type FileWithPreview,
-	ProfileImageCropper,
-} from "./profile-image-cropper";
+import { useUpdateProfileImage } from "../hooks/use-update-profile-image";
 
 export const ProfileImageEditor = () => {
-	const [selectedFile, setSelectedFile] = useState<FileWithPreview | null>(
-		null,
-	);
+	const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
 	const [isDialogOpen, setDialogOpen] = useState(false);
 
 	const handleSelectFile = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const file = e.target.files?.[0];
-			if (!file) {
-				return;
-			}
+			if (!file) return;
 
-			const fileWithPreview = Object.assign(file, {
-				preview: URL.createObjectURL(file),
-			});
-
-			setSelectedFile(fileWithPreview);
+			setSelectedFile(file);
 			setDialogOpen(true);
 		},
 		[],
+	);
+
+	const { mutate: updateProfileImage, isPending } = useUpdateProfileImage();
+
+	const handleCrop = useCallback(
+		(file: File) => {
+			updateProfileImage(file);
+			setDialogOpen(false);
+		},
+		[updateProfileImage],
 	);
 
 	const { user } = useAuth();
@@ -50,17 +52,30 @@ export const ProfileImageEditor = () => {
 				},
 			})}
 		>
-			<ProfileImageCropper
+			<ImageCropper
+				title="プロフィール画像を変更"
 				dialogOpen={isDialogOpen}
-				displayName={user.displayName}
+				filename={user.displayName || "avatar"}
 				setDialogOpen={setDialogOpen}
-				selectedFile={selectedFile}
-				setSelectedFile={setSelectedFile}
+				file={selectedFile}
+				onCrop={handleCrop}
 			/>
 			<label
 				className={css({
 					cursor: "pointer",
 					flexShrink: 0,
+					position: "relative",
+					overflow: "hidden",
+					borderRadius: "full",
+					borderWidth: 1,
+					borderStyle: "solid",
+					borderColor: "gray.200",
+
+					"&:has(:focus-visible)": {
+						borderWidth: 1,
+						borderStyle: "solid",
+						borderColor: "green.600",
+					},
 				})}
 			>
 				<input
@@ -82,18 +97,21 @@ export const ProfileImageEditor = () => {
 						},
 					})}
 					onChange={handleSelectFile}
+					onClick={(e) => {
+						// valueを初期化して、同じファイルを選択してもonChangeが発火するようにする
+						// @ts-ignore
+						e.target.value = "";
+					}}
 				/>
+				<SkeletonOverlay isLoading={isPending} />
 				<img
 					src={user.profileImageURL}
 					alt={user.displayName}
 					width="240"
 					height="240"
 					className={css({
-						borderRadius: "full",
-						borderWidth: 1,
-						borderColor: "gray.200",
-						borderStyle: "solid",
 						padding: 1,
+						borderRadius: "full",
 						aspectRatio: "1 / 1",
 
 						lgDown: {
