@@ -5,11 +5,11 @@ import { D1Database, D1DatabaseAPI } from "@miniflare/d1";
 import { createSQLiteDB } from "@miniflare/shared";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
+import { registerCalendarSeed } from "./senario/register-calendar";
 import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
 import { resetRegister } from "./senario/reset-register";
-import { registerCalendarSeed } from "./senario/register-calendar";
 
 const argv = minimist<{
 	help?: boolean;
