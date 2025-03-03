@@ -1,5 +1,6 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import { ROLE_BY_ID } from "../../../constants/role";
 import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
@@ -11,6 +12,7 @@ const USER_BASIC_INFO_COLUMNS_GETTER = {
 		id: true,
 	},
 	with: {
+		roles: true,
 		profile: {
 			columns: {
 				displayId: true,
@@ -27,12 +29,14 @@ type UserBasicInfoRawData = {
 		displayName: string | null;
 		profileImageURL: string | null;
 	};
+	roles: { userId: string; roleId: number }[];
 };
 const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	id: user.id,
 	displayId: user.profile.displayId ?? undefined,
 	displayName: user.profile.displayName ?? undefined,
 	profileImageURL: user.profile.profileImageURL ?? undefined,
+	roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 });
 
 export class CloudflareOAuthExternalRepository
@@ -408,16 +412,18 @@ export class CloudflareOAuthExternalRepository
 			with: {
 				client: true,
 				scopes: true,
+				user: USER_BASIC_INFO_COLUMNS_GETTER,
 			},
 		});
 
 		if (!res) return undefined;
 
-		const { scopes, ...token } = res;
+		const { scopes, user, ...token } = res;
 
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			user: USER_BASIC_INFO_TRANSFORMER(user),
 		};
 	}
 }
