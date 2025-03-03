@@ -1,6 +1,6 @@
 import { css } from "styled-system/css";
 
-export const DeleteSecretConfirmation = () => {
+export const DeleteConfirmation = () => {
 	return (
 		<div className={css({ display: "flex", flexDirection: "column" })}>
 			<p

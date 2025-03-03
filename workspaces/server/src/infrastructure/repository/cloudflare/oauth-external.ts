@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
@@ -254,6 +254,48 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res.every((r) => r.success))
 			throw new Error("Failed to update client");
+	}
+
+	async deleteClient(clientId: string) {
+		const res = await this.client.batch([
+			// clientId に紐づく token scopes を削除
+			this.client
+				.delete(schema.oauthTokenScopes)
+				.where(
+					inArray(
+						schema.oauthTokenScopes.tokenId,
+						// client.query ではなく .select にすることで、
+						// クエリを構築するだけにして取得処理は行わないようにする
+						this.client
+							.select({ clientId: schema.oauthTokens.clientId })
+							.from(schema.oauthTokens)
+							.where(eq(schema.oauthTokens.clientId, clientId)),
+					),
+				),
+			// そしたら依存関係が取り除かれるので、 token などを削除
+			this.client
+				.delete(schema.oauthTokens)
+				.where(eq(schema.oauthTokens.clientId, clientId)),
+			this.client
+				.delete(schema.oauthClientScopes)
+				.where(eq(schema.oauthClientScopes.clientId, clientId)),
+			this.client
+				.delete(schema.oauthClientCallbacks)
+				.where(eq(schema.oauthClientCallbacks.clientId, clientId)),
+			this.client
+				.delete(schema.oauthClientSecrets)
+				.where(eq(schema.oauthClientSecrets.clientId, clientId)),
+			this.client
+				.delete(schema.oauthClientManagers)
+				.where(eq(schema.oauthClientManagers.clientId, clientId)),
+			// すべてを消してから client を消す
+			this.client
+				.delete(schema.oauthClients)
+				.where(eq(schema.oauthClients.id, clientId)),
+		]);
+
+		if (!res.every((r) => r.success))
+			throw new Error("Failed to delete client");
 	}
 
 	// ----- OAuth flow に関する処理 ----- //

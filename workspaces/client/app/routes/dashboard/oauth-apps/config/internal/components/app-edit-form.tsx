@@ -1,11 +1,11 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { scope } from "@idp/server/shared/scope";
 import { useCallback, useMemo, useState } from "react";
-import { Plus, X } from "react-feather";
+import { Plus, Save, Trash, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Link } from "react-router";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
+import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
@@ -13,7 +13,9 @@ import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { OAuthSchemas } from "~/schema/oauth";
 import type { OAuthScope } from "~/types/oauth";
+import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
+import { DeleteConfirmation } from "./delete-confirmation";
 
 const UpdateFormSchema = v.object({
 	name: OAuthSchemas.ApplicationName,
@@ -62,6 +64,8 @@ export const AppEditForm = ({ id, appData }: Props) => {
 	const [isDialogOpen, setDialogOpen] = useState(false);
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+	const { mutate: deleteApp } = useDeleteApp({ appId: id });
+
 	const {
 		watch,
 		control,
@@ -104,6 +108,15 @@ export const AppEditForm = ({ id, appData }: Props) => {
 		},
 		[],
 	);
+
+	const handleDeleteApp = useCallback(async () => {
+		const res = await ConfirmDialog.call({
+			title: "アプリケーションを削除する",
+			children: <DeleteConfirmation />,
+		});
+		if (res.type === "dismiss") return;
+		deleteApp();
+	}, [deleteApp]);
 
 	const iconURL = useMemo(() => {
 		if (!icon) return appData.logoUrl;
@@ -308,11 +321,17 @@ export const AppEditForm = ({ id, appData }: Props) => {
 					gridColumn: "1 / -1",
 				})}
 			>
-				<Link to="/oauth-apps">
-					<ButtonLike variant="secondary">キャンセル</ButtonLike>
-				</Link>
 				<button type="submit" disabled={isPending}>
-					<ButtonLike disabled={isPending}>更新</ButtonLike>
+					<ButtonLike disabled={isPending}>
+						<Save size={18} />
+						更新
+					</ButtonLike>
+				</button>
+				<button type="button" onClick={handleDeleteApp} disabled={isPending}>
+					<ButtonLike variant="danger" disabled={isPending}>
+						<Trash size={18} />
+						削除
+					</ButtonLike>
 				</button>
 			</div>
 		</form>

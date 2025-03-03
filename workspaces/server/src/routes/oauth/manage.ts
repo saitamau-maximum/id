@@ -20,20 +20,22 @@ const generateHash = async (secret: string) => {
 	return hashHex;
 };
 
-const getClientMiddleware = factory.createMiddleware(async (c, next) => {
-	const { id: clientId } = c.req.param();
-	const { userId } = c.get("jwtPayload");
+const verifyOAuthClientMiddleware = factory.createMiddleware(
+	async (c, next) => {
+		const { clientId } = c.req.param();
+		const { userId } = c.get("jwtPayload");
 
-	const client = await c.var.OAuthExternalRepository.getClientById(clientId);
+		const client = await c.var.OAuthExternalRepository.getClientById(clientId);
 
-	if (!client) return c.text("Not found", 404);
+		if (!client) return c.text("Not found", 404);
 
-	if (client.managers.every((manager) => manager.id !== userId))
-		return c.text("Forbidden", 403);
+		if (client.managers.every((manager) => manager.id !== userId))
+			return c.text("Forbidden", 403);
 
-	c.set("oauthClientInfo", client);
-	return next();
-});
+		c.set("oauthClientInfo", client);
+		return next();
+	},
+);
 
 const registerSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
@@ -80,7 +82,7 @@ const route = app
 	.get("/list", authMiddleware, async (c) =>
 		c.json(await c.var.OAuthExternalRepository.getClients()),
 	)
-	.get("/:id", authMiddleware, getClientMiddleware, async (c) => {
+	.get("/:clientId", authMiddleware, verifyOAuthClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
@@ -163,9 +165,9 @@ const route = app
 		}
 	})
 	.put(
-		"/:id",
+		"/:clientId",
 		authMiddleware,
-		getClientMiddleware,
+		verifyOAuthClientMiddleware,
 		vValidator("form", registerSchema),
 		async (c) => {
 			const { id: clientId } = c.req.param();
@@ -214,10 +216,20 @@ const route = app
 			}
 		},
 	)
-	.put(
-		"/:id/managers",
+	.delete(
+		"/:clientId",
 		authMiddleware,
-		getClientMiddleware,
+		verifyOAuthClientMiddleware,
+		async (c) => {
+			const { id: clientId } = c.req.param();
+			await c.var.OAuthExternalRepository.deleteClient(clientId);
+			return c.text("OK");
+		},
+	)
+	.put(
+		"/:clientId/managers",
+		authMiddleware,
+		verifyOAuthClientMiddleware,
 		vValidator("json", managersSchema),
 		async (c) => {
 			const { id: clientId } = c.req.param();
@@ -238,27 +250,32 @@ const route = app
 			return c.text("OK");
 		},
 	)
-	.put("/:id/secrets", authMiddleware, getClientMiddleware, async (c) => {
-		const { id: clientId } = c.req.param();
-		const { userId } = c.get("jwtPayload");
-
-		const client = c.get("oauthClientInfo");
-		if (!client) return c.text("Not found", 404);
-
-		const secret = await c.var.OAuthExternalRepository.generateClientSecret(
-			clientId,
-			userId,
-		);
-
-		return c.json({
-			secret,
-			secretHash: await generateHash(secret),
-		});
-	})
 	.put(
-		"/:id/secrets/:hash",
+		"/:clientId/secrets",
 		authMiddleware,
-		getClientMiddleware,
+		verifyOAuthClientMiddleware,
+		async (c) => {
+			const { id: clientId } = c.req.param();
+			const { userId } = c.get("jwtPayload");
+
+			const client = c.get("oauthClientInfo");
+			if (!client) return c.text("Not found", 404);
+
+			const secret = await c.var.OAuthExternalRepository.generateClientSecret(
+				clientId,
+				userId,
+			);
+
+			return c.json({
+				secret,
+				secretHash: await generateHash(secret),
+			});
+		},
+	)
+	.put(
+		"/:clientId/secrets/:hash",
+		authMiddleware,
+		verifyOAuthClientMiddleware,
 		vValidator("json", secretDescriptionSchema),
 		async (c) => {
 			// memo: secret 情報のうち変更できるのは description のみ
@@ -283,9 +300,9 @@ const route = app
 		},
 	)
 	.delete(
-		"/:id/secrets/:hash",
+		"/:clientId/secrets/:hash",
 		authMiddleware,
-		getClientMiddleware,
+		verifyOAuthClientMiddleware,
 		async (c) => {
 			const { id: clientId, hash: secretHash } = c.req.param();
 			const client = c.get("oauthClientInfo");

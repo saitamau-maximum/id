@@ -98,6 +98,7 @@ export type IOAuthExternalRepository = {
 		callbackUrls: string[],
 		logoUrl: string | null,
 	) => Promise<void>;
+	deleteClient: (clientId: string) => Promise<void>;
 
 	// OAuth flow
 	createAccessToken: (
