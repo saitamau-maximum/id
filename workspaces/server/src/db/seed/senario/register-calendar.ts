@@ -1,4 +1,4 @@
-import crypto from "crypto";
+import crypto from "node:crypto";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "../../schema";
 
