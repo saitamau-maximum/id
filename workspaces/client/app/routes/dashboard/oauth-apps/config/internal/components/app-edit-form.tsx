@@ -3,7 +3,6 @@ import { scope } from "@idp/server/shared/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, Save, Trash, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Link } from "react-router";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
@@ -328,9 +327,6 @@ export const AppEditForm = ({ id, appData }: Props) => {
 						更新
 					</ButtonLike>
 				</button>
-				<Link to="/oauth-apps">
-					<ButtonLike variant="secondary">キャンセル</ButtonLike>
-				</Link>
 				<button type="button" onClick={handleDeleteApp} disabled={isPending}>
 					<ButtonLike variant="danger" disabled={isPending}>
 						<Trash size={18} />
