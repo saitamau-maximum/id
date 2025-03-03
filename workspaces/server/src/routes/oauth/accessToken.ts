@@ -140,7 +140,7 @@ const route = app
 			}
 
 			// token の残り時間を計算
-			const remMs = tokenInfo.codeExpiresAt.getTime() - nowUnixMs;
+			const remMs = tokenInfo.accessTokenExpiresAt.getTime() - nowUnixMs;
 
 			return c.json(
 				{

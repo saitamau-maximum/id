@@ -179,3 +179,13 @@ export const oauthTokensRelations = relations(oauthTokens, ({ one, many }) => ({
 	}),
 	scopes: many(oauthTokenScopes),
 }));
+
+export const oauthTokenScopesRelations = relations(
+	oauthTokenScopes,
+	({ one }) => ({
+		token: one(oauthTokens, {
+			fields: [oauthTokenScopes.tokenId],
+			references: [oauthTokens.id],
+		}),
+	}),
+);
