@@ -25,7 +25,7 @@ export interface IRegisterAppParams {
 	description: string;
 	scopeIds: number[];
 	callbackUrls: string[];
-	icon: File;
+	icon?: File;
 }
 
 export interface IOAuthAppsRepository {
@@ -33,8 +33,7 @@ export interface IOAuthAppsRepository {
 	getApps$$key: () => unknown[];
 	getAppById: (appId: string) => Promise<GetAppByIdRes>;
 	getAppById$$key: (appId: string) => unknown[];
-	addManagers: (appId: string, managers: string[]) => Promise<void>;
-	deleteManagers: (appId: string, managers: string[]) => Promise<void>;
+	updateManagers: (appId: string, managerUserIds: string[]) => Promise<void>;
 	generateSecret: (
 		appId: string,
 	) => Promise<{ secret: string; secretHash: string }>;
@@ -48,6 +47,14 @@ export interface IOAuthAppsRepository {
 		title: string;
 		description: string;
 	}>;
+	updateApp: (
+		appId: string,
+		params: IRegisterAppParams,
+	) => Promise<{
+		title: string;
+		description: string;
+	}>;
+	deleteApp(appId: string): Promise<void>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -64,8 +71,8 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 	}
 
 	async getAppById(appId: string) {
-		const res = await client.oauth.manage[":id"].$get({
-			param: { id: appId },
+		const res = await client.oauth.manage[":clientId"].$get({
+			param: { clientId: appId },
 		});
 		if (!res.ok) {
 			throw new Error("Failed to fetch app");
@@ -74,30 +81,20 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 	}
 
 	getAppById$$key(appId: string) {
-		return ["app", { id: appId }];
+		return ["app", { clientId: appId }];
 	}
 
-	async addManagers(appId: string, managers: string[]) {
-		const res = await client.oauth.manage[":id"].managers.$put({
-			param: { id: appId },
-			json: { managers },
+	async updateManagers(appId: string, managerUserIds: string[]) {
+		const res = await client.oauth.manage[":clientId"].managers.$put({
+			param: { clientId: appId },
+			json: { managerUserIds },
 		});
-		if (!res.ok) throw new Error("Failed to add managers");
-	}
-
-	async deleteManagers(appId: string, managers: string[]) {
-		const res = await client.oauth.manage[":id"].managers.$delete({
-			param: { id: appId },
-			json: { managers },
-		});
-		if (!res.ok) throw new Error("Failed to delete managers");
-
-		// TODO: もし自分が含まれていたらどうにかする
+		if (!res.ok) throw new Error("Failed to update managers");
 	}
 
 	async generateSecret(appId: string) {
-		const res = await client.oauth.manage[":id"].secrets.$put({
-			param: { id: appId },
+		const res = await client.oauth.manage[":clientId"].secrets.$put({
+			param: { clientId: appId },
 		});
 		if (!res.ok) throw new Error("Failed to generate secret");
 		return res.json();
@@ -108,17 +105,19 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		secretHash: string,
 		description: string,
 	) {
-		const res = await client.oauth.manage[":id"].secrets[":hash"].$put({
-			param: { id: appId, hash: secretHash },
+		const res = await client.oauth.manage[":clientId"].secrets[":hash"].$put({
+			param: { clientId: appId, hash: secretHash },
 			json: { description },
 		});
 		if (!res.ok) throw new Error("Failed to update secret description");
 	}
 
 	async deleteSecret(appId: string, secretHash: string) {
-		const res = await client.oauth.manage[":id"].secrets[":hash"].$delete({
-			param: { id: appId, hash: secretHash },
-		});
+		const res = await client.oauth.manage[":clientId"].secrets[":hash"].$delete(
+			{
+				param: { clientId: appId, hash: secretHash },
+			},
+		);
 		if (!res.ok) throw new Error("Failed to delete secret");
 	}
 
@@ -129,20 +128,58 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: IRegisterAppParams) {
-		const res = await client.oauth.manage.register.$post({
-			form: {
-				name,
-				description,
-				scopeIds: scopeIds.join(","),
-				callbackUrls: callbackUrls.join(","),
-				icon,
-			},
-		});
+		const form: Parameters<
+			typeof client.oauth.manage.register.$post
+		>[0]["form"] = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+		};
+
+		if (icon) form.icon = icon;
+
+		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
 
 		return {
 			title: name,
 			description,
 		};
+	}
+
+	async updateApp(
+		appId: string,
+		{ name, description, scopeIds, callbackUrls, icon }: IRegisterAppParams,
+	) {
+		const form: Parameters<
+			(typeof client.oauth.manage)[":clientId"]["$put"]
+		>[0]["form"] = {
+			name,
+			description,
+			scopeIds: scopeIds.join(","),
+			callbackUrls: callbackUrls.join(","),
+		};
+
+		if (icon) form.icon = icon;
+
+		const res = await client.oauth.manage[":clientId"].$put({
+			param: { clientId: appId },
+			form,
+		});
+
+		if (!res.ok) throw new Error("Failed to update app");
+
+		return {
+			title: name,
+			description,
+		};
+	}
+
+	async deleteApp(appId: string) {
+		const res = await client.oauth.manage[":clientId"].$delete({
+			param: { clientId: appId },
+		});
+		if (!res.ok) throw new Error("Failed to delete app");
 	}
 }

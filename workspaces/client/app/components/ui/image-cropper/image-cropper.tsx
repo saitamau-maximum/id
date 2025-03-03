@@ -1,7 +1,12 @@
 "use client";
-
-import type React from "react";
-import { type SyntheticEvent, useCallback, useRef, useState } from "react";
+import {
+	type SyntheticEvent,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
+import { Crop as RFCrop } from "react-feather";
 
 import ReactCrop, {
 	centerCrop,
@@ -11,32 +16,38 @@ import ReactCrop, {
 } from "react-image-crop";
 
 import "react-image-crop/dist/ReactCrop.css";
-
-import { UploadCloud } from "react-feather";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
-import { useUploadProfileImage } from "../hooks/use-upload-profile-image";
 
 export type FileWithPreview = File & {
 	preview: string;
 };
 
 interface ImageCropperProps {
-	displayName: string | undefined;
+	title: string;
+	filename: string;
 	dialogOpen: boolean;
 	setDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
-	selectedFile: FileWithPreview | null;
-	setSelectedFile: React.Dispatch<React.SetStateAction<FileWithPreview | null>>;
+	file: File | null;
+	onCrop: (file: File) => void;
 }
 
-export const ProfileImageCropper = ({
+export const ImageCropper = ({
+	title,
 	dialogOpen,
-	displayName,
+	filename,
 	setDialogOpen,
-	selectedFile,
-	setSelectedFile,
+	file,
+	onCrop,
 }: ImageCropperProps) => {
+	const selectedFile = useMemo(() => {
+		if (!file) return null;
+		return Object.assign(file, {
+			preview: URL.createObjectURL(file),
+		});
+	}, [file]);
+
 	const aspect = 1;
 
 	const imgRef = useRef<HTMLImageElement | null>(null);
@@ -44,21 +55,6 @@ export const ProfileImageCropper = ({
 
 	const [crop, setCrop] = useState<Crop>();
 	const [croppedImageUrl, setCroppedImageUrl] = useState<string>("");
-
-	const { mutate: uploadProfileImage, isError: isUploadError } =
-		useUploadProfileImage({
-			onSuccess: () => {
-				setDialogOpen(false);
-				const file = new File([croppedImageUrl], `${displayName}.png`, {
-					type: "image/png",
-				});
-				const cropped = URL.createObjectURL(file);
-				const fileWithPreview = Object.assign(file, {
-					preview: cropped,
-				});
-				setSelectedFile(fileWithPreview);
-			},
-		});
 
 	function onImageLoad(e: SyntheticEvent<HTMLImageElement>) {
 		setIsLoaded(true);
@@ -104,17 +100,17 @@ export const ProfileImageCropper = ({
 		return canvas.toDataURL("image/png", 1.0);
 	}
 
-	async function onCrop() {
+	const handleCrop = useCallback(async () => {
 		try {
 			const blob = await fetch(croppedImageUrl).then((r) => r.blob());
-			const file = new File([blob], `${displayName}.png`, {
+			const file = new File([blob], `${filename}.png`, {
 				type: "image/png",
 			});
-			uploadProfileImage(file);
+			onCrop(file);
 		} catch (error) {
 			alert("Something went wrong!");
 		}
-	}
+	}, [croppedImageUrl, filename, onCrop]);
 
 	const handleCancel = useCallback(() => {
 		setDialogOpen(false);
@@ -122,9 +118,10 @@ export const ProfileImageCropper = ({
 
 	return (
 		<Dialog
-			title="プロフィール画像の編集"
+			title={title}
 			isOpen={dialogOpen}
 			onOpenChange={setDialogOpen}
+			isDismissable
 		>
 			<div
 				className={css({
@@ -167,17 +164,6 @@ export const ProfileImageCropper = ({
 					)}
 				</ReactCrop>
 			</div>
-			{isUploadError && (
-				<p
-					className={css({
-						color: "red.600",
-						fontSize: "sm",
-						marginBottom: 4,
-					})}
-				>
-					アップロードに失敗しました。切り抜き後の画像が5MiBを超えている可能性があります。
-				</p>
-			)}
 			<div
 				className={css({
 					display: "flex",
@@ -188,10 +174,10 @@ export const ProfileImageCropper = ({
 				<button type="button" onClick={handleCancel}>
 					<ButtonLike variant="secondary">キャンセル</ButtonLike>
 				</button>
-				<button type="button" onClick={onCrop}>
+				<button type="button" onClick={handleCrop}>
 					<ButtonLike>
-						<UploadCloud size={20} />
-						更新
+						<RFCrop size={16} />
+						切り取り
 					</ButtonLike>
 				</button>
 			</div>

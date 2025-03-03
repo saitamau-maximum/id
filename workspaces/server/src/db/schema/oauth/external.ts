@@ -73,16 +73,6 @@ export const oauthClientScopes = sqliteTable(
 	}),
 );
 
-export const oauthClientScopesRelations = relations(
-	oauthClientScopes,
-	({ one }) => ({
-		client: one(oauthClients, {
-			fields: [oauthClientScopes.clientId],
-			references: [oauthClients.id],
-		}),
-	}),
-);
-
 export const oauthTokens = sqliteTable("oauth_tokens", {
 	id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
 	clientId: text("client_id")
@@ -163,6 +153,16 @@ export const oauthClientCallbacksRelations = relations(
 	({ one }) => ({
 		client: one(oauthClients, {
 			fields: [oauthClientCallbacks.clientId],
+			references: [oauthClients.id],
+		}),
+	}),
+);
+
+export const oauthClientScopesRelations = relations(
+	oauthClientScopes,
+	({ one }) => ({
+		client: one(oauthClients, {
+			fields: [oauthClientScopes.clientId],
 			references: [oauthClients.id],
 		}),
 	}),

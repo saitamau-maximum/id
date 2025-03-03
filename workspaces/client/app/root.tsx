@@ -11,6 +11,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { UserSelector } from "./components/feature/user/user-selector";
+import { ConfirmDialog } from "./components/logic/callable/comfirm";
+import { InformationDialog } from "./components/logic/callable/information";
 import { RepositoryProvider } from "./hooks/use-repository";
 import { ToastProvider } from "./hooks/use-toast/toast-provider";
 import { initializeEnv } from "./utils/env";
@@ -87,6 +90,9 @@ export default function App() {
 			<QueryClientProvider client={queryClient}>
 				<ToastProvider>
 					<Outlet />
+					<UserSelector.Root />
+					<ConfirmDialog.Root />
+					<InformationDialog.Root />
 				</ToastProvider>
 			</QueryClientProvider>
 		</RepositoryProvider>

@@ -73,8 +73,7 @@ export type IOAuthExternalRepository = {
 
 	// management
 	getClients: () => Promise<GetClientsRes[]>;
-	addManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
-	deleteManagers: (clientId: string, userDisplayIds: string[]) => Promise<void>;
+	updateManagers: (clientId: string, userIds: string[]) => Promise<void>;
 	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
 	updateClientSecretDescription: (
 		clientId: string,
@@ -91,6 +90,15 @@ export type IOAuthExternalRepository = {
 		callbackUrls: string[],
 		logoUrl: string | null,
 	) => Promise<void>;
+	updateClient: (
+		clientId: string,
+		name: string,
+		description: string,
+		scopeIds: ScopeId[],
+		callbackUrls: string[],
+		logoUrl: string | null,
+	) => Promise<void>;
+	deleteClient: (clientId: string) => Promise<void>;
 
 	// OAuth flow
 	createAccessToken: (

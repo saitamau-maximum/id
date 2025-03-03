@@ -12,7 +12,7 @@ export const ToastStack = ({ children }: ToastStackProps) => {
 				bottom: 0,
 				right: 0,
 				padding: 4,
-				zIndex: 1,
+				zIndex: 9999,
 				display: "flex",
 				flexDirection: "column",
 				gap: 4,

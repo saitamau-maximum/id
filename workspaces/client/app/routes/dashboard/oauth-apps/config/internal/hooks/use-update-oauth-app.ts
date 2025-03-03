@@ -13,14 +13,14 @@ interface IMutationParams {
 	icon?: File;
 }
 
-export function useRegisterOAuthApp() {
+export function useUpdateOAuthApp({ id }: { id: string }) {
 	const { oauthAppsRepository } = useRepository();
 	const { pushToast } = useToast();
 	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (payload: IMutationParams) => {
-			return oauthAppsRepository.registerApp({
+		mutationFn: (payload: IMutationParams) =>
+			oauthAppsRepository.updateApp(id, {
 				...payload,
 				scopeIds: payload.scopeIds.map(Number),
 				callbackUrls: payload.callbackUrls.map((url) =>
@@ -28,19 +28,17 @@ export function useRegisterOAuthApp() {
 					encodeURIComponent(url.value),
 				),
 				icon: payload.icon,
-			});
-		},
+			}),
 		onSuccess: (data) => {
 			pushToast({
 				type: "success",
-				title: `OAuth アプリケーション「${data.title}」の登録が完了しました`,
+				title: `${data.title} の更新に成功しました`,
 			});
-			navigate("/oauth-apps");
 		},
 		onError: () => {
 			pushToast({
 				type: "error",
-				title: "OAuth アプリケーションの登録に失敗しました",
+				title: "OAuth アプリケーションの更新に失敗しました",
 				description: "もう一度お試しください",
 			});
 		},
