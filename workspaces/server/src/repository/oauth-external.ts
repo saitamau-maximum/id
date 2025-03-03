@@ -41,7 +41,7 @@ export type Token = {
 
 type UserBasicInfo = Pick<
 	User,
-	"id" | "displayId" | "displayName" | "profileImageURL"
+	"id" | "displayId" | "displayName" | "profileImageURL" | "roles"
 >;
 
 type GetClientsRes = Client & {
@@ -65,6 +65,7 @@ type GetTokenByCodeRes = Token & {
 type GetTokenByATRes = Token & {
 	client: Client;
 	scopes: Scope[];
+	user: UserBasicInfo;
 };
 
 export type IOAuthExternalRepository = {

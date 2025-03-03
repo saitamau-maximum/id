@@ -3,6 +3,7 @@ import { oauthAccessTokenRoute } from "./accessToken";
 import { oauthAuthorizeRoute } from "./authorize";
 import { oauthCallbackRoute } from "./callback";
 import { oauthManageRoute } from "./manage";
+import { oauthResourcesRoute } from "./resources";
 import { oauthUtilRoute } from "./util";
 import { oauthVerifyTokenRoute } from "./verifyToken";
 
@@ -14,6 +15,7 @@ const route = app
 	.route("/access-token", oauthAccessTokenRoute)
 	.route("/verify-token", oauthVerifyTokenRoute)
 	.route("/util", oauthUtilRoute)
-	.route("/manage", oauthManageRoute);
+	.route("/manage", oauthManageRoute)
+	.route("/resources", oauthResourcesRoute);
 
 export { route as oauthRoute };
