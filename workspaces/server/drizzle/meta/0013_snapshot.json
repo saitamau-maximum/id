@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "3104a5ac-459a-4df3-bfb5-868c3003cbfc",
-  "prevId": "ea605a6c-5148-4c66-af29-f5c0884a480c",
+  "id": "95f11b91-7c35-4ac8-8325-5d56c6e1c932",
+  "prevId": "8907c6b6-21b1-47e6-9fa2-aecdea7b5268",
   "tables": {
     "calendar_events": {
       "name": "calendar_events",
