@@ -54,6 +54,7 @@ export interface IOAuthAppsRepository {
 		title: string;
 		description: string;
 	}>;
+	deleteApp(appId: string): Promise<void>;
 }
 
 export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
@@ -171,5 +172,12 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 			title: name,
 			description,
 		};
+	}
+
+	async deleteApp(appId: string) {
+		const res = await client.oauth.manage[":id"].$delete({
+			param: { id: appId },
+		});
+		if (!res.ok) throw new Error("Failed to delete app");
 	}
 }

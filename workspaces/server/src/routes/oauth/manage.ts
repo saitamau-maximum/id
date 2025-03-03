@@ -214,6 +214,11 @@ const route = app
 			}
 		},
 	)
+	.delete("/:id", authMiddleware, getClientMiddleware, async (c) => {
+		const { id: clientId } = c.req.param();
+		await c.var.OAuthExternalRepository.deleteClient(clientId);
+		return c.text("OK");
+	})
 	.put(
 		"/:id/managers",
 		authMiddleware,

@@ -9,7 +9,7 @@ import type { OAuthClientSecret } from "~/types/oauth";
 import { useDeleteSecret } from "../hooks/use-delete-secret";
 import { useGenerateSecret } from "../hooks/use-generate-secret";
 import { ConfigSectionSubHeader } from "./config-section-sub-header";
-import { DeleteSecretConfirmation } from "./delete-secret-confirmation";
+import { DeleteConfirmation } from "./delete-confirmation";
 
 interface Props {
 	appId: string;
@@ -24,7 +24,7 @@ export const SecretsManager = ({ appId, secrets }: Props) => {
 		(secretHash: string) => async () => {
 			const res = await ConfirmDialog.call({
 				title: "シークレットを削除する",
-				children: <DeleteSecretConfirmation />,
+				children: <DeleteConfirmation />,
 			});
 			if (res.type === "dismiss") return;
 			deleteSecret({ secretHash });
