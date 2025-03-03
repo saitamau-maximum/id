@@ -20,10 +20,10 @@ export default function Calendar() {
 				{FLAG.CALENDAR_FLAGS &&
 					data.map((event) => (
 						<div key={event.id}>
-							<p>{event.title}</p>
-							<p>{event.description}</p>
-							<p>{event.startAt}</p>
-							<p>{event.endAt}</p>
+							<p>タイトル：{event.title}</p>
+							<p>説明：{event.description}</p>
+							<p>開始：{event.startAt}</p>
+							<p>終了：{event.endAt}</p>
 						</div>
 					))}
 			</div>
