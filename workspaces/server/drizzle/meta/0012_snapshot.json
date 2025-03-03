@@ -1,97 +1,9 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ea605a6c-5148-4c66-af29-f5c0884a480c",
+  "id": "8907c6b6-21b1-47e6-9fa2-aecdea7b5268",
   "prevId": "f2f388e8-151d-407c-b438-703bccf2a9bf",
   "tables": {
-    "calendar_events": {
-      "name": "calendar_events",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "start_at": {
-          "name": "start_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "end_at": {
-          "name": "end_at",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "user_idx": {
-          "name": "user_idx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": false
-        },
-        "start_at_idx": {
-          "name": "start_at_idx",
-          "columns": [
-            "start_at"
-          ],
-          "isUnique": false
-        },
-        "end_at_idx": {
-          "name": "end_at_idx",
-          "columns": [
-            "end_at"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "calendar_events_user_id_users_id_fk": {
-          "name": "calendar_events_user_id_users_id_fk",
-          "tableFrom": "calendar_events",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "user_profiles": {
       "name": "user_profiles",
       "columns": {
@@ -422,19 +334,6 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
-        },
-        "oauth_client_scopes_scope_id_oauth_scopes_id_fk": {
-          "name": "oauth_client_scopes_scope_id_oauth_scopes_id_fk",
-          "tableFrom": "oauth_client_scopes",
-          "tableTo": "oauth_scopes",
-          "columnsFrom": [
-            "scope_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -588,45 +487,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "oauth_scopes": {
-      "name": "oauth_scopes",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": true
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "oauth_scopes_name_unique": {
-          "name": "oauth_scopes_name_unique",
-          "columns": [
-            "name"
-          ],
-          "isUnique": true
-        }
-      },
-      "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "oauth_token_scopes": {
       "name": "oauth_token_scopes",
       "columns": {
@@ -653,19 +513,6 @@
           "tableTo": "oauth_tokens",
           "columnsFrom": [
             "token_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "oauth_token_scopes_scope_id_oauth_scopes_id_fk": {
-          "name": "oauth_token_scopes_scope_id_oauth_scopes_id_fk",
-          "tableFrom": "oauth_token_scopes",
-          "tableTo": "oauth_scopes",
-          "columnsFrom": [
-            "scope_id"
           ],
           "columnsTo": [
             "id"
