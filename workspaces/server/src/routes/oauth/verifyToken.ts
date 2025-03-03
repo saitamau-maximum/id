@@ -1,5 +1,4 @@
 import { factory } from "../../factory";
-import { authByAccessTokenMiddleware } from "../../middleware/oauth";
 
 const app = factory.createApp();
 
@@ -36,13 +35,21 @@ const INVALID_REQUEST_RESPONSE: InvalidResponseType = {
 };
 
 const route = app
-	.get("/", authByAccessTokenMiddleware, async (c) => {
-		const tokenInfo = c.var.tokenInfo;
-
+	.get("/", async (c) => {
 		c.header("Cache-Control", "no-store");
 		c.header("Pragma", "no-cache");
 
-		// Token が見つからない場合
+		// authByAccessTokenMiddleware は、 tokenInfo が存在しない場合に 401 Unauthorized を返したくないので使わない
+		const authorization = c.req.header("Authorization");
+		const AUTHORIZATION_REGEX = /^Bearer (.+)$/;
+		const accessToken = authorization?.match(AUTHORIZATION_REGEX)?.[1];
+		if (!accessToken) {
+			return c.text("Unauthorized", 401);
+		}
+
+		const tokenInfo =
+			await c.var.OAuthExternalRepository.getTokenByAccessToken(accessToken);
+
 		if (!tokenInfo) {
 			return c.json<InvalidResponseType>(INVALID_REQUEST_RESPONSE, 404);
 		}
