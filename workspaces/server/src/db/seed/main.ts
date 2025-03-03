@@ -9,6 +9,7 @@ import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
 import { resetRegister } from "./senario/reset-register";
+import { registerCalendarSeed } from "./senario/register-calendar";
 
 const argv = minimist<{
 	help?: boolean;
@@ -55,6 +56,7 @@ async function init() {
 			choices: [
 				{ title: "ユーザー登録", value: "register-user" },
 				{ title: "OAuth アプリケーション登録", value: "register-oauth-app" },
+				{ title: "カレンダーイベント登録", value: "register-calendar" },
 				{ title: "ユーザー初期登録リセット", value: "reset-register" },
 				{ title: "DBリセット", value: "reset" },
 			],
@@ -78,6 +80,9 @@ async function init() {
 				break;
 			case "register-oauth-app":
 				await registerOAuthAppSeed(client);
+				break;
+			case "register-calendar":
+				await registerCalendarSeed(client);
 				break;
 			case "reset-register":
 				await resetRegister(client);
