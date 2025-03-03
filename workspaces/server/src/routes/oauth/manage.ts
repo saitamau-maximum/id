@@ -170,7 +170,7 @@ const route = app
 		verifyOAuthClientMiddleware,
 		vValidator("form", registerSchema),
 		async (c) => {
-			const { id: clientId } = c.req.param();
+			const { clientId } = c.req.param();
 			const { name, description, scopeIds, callbackUrls, icon } =
 				c.req.valid("form");
 			const serverOrigin = new URL(c.req.url).origin;
@@ -221,7 +221,7 @@ const route = app
 		authMiddleware,
 		verifyOAuthClientMiddleware,
 		async (c) => {
-			const { id: clientId } = c.req.param();
+			const { clientId } = c.req.param();
 			await c.var.OAuthExternalRepository.deleteClient(clientId);
 			return c.text("OK");
 		},
@@ -232,7 +232,7 @@ const route = app
 		verifyOAuthClientMiddleware,
 		vValidator("json", managersSchema),
 		async (c) => {
-			const { id: clientId } = c.req.param();
+			const { clientId } = c.req.param();
 			const { managerUserIds } = c.req.valid("json");
 
 			const client = c.get("oauthClientInfo");
@@ -255,7 +255,7 @@ const route = app
 		authMiddleware,
 		verifyOAuthClientMiddleware,
 		async (c) => {
-			const { id: clientId } = c.req.param();
+			const { clientId } = c.req.param();
 			const { userId } = c.get("jwtPayload");
 
 			const client = c.get("oauthClientInfo");
@@ -279,7 +279,7 @@ const route = app
 		vValidator("json", secretDescriptionSchema),
 		async (c) => {
 			// memo: secret 情報のうち変更できるのは description のみ
-			const { id: clientId, hash: secretHash } = c.req.param();
+			const { clientId, hash: secretHash } = c.req.param();
 			const { description } = c.req.valid("json");
 
 			const client = c.get("oauthClientInfo");
@@ -304,7 +304,7 @@ const route = app
 		authMiddleware,
 		verifyOAuthClientMiddleware,
 		async (c) => {
-			const { id: clientId, hash: secretHash } = c.req.param();
+			const { clientId, hash: secretHash } = c.req.param();
 			const client = c.get("oauthClientInfo");
 			if (!client) return c.text("Not found", 404);
 
