@@ -1,10 +1,13 @@
 const FLAGS_DEFAULT = {
 	ENABLE_LOGIN: true,
-	ENABLE_OAUTH_REGISTRATION: true,
+	ENABLE_OAUTH_REGISTRATION: false,
+	CALENDAR_FLAGS: false,
 };
 
 export const DEV_FLAGS = {
 	...FLAGS_DEFAULT,
+	ENABLE_OAUTH_REGISTRATION: true,
+	CALENDAR_FLAGS: true,
 };
 
 export const PROD_FLAGS = {

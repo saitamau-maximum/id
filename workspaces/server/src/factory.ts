@@ -1,6 +1,7 @@
 import { createFactory } from "hono/factory";
 import type { JwtVariables } from "hono/jwt";
 import type { IContributionCacheRepository } from "./repository/cache";
+import type { ICalendarRepository } from "./repository/calendar";
 import type { IContributionRepository } from "./repository/contribution";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
 import type { IOAuthInternalRepository } from "./repository/oauth-internal";
@@ -24,6 +25,7 @@ export type HonoEnv = {
 		OAuthAppStorageRepository: IOAuthAppStorageRepository;
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
+		CalendarRepository: ICalendarRepository;
 		tokenInfo?: Awaited<
 			ReturnType<IOAuthExternalRepository["getTokenByAccessToken"]>
 		>;

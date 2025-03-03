@@ -90,3 +90,22 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
 		references: [users.id],
 	}),
 }));
+
+export const calendarEvents = sqliteTable(
+	"calendar_events",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		title: text("title").notNull(),
+		description: text("description").notNull(),
+		startAt: text("start_at").notNull(),
+		endAt: text("end_at").notNull(),
+	},
+	(table) => ({
+		userIdx: index("user_idx").on(table.userId),
+		startAtIdx: index("start_at_idx").on(table.startAt),
+		endAtIdx: index("end_at_idx").on(table.endAt),
+	}),
+);
