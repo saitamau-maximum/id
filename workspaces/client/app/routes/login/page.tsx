@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { useAuth } from "~/hooks/use-auth";
@@ -10,10 +10,14 @@ import { LoginButtonLike } from "./internal/components/login-button";
 export default function Login() {
 	const { isLoading, isAuthorized } = useAuth();
 	const navigate = useNavigate();
+	const location = useLocation();
 
 	const shouldProceed = !isLoading && isAuthorized;
 
-	const continueToURL = encodeURIComponent(`${window.location.origin}/verify`);
+	// もし continue_to がクエリパラメータに指定されていたらそれを使う
+	const continueToURL = location.search.includes("continue_to=")
+		? location.search.split("continue_to=")[1].split("&")[0]
+		: encodeURIComponent(`${window.location.origin}/verify`);
 
 	useEffect(() => {
 		if (shouldProceed) {

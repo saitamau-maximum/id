@@ -1,6 +1,7 @@
 import { getSignedCookie } from "hono/cookie";
 import { jwt, verify } from "hono/jwt";
 import { COOKIE_NAME } from "../constants/cookie";
+import { PRODUCTION_HOSTNAME } from "../constants/env";
 import { factory } from "../factory";
 
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
@@ -21,9 +22,8 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 		}
 
 		const requestUrl = new URL(c.req.url);
-		const continueTo = requestUrl.pathname + requestUrl.search;
 		return c.redirect(
-			`/auth/login?continue_to=${encodeURIComponent(continueTo)}`,
+			`https://${PRODUCTION_HOSTNAME}/login?continue_to=${encodeURIComponent(requestUrl.toString())}`,
 		);
 	},
 );
