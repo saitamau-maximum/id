@@ -17,7 +17,6 @@ const buttonLikeStyle = cva({
 		borderStyle: "solid",
 		borderWidth: 2,
 		fontWeight: "bold",
-		minWidth: "120px",
 		cursor: "pointer",
 		transition: ["background", "colors"],
 		textDecoration: "none",
@@ -64,10 +63,12 @@ const buttonLikeStyle = cva({
 			sm: {
 				padding: "token(spacing.1) token(spacing.2)",
 				fontSize: "sm",
+				minWidth: "80px",
 			},
 			md: {
 				padding: "token(spacing.1) token(spacing.4)",
 				fontSize: "md",
+				minWidth: "120px",
 			},
 		},
 	},
