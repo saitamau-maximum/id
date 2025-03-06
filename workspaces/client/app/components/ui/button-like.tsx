@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { cva, cx } from "styled-system/css";
 
 type Props = ComponentProps<"span"> & {
-	variant?: "primary" | "secondary" | "danger";
+	variant?: "primary" | "secondary" | "danger" | "text";
 	disabled?: boolean;
 	size?: "sm" | "md";
 };
@@ -49,6 +49,14 @@ const buttonLikeStyle = cva({
 				_hover: {
 					backgroundColor: "rose.500",
 					borderColor: "rose.500",
+				},
+			},
+			text: {
+				color: "green.600",
+				backgroundColor: "transparent",
+				borderColor: "transparent",
+				_hover: {
+					backgroundColor: "rgba(0, 0, 0, 0.05)",
 				},
 			},
 		},
