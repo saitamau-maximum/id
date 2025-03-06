@@ -112,11 +112,13 @@ export const AppEditForm = ({ id, appData }: Props) => {
 	const handleDeleteApp = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "アプリケーションを削除する",
-			children: <DeleteConfirmation />,
+			confirmLabel: "削除",
+			danger: true,
+			children: <DeleteConfirmation appName={appData.name} />,
 		});
 		if (res.type === "dismiss") return;
 		deleteApp();
-	}, [deleteApp]);
+	}, [deleteApp, appData.name]);
 
 	const iconURL = useMemo(() => {
 		if (!icon) return appData.logoUrl;

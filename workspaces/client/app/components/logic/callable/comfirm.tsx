@@ -6,6 +6,9 @@ import { Dialog } from "~/components/ui/dialog";
 
 interface Props {
 	title: string;
+	confirmLabel?: string;
+	dismissLabel?: string;
+	danger?: boolean;
 	children?: React.ReactNode;
 }
 
@@ -18,7 +21,14 @@ type Payload =
 	  };
 
 export const ConfirmDialog = createCallable<Props, Payload>(
-	({ call, title, children }) => {
+	({
+		call,
+		title,
+		children,
+		confirmLabel = "OK",
+		dismissLabel = "キャンセル",
+		danger,
+	}) => {
 		const handleOK = useCallback(() => {
 			call.end({ type: "success" });
 		}, [call]);
@@ -43,10 +53,12 @@ export const ConfirmDialog = createCallable<Props, Payload>(
 					})}
 				>
 					<button type="button" onClick={() => call.end({ type: "dismiss" })}>
-						<ButtonLike variant="secondary">キャンセル</ButtonLike>
+						<ButtonLike variant="secondary">{dismissLabel}</ButtonLike>
 					</button>
 					<button type="button" onClick={handleOK}>
-						<ButtonLike>OK</ButtonLike>
+						<ButtonLike variant={danger ? "danger" : "primary"}>
+							{confirmLabel}
+						</ButtonLike>
 					</button>
 				</div>
 			</Dialog>

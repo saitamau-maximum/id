@@ -5,11 +5,12 @@ import { Dialog } from "~/components/ui/dialog";
 
 interface Props {
 	title: string;
+	label?: string;
 	children?: React.ReactNode;
 }
 
 export const InformationDialog = createCallable<Props>(
-	({ call, title, children }) => {
+	({ call, title, label = "OK", children }) => {
 		return (
 			<Dialog
 				title={title}
@@ -30,7 +31,7 @@ export const InformationDialog = createCallable<Props>(
 					})}
 				>
 					<button type="button" onClick={() => call.end()}>
-						<ButtonLike>OK</ButtonLike>
+						<ButtonLike>{label}</ButtonLike>
 					</button>
 				</div>
 			</Dialog>

@@ -1,8 +1,28 @@
 import { css } from "styled-system/css";
 
-export const DeleteConfirmation = () => {
+interface Props {
+	appName: string;
+}
+
+export const DeleteConfirmation = ({ appName }: Props) => {
 	return (
-		<div className={css({ display: "flex", flexDirection: "column" })}>
+		<div
+			className={css({
+				display: "flex",
+				flexDirection: "column",
+				margin: "token(spacing.8) 0",
+			})}
+		>
+			<h2
+				className={css({
+					textAlign: "center",
+					fontWeight: "bold",
+					fontSize: "xl",
+					marginBottom: "token(spacing.4)",
+				})}
+			>
+				「{appName}」
+			</h2>
 			<p
 				className={css({
 					textAlign: "center",

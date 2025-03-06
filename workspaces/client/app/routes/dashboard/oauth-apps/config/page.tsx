@@ -114,7 +114,11 @@ export default function Config() {
 							)}
 						</IconButton>
 					</div>
-					<SecretsManager appId={oauthApp.id} secrets={oauthApp.secrets} />
+					<SecretsManager
+						appId={oauthApp.id}
+						appName={oauthApp.name}
+						secrets={oauthApp.secrets}
+					/>
 				</section>
 				<section
 					className={cx(

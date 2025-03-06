@@ -70,7 +70,6 @@ export const UserSelector = createCallable<Props, Payload>(
 					className={css({
 						display: "grid",
 						gap: 4,
-						width: "min(calc(100vw - 32px), 800px)",
 					})}
 				>
 					<Form.Field.TextInput

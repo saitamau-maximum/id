@@ -13,9 +13,10 @@ import { DeleteConfirmation } from "./delete-confirmation";
 
 interface Props {
 	appId: string;
+	appName: string;
 	secrets: OAuthClientSecret[];
 }
-export const SecretsManager = ({ appId, secrets }: Props) => {
+export const SecretsManager = ({ appId, appName, secrets }: Props) => {
 	const { mutate: generateSecret } = useGenerateSecret({ appId });
 	const { mutate: deleteSecret } = useDeleteSecret({ appId });
 	const { data: members } = useMembers();
@@ -24,12 +25,14 @@ export const SecretsManager = ({ appId, secrets }: Props) => {
 		(secretHash: string) => async () => {
 			const res = await ConfirmDialog.call({
 				title: "シークレットを削除する",
-				children: <DeleteConfirmation />,
+				confirmLabel: "削除",
+				danger: true,
+				children: <DeleteConfirmation appName={appName} />,
 			});
 			if (res.type === "dismiss") return;
 			deleteSecret({ secretHash });
 		},
-		[deleteSecret],
+		[deleteSecret, appName],
 	);
 
 	return (
