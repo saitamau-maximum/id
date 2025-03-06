@@ -10,6 +10,7 @@ ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 ENV = "development"
+CLIENT_ORIGIN = "http://localhost:5173"
 
 # IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく
 
@@ -42,6 +43,7 @@ GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 ENV = "preview"
+CLIENT_ORIGIN = ""  # これは OAuth 周りで使うが、 Preview では OAuth は使わないので空にしておく　必要なら適宜設定する
 
 [[env.preview.routes]]
 pattern = "api-preview.id.maximum.vc"
@@ -76,6 +78,7 @@ GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
 ENV = "production"
+CLIENT_ORIGIN = "https://id.maximum.vc"
 
 [[env.production.routes]]
 pattern = "api.id.maximum.vc"

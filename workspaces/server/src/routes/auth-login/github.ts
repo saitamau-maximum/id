@@ -11,7 +11,6 @@ import type { CookieOptions } from "hono/utils/cookie";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
-import { PRODUCTION_HOSTNAME } from "../../constants/env";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
@@ -187,8 +186,8 @@ const route = app
 			// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 			if (
 				(c.env.ENV as string) === "production" &&
-				(continueToUrl.hostname !== PRODUCTION_HOSTNAME ||
-					continueToUrl.hostname !== requestUrl.hostname)
+				(continueToUrl.origin !== c.env.CLIENT_ORIGIN ||
+					continueToUrl.origin !== requestUrl.origin)
 			) {
 				return c.text("Bad Request", 400);
 			}

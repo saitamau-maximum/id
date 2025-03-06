@@ -7,6 +7,7 @@ interface Env {
 	GITHUB_APP_ID: "387915";
 	GITHUB_APP_INSTALLID: "41674415";
 	ENV: "development";
+	CLIENT_ORIGIN: "http://localhost:5173";
 	SECRET: string;
 	PRIVKEY_FOR_OAUTH: string;
 	GITHUB_APP_PRIVKEY: string;
