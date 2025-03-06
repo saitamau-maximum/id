@@ -15,8 +15,8 @@ const buttonLikeStyle = cva({
 		gap: 2,
 		borderRadius: 8,
 		borderStyle: "solid",
-		borderWidth: 2,
-		fontWeight: "bold",
+		borderWidth: 1,
+		fontWeight: 600,
 		cursor: "pointer",
 		transition: ["background", "colors"],
 		textDecoration: "none",
@@ -34,12 +34,11 @@ const buttonLikeStyle = cva({
 				},
 			},
 			secondary: {
-				color: "green.600",
-				backgroundColor: "white",
-				borderColor: "green.600",
+				color: "gray.600",
+				backgroundColor: "transparent",
+				borderColor: "gray.400",
 				_hover: {
-					backgroundColor: "green.600",
-					color: "white",
+					backgroundColor: "rgba(0, 0, 0, 0.05)",
 				},
 			},
 			danger: {
