@@ -178,7 +178,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 									key={field.id}
 									className={css({
 										display: "grid",
-										gridTemplateColumns: "1fr auto",
+										gridTemplateColumns: index === 0 ? "1fr" : "1fr auto",
 										gap: 4,
 										placeItems: "center",
 									})}
@@ -211,7 +211,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 									})
 								}
 							>
-								<ButtonLike size="sm" variant="primary">
+								<ButtonLike size="sm" variant="text">
 									<Plus size={16} />
 									Add
 								</ButtonLike>
