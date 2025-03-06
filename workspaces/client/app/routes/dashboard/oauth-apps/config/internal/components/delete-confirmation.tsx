@@ -13,7 +13,7 @@ export const DeleteConfirmation = () => {
 			<p
 				className={css({
 					textAlign: "center",
-					color: "red.400",
+					color: "rose.400",
 					fontWeight: "bold",
 					fontSize: "sm",
 				})}

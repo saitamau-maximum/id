@@ -45,11 +45,11 @@ const buttonLikeStyle = cva({
 			},
 			danger: {
 				color: "white",
-				backgroundColor: "red.600",
-				borderColor: "red.600",
+				backgroundColor: "rose.600",
+				borderColor: "rose.600",
 				_hover: {
-					backgroundColor: "red.500",
-					borderColor: "red.500",
+					backgroundColor: "rose.500",
+					borderColor: "rose.500",
 				},
 			},
 		},

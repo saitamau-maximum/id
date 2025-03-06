@@ -28,7 +28,7 @@ const toastItemContainerStyle = cva({
 		type: {
 			error: {
 				color: "gray.700",
-				borderColor: "red.600",
+				borderColor: "rose.600",
 			},
 			success: {
 				color: "gray.700",
@@ -48,7 +48,7 @@ const linkStyle = css({
 });
 
 const ICONS = {
-	error: <AlertCircle className={css({ color: "red.600" })} />,
+	error: <AlertCircle className={css({ color: "rose.600" })} />,
 	success: <CheckCircle className={css({ color: "green.600" })} />,
 } as const;
 
