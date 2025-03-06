@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { useAuth } from "~/hooks/use-auth";
+import { useToast } from "~/hooks/use-toast";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
@@ -11,6 +12,7 @@ export default function Login() {
 	const { isLoading, isAuthorized } = useAuth();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
+	const { pushToast } = useToast();
 
 	const shouldProceed = !isLoading && isAuthorized;
 
@@ -24,6 +26,17 @@ export default function Login() {
 			navigate("/");
 		}
 	}, [shouldProceed, navigate]);
+
+	useEffect(() => {
+		if (searchParams.has("continue_to")) {
+			pushToast({
+				type: "error",
+				title: "ログインしてください",
+				description:
+					"OAuth アプリケーションを利用するためにはログインが必要です",
+			});
+		}
+	}, [searchParams, pushToast]);
 
 	if (shouldProceed) {
 		return null;
