@@ -112,11 +112,13 @@ export const AppEditForm = ({ id, appData }: Props) => {
 	const handleDeleteApp = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "アプリケーションを削除する",
-			children: <DeleteConfirmation />,
+			confirmLabel: "削除",
+			danger: true,
+			children: <DeleteConfirmation title={appData.name} />,
 		});
 		if (res.type === "dismiss") return;
 		deleteApp();
-	}, [deleteApp]);
+	}, [deleteApp, appData.name]);
 
 	const iconURL = useMemo(() => {
 		if (!icon) return appData.logoUrl;
@@ -178,7 +180,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 									key={field.id}
 									className={css({
 										display: "grid",
-										gridTemplateColumns: "1fr auto",
+										gridTemplateColumns: index === 0 ? "1fr" : "1fr auto",
 										gap: 4,
 										placeItems: "center",
 									})}
@@ -211,7 +213,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 									})
 								}
 							>
-								<ButtonLike size="sm" variant="primary">
+								<ButtonLike size="sm" variant="text">
 									<Plus size={16} />
 									Add
 								</ButtonLike>

@@ -13,7 +13,7 @@ export const ErrorDisplay = ({ error, center }: Props) => {
 	return (
 		<p
 			className={css({
-				color: "red.600",
+				color: "rose.600",
 				fontSize: "sm",
 			})}
 			style={{ textAlign: center ? "center" : "start" }}

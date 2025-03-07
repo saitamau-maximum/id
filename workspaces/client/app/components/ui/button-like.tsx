@@ -2,7 +2,7 @@ import type { ComponentProps } from "react";
 import { cva, cx } from "styled-system/css";
 
 type Props = ComponentProps<"span"> & {
-	variant?: "primary" | "secondary" | "danger";
+	variant?: "primary" | "secondary" | "danger" | "text";
 	disabled?: boolean;
 	size?: "sm" | "md";
 };
@@ -15,9 +15,8 @@ const buttonLikeStyle = cva({
 		gap: 2,
 		borderRadius: 8,
 		borderStyle: "solid",
-		borderWidth: 2,
-		fontWeight: "bold",
-		minWidth: "120px",
+		borderWidth: 1,
+		fontWeight: 600,
 		cursor: "pointer",
 		transition: ["background", "colors"],
 		textDecoration: "none",
@@ -35,21 +34,28 @@ const buttonLikeStyle = cva({
 				},
 			},
 			secondary: {
-				color: "green.600",
-				backgroundColor: "white",
-				borderColor: "green.600",
+				color: "gray.600",
+				backgroundColor: "transparent",
+				borderColor: "gray.400",
 				_hover: {
-					backgroundColor: "green.600",
-					color: "white",
+					backgroundColor: "rgba(0, 0, 0, 0.05)",
 				},
 			},
 			danger: {
 				color: "white",
-				backgroundColor: "red.600",
-				borderColor: "red.600",
+				backgroundColor: "rose.600",
+				borderColor: "rose.600",
 				_hover: {
-					backgroundColor: "red.500",
-					borderColor: "red.500",
+					backgroundColor: "rose.500",
+					borderColor: "rose.500",
+				},
+			},
+			text: {
+				color: "green.600",
+				backgroundColor: "transparent",
+				borderColor: "transparent",
+				_hover: {
+					backgroundColor: "rgba(0, 0, 0, 0.05)",
 				},
 			},
 		},
@@ -64,10 +70,12 @@ const buttonLikeStyle = cva({
 			sm: {
 				padding: "token(spacing.1) token(spacing.2)",
 				fontSize: "sm",
+				minWidth: "80px",
 			},
 			md: {
 				padding: "token(spacing.1) token(spacing.4)",
 				fontSize: "md",
+				minWidth: "120px",
 			},
 		},
 	},

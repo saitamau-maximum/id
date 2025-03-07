@@ -3,7 +3,6 @@ import { scope } from "@idp/server/shared/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
-import { Link } from "react-router";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
@@ -155,7 +154,7 @@ export default function Register() {
 										key={field.id}
 										className={css({
 											display: "grid",
-											gridTemplateColumns: "1fr auto",
+											gridTemplateColumns: index === 0 ? "1fr" : "1fr auto",
 											gap: 4,
 											placeItems: "center",
 										})}
@@ -188,7 +187,7 @@ export default function Register() {
 										})
 									}
 								>
-									<ButtonLike size="sm" variant="primary">
+									<ButtonLike size="sm" variant="text">
 										<Plus size={16} />
 										Add
 									</ButtonLike>
@@ -298,9 +297,6 @@ export default function Register() {
 						gridColumn: "1 / -1",
 					})}
 				>
-					<Link to="/oauth-apps">
-						<ButtonLike variant="secondary">キャンセル</ButtonLike>
-					</Link>
 					<button type="submit" disabled={isPending}>
 						<ButtonLike disabled={isPending}>登録</ButtonLike>
 					</button>

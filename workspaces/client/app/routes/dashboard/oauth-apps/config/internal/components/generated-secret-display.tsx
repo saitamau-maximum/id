@@ -23,13 +23,29 @@ export const GeneratedSecretDisplay = ({ secret }: Props) => {
 	}, [secret, pushToast]);
 
 	return (
-		<div>
-			<div className={css({ display: "flex", gap: 2, alignItems: "center" })}>
+		<div
+			className={css({
+				display: "flex",
+				flexDirection: "column",
+				alignItems: "center",
+				margin: "token(spacing.8) 0",
+			})}
+		>
+			<div
+				className={css({
+					display: "grid",
+					gridTemplateColumns: "1fr auto",
+					gap: 2,
+					placeItems: "center",
+					justifyContent: "center",
+				})}
+			>
 				<code
 					className={css({
 						backgroundColor: "gray.100",
 						borderRadius: "md",
 						padding: 2,
+						wordBreak: "break-all",
 					})}
 				>
 					{secret}
