@@ -1,10 +1,10 @@
 import { css } from "styled-system/css";
 
 interface Props {
-	appName: string;
+	title?: string;
 }
 
-export const DeleteConfirmation = ({ appName }: Props) => {
+export const DeleteConfirmation = ({ title }: Props) => {
 	return (
 		<div
 			className={css({
@@ -13,16 +13,18 @@ export const DeleteConfirmation = ({ appName }: Props) => {
 				margin: "token(spacing.8) 0",
 			})}
 		>
-			<h2
-				className={css({
-					textAlign: "center",
-					fontWeight: "bold",
-					fontSize: "xl",
-					marginBottom: "token(spacing.4)",
-				})}
-			>
-				「{appName}」
-			</h2>
+			{title && (
+				<h2
+					className={css({
+						textAlign: "center",
+						fontWeight: "bold",
+						fontSize: "xl",
+						marginBottom: "token(spacing.4)",
+					})}
+				>
+					「{title}」
+				</h2>
+			)}
 			<p
 				className={css({
 					textAlign: "center",

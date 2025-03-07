@@ -114,7 +114,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 			title: "アプリケーションを削除する",
 			confirmLabel: "削除",
 			danger: true,
-			children: <DeleteConfirmation appName={appData.name} />,
+			children: <DeleteConfirmation title={appData.name} />,
 		});
 		if (res.type === "dismiss") return;
 		deleteApp();
