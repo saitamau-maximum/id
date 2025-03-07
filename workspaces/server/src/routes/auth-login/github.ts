@@ -186,8 +186,8 @@ const route = app
 			// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 			if (
 				(c.env.ENV as string) === "production" &&
-				(continueToUrl.origin !== c.env.CLIENT_ORIGIN ||
-					continueToUrl.origin !== requestUrl.origin)
+				continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
+				continueToUrl.origin !== requestUrl.origin
 			) {
 				return c.text("Bad Request", 400);
 			}
