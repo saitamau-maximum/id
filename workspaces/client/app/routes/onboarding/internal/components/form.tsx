@@ -20,7 +20,6 @@ const RegisterFormSchema = v.object({
 	academicEmail: UserSchemas.AcademicEmail,
 	studentId: UserSchemas.StudentId,
 	grade: UserSchemas.Grade,
-	bio: UserSchemas.Bio,
 });
 
 type FormValues = v.InferInput<typeof RegisterFormSchema>;
@@ -32,7 +31,6 @@ export const RegisterForm = () => {
 	const {
 		register,
 		handleSubmit,
-		watch,
 		formState: { errors },
 	} = useForm<FormValues>({
 		resolver: valibotResolver(RegisterFormSchema),
@@ -45,12 +43,8 @@ export const RegisterForm = () => {
 			academicEmail: user?.academicEmail,
 			studentId: user?.studentId,
 			grade: user?.grade,
-			bio: user?.bio,
 		},
 	});
-
-	const bio = watch("bio");
-	const bioLength = bio?.length || 0;
 
 	return (
 		<form

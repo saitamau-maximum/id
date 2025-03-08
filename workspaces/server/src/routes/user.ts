@@ -17,7 +17,7 @@ const normalizeRealName = (text: string) => {
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
-const registerSchema = v.object({
+const ProfileSchema = v.object({
 	displayName: v.pipe(v.string(), v.nonEmpty()),
 	realName: v.pipe(
 		v.string(),
@@ -45,6 +45,29 @@ const registerSchema = v.object({
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
 });
 
+const registerSchema = v.object({
+	displayName: ProfileSchema.entries.displayName,
+	realName: ProfileSchema.entries.realName,
+	realNameKana: ProfileSchema.entries.realNameKana,
+	displayId: ProfileSchema.entries.displayId,
+	email: ProfileSchema.entries.email,
+	academicEmail: ProfileSchema.entries.academicEmail,
+	studentId: ProfileSchema.entries.studentId,
+	grade: ProfileSchema.entries.grade,
+});
+
+const updateSchema = v.object({
+	displayName: ProfileSchema.entries.displayName,
+	realName: ProfileSchema.entries.realName,
+	realNameKana: ProfileSchema.entries.realNameKana,
+	displayId: ProfileSchema.entries.displayId,
+	email: ProfileSchema.entries.email,
+	academicEmail: ProfileSchema.entries.academicEmail,
+	studentId: ProfileSchema.entries.studentId,
+	grade: ProfileSchema.entries.grade,
+	bio: ProfileSchema.entries.bio,
+});
+
 const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
 });
@@ -67,7 +90,6 @@ const route = app
 				email,
 				studentId,
 				grade,
-				bio,
 			} = c.req.valid("json");
 
 			const normalizedDisplayName = normalizeRealName(displayName);
@@ -83,7 +105,6 @@ const route = app
 				email,
 				studentId,
 				grade,
-				bio,
 			});
 
 			return c.text("ok", 200);
@@ -92,7 +113,7 @@ const route = app
 	.put(
 		"/update",
 		authMiddleware,
-		vValidator("json", registerSchema),
+		vValidator("json", updateSchema),
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;
