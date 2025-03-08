@@ -126,7 +126,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
-			bio: payload.bio,
 		};
 
 		const [_, res] = await this.client.batch([
