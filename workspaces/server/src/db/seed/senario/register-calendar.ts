@@ -44,6 +44,15 @@ export const registerCalendarSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
 	for (const event of DUMMY_EVENTS) {
+		const res = await client.query.users.findFirst({
+			where: (user, { eq }) => eq(user.id, event.userId),
+		});
+		if (!res) {
+			console.error(`ユーザーが見つかりませんでした: ${event.userId}`);
+			console.log("ユーザー登録シナリオを実行してから再度実行してください");
+			return;
+		}
+
 		await client.insert(schema.calendarEvents).values({
 			...event,
 			id: crypto.randomUUID().toString(),
