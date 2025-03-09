@@ -1,6 +1,6 @@
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { OAUTH_PROVIDER_IDS } from "../../../constants/oauth";
 import { ROLE_IDS } from "../../../constants/role";
+import { SOCIAL_SERVICES_IDS } from "../../../constants/social";
 import * as schema from "../../schema";
 
 export const DUMMY_USER_IDS = {
@@ -90,35 +90,35 @@ export const DUMMY_UNINITIALIZED_USERS = [
 export const DUMMY_OAUTH_CONNECTIONS = [
 	{
 		userId: "user1",
-		providerId: OAUTH_PROVIDER_IDS.GITHUB,
+		providerId: SOCIAL_SERVICES_IDS.GITHUB,
 		providerUserId: "github-user1",
 		login: "userone",
 		email: "user1@example.com",
 	},
 	{
 		userId: "user2",
-		providerId: OAUTH_PROVIDER_IDS.GITHUB,
+		providerId: SOCIAL_SERVICES_IDS.GITHUB,
 		providerUserId: "github-user2",
 		login: "usertwo",
 		email: "user2@example.com",
 	},
 	{
 		userId: "user3",
-		providerId: OAUTH_PROVIDER_IDS.GITHUB,
+		providerId: SOCIAL_SERVICES_IDS.GITHUB,
 		providerUserId: "github-user3",
 		login: "userthree",
 		email: "user3@example.com",
 	},
 	{
 		userId: "user4",
-		providerId: OAUTH_PROVIDER_IDS.GITHUB,
+		providerId: SOCIAL_SERVICES_IDS.GITHUB,
 		providerUserId: "github-user4",
 		login: "userfour",
 		email: "user4@example.com",
 	},
 	{
 		userId: "user5",
-		providerId: OAUTH_PROVIDER_IDS.GITHUB,
+		providerId: SOCIAL_SERVICES_IDS.GITHUB,
 		providerUserId: "github-user5",
 		login: "userfive",
 		email: "user5@example.com",

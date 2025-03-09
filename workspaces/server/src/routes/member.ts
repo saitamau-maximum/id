@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { SOCIAL_SERVICES_IDS } from "../constants/social";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 
@@ -39,7 +39,7 @@ const route = app
 			);
 
 		const githubConn = oauthConnections.find(
-			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+			(conn) => conn.providerId === SOCIAL_SERVICES_IDS.GITHUB,
 		);
 
 		if (!githubConn || !githubConn.name) {

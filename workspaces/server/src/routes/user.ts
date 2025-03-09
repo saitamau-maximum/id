@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { SOCIAL_SERVICES_IDS } from "../constants/social";
 import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
@@ -168,7 +168,7 @@ const route = app
 			);
 
 		const githubConn = oauthConnections.find(
-			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+			(conn) => conn.providerId === SOCIAL_SERVICES_IDS.GITHUB,
 		);
 
 		if (!githubConn || !githubConn.name) {
