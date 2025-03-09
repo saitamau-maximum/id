@@ -72,6 +72,11 @@ const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
 });
 
+const socialLinkSchema = v.object({
+	providerId: v.pipe(v.string(), v.nonEmpty()),
+	url: v.pipe(v.string(), v.nonEmpty(), v.url()),
+});
+
 const route = app
 	.post(
 		"/register",
@@ -245,6 +250,78 @@ const route = app
 			console.error(e);
 			return c.text("Not found", 404);
 		}
-	});
+	})
+	.post(
+		"/social-link",
+		authMiddleware,
+		vValidator("json", socialLinkSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { SocialLinkRepository } = c.var;
+			console.log(c.req.valid("json"));
+
+			try {
+				await SocialLinkRepository.createSocialLink({
+					userId: payload.userId,
+					...c.req.valid("json"),
+				});
+			} catch (e) {
+				console.error(e);
+				return c.text("Failed to create social link", 500);
+			}
+		},
+	)
+	.put(
+		"/social-link",
+		authMiddleware,
+		vValidator("json", socialLinkSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { SocialLinkRepository } = c.var;
+
+			try {
+				await SocialLinkRepository.updateSocialLink({
+					userId: payload.userId,
+					...c.req.valid("json"),
+				});
+			} catch (e) {
+				console.error(e);
+				return c.text("Failed to update social link", 500);
+			}
+		},
+	)
+	.get("/social-link/:userId", async (c) => {
+		const { SocialLinkRepository } = c.var;
+		const userId = c.req.param("userId");
+		console.log(SocialLinkRepository);
+
+		try {
+			const body = await SocialLinkRepository.getSocialLinksByUserId(userId);
+			return c.json(body, 200);
+		} catch (e) {
+			console.error(e);
+			return c.text("Failed to get social link", 500);
+		}
+	})
+	.delete(
+		"/social-link",
+		authMiddleware,
+		vValidator("json", socialLinkSchema),
+		async (c) => {
+			const payload = c.get("jwtPayload");
+			const { SocialLinkRepository } = c.var;
+
+			try {
+				await SocialLinkRepository.deleteSocialLink(
+					c.req.valid("json").providerId,
+					payload.userId,
+				);
+				return c.text("ok", 200);
+			} catch (e) {
+				console.error(e);
+				return c.text("Failed to delete social link", 500);
+			}
+		},
+	);
 
 export { route as userRoute };

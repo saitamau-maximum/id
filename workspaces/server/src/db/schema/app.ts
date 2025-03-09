@@ -91,6 +91,27 @@ export const userRolesRelations = relations(userRoles, ({ one }) => ({
 	}),
 }));
 
+export const socialLinks = sqliteTable(
+	"social_links",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		providerId: text("provider_id").notNull(),
+		url: text("url").notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.providerId] }),
+	}),
+);
+
+export const socialLinksRelations = relations(socialLinks, ({ one }) => ({
+	user: one(users, {
+		fields: [socialLinks.userId],
+		references: [users.id],
+	}),
+}));
+
 export const calendarEvents = sqliteTable(
 	"calendar_events",
 	{
