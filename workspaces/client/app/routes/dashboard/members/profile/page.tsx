@@ -1,5 +1,7 @@
+import { CheckCircle } from "react-feather";
 import { useParams } from "react-router";
 import { css } from "styled-system/css";
+import { CertificationCard } from "~/components/feature/user/certification-card";
 import { ContributionCard } from "~/components/feature/user/contribution/card";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useDeviceType } from "~/hooks/use-device-type";
@@ -57,7 +59,7 @@ export default function Profile() {
 					base: "repeat(1, 1fr)",
 				},
 				justifyContent: "center",
-				placeItems: "center",
+				placeItems: "start",
 				gap: 16,
 			})}
 		>
@@ -80,6 +82,52 @@ export default function Profile() {
 						fontSize: "2xl",
 						fontWeight: "bold",
 						color: "gray.600",
+					})}
+				>
+					Achievements
+				</h1>
+				<p
+					className={css({
+						color: "gray.500",
+						fontSize: "sm",
+						marginBottom: 4,
+					})}
+				>
+					経歴・資格情報など
+				</p>
+				<h2
+					className={css({
+						fontSize: "lg",
+						fontWeight: "bold",
+						color: "gray.600",
+						marginBottom: 2,
+					})}
+				>
+					<CheckCircle
+						width={20}
+						height={20}
+						className={css({
+							display: "inline-block",
+							marginRight: 2,
+						})}
+					/>
+					資格・試験
+				</h2>
+				<div
+					className={css({
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "start",
+					})}
+				>
+					<CertificationCard certifications={memberProfile?.certifications} />
+				</div>
+				<h1
+					className={css({
+						fontSize: "2xl",
+						fontWeight: "bold",
+						color: "gray.600",
+						marginTop: 8,
 					})}
 				>
 					Activities
