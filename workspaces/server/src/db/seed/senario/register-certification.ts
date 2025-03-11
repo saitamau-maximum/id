@@ -18,17 +18,17 @@ export const DUMMY_CERTS = [
 export const DUMMY_RECORDS = [
 	{
 		userId: DUMMY_USER_IDS.USER1,
-		certDefinitionId: "fe",
+		certificationId: "fe",
 		certifiedIn: 2025,
 	},
 	{
 		userId: DUMMY_USER_IDS.USER2,
-		certDefinitionId: "fe",
+		certificationId: "fe",
 		certifiedIn: 2024,
 	},
 	{
 		userId: DUMMY_USER_IDS.USER2,
-		certDefinitionId: "ap",
+		certificationId: "ap",
 		certifiedIn: 2025,
 	},
 ];
@@ -37,7 +37,7 @@ export const registerCertificationSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
 	await client.batch([
-		client.insert(schema.certificationDefinitions).values(DUMMY_CERTS),
-		client.insert(schema.certifications).values(DUMMY_RECORDS),
+		client.insert(schema.certifications).values(DUMMY_CERTS),
+		client.insert(schema.userCertifications).values(DUMMY_RECORDS),
 	]);
 };
