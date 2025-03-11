@@ -34,6 +34,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthIssuedTokens: many(oauthTokens),
 	oauthConnections: many(oauthConnections),
 	roles: many(userRoles),
+	certifications: many(certifications),
 }));
 
 export const userProfiles = sqliteTable(
@@ -109,3 +110,53 @@ export const calendarEvents = sqliteTable(
 		endAtIdx: index("end_at_idx").on(table.endAt),
 	}),
 );
+
+export const certificationDefinitions = sqliteTable(
+	"certification_definitions",
+	{
+		id: text("id").primaryKey(),
+		title: text("title").notNull().unique(),
+		description: text("description"),
+	},
+);
+
+export const certifications = sqliteTable(
+	"certifications",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		certDefinitionId: text("cert_def_id")
+			.references(() => certificationDefinitions.id)
+			.notNull(),
+		// 「タイムスタンプとしていつ資格を取得したか」は微妙なので、年のみ管理する
+		// Memo: 「合格発表タイミングを書いてね」を書く
+		certifiedIn: integer("certified_in").notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.certDefinitionId] }),
+		userCertifiedAtIdx: index("user_certifiedat_idx").on(
+			table.userId,
+			table.certifiedIn,
+		),
+	}),
+);
+
+export const certificationDefsRelations = relations(
+	certificationDefinitions,
+	({ many }) => ({
+		certifications: many(certifications),
+		users: many(users),
+	}),
+);
+
+export const certificationsRelations = relations(certifications, ({ one }) => ({
+	certification: one(certificationDefinitions, {
+		fields: [certifications.certDefinitionId],
+		references: [certificationDefinitions.id],
+	}),
+	user: one(users, {
+		fields: [certifications.userId],
+		references: [users.id],
+	}),
+}));
