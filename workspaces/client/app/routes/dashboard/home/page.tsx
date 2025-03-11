@@ -76,8 +76,7 @@ export default function Home() {
 							})}
 						>
 							<CheckCircle
-								width={20}
-								height={20}
+								size={20}
 								className={css({
 									display: "inline-block",
 									marginRight: 2,

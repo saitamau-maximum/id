@@ -2,10 +2,10 @@ import { css } from "styled-system/css";
 import type { Certification } from "~/types/certification";
 
 interface Props {
-	certifications?: Certification[];
+	certifications: Certification[];
 }
 
-export const CertificationCard = ({ certifications = [] }: Props) => {
+export const CertificationCard = ({ certifications }: Props) => {
 	return (
 		<div
 			className={css({
@@ -32,7 +32,7 @@ export const CertificationCard = ({ certifications = [] }: Props) => {
 							borderRadius: 14,
 							fontSize: 14,
 							fontWeight: 500,
-							border: "1px solid #c7c7c7",
+							border: "1px solid token(colors.gray.300)",
 							margin: "token(spacing.1)",
 						})}
 						key={certification.id}

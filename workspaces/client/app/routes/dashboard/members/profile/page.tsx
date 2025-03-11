@@ -107,8 +107,7 @@ export default function Profile() {
 							})}
 						>
 							<CheckCircle
-								width={20}
-								height={20}
+								size={20}
 								className={css({
 									display: "inline-block",
 									marginRight: 2,
@@ -124,7 +123,7 @@ export default function Profile() {
 							})}
 						>
 							<CertificationCard
-								certifications={memberProfile?.certifications}
+								certifications={memberProfile?.certifications || []}
 							/>
 						</div>
 					</>
