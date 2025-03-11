@@ -44,6 +44,7 @@ export const Document = ({
 					},
 					"& img": {
 						display: inlineOnly ? "none" : "block",
+						maxWidth: "100%",
 					},
 					"& blockquote": {
 						display: inlineOnly ? "none" : "block",
