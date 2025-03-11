@@ -24,6 +24,7 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 			})}
 		>
 			<Document
+				inlineOnly
 				className={css({
 					color: "gray.500",
 					fontSize: "md",

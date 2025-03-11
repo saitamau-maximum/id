@@ -183,6 +183,7 @@ export const ProfileCard: React.FC<Props> = ({
 			</div>
 			{bio && (
 				<Document
+					inlineOnly
 					className={css({
 						color: "gray.500",
 						fontSize: "md",
