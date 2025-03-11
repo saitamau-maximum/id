@@ -1,4 +1,5 @@
 import { css } from "styled-system/css";
+import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
@@ -181,20 +182,18 @@ export const ProfileCard: React.FC<Props> = ({
 				</div>
 			</div>
 			{bio && (
-				<div
+				<Document
+					inlineOnly
 					className={css({
 						color: "gray.500",
 						fontSize: "md",
 						mdDown: {
 							fontSize: "sm",
 						},
-						overflowWrap: "break-word",
-						lineHeight: "1.5",
-						whiteSpace: "pre-wrap",
 					})}
 				>
 					{bioPreviewContent}
-				</div>
+				</Document>
 			)}
 		</div>
 	);
