@@ -29,7 +29,7 @@ export default function Home() {
 					base: "repeat(1, 1fr)",
 				},
 				justifyContent: "center",
-				placeItems: "center",
+				placeItems: "start",
 				gap: 16,
 			})}
 		>
