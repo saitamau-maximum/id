@@ -80,7 +80,7 @@ export default function Profile() {
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
 				{FLAG.ENABLE_CERTIFICATION && (
 					<>
-						<h1
+						<h2
 							className={css({
 								fontSize: "2xl",
 								fontWeight: "bold",
@@ -88,7 +88,7 @@ export default function Profile() {
 							})}
 						>
 							Achievements
-						</h1>
+						</h2>
 						<p
 							className={css({
 								color: "gray.500",
@@ -98,7 +98,7 @@ export default function Profile() {
 						>
 							経歴・資格情報など
 						</p>
-						<h2
+						<h3
 							className={css({
 								fontSize: "lg",
 								fontWeight: "bold",
@@ -114,7 +114,7 @@ export default function Profile() {
 								})}
 							/>
 							資格・試験
-						</h2>
+						</h3>
 						<div
 							className={css({
 								display: "flex",
@@ -128,7 +128,7 @@ export default function Profile() {
 						</div>
 					</>
 				)}
-				<h1
+				<h2
 					className={css({
 						fontSize: "2xl",
 						fontWeight: "bold",
@@ -137,7 +137,7 @@ export default function Profile() {
 					})}
 				>
 					Activities
-				</h1>
+				</h2>
 				<p
 					className={css({
 						color: "gray.500",
