@@ -6,6 +6,7 @@ import { createSQLiteDB } from "@miniflare/shared";
 import { drizzle } from "drizzle-orm/d1";
 import * as schema from "../schema";
 import { registerCalendarSeed } from "./senario/register-calendar";
+import { registerCertificationSeed } from "./senario/register-certification";
 import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
@@ -57,6 +58,7 @@ async function init() {
 				{ title: "ユーザー登録", value: "register-user" },
 				{ title: "OAuth アプリケーション登録", value: "register-oauth-app" },
 				{ title: "カレンダーイベント登録", value: "register-calendar" },
+				{ title: "資格一覧登録", value: "register-certification" },
 				{ title: "ユーザー初期登録リセット", value: "reset-register" },
 				{ title: "DBリセット", value: "reset" },
 			],
@@ -83,6 +85,9 @@ async function init() {
 				break;
 			case "register-calendar":
 				await registerCalendarSeed(client);
+				break;
+			case "register-certification":
+				await registerCertificationSeed(client);
 				break;
 			case "reset-register":
 				await resetRegister(client);
