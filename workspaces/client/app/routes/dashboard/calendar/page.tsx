@@ -1,8 +1,9 @@
-import { FLAG } from "~/utils/flag";
+import { css } from "styled-system/css";
+import { Calendar } from "~/components/feature/calendar/calendar";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useCalendar } from "./hooks/use-calendar";
 
-export default function Calendar() {
+export default function CalendarHome() {
 	const { data } = useCalendar();
 
 	if (!data) {
@@ -15,18 +16,20 @@ export default function Calendar() {
 				title="Maximum Calendar"
 				subtitle="サークルの講習会やイベントなどの予定を確認できます"
 			/>
-			<div>
-				{/* TODO: イベントの取得はできているが、日時でのソートやデザインをあてる必要あり */}
-				{FLAG.CALENDAR_FLAGS &&
-					data.map((event) => (
-						<div key={event.id}>
-							<p>タイトル：{event.title}</p>
-							<p>説明：{event.description}</p>
-							<p>開始：{event.startAt}</p>
-							<p>終了：{event.endAt}</p>
-						</div>
-					))}
+			<div
+				className={css({
+					display: "flex",
+					justifyContent: "center",
+					marginTop: 24,
+				})}
+			>
+				<div className={css({ width: 400 })}>
+					<Calendar events={data} label="Event Calendar" />
+				</div>
 			</div>
+			{data.map((event) => (
+				<pre key={event.id}>{JSON.stringify(event, null, 2)}</pre>
+			))}
 		</div>
 	);
 }
