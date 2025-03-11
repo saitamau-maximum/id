@@ -1,5 +1,12 @@
 import type { Role } from "../constants/role";
 
+export type Certification = {
+	id: string;
+	title: string;
+	description: string | null;
+	certifiedIn: number;
+};
+
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -17,12 +24,14 @@ export type User = {
 	id: string;
 	initialized: boolean;
 	roles: Role[];
+	certifications: Certification[];
 } & Partial<Profile>;
 
 export type Member = {
 	id: string;
 	initialized: boolean;
 	roles: Role[];
+	certifications: Certification[];
 } & Partial<
 	Pick<
 		Profile,
