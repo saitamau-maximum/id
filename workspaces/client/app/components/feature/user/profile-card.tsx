@@ -1,12 +1,9 @@
 import { css } from "styled-system/css";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { Role } from "~/types/role";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
-type Props = Member & {
-	roles: Role[];
-};
+type Props = Omit<Member, "certifications">;
 
 export const ProfileCard: React.FC<Props> = ({
 	displayName,

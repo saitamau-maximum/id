@@ -34,6 +34,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthIssuedTokens: many(oauthTokens),
 	oauthConnections: many(oauthConnections),
 	roles: many(userRoles),
+	certifications: many(userCertifications),
 }));
 
 export const userProfiles = sqliteTable(
@@ -107,5 +108,51 @@ export const calendarEvents = sqliteTable(
 		userIdx: index("user_idx").on(table.userId),
 		startAtIdx: index("start_at_idx").on(table.startAt),
 		endAtIdx: index("end_at_idx").on(table.endAt),
+	}),
+);
+
+export const certifications = sqliteTable("certifications", {
+	id: text("id").primaryKey(),
+	title: text("title").notNull().unique(),
+	description: text("description"),
+});
+
+export const userCertifications = sqliteTable(
+	"user_certifications",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		certificationId: text("certification_id")
+			.references(() => certifications.id)
+			.notNull(),
+		// 「タイムスタンプとしていつ資格を取得したか」は微妙なので、年のみ管理する
+		// Memo: 「合格発表タイミングを書いてね」を書く
+		certifiedIn: integer("certified_in").notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.certificationId] }),
+		userCertifiedAtIdx: index("user_certifiedat_idx").on(
+			table.userId,
+			table.certifiedIn,
+		),
+	}),
+);
+
+export const certificationRelations = relations(certifications, ({ many }) => ({
+	userCertifications: many(userCertifications),
+}));
+
+export const userCertificationsRelations = relations(
+	userCertifications,
+	({ one }) => ({
+		certification: one(certifications, {
+			fields: [userCertifications.certificationId],
+			references: [certifications.id],
+		}),
+		user: one(users, {
+			fields: [userCertifications.userId],
+			references: [users.id],
+		}),
 	}),
 );

@@ -1,8 +1,11 @@
+import { CheckCircle } from "react-feather";
 import { css } from "styled-system/css";
+import { CertificationCard } from "~/components/feature/user/certification-card";
 import { ContributionCard } from "~/components/feature/user/contribution/card";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useAuth } from "~/hooks/use-auth";
 import { useDeviceType } from "~/hooks/use-device-type";
+import { FLAG } from "~/utils/flag";
 import { useContribution } from "./internal/hooks/use-contribution";
 
 export default function Home() {
@@ -21,12 +24,13 @@ export default function Home() {
 				maxWidth: "1200px",
 				marginTop: 32,
 				display: "grid",
-				gridTemplateColumns: {
-					"@dashboard/4xl": "480px 360px",
-					base: "repeat(1, 1fr)",
+				gridTemplateColumns: "repeat(1, 1fr)",
+				placeItems: "center",
+				"@dashboard/4xl": {
+					gridTemplateColumns: "480px 360px",
+					placeItems: "start",
 				},
 				justifyContent: "center",
-				placeItems: "center",
 				gap: 16,
 			})}
 		>
@@ -43,8 +47,46 @@ export default function Home() {
 					bio={user.bio}
 				/>
 			</div>
+			{FLAG.ENABLE_CERTIFICATION && (
+				<div className={css({ width: "100%", maxWidth: "480px" })}>
+					<h2
+						className={css({
+							fontSize: "2xl",
+							fontWeight: "bold",
+							color: "gray.600",
+						})}
+					>
+						Achievements
+					</h2>
+					<p
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+							marginBottom: 4,
+						})}
+					>
+						経歴・資格情報など
+					</p>
+					<h3
+						className={css({
+							fontSize: "md",
+							fontWeight: "bold",
+							color: "gray.600",
+							marginBottom: 2,
+							display: "flex",
+							alignItems: "center",
+							gap: 2,
+						})}
+					>
+						<CheckCircle size={16} />
+						資格・試験
+					</h3>
+
+					<CertificationCard certifications={user.certifications} />
+				</div>
+			)}
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
-				<h1
+				<h2
 					className={css({
 						fontSize: "2xl",
 						fontWeight: "bold",
@@ -52,7 +94,7 @@ export default function Home() {
 					})}
 				>
 					Activities
-				</h1>
+				</h2>
 				<p
 					className={css({
 						color: "gray.500",
