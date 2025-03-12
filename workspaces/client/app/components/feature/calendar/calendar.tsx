@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import {} from "react-aria-components";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import { css } from "styled-system/css";
 import type { CalendarEvent } from "~/types/event";
@@ -15,8 +14,8 @@ type Calendar = {
 	month: number;
 };
 
-const MONTH_FIRST = 0;
-const MONTH_LAST = 11;
+const MONTH_IDX_JAN = 0;
+const MONTH_IDX_DEC = 11;
 
 type Cell =
 	| {
@@ -79,8 +78,8 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 
 	const previousMonth = useCallback(() => {
 		setDisplayedCalendar((prev) => {
-			if (prev.month === MONTH_FIRST) {
-				return { year: prev.year - 1, month: MONTH_LAST };
+			if (prev.month === MONTH_IDX_JAN) {
+				return { year: prev.year - 1, month: MONTH_IDX_DEC };
 			}
 			return { ...prev, month: prev.month - 1 };
 		});
@@ -88,8 +87,8 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 
 	const nextMonth = useCallback(() => {
 		setDisplayedCalendar((prev) => {
-			if (prev.month === MONTH_LAST) {
-				return { year: prev.year + 1, month: MONTH_FIRST };
+			if (prev.month === MONTH_IDX_DEC) {
+				return { year: prev.year + 1, month: MONTH_IDX_JAN };
 			}
 			return { ...prev, month: prev.month + 1 };
 		});
@@ -110,7 +109,6 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 		const firstDayWeek = firstDay.getDay();
 		const lastDate = lastDay.getDate();
 		const lastDateWeek = lastDate + firstDayWeek;
-		console.log(firstDayWeek, lastDateWeek);
 
 		let week: Row = { id: "0", cells: [] };
 		for (let i = 0; i < lastDateWeek; i++) {
@@ -239,12 +237,35 @@ interface CellProps {
 const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
 	const cellEvents = events.filter((event) => {
 		if (cell.type === "empty") return false;
-		return (
+		// 今日よりも前の日付に終わるイベントは表示しない
+		if (event.endAt.getFullYear() < cell.year) return false;
+		if (
+			event.endAt.getFullYear() === cell.year &&
+			event.endAt.getMonth() < cell.month
+		)
+			return false;
+		if (
+			event.endAt.getFullYear() === cell.year &&
+			event.endAt.getMonth() === cell.month &&
+			event.endAt.getDate() < cell.day
+		)
+			return false;
+		// 今日よりも後の日付に始まるイベントは表示しない
+		if (event.startAt.getFullYear() > cell.year) return false;
+		if (
+			event.startAt.getFullYear() === cell.year &&
+			event.startAt.getMonth() > cell.month
+		)
+			return false;
+		if (
 			event.startAt.getFullYear() === cell.year &&
 			event.startAt.getMonth() === cell.month &&
-			event.startAt.getDate() === cell.day
-		);
+			event.startAt.getDate() > cell.day
+		)
+			return false;
+		return true;
 	});
+
 	const isToday =
 		cell.type === "day" &&
 		new Date().getFullYear() === cell.year &&
