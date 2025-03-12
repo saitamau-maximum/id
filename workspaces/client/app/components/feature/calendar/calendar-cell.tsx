@@ -6,9 +6,15 @@ interface CellProps {
 	cell: TCalendarCell;
 	events: CalendarEvent[];
 	onDateClick?: (date: Date) => void;
+	active?: boolean;
 }
 
-export const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
+export const CalendarCell = ({
+	cell,
+	events,
+	onDateClick,
+	active = false,
+}: CellProps) => {
 	const cellEvents = events.filter((event) => {
 		if (cell.type === "empty") return false;
 		const cellDate = `${cell.year}${String(cell.month + 1).padStart(2, "0")}${String(cell.day).padStart(2, "0")}`;
@@ -53,6 +59,9 @@ export const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
 						fontWeight: "bold",
 						transition: "colors",
 						cursor: "pointer",
+						borderWidth: 2,
+						borderColor: active ? "green.700" : "transparent",
+						borderStyle: "solid",
 
 						_hover: {
 							backgroundColor: isToday
@@ -67,6 +76,7 @@ export const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
 							onDateClick(new Date(cell.year, cell.month, cell.day));
 						}
 					}}
+					aria-label={`${cell.year}年${cell.month + 1}月${cell.day}日を選択`}
 				>
 					{cell.label}
 				</button>

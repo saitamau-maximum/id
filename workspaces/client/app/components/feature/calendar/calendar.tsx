@@ -9,6 +9,7 @@ interface Props {
 	label: string;
 	events: CalendarEvent[];
 	onDateClick?: (date: Date) => void;
+	targetDate?: Date;
 }
 const MONTH_IDX_JAN = 0;
 const MONTH_IDX_DEC = 11;
@@ -47,7 +48,7 @@ const controllerButtonStyle = css({
 	},
 });
 
-export const Calendar = ({ label, events, onDateClick }: Props) => {
+export const Calendar = ({ label, events, onDateClick, targetDate }: Props) => {
 	const [displayedCalendar, setDisplayedCalendar] = useState<TCalendarState>({
 		year: new Date().getFullYear(),
 		month: new Date().getMonth(),
@@ -143,7 +144,7 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 					className={css({
 						fontSize: "lg",
 						fontWeight: "bold",
-						color: "gray.600",
+						color: "gray.500",
 					})}
 				>
 					{calendarLabel}
@@ -195,6 +196,13 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 									cell={cell}
 									events={events}
 									onDateClick={onDateClick}
+									active={
+										targetDate &&
+										targetDate.getFullYear() === displayedCalendar.year &&
+										targetDate.getMonth() === displayedCalendar.month &&
+										targetDate.getDate() ===
+											(cell.type === "day" ? cell.day : -1)
+									}
 								/>
 							))}
 						</tr>
