@@ -15,7 +15,9 @@ export default [
 				index("routes/dashboard/members/page.tsx"),
 				route(":userDisplayId", "routes/dashboard/members/profile/page.tsx"),
 			]),
-			route("calendar", "routes/dashboard/calendar/page.tsx"),
+			...(FLAG.ENABLE_CALENDAR
+				? [route("calendar", "routes/dashboard/calendar/page.tsx")]
+				: []),
 			route("settings", "routes/dashboard/settings/page.tsx"),
 			...prefix("admin", [
 				layout("routes/dashboard/admin/layout.tsx", [
