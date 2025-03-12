@@ -54,11 +54,19 @@ export default function CalendarHome() {
 				className={css({
 					display: "flex",
 					justifyContent: "center",
-					gap: 8,
+					flexDirection: "column",
+					alignItems: "center",
+					gap: 4,
 					marginTop: 24,
 					maxWidth: 1024,
 					width: "100%",
 					margin: "0 auto",
+
+					"@dashboard/3xl": {
+						flexDirection: "row",
+						alignItems: "flex-start",
+						gap: 8,
+					},
 				})}
 			>
 				<Calendar
