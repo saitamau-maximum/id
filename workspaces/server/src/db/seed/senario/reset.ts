@@ -15,6 +15,9 @@ export const reset = async (client: DrizzleD1Database<typeof schema>) => {
 	// internal oauth
 	await client.delete(schema.oauthConnections);
 
+	// calendar
+	await client.delete(schema.calendarEvents);
+
 	// app
 	await client.delete(schema.userProfiles);
 	await client.delete(schema.userRoles);
