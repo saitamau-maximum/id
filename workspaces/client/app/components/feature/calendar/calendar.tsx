@@ -237,33 +237,11 @@ interface CellProps {
 const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
 	const cellEvents = events.filter((event) => {
 		if (cell.type === "empty") return false;
-		// 今日よりも前の日付に終わるイベントは表示しない
-		if (event.endAt.getFullYear() < cell.year) return false;
-		if (
-			event.endAt.getFullYear() === cell.year &&
-			event.endAt.getMonth() < cell.month
-		)
-			return false;
-		if (
-			event.endAt.getFullYear() === cell.year &&
-			event.endAt.getMonth() === cell.month &&
-			event.endAt.getDate() < cell.day
-		)
-			return false;
-		// 今日よりも後の日付に始まるイベントは表示しない
-		if (event.startAt.getFullYear() > cell.year) return false;
-		if (
-			event.startAt.getFullYear() === cell.year &&
-			event.startAt.getMonth() > cell.month
-		)
-			return false;
-		if (
-			event.startAt.getFullYear() === cell.year &&
-			event.startAt.getMonth() === cell.month &&
-			event.startAt.getDate() > cell.day
-		)
-			return false;
-		return true;
+		const cellDate = `${cell.year}${String(cell.month + 1).padStart(2, "0")}${String(cell.day).padStart(2, "0")}`;
+		const eventStartDate = `${event.startAt.getFullYear()}${String(event.startAt.getMonth() + 1).padStart(2, "0")}${String(event.startAt.getDate()).padStart(2, "0")}`;
+		const eventEndDate = `${event.endAt.getFullYear()}${String(event.endAt.getMonth() + 1).padStart(2, "0")}${String(event.endAt.getDate()).padStart(2, "0")}`;
+
+		return eventStartDate <= cellDate && cellDate <= eventEndDate;
 	});
 
 	const isToday =
