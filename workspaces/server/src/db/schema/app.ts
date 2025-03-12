@@ -97,7 +97,7 @@ export const socialLinks = sqliteTable(
 		userId: text("user_id")
 			.references(() => users.id)
 			.notNull(),
-		providerId: text("provider_id").notNull(),
+		providerId: int("provider_id").notNull(),
 		url: text("url").notNull(),
 	},
 	(table) => ({

@@ -73,8 +73,12 @@ const updateProfileImageSchema = v.object({
 });
 
 const socialLinkSchema = v.object({
-	providerId: v.pipe(v.string(), v.nonEmpty()),
+	providerId: v.number(),
 	url: v.pipe(v.string(), v.nonEmpty(), v.url()),
+});
+
+const deleteSocialLinkSchema = v.object({
+	providerId: v.number(),
 });
 
 const route = app
@@ -256,15 +260,21 @@ const route = app
 		authMiddleware,
 		vValidator("json", socialLinkSchema),
 		async (c) => {
-			const payload = c.get("jwtPayload");
 			const { SocialLinkRepository } = c.var;
-			console.log(c.req.valid("json"));
+			const { userId } = c.get("jwtPayload");
+			const { providerId } = c.req.valid("json");
+
+			// providerId が有効なものかチェックする
+			if (!Object.values(SOCIAL_SERVICES_IDS).includes(providerId)) {
+				return c.text("Invalid providerId", 400);
+			}
 
 			try {
 				await SocialLinkRepository.createSocialLink({
-					userId: payload.userId,
+					userId: userId,
 					...c.req.valid("json"),
 				});
+				return c.text("ok", 200);
 			} catch (e) {
 				console.error(e);
 				return c.text("Failed to create social link", 500);
@@ -284,6 +294,7 @@ const route = app
 					userId: payload.userId,
 					...c.req.valid("json"),
 				});
+				return c.text("ok", 200);
 			} catch (e) {
 				console.error(e);
 				return c.text("Failed to update social link", 500);
@@ -293,7 +304,6 @@ const route = app
 	.get("/social-link/:userId", async (c) => {
 		const { SocialLinkRepository } = c.var;
 		const userId = c.req.param("userId");
-		console.log(SocialLinkRepository);
 
 		try {
 			const body = await SocialLinkRepository.getSocialLinksByUserId(userId);
@@ -306,16 +316,16 @@ const route = app
 	.delete(
 		"/social-link",
 		authMiddleware,
-		vValidator("json", socialLinkSchema),
+		vValidator("json", deleteSocialLinkSchema),	
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { SocialLinkRepository } = c.var;
 
 			try {
-				await SocialLinkRepository.deleteSocialLink(
-					c.req.valid("json").providerId,
-					payload.userId,
-				);
+				await SocialLinkRepository.deleteSocialLink({
+					userId: payload.userId,
+					...c.req.valid("json"),
+				});
 				return c.text("ok", 200);
 			} catch (e) {
 				console.error(e);

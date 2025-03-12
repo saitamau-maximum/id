@@ -4,6 +4,7 @@ import * as schema from "../../../db/schema";
 import type {
 	ISocialLink,
 	ISocialLinkRepository,
+	DeleteSocialLinkPayload,
 } from "../../../repository/social-link";
 
 export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
@@ -48,13 +49,13 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 		}
 	}
 
-	async deleteSocialLink(userId: string, providerId: string): Promise<void> {
+	async deleteSocialLink(socialLink: DeleteSocialLinkPayload): Promise<void> {
 		const res = await this.client
 			.delete(schema.socialLinks)
 			.where(
 				and(
-					eq(schema.socialLinks.userId, userId),
-					eq(schema.socialLinks.providerId, providerId),
+					eq(schema.socialLinks.userId, socialLink.userId),
+					eq(schema.socialLinks.providerId, socialLink.providerId),
 				),
 			);
 		if (!res) {
