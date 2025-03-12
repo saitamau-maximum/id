@@ -53,7 +53,7 @@ export const CalendarCell = ({
 						backgroundColor: isToday
 							? "green.500"
 							: hasEvent
-								? "green.200"
+								? "green.100"
 								: "transparent",
 						color: isToday ? "white" : "gray.500",
 						fontWeight: "bold",
@@ -67,7 +67,7 @@ export const CalendarCell = ({
 							backgroundColor: isToday
 								? "green.600"
 								: hasEvent
-									? "green.300"
+									? "green.200"
 									: "gray.100",
 						},
 					})}
