@@ -1,9 +1,8 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
-import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -43,14 +42,19 @@ export const ProfileUpdateForm = () => {
 		null,
 	);
 
+	const requestableCertifications = useMemo(() => {
+		const requestedIds = user?.certifications.map((c) => c.id) || [];
+		return certifications?.filter((c) => !requestedIds.includes(c.id)) || [];
+	}, [certifications, user]);
+
 	const handleCertRequest = useCallback(async () => {
+		if ((requestableCertifications ?? []).length === 0) return;
 		const res = await CertificationRequest.call({
-			certifications: certifications || [],
-			requestedCertifications: user?.certifications || [],
+			certifications: requestableCertifications,
 		});
 		if (res.type === "dismiss") return;
 		sendCertificationRequest(res.request);
-	}, [certifications, user, sendCertificationRequest]);
+	}, [requestableCertifications, sendCertificationRequest]);
 
 	const {
 		register,
@@ -182,8 +186,14 @@ export const ProfileUpdateForm = () => {
 				<legend>
 					<Form.LabelText>資格・試験</Form.LabelText>
 				</legend>
-				<button type="button" onClick={handleCertRequest}>
-					<AnchorLike>資格・試験の情報を申請する</AnchorLike>
+				<button
+					type="button"
+					onClick={handleCertRequest}
+					disabled={requestableCertifications.length === 0}
+				>
+					<ButtonLike disabled={requestableCertifications.length === 0}>
+						資格・試験の情報を申請する
+					</ButtonLike>
 				</button>
 			</Form.FieldSet>
 

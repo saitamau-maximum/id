@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { createCallable } from "react-call";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -6,11 +6,10 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import type { CertificationRequestParams } from "~/repository/certification";
-import type { Certification, UserCertification } from "~/types/certification";
+import type { Certification } from "~/types/certification";
 
 interface Props {
 	certifications: Certification[];
-	requestedCertifications: UserCertification[];
 }
 
 type Payload =
@@ -23,13 +22,7 @@ type Payload =
 	  };
 
 export const CertificationRequest = createCallable<Props, Payload>(
-	({ call, certifications, requestedCertifications }) => {
-		// すでに申請した資格・試験を除外
-		const requestableCertifications = useMemo(() => {
-			const requestedIds = requestedCertifications.map((c) => c.id);
-			return certifications.filter((c) => !requestedIds.includes(c.id));
-		}, [certifications, requestedCertifications]);
-
+	({ call, certifications }) => {
 		const [selectedCertification, setSelectedCertification] =
 			useState<Certification | null>(null);
 		const [certifiedIn, setCertifiedIn] = useState<number | null>(null);
@@ -40,7 +33,7 @@ export const CertificationRequest = createCallable<Props, Payload>(
 				certificationId: v.pipe(
 					v.string("資格・試験を選択してください"),
 					v.custom(
-						(value) => requestableCertifications.some((c) => c.id === value),
+						(value) => certifications.some((c) => c.id === value),
 						"選択された資格・試験は申請できません",
 					),
 				),
@@ -70,15 +63,15 @@ export const CertificationRequest = createCallable<Props, Payload>(
 					certifiedIn: validationCheck.output.certifiedIn,
 				},
 			});
-		}, [call, selectedCertification, certifiedIn, requestableCertifications]);
+		}, [call, selectedCertification, certifiedIn, certifications]);
 
 		const handleUpdateRadio = useCallback(
 			(id: string) => {
 				setSelectedCertification(
-					requestableCertifications.find((c) => c.id === id) ?? null,
+					certifications.find((c) => c.id === id) ?? null,
 				);
 			},
-			[requestableCertifications],
+			[certifications],
 		);
 
 		return (
@@ -107,7 +100,7 @@ export const CertificationRequest = createCallable<Props, Payload>(
 						})}
 					>
 						<Form.RadioGroup>
-							{requestableCertifications.map((cert) => (
+							{certifications.map((cert) => (
 								<Form.Radio
 									key={cert.id}
 									value={cert.id}
