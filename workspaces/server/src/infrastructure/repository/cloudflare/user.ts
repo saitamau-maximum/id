@@ -7,6 +7,7 @@ import type {
 	Member,
 	Profile,
 	User,
+	WithCertifications,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -70,7 +71,9 @@ export class CloudflareUserRepository implements IUserRepository {
 		return res.userId;
 	}
 
-	async fetchUserProfileById(userId: string): Promise<User> {
+	async fetchUserProfileById(
+		userId: string,
+	): Promise<User & WithCertifications> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -198,11 +201,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				profile: true,
 				roles: true,
-				certifications: {
-					with: {
-						certification: true,
-					},
-				},
 			},
 		});
 
@@ -217,16 +215,12 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.profile.grade ?? undefined,
 			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
-			certifications: user.certifications.map((cert) => ({
-				id: cert.certification.id,
-				title: cert.certification.title,
-				description: cert.certification.description,
-				certifiedIn: cert.certifiedIn,
-			})),
 		}));
 	}
 
-	async fetchMemberByDisplayId(displayId: string): Promise<Member> {
+	async fetchMemberByDisplayId(
+		displayId: string,
+	): Promise<Member & WithCertifications> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -280,11 +274,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				roles: true,
 				profile: true,
-				certifications: {
-					with: {
-						certification: true,
-					},
-				},
 			},
 		});
 
@@ -302,12 +291,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.profile.grade ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			bio: user.profile.bio ?? undefined,
-			certifications: user.certifications.map((cert) => ({
-				id: cert.certification.id,
-				title: cert.certification.title,
-				description: cert.certification.description,
-				certifiedIn: cert.certifiedIn,
-			})),
 		}));
 	}
 

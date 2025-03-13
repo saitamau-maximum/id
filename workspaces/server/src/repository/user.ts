@@ -7,6 +7,10 @@ export type Certification = {
 	certifiedIn: number;
 };
 
+export type WithCertifications = {
+	certifications: Certification[];
+};
+
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -24,14 +28,12 @@ export type User = {
 	id: string;
 	initialized: boolean;
 	roles: Role[];
-	certifications: Certification[];
 } & Partial<Profile>;
 
 export type Member = {
 	id: string;
 	initialized: boolean;
 	roles: Role[];
-	certifications: Certification[];
 } & Partial<
 	Pick<
 		Profile,
@@ -55,10 +57,12 @@ export interface IUserRepository {
 		providerUserId: string,
 		providerId: number,
 	) => Promise<string>;
-	fetchUserProfileById: (userId: string) => Promise<User>;
+	fetchUserProfileById: (userId: string) => Promise<User & WithCertifications>;
 	fetchAllUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
-	fetchMemberByDisplayId: (displayId: string) => Promise<Member>;
+	fetchMemberByDisplayId: (
+		displayId: string,
+	) => Promise<Member & WithCertifications>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
