@@ -2,39 +2,17 @@ import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import { css } from "styled-system/css";
 import type { CalendarEvent } from "~/types/event";
+import { CalendarCell } from "./calendar-cell";
+import type { TCalendarRow, TCalendarState } from "./types";
 
 interface Props {
 	label: string;
 	events: CalendarEvent[];
 	onDateClick?: (date: Date) => void;
+	targetDate?: Date;
 }
-
-type Calendar = {
-	year: number;
-	month: number;
-};
-
 const MONTH_IDX_JAN = 0;
 const MONTH_IDX_DEC = 11;
-
-type Cell =
-	| {
-			type: "day";
-			year: number;
-			month: number;
-			day: number;
-			idx: number;
-			label?: string;
-	  }
-	| {
-			type: "empty";
-			idx: number;
-	  };
-
-type Row = {
-	id: string;
-	cells: Cell[];
-};
 
 const SUNDAY = "日";
 const MONDAY = "月";
@@ -70,8 +48,8 @@ const controllerButtonStyle = css({
 	},
 });
 
-export const Calendar = ({ label, events, onDateClick }: Props) => {
-	const [displayedCalendar, setDisplayedCalendar] = useState<Calendar>({
+export const Calendar = ({ label, events, onDateClick, targetDate }: Props) => {
+	const [displayedCalendar, setDisplayedCalendar] = useState<TCalendarState>({
 		year: new Date().getFullYear(),
 		month: new Date().getMonth(),
 	});
@@ -95,7 +73,7 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 	}, []);
 
 	const displayWeeks = useMemo(() => {
-		const weeks: Row[] = [];
+		const weeks: TCalendarRow[] = [];
 		const firstDay = new Date(
 			displayedCalendar.year,
 			displayedCalendar.month,
@@ -110,7 +88,7 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 		const lastDate = lastDay.getDate();
 		const lastDateWeek = lastDate + firstDayWeek;
 
-		let week: Row = { id: "0", cells: [] };
+		let week: TCalendarRow = { id: "0", cells: [] };
 		for (let i = 0; i < lastDateWeek; i++) {
 			if (i < firstDayWeek) {
 				week.cells.push({
@@ -166,7 +144,7 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 					className={css({
 						fontSize: "lg",
 						fontWeight: "bold",
-						color: "gray.600",
+						color: "gray.500",
 					})}
 				>
 					{calendarLabel}
@@ -218,6 +196,13 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 									cell={cell}
 									events={events}
 									onDateClick={onDateClick}
+									active={
+										targetDate &&
+										targetDate.getFullYear() === displayedCalendar.year &&
+										targetDate.getMonth() === displayedCalendar.month &&
+										targetDate.getDate() ===
+											(cell.type === "day" ? cell.day : -1)
+									}
 								/>
 							))}
 						</tr>
@@ -225,78 +210,5 @@ export const Calendar = ({ label, events, onDateClick }: Props) => {
 				</tbody>
 			</table>
 		</div>
-	);
-};
-
-interface CellProps {
-	cell: Cell;
-	events: CalendarEvent[];
-	onDateClick?: (date: Date) => void;
-}
-
-const CalendarCell = ({ cell, events, onDateClick }: CellProps) => {
-	const cellEvents = events.filter((event) => {
-		if (cell.type === "empty") return false;
-		const cellDate = `${cell.year}${String(cell.month + 1).padStart(2, "0")}${String(cell.day).padStart(2, "0")}`;
-		const eventStartDate = `${event.startAt.getFullYear()}${String(event.startAt.getMonth() + 1).padStart(2, "0")}${String(event.startAt.getDate()).padStart(2, "0")}`;
-		const eventEndDate = `${event.endAt.getFullYear()}${String(event.endAt.getMonth() + 1).padStart(2, "0")}${String(event.endAt.getDate()).padStart(2, "0")}`;
-
-		return eventStartDate <= cellDate && cellDate <= eventEndDate;
-	});
-
-	const isToday =
-		cell.type === "day" &&
-		new Date().getFullYear() === cell.year &&
-		new Date().getMonth() === cell.month &&
-		new Date().getDate() === cell.day;
-
-	const hasEvent = cellEvents.length > 0;
-
-	return (
-		<td
-			className={css({
-				color: "gray.600",
-				textAlign: "center",
-				width: "fit-content",
-				padding: 1,
-			})}
-		>
-			{cell.type === "empty" ? null : (
-				<button
-					type="button"
-					className={css({
-						width: "40px",
-						height: "40px",
-						display: "grid",
-						placeItems: "center",
-						borderRadius: "50%",
-						backgroundColor: isToday
-							? "green.500"
-							: hasEvent
-								? "green.200"
-								: "transparent",
-						color: isToday ? "white" : "gray.500",
-						fontWeight: "bold",
-						transition: "colors",
-						cursor: "pointer",
-
-						_hover: {
-							backgroundColor: isToday
-								? "green.600"
-								: hasEvent
-									? "green.300"
-									: "gray.100",
-						},
-					})}
-					onClick={() => {
-						if (cell.type === "day" && onDateClick) {
-							onDateClick(new Date(cell.year, cell.month, cell.day));
-						}
-					}}
-				>
-					{cell.label}
-				</button>
-			)}
-		</td>
 	);
 };
