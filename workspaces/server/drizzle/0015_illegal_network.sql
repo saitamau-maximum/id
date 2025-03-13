@@ -1,0 +1,1 @@
+ALTER TABLE `user_certifications` ADD `is_approved` integer DEFAULT false NOT NULL;

@@ -83,6 +83,7 @@ export class CloudflareUserRepository implements IUserRepository {
 					with: {
 						certification: true,
 					},
+					where: eq(schema.userCertifications.isApproved, true),
 				},
 			},
 		});
@@ -231,6 +232,7 @@ export class CloudflareUserRepository implements IUserRepository {
 							with: {
 								certification: true,
 							},
+							where: eq(schema.userCertifications.isApproved, true),
 						},
 					},
 				},
