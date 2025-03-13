@@ -1,13 +1,19 @@
-import type { ICertification } from "node_modules/@idp/server/dist/repository/certification";
+import type { Certification } from "~/types/certification";
 import { client } from "~/utils/hono";
 
+export interface CertificationRequestParams {
+	certificationId: string;
+	certifiedIn: number;
+}
+
 export interface ICertificationRepository {
-	getAllCertifications(): Promise<ICertification[]>;
+	getAllCertifications(): Promise<Certification[]>;
 	getAllCertifications$$key(): string;
+	requestCertification: (params: CertificationRequestParams) => Promise<void>;
 }
 
 export class CertificationRepositoryImpl implements ICertificationRepository {
-	async getAllCertifications(): Promise<ICertification[]> {
+	async getAllCertifications(): Promise<Certification[]> {
 		const res = await client.certification.all.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch certifications");
@@ -17,5 +23,20 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 
 	getAllCertifications$$key() {
 		return "certifications";
+	}
+
+	async requestCertification({
+		certificationId,
+		certifiedIn,
+	}: CertificationRequestParams) {
+		const res = await client.certification.request.$post({
+			json: {
+				certificationId,
+				certifiedIn,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to request certification");
+		}
 	}
 }

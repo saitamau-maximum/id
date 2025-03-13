@@ -1,17 +1,22 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
+import { AnchorLike } from "~/components/ui/anchor-like";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { Switch } from "~/components/ui/switch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
+import { useRepository } from "~/hooks/use-repository";
 import { UserSchemas } from "~/schema/user";
+import type { Certification } from "~/types/certification";
+import { useSendCertificationRequest } from "../hooks/use-send-certification-request";
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
+import { CertificationRequest } from "./certification-request";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -29,8 +34,23 @@ type FormValues = v.InferInput<typeof UpdateFormSchema>;
 
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
+	const { mutate: sendCertificationRequest } = useSendCertificationRequest();
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
+	const { certificationRepository } = useRepository();
+
+	const [certifications, setCertifications] = useState<Certification[] | null>(
+		null,
+	);
+
+	const handleCertRequest = useCallback(async () => {
+		const res = await CertificationRequest.call({
+			certifications: certifications || [],
+			requestedCertifications: user?.certifications || [],
+		});
+		if (res.type === "dismiss") return;
+		sendCertificationRequest(res.request);
+	}, [certifications, user, sendCertificationRequest]);
 
 	const {
 		register,
@@ -51,6 +71,10 @@ export const ProfileUpdateForm = () => {
 			bio: user?.bio,
 		},
 	});
+
+	useEffect(() => {
+		certificationRepository.getAllCertifications().then(setCertifications);
+	}, [certificationRepository]);
 
 	const bio = watch("bio");
 	const bioLength = bio?.length || 0;
@@ -153,6 +177,16 @@ export const ProfileUpdateForm = () => {
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
+
+			<Form.FieldSet>
+				<legend>
+					<Form.LabelText>資格・試験</Form.LabelText>
+				</legend>
+				<button type="button" onClick={handleCertRequest}>
+					<AnchorLike>資格・試験の情報を申請する</AnchorLike>
+				</button>
+			</Form.FieldSet>
+
 			<Form.FieldSet>
 				<div
 					className={css({
