@@ -18,6 +18,9 @@ export type User = {
 	studentId?: string;
 	grade?: string;
 	bio?: string;
+};
+
+export type UserWithCertifications = User & {
 	certifications: UserCertification[];
 };
 
@@ -44,5 +47,8 @@ export type Member = Pick<
 	| "profileImageURL"
 	| "grade"
 	| "bio"
-	| "certifications"
 >;
+
+export type MemberWithCertifications = Member & {
+	certifications: UserCertification[];
+};

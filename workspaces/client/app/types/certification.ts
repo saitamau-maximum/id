@@ -6,4 +6,5 @@ export type Certification = {
 
 export type UserCertification = Certification & {
 	certifiedIn: number;
+	isApproved: boolean;
 };

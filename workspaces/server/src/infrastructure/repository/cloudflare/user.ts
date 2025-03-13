@@ -5,9 +5,10 @@ import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
 	Member,
+	MemberWithCertifications,
 	Profile,
 	User,
-	WithCertifications,
+	UserWithCertifications,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -71,9 +72,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return res.userId;
 	}
 
-	async fetchUserProfileById(
-		userId: string,
-	): Promise<User & WithCertifications> {
+	async fetchUserProfileById(userId: string): Promise<UserWithCertifications> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -83,7 +82,6 @@ export class CloudflareUserRepository implements IUserRepository {
 					with: {
 						certification: true,
 					},
-					where: eq(schema.userCertifications.isApproved, true),
 				},
 			},
 		});
@@ -111,6 +109,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				title: cert.certification.title,
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
+				isApproved: cert.isApproved,
 			})),
 		};
 	}
@@ -221,7 +220,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMemberByDisplayId(
 		displayId: string,
-	): Promise<Member & WithCertifications> {
+	): Promise<MemberWithCertifications> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -232,7 +231,6 @@ export class CloudflareUserRepository implements IUserRepository {
 							with: {
 								certification: true,
 							},
-							where: eq(schema.userCertifications.isApproved, true),
 						},
 					},
 				},
@@ -259,6 +257,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				title: cert.certification.title,
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
+				isApproved: cert.isApproved,
 			})),
 		};
 	}
