@@ -1,8 +1,8 @@
 import { css } from "styled-system/css";
-import type { Certification } from "~/types/certification";
+import type { UserCertification } from "~/types/certification";
 
 interface Props {
-	certifications: Certification[];
+	certifications: UserCertification[];
 }
 
 export const CertificationCard = ({ certifications }: Props) => {
