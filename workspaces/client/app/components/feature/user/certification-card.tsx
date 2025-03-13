@@ -1,3 +1,4 @@
+import { AlertCircle } from "react-feather";
 import { css } from "styled-system/css";
 import type { UserCertification } from "~/types/certification";
 
@@ -31,19 +32,39 @@ export const CertificationCard = ({ certifications }: Props) => {
 			{certifications.map((certification) => (
 				<span
 					className={css({
-						display: "inline-block",
+						display: "inline-flex",
 						padding: "token(spacing.1) token(spacing.2)",
 						lineHeight: 1,
-						borderRadius: 14,
-						fontSize: 14,
-						fontWeight: 500,
 						border: "1px solid token(colors.gray.300)",
+						borderRadius: 14,
 						margin: "token(spacing.1)",
 						color: "gray.600",
+						gap: "token(spacing.1)",
+						alignItems: "center",
+						justifyContent: "center",
 					})}
 					key={certification.id}
 				>
-					{certification.title}
+					{!certification.isApproved && (
+						<AlertCircle size={16} aria-label="未承認" />
+					)}
+					<span
+						className={css({
+							fontSize: 14,
+							fontWeight: 500,
+						})}
+					>
+						{certification.title}
+					</span>
+					<span
+						className={css({
+							fontSize: 10,
+							fontWeight: 400,
+							lineHeight: "14px",
+						})}
+					>
+						{certification.certifiedIn}
+					</span>
 				</span>
 			))}
 		</div>
