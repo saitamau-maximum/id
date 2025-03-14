@@ -5,6 +5,7 @@ import type {
 	ICertification,
 	ICertificationRepository,
 	ICertificationRequest,
+	ICertificationRequestWithUser,
 } from "../../../repository/certification";
 
 export class CloudflareCertificationRepository
@@ -30,11 +31,30 @@ export class CloudflareCertificationRepository
 		});
 	}
 
-	async getAllCertificationRequests(): Promise<ICertificationRequest[]> {
+	async getAllCertificationRequests(): Promise<
+		ICertificationRequestWithUser[]
+	> {
 		const res = await this.client.query.userCertifications.findMany({
 			where: (cert, { eq }) => eq(cert.isApproved, false),
+			with: {
+				user: {
+					with: {
+						profile: {
+							columns: {
+								displayId: true,
+								displayName: true,
+								profileImageURL: true,
+							},
+						},
+					},
+				},
+			},
 		});
-		return res;
+		return res.map((req) => ({
+			user: req.user.profile,
+			certificationId: req.certificationId,
+			certifiedIn: req.certifiedIn,
+		}));
 	}
 
 	async approveCertificationRequest(

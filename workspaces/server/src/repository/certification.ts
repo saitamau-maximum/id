@@ -10,10 +10,20 @@ export interface ICertificationRequest {
 	certifiedIn: number;
 }
 
+export interface ICertificationRequestWithUser {
+	user: {
+		displayId: string | null;
+		displayName: string | null;
+		profileImageURL: string | null;
+	};
+	certificationId: string;
+	certifiedIn: number;
+}
+
 export interface ICertificationRepository {
 	getAllCertifications: () => Promise<ICertification[]>;
 	requestCertification: (params: ICertificationRequest) => Promise<void>;
-	getAllCertificationRequests: () => Promise<ICertificationRequest[]>;
+	getAllCertificationRequests: () => Promise<ICertificationRequestWithUser[]>;
 	approveCertificationRequest(
 		userId: string,
 		certificationId: string,

@@ -28,6 +28,7 @@ export const CertificationCreator = () => {
 					fontSize: "xl",
 					fontWeight: "bold",
 					color: "gray.600",
+					marginTop: 6,
 					marginBottom: 4,
 				})}
 			>

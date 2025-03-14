@@ -1,9 +1,11 @@
 import { css } from "styled-system/css";
-import { useCertifications } from "../hooks/use-certifications";
+import type { Certification } from "~/types/certification";
 
-export const CertificationTable = () => {
-	const { data: certifications } = useCertifications();
+interface Props {
+	certifications: Certification[];
+}
 
+export const CertificationTable = ({ certifications }: Props) => {
 	return (
 		<div>
 			<h2
@@ -11,6 +13,8 @@ export const CertificationTable = () => {
 					fontSize: "xl",
 					fontWeight: "bold",
 					color: "gray.600",
+					marginTop: 6,
+					marginBottom: 4,
 				})}
 			>
 				資格・試験の一覧

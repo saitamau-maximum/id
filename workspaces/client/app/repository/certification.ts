@@ -6,8 +6,12 @@ export interface CertificationRequestParams {
 	certifiedIn: number;
 }
 
-export interface CertificationRequest {
-	userId: string;
+export interface CertificationRequestWithUser {
+	user: {
+		displayId: string | null;
+		displayName: string | null;
+		profileImageURL: string | null;
+	};
 	certificationId: string;
 	certifiedIn: number;
 }
@@ -27,7 +31,7 @@ export interface ICertificationRepository {
 	getAllCertifications(): Promise<Certification[]>;
 	getAllCertifications$$key(): unknown[];
 	requestCertification: (params: CertificationRequestParams) => Promise<void>;
-	getAllCertificationRequests: () => Promise<CertificationRequest[]>;
+	getAllCertificationRequests: () => Promise<CertificationRequestWithUser[]>;
 	getAllCertificationRequests$$key(): unknown[];
 	reviewCertificationRequest: (
 		params: CertificationRequestReviewParams,
@@ -63,7 +67,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async getAllCertificationRequests(): Promise<CertificationRequest[]> {
+	async getAllCertificationRequests(): Promise<CertificationRequestWithUser[]> {
 		const res = await client.certification.request.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch certification requests");
