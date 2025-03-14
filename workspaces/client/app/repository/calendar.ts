@@ -11,7 +11,7 @@ export interface ICreateEventPayload {
 
 export interface ICalendarRepository {
 	getAllEvents: () => Promise<CalendarEvent[]>;
-	getAllEvents$$key: () => string;
+	getAllEvents$$key: () => unknown[];
 	createEvent: (event: ICreateEventPayload) => Promise<void>;
 	updateEvent: (event: CalendarEvent) => Promise<void>;
 	deleteEvent: (eventId: CalendarEvent["id"]) => Promise<void>;
@@ -31,7 +31,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 	}
 
 	getAllEvents$$key() {
-		return "calendar-events";
+		return ["calendar-events"];
 	}
 
 	async createEvent(event: ICreateEventPayload) {
