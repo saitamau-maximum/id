@@ -25,9 +25,10 @@ export const CertificationCreator = () => {
 		<div>
 			<h2
 				className={css({
-					fontSize: "2xl",
+					fontSize: "xl",
 					fontWeight: "bold",
 					color: "gray.600",
+					marginBottom: 4,
 				})}
 			>
 				新しい資格・試験を追加する
@@ -37,6 +38,13 @@ export const CertificationCreator = () => {
 					mutate(d, {
 						onSuccess: () => reset(),
 					});
+				})}
+				className={css({
+					width: "100%",
+					display: "flex",
+					flexDirection: "column",
+					gap: 6,
+					alignItems: "center",
 				})}
 			>
 				<Form.Field.TextInput
@@ -48,16 +56,27 @@ export const CertificationCreator = () => {
 					label="資格・試験の説明"
 					{...register("description")}
 				/>
-				<button type="submit" disabled={isPending}>
-					<ButtonLike variant="primary" disabled={isPending}>
-						作成
-					</ButtonLike>
-				</button>
-				<button type="reset" disabled={isPending}>
-					<ButtonLike variant="secondary" disabled={isPending}>
-						クリア
-					</ButtonLike>
-				</button>
+				<div
+					className={css({
+						width: "100%",
+						display: "flex",
+						flexDirection: "row",
+						gap: 6,
+						alignItems: "center",
+						justifyContent: "center",
+					})}
+				>
+					<button type="submit" disabled={isPending}>
+						<ButtonLike variant="primary" disabled={isPending}>
+							作成
+						</ButtonLike>
+					</button>
+					<button type="reset" disabled={isPending}>
+						<ButtonLike variant="secondary" disabled={isPending}>
+							クリア
+						</ButtonLike>
+					</button>
+				</div>
 			</form>
 		</div>
 	);

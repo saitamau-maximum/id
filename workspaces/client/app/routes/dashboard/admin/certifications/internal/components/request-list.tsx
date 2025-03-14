@@ -8,7 +8,7 @@ export const CertificationRequestList = () => {
 		<div>
 			<h2
 				className={css({
-					fontSize: "2xl",
+					fontSize: "xl",
 					fontWeight: "bold",
 					color: "gray.600",
 				})}
