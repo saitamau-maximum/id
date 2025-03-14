@@ -41,86 +41,97 @@ export const CertificationRequestList = ({ certifications }: Props) => {
 			>
 				資格・試験のリクエスト一覧
 			</h2>
-			<Table.Root>
-				<thead>
-					<Table.Tr>
-						<Table.Th>申請者</Table.Th>
-						<Table.Th>資格・試験</Table.Th>
-						<Table.Th>取得年</Table.Th>
-						<Table.Th>承認 / 却下</Table.Th>
-					</Table.Tr>
-				</thead>
-				<tbody>
-					{certificationRequests?.map((certificationRequest) => {
-						return (
-							<Table.Tr
-								key={`${certificationRequest.user.displayId}:${certificationRequest.certificationId}`}
-							>
-								<Table.Td>
-									<UserDisplay
-										displayId={certificationRequest.user.displayId ?? ""}
-										name={certificationRequest.user.displayName ?? ""}
-										iconURL={certificationRequest.user.profileImageURL ?? ""}
-									/>
-								</Table.Td>
-								<Table.Td>
-									{
-										certifications.find(
-											(cert) =>
-												cert.id === certificationRequest.certificationId,
-										)?.title
-									}
-								</Table.Td>
-								<Table.Td>{certificationRequest.certifiedIn}</Table.Td>
-								<Table.Td
-									className={css({
-										display: "flex",
-										gap: 4,
-										alignItems: "center",
-										justifyContent: "center",
-									})}
-								>
-									<button
-										type="button"
-										className={css({
-											cursor: "pointer",
-											"&:hover": {
-												color: "green.600",
-											},
-										})}
-										onClick={() =>
-											handleApproveRequest(
-												certificationRequest.user.id,
-												certificationRequest.certificationId,
-											)
-										}
-									>
-										<Check size={20} />
-									</button>
-									/
-									<button
-										type="button"
-										className={css({
-											cursor: "pointer",
-											"&:hover": {
-												color: "rose.600",
-											},
-										})}
-										onClick={() =>
-											handleRejectRequest(
-												certificationRequest.user.id,
-												certificationRequest.certificationId,
-											)
-										}
-									>
-										<X size={20} />
-									</button>
-								</Table.Td>
-							</Table.Tr>
-						);
+			{certificationRequests?.length === 0 ? (
+				<p
+					className={css({
+						color: "gray.500",
+						textAlign: "center",
 					})}
-				</tbody>
-			</Table.Root>
+				>
+					リクエストはありません
+				</p>
+			) : (
+				<Table.Root>
+					<thead>
+						<Table.Tr>
+							<Table.Th>申請者</Table.Th>
+							<Table.Th>資格・試験</Table.Th>
+							<Table.Th>取得年</Table.Th>
+							<Table.Th>承認 / 却下</Table.Th>
+						</Table.Tr>
+					</thead>
+					<tbody>
+						{certificationRequests?.map((certificationRequest) => {
+							return (
+								<Table.Tr
+									key={`${certificationRequest.user.displayId}:${certificationRequest.certificationId}`}
+								>
+									<Table.Td>
+										<UserDisplay
+											displayId={certificationRequest.user.displayId ?? ""}
+											name={certificationRequest.user.displayName ?? ""}
+											iconURL={certificationRequest.user.profileImageURL ?? ""}
+										/>
+									</Table.Td>
+									<Table.Td>
+										{
+											certifications.find(
+												(cert) =>
+													cert.id === certificationRequest.certificationId,
+											)?.title
+										}
+									</Table.Td>
+									<Table.Td>{certificationRequest.certifiedIn}</Table.Td>
+									<Table.Td
+										className={css({
+											display: "flex",
+											gap: 4,
+											alignItems: "center",
+											justifyContent: "center",
+										})}
+									>
+										<button
+											type="button"
+											className={css({
+												cursor: "pointer",
+												"&:hover": {
+													color: "green.600",
+												},
+											})}
+											onClick={() =>
+												handleApproveRequest(
+													certificationRequest.user.id,
+													certificationRequest.certificationId,
+												)
+											}
+										>
+											<Check size={20} />
+										</button>
+										/
+										<button
+											type="button"
+											className={css({
+												cursor: "pointer",
+												"&:hover": {
+													color: "rose.600",
+												},
+											})}
+											onClick={() =>
+												handleRejectRequest(
+													certificationRequest.user.id,
+													certificationRequest.certificationId,
+												)
+											}
+										>
+											<X size={20} />
+										</button>
+									</Table.Td>
+								</Table.Tr>
+							);
+						})}
+					</tbody>
+				</Table.Root>
+			)}
 		</div>
 	);
 };
