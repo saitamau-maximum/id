@@ -4,9 +4,10 @@ import type { UserCertification } from "~/types/certification";
 
 interface Props {
 	certifications: UserCertification[];
+	onClick?: (certification: UserCertification) => void;
 }
 
-export const CertificationCard = ({ certifications }: Props) => {
+export const CertificationCard = ({ certifications, onClick }: Props) => {
 	if (certifications.length === 0) {
 		return (
 			<p
@@ -42,7 +43,21 @@ export const CertificationCard = ({ certifications }: Props) => {
 						gap: "token(spacing.1)",
 						alignItems: "center",
 						justifyContent: "center",
+						...(onClick
+							? {
+									cursor: "pointer",
+									"&:hover": {
+										background: "gray.100",
+									},
+								}
+							: {}),
 					})}
+					onClick={() => {
+						if (onClick) onClick(certification);
+					}}
+					onKeyUp={() => {
+						if (onClick) onClick(certification);
+					}}
 					key={certification.id}
 				>
 					{!certification.isApproved && (
