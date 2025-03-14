@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import { DefaultRepositories } from "~/repository";
 import type { IAuthRepository } from "~/repository/auth";
 import type { ICalendarRepository } from "~/repository/calendar";
+import type { ICertificationRepository } from "~/repository/certification";
 import type { IMemberRepository } from "~/repository/member";
 import type { IOAuthAppsRepository } from "~/repository/oauth-apps";
 import type { IUserRepository } from "~/repository/user";
@@ -12,6 +13,7 @@ export interface RepositoryContextProps {
 	memberRepository: IMemberRepository;
 	oauthAppsRepository: IOAuthAppsRepository;
 	calendarRepository: ICalendarRepository;
+	certificationRepository: ICertificationRepository;
 }
 
 export const RepositoryContext =

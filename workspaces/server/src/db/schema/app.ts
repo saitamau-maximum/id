@@ -127,8 +127,10 @@ export const userCertifications = sqliteTable(
 			.references(() => certifications.id)
 			.notNull(),
 		// 「タイムスタンプとしていつ資格を取得したか」は微妙なので、年のみ管理する
-		// Memo: 「合格発表タイミングを書いてね」を書く
 		certifiedIn: integer("certified_in").notNull(),
+		isApproved: integer("is_approved", { mode: "boolean" })
+			.notNull()
+			.default(false),
 	},
 	(table) => ({
 		pk: primaryKey({ columns: [table.userId, table.certificationId] }),

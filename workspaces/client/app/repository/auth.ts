@@ -1,8 +1,8 @@
-import type { User } from "~/types/user";
+import type { UserWithCertifications } from "~/types/user";
 import { client } from "~/utils/hono";
 
 export interface IAuthRepository {
-	me: () => Promise<User>;
+	me: () => Promise<UserWithCertifications>;
 	me$$key(): unknown[];
 }
 

@@ -115,17 +115,9 @@ export default function Profile() {
 						/>
 						資格・試験
 					</h3>
-					<div
-						className={css({
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "start",
-						})}
-					>
-						<CertificationCard
-							certifications={memberProfile?.certifications || []}
-						/>
-					</div>
+					<CertificationCard
+						certifications={memberProfile?.certifications || []}
+					/>
 				</div>
 			)}
 			<div className={css({ width: "100%", maxWidth: "480px" })}>

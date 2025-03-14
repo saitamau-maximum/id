@@ -81,7 +81,6 @@ export default function Home() {
 						<CheckCircle size={16} />
 						資格・試験
 					</h3>
-
 					<CertificationCard certifications={user.certifications} />
 				</div>
 			)}

@@ -5,6 +5,7 @@ import { Octokit } from "octokit";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
+import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
@@ -16,6 +17,7 @@ import { GithubOrganizationRepository } from "./infrastructure/repository/github
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
+import { certificationRoute } from "./routes/certification";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
@@ -40,6 +42,10 @@ export const route = app
 			new CloudflareOAuthInternalRepository(c.env.DB),
 		);
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
+		c.set(
+			"CertificationRepository",
+			new CloudflareCertificationRepository(c.env.DB),
+		);
 
 		c.set(
 			"ContributionCacheRepository",
@@ -77,6 +83,7 @@ export const route = app
 	.route("/member", memberRoute)
 	.route("/oauth", oauthRoute)
 	.route("/admin", adminRoute)
-	.route("/calendar", calendarRoute);
+	.route("/calendar", calendarRoute)
+	.route("/certification", certificationRoute);
 
 export default app;
