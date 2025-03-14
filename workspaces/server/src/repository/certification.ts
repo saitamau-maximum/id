@@ -22,5 +22,5 @@ export interface ICertificationRepository {
 		userId: string,
 		certificationId: string,
 	): Promise<void>;
-	createCertification: (certification: ICertification) => Promise<void>;
+	createCertification: (params: Omit<ICertification, "id">) => Promise<void>;
 }

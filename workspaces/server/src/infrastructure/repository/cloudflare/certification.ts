@@ -68,7 +68,8 @@ export class CloudflareCertificationRepository
 			);
 	}
 
-	async createCertification(certification: ICertification): Promise<void> {
-		await this.client.insert(schema.certifications).values(certification);
+	async createCertification(params: Omit<ICertification, "id">): Promise<void> {
+		const id = crypto.randomUUID();
+		await this.client.insert(schema.certifications).values({ ...params, id });
 	}
 }

@@ -21,9 +21,8 @@ const CertificationReviewSchema = v.object({
 });
 
 const CertificationCreateSchema = v.object({
-	id: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.string(),
+	description: v.optional(v.string()),
 });
 
 const route = app
@@ -85,12 +84,16 @@ const route = app
 	)
 	.post(
 		"/create",
+		authMiddleware,
 		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
 		vValidator("json", CertificationCreateSchema),
 		async (c) => {
 			const { CertificationRepository } = c.var;
-			const certification = c.req.valid("json");
-			await CertificationRepository.createCertification(certification);
+			const { title, description } = c.req.valid("json");
+			await CertificationRepository.createCertification({
+				title,
+				description: description ?? null,
+			});
 			return c.text("ok", 200);
 		},
 	);

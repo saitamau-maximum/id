@@ -18,6 +18,11 @@ export interface CertificationRequestReviewParams {
 	isApproved: boolean;
 }
 
+export interface CertificationCreationParams {
+	title: string;
+	description?: string;
+}
+
 export interface ICertificationRepository {
 	getAllCertifications(): Promise<Certification[]>;
 	getAllCertifications$$key(): unknown[];
@@ -27,6 +32,7 @@ export interface ICertificationRepository {
 	reviewCertificationRequest: (
 		params: CertificationRequestReviewParams,
 	) => Promise<void>;
+	createCertification: (params: CertificationCreationParams) => Promise<void>;
 }
 
 export class CertificationRepositoryImpl implements ICertificationRepository {
@@ -83,6 +89,21 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to review certification request");
+		}
+	}
+
+	async createCertification({
+		title,
+		description,
+	}: CertificationCreationParams) {
+		const res = await client.certification.create.$post({
+			json: {
+				title,
+				description,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to create certification");
 		}
 	}
 }
