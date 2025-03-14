@@ -1,4 +1,6 @@
+import { Trash } from "react-feather";
 import { css } from "styled-system/css";
+import { Table } from "~/components/ui/table";
 import type { Certification } from "~/types/certification";
 
 interface Props {
@@ -19,19 +21,39 @@ export const CertificationTable = ({ certifications }: Props) => {
 			>
 				資格・試験の一覧
 			</h2>
-			<ul>
-				{
-					// WIP
-					certifications?.map((certification) => {
+			<Table.Root>
+				<thead>
+					<Table.Tr>
+						<Table.Th>資格・試験</Table.Th>
+						<Table.Th>説明</Table.Th>
+						<Table.Th>削除</Table.Th>
+					</Table.Tr>
+				</thead>
+				<tbody>
+					{certifications?.map((certification) => {
 						return (
-							<li key={certification.id}>
-								{certification.id}: {certification.title} (
-								{certification.description})
-							</li>
+							<Table.Tr key={certification.id}>
+								<Table.Td>{certification.title}</Table.Td>
+								<Table.Td>{certification.description}</Table.Td>
+								<Table.Td>
+									{/* 機能はあとでやる */}
+									<button
+										type="button"
+										className={css({
+											cursor: "pointer",
+											"&:hover": {
+												color: "rose.600",
+											},
+										})}
+									>
+										<Trash size={20} />
+									</button>
+								</Table.Td>
+							</Table.Tr>
 						);
-					})
-				}
-			</ul>
+					})}
+				</tbody>
+			</Table.Root>
 		</div>
 	);
 };
