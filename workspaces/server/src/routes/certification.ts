@@ -52,6 +52,7 @@ const route = app
 	)
 	.get(
 		"/request",
+		authMiddleware,
 		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
 		async (c) => {
 			const { CertificationRepository } = c.var;
@@ -62,6 +63,7 @@ const route = app
 	)
 	.put(
 		"/review",
+		authMiddleware,
 		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
 		vValidator("json", CertificationReviewSchema),
 		async (c) => {
