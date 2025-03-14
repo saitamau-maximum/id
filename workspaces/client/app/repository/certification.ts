@@ -23,8 +23,13 @@ export interface CertificationRequestReviewParams {
 	isApproved: boolean;
 }
 
-export interface CertificationCreationParams {
+export interface CertificationCreateParams {
 	title: string;
+	description?: string;
+}
+
+export interface CertificationUpdateParams {
+	certificationId: string;
 	description?: string;
 }
 
@@ -37,7 +42,8 @@ export interface ICertificationRepository {
 	reviewCertificationRequest: (
 		params: CertificationRequestReviewParams,
 	) => Promise<void>;
-	createCertification: (params: CertificationCreationParams) => Promise<void>;
+	createCertification: (params: CertificationCreateParams) => Promise<void>;
+	updateCertification: (params: CertificationUpdateParams) => Promise<void>;
 	deleteCertification: (certificationId: string) => Promise<void>;
 	deleteUserCertification: (certificationId: string) => Promise<void>;
 }
@@ -99,10 +105,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async createCertification({
-		title,
-		description,
-	}: CertificationCreationParams) {
+	async createCertification({ title, description }: CertificationCreateParams) {
 		const res = await client.certification.create.$post({
 			json: {
 				title,
@@ -111,6 +114,20 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to create certification");
+		}
+	}
+
+	async updateCertification(params: CertificationUpdateParams) {
+		const res = await client.certification[":certificationId"].$put({
+			param: {
+				certificationId: params.certificationId,
+			},
+			json: {
+				description: params.description,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to update certification");
 		}
 	}
 

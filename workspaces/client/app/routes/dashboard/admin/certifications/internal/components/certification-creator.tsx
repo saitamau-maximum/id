@@ -5,7 +5,7 @@ import { css } from "styled-system/css";
 import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
-import { useCreateCertification } from "../hooks/use-create-certification";
+import { useCreateCertification } from "../hooks/use-certification-mutations";
 
 const CreateFormSchema = v.object({
 	title: v.pipe(v.string(), v.nonEmpty()),

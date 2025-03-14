@@ -25,6 +25,10 @@ const CertificationCreateSchema = v.object({
 	description: v.optional(v.string()),
 });
 
+const CertificationUpdateSchema = v.object({
+	description: v.optional(v.string()),
+});
+
 const route = app
 	.get("/all", async (c) => {
 		const { CertificationRepository } = c.var;
@@ -92,6 +96,22 @@ const route = app
 			const { title, description } = c.req.valid("json");
 			await CertificationRepository.createCertification({
 				title,
+				description: description ?? null,
+			});
+			return c.text("ok", 200);
+		},
+	)
+	.put(
+		"/:certificationId",
+		authMiddleware,
+		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
+		vValidator("json", CertificationUpdateSchema),
+		async (c) => {
+			const { CertificationRepository } = c.var;
+			const certificationId = c.req.param("certificationId");
+			const { description } = c.req.valid("json");
+			await CertificationRepository.updateCertification({
+				certificationId,
 				description: description ?? null,
 			});
 			return c.text("ok", 200);

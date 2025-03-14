@@ -6,6 +6,7 @@ import type {
 	ICertificationRepository,
 	ICertificationRequest,
 	ICertificationRequestWithUser,
+	ICertificationUpdateRequest,
 } from "../../../repository/certification";
 
 export class CloudflareCertificationRepository
@@ -94,6 +95,15 @@ export class CloudflareCertificationRepository
 	async createCertification(params: Omit<ICertification, "id">): Promise<void> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.certifications).values({ ...params, id });
+	}
+
+	async updateCertification(
+		params: ICertificationUpdateRequest,
+	): Promise<void> {
+		await this.client
+			.update(schema.certifications)
+			.set({ description: params.description })
+			.where(eq(schema.certifications.id, params.certificationId));
 	}
 
 	async deleteCertification(certificationId: string): Promise<void> {
