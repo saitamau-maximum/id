@@ -1,6 +1,7 @@
 import { useActionState, useCallback, useState } from "react";
 import { Check, Edit, Trash } from "react-feather";
 import { css } from "styled-system/css";
+import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { Form } from "~/components/ui/form";
 import { Table } from "~/components/ui/table";
@@ -10,7 +11,6 @@ import {
 	useDeleteCertification,
 	useUpdateCertification,
 } from "../hooks/use-certification-mutations";
-import { DeleteConfirmation } from "./delete-confirmation";
 
 interface Props {
 	certifications: Certification[];

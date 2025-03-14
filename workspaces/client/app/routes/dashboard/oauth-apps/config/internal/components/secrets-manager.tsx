@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { Plus, Trash2 } from "react-feather";
 import { css } from "styled-system/css";
+import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { UserDisplay } from "~/components/feature/user/user-display";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { IconButton } from "~/components/ui/icon-button";
@@ -9,7 +10,6 @@ import type { OAuthClientSecret } from "~/types/oauth";
 import { useDeleteSecret } from "../hooks/use-delete-secret";
 import { useGenerateSecret } from "../hooks/use-generate-secret";
 import { ConfigSectionSubHeader } from "./config-section-sub-header";
-import { DeleteConfirmation } from "./delete-confirmation";
 
 interface Props {
 	appId: string;
