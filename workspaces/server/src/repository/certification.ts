@@ -4,7 +4,7 @@ export interface ICertification {
 	description: string | null;
 }
 
-export interface ICertificationRequestParams {
+export interface ICertificationRequest {
 	userId: string;
 	certificationId: string;
 	certifiedIn: number;
@@ -12,5 +12,15 @@ export interface ICertificationRequestParams {
 
 export interface ICertificationRepository {
 	getAllCertifications: () => Promise<ICertification[]>;
-	requestCertification: (params: ICertificationRequestParams) => Promise<void>;
+	requestCertification: (params: ICertificationRequest) => Promise<void>;
+	getAllCertificationRequests: () => Promise<ICertificationRequest[]>;
+	approveCertificationRequest(
+		userId: string,
+		certificationId: string,
+	): Promise<void>;
+	rejectCertificationRequest(
+		userId: string,
+		certificationId: string,
+	): Promise<void>;
+	createCertification: (certification: ICertification) => Promise<void>;
 }
