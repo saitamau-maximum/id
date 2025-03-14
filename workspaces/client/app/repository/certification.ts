@@ -8,7 +8,7 @@ export interface CertificationRequestParams {
 
 export interface ICertificationRepository {
 	getAllCertifications(): Promise<Certification[]>;
-	getAllCertifications$$key(): string;
+	getAllCertifications$$key(): unknown[];
 	requestCertification: (params: CertificationRequestParams) => Promise<void>;
 }
 
@@ -22,7 +22,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 	}
 
 	getAllCertifications$$key() {
-		return "certifications";
+		return ["certifications"];
 	}
 
 	async requestCertification({

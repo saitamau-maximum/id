@@ -16,7 +16,6 @@ import { ConfirmDialog } from "./components/logic/callable/comfirm";
 import { InformationDialog } from "./components/logic/callable/information";
 import { RepositoryProvider } from "./hooks/use-repository";
 import { ToastProvider } from "./hooks/use-toast/toast-provider";
-import { CertificationRequest } from "./routes/dashboard/settings/internal/components/certification-request";
 import { initializeEnv } from "./utils/env";
 
 initializeEnv();
@@ -91,7 +90,6 @@ export default function App() {
 			<QueryClientProvider client={queryClient}>
 				<ToastProvider>
 					<Outlet />
-					<CertificationRequest.Root />
 					<UserSelector.Root />
 					<ConfirmDialog.Root />
 					<InformationDialog.Root />
