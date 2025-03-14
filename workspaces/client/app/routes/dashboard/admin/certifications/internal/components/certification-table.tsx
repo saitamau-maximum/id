@@ -89,7 +89,8 @@ const CertificationTableRow = ({ certification }: TableRowProps) => {
 			const param: CertificationUpdateParams = {
 				certificationId: certification.id,
 			};
-			if (typeof description === "string") param.description = description;
+			if (typeof description === "string" && description !== "")
+				param.description = description;
 
 			updateCertification(param);
 			setEditing(false);
