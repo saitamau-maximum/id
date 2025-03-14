@@ -1,13 +1,22 @@
+import { useCallback } from "react";
 import { Trash } from "react-feather";
 import { css } from "styled-system/css";
 import { Table } from "~/components/ui/table";
 import type { Certification } from "~/types/certification";
+import { useDeleteCertification } from "../hooks/use-delete-certification";
 
 interface Props {
 	certifications: Certification[];
 }
 
 export const CertificationTable = ({ certifications }: Props) => {
+	const { mutate, isPending } = useDeleteCertification();
+
+	const handleDeleteCertification = useCallback(
+		(certificationId: string) => mutate(certificationId),
+		[mutate],
+	);
+
 	return (
 		<div>
 			<h2
@@ -54,15 +63,18 @@ export const CertificationTable = ({ certifications }: Props) => {
 												justifyContent: "center",
 											})}
 										>
-											{/* 機能はあとでやる */}
 											<button
 												type="button"
+												disabled={isPending}
 												className={css({
 													cursor: "pointer",
 													"&:hover": {
 														color: "rose.600",
 													},
 												})}
+												onClick={() => {
+													handleDeleteCertification(certification.id);
+												}}
 											>
 												<Trash size={20} />
 											</button>

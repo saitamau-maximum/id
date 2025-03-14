@@ -38,6 +38,8 @@ export interface ICertificationRepository {
 		params: CertificationRequestReviewParams,
 	) => Promise<void>;
 	createCertification: (params: CertificationCreationParams) => Promise<void>;
+	deleteCertification: (certificationId: string) => Promise<void>;
+	deleteUserCertification: (certificationId: string) => Promise<void>;
 }
 
 export class CertificationRepositoryImpl implements ICertificationRepository {
@@ -109,6 +111,28 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to create certification");
+		}
+	}
+
+	async deleteCertification(certificationId: string) {
+		const res = await client.certification[":certificationId"].$delete({
+			param: {
+				certificationId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to delete certification");
+		}
+	}
+
+	async deleteUserCertification(certificationId: string) {
+		const res = await client.certification[":certificationId"].my.$delete({
+			param: {
+				certificationId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to delete certification");
 		}
 	}
 }

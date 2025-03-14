@@ -95,4 +95,28 @@ export class CloudflareCertificationRepository
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.certifications).values({ ...params, id });
 	}
+
+	async deleteCertification(certificationId: string): Promise<void> {
+		await this.client.batch([
+			this.client
+				.delete(schema.userCertifications)
+				.where(eq(schema.userCertifications.certificationId, certificationId)),
+			this.client
+				.delete(schema.certifications)
+				.where(eq(schema.certifications.id, certificationId)),
+		]);
+	}
+
+	async deleteUserCertification(
+		params: Omit<ICertificationRequest, "certifiedIn">,
+	): Promise<void> {
+		await this.client
+			.delete(schema.userCertifications)
+			.where(
+				and(
+					eq(schema.userCertifications.userId, params.userId),
+					eq(schema.userCertifications.certificationId, params.certificationId),
+				),
+			);
+	}
 }

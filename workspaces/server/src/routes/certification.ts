@@ -96,6 +96,27 @@ const route = app
 			});
 			return c.text("ok", 200);
 		},
-	);
+	)
+	.delete(
+		"/:certificationId",
+		authMiddleware,
+		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
+		async (c) => {
+			const { CertificationRepository } = c.var;
+			const certificationId = c.req.param("certificationId");
+			await CertificationRepository.deleteCertification(certificationId);
+			return c.text("ok", 200);
+		},
+	)
+	.delete("/:certificationId/my", authMiddleware, async (c) => {
+		const { CertificationRepository } = c.var;
+		const { userId } = c.get("jwtPayload");
+		const certificationId = c.req.param("certificationId");
+		await CertificationRepository.deleteUserCertification({
+			userId,
+			certificationId,
+		});
+		return c.text("ok", 200);
+	});
 
 export { route as certificationRoute };
