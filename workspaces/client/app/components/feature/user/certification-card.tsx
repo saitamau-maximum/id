@@ -52,6 +52,7 @@ export const CertificationCard = ({ certifications }: Props) => {
 						className={css({
 							fontSize: 14,
 							fontWeight: 500,
+							textWrap: "nowrap",
 						})}
 					>
 						{certification.title}
