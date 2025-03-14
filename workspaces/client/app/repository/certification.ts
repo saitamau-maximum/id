@@ -8,6 +8,7 @@ export interface CertificationRequestParams {
 
 export interface CertificationRequestWithUser {
 	user: {
+		id: string;
 		displayId: string | null;
 		displayName: string | null;
 		profileImageURL: string | null;

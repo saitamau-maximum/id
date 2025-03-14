@@ -12,6 +12,7 @@ export interface ICertificationRequest {
 
 export interface ICertificationRequestWithUser {
 	user: {
+		id: string;
 		displayId: string | null;
 		displayName: string | null;
 		profileImageURL: string | null;

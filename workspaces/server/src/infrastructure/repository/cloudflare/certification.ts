@@ -51,7 +51,10 @@ export class CloudflareCertificationRepository
 			},
 		});
 		return res.map((req) => ({
-			user: req.user.profile,
+			user: {
+				id: req.user.id,
+				...req.user.profile,
+			},
 			certificationId: req.certificationId,
 			certifiedIn: req.certifiedIn,
 		}));
