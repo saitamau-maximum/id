@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -9,9 +9,8 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { Switch } from "~/components/ui/switch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { useRepository } from "~/hooks/use-repository";
 import { UserSchemas } from "~/schema/user";
-import type { Certification } from "~/types/certification";
+import { useCertifications } from "../hooks/use-certifications";
 import { useSendCertificationRequest } from "../hooks/use-send-certification-request";
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
@@ -36,11 +35,7 @@ export const ProfileUpdateForm = () => {
 	const { mutate: sendCertificationRequest } = useSendCertificationRequest();
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
-	const { certificationRepository } = useRepository();
-
-	const [certifications, setCertifications] = useState<Certification[] | null>(
-		null,
-	);
+	const { data: certifications } = useCertifications();
 
 	const requestableCertifications = useMemo(() => {
 		const requestedIds = user?.certifications.map((c) => c.id) || [];
@@ -75,10 +70,6 @@ export const ProfileUpdateForm = () => {
 			bio: user?.bio,
 		},
 	});
-
-	useEffect(() => {
-		certificationRepository.getAllCertifications().then(setCertifications);
-	}, [certificationRepository]);
 
 	const bio = watch("bio");
 	const bioLength = bio?.length || 0;
