@@ -154,7 +154,7 @@ export const CertificationTable = ({ certifications }: Props) => {
 											})}
 											onClick={() => {
 												setEditing((arr) =>
-													// index == idx なら true にして、それ以外ならそのまま
+													// index === idx なら true にして、それ以外ならそのまま
 													arr.map((val, index) => val || index === idx),
 												);
 											}}
