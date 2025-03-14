@@ -114,7 +114,7 @@ export const calendarEvents = sqliteTable(
 export const certifications = sqliteTable("certifications", {
 	id: text("id").primaryKey(),
 	title: text("title").notNull().unique(),
-	description: text("description"),
+	description: text("description").notNull().default(""),
 });
 
 export const userCertifications = sqliteTable(

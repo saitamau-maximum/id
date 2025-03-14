@@ -22,11 +22,11 @@ const CertificationReviewSchema = v.object({
 
 const CertificationCreateSchema = v.object({
 	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	description: v.string(),
 });
 
 const CertificationUpdateSchema = v.object({
-	description: v.optional(v.string()),
+	description: v.string(),
 });
 
 const route = app
@@ -96,7 +96,7 @@ const route = app
 			const { title, description } = c.req.valid("json");
 			await CertificationRepository.createCertification({
 				title,
-				description: description ?? null,
+				description,
 			});
 			return c.text("ok", 200);
 		},
@@ -112,7 +112,7 @@ const route = app
 			const { description } = c.req.valid("json");
 			await CertificationRepository.updateCertification({
 				certificationId,
-				description: description ?? null,
+				description,
 			});
 			return c.text("ok", 200);
 		},

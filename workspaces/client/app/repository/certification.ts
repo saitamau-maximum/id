@@ -25,12 +25,12 @@ export interface CertificationRequestReviewParams {
 
 export interface CertificationCreateParams {
 	title: string;
-	description?: string;
+	description: string;
 }
 
 export interface CertificationUpdateParams {
 	certificationId: string;
-	description?: string;
+	description: string;
 }
 
 export interface ICertificationRepository {

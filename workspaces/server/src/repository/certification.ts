@@ -1,7 +1,7 @@
 export interface ICertification {
 	id: string;
 	title: string;
-	description: string | null;
+	description: string;
 }
 
 export interface ICertificationRequest {
@@ -24,7 +24,7 @@ export interface ICertificationRequestWithUser {
 export interface ICertificationUpdateRequest {
 	certificationId: string;
 	// title を変更させないのは、例えば「FE を登録 -> 申請・承認 -> AP に変更」とされなくないため
-	description: string | null;
+	description: string;
 }
 
 export interface ICertificationRepository {
