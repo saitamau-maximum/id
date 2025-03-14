@@ -46,18 +46,27 @@ export const CertificationTable = ({ certifications }: Props) => {
 									<Table.Td>{certification.title}</Table.Td>
 									<Table.Td>{certification.description}</Table.Td>
 									<Table.Td>
-										{/* 機能はあとでやる */}
-										<button
-											type="button"
+										<div
 											className={css({
-												cursor: "pointer",
-												"&:hover": {
-													color: "rose.600",
-												},
+												display: "flex",
+												gap: 4,
+												alignItems: "center",
+												justifyContent: "center",
 											})}
 										>
-											<Trash size={20} />
-										</button>
+											{/* 機能はあとでやる */}
+											<button
+												type="button"
+												className={css({
+													cursor: "pointer",
+													"&:hover": {
+														color: "rose.600",
+													},
+												})}
+											>
+												<Trash size={20} />
+											</button>
+										</div>
 									</Table.Td>
 								</Table.Tr>
 							);
