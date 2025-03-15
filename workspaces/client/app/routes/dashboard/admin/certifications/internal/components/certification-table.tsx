@@ -7,10 +7,8 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { Form } from "~/components/ui/form";
 import { Table } from "~/components/ui/table";
 import type { Certification } from "~/types/certification";
-import {
-	useDeleteCertification,
-	useUpdateCertification,
-} from "../hooks/use-certification-mutations";
+import { useDeleteCertification } from "../hooks/use-delete-certification";
+import { useUpdateCertification } from "../hooks/use-update-certification";
 
 interface Props {
 	certifications: Certification[];
