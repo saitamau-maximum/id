@@ -6,6 +6,7 @@ import type {
 	ICertificationRepository,
 	ICertificationRequest,
 	ICertificationRequestWithUser,
+	ICertificationUpdateRequest,
 } from "../../../repository/certification";
 
 export class CloudflareCertificationRepository
@@ -94,5 +95,38 @@ export class CloudflareCertificationRepository
 	async createCertification(params: Omit<ICertification, "id">): Promise<void> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.certifications).values({ ...params, id });
+	}
+
+	async updateCertification(
+		params: ICertificationUpdateRequest,
+	): Promise<void> {
+		await this.client
+			.update(schema.certifications)
+			.set({ description: params.description })
+			.where(eq(schema.certifications.id, params.certificationId));
+	}
+
+	async deleteCertification(certificationId: string): Promise<void> {
+		await this.client.batch([
+			this.client
+				.delete(schema.userCertifications)
+				.where(eq(schema.userCertifications.certificationId, certificationId)),
+			this.client
+				.delete(schema.certifications)
+				.where(eq(schema.certifications.id, certificationId)),
+		]);
+	}
+
+	async deleteUserCertification(
+		params: Omit<ICertificationRequest, "certifiedIn">,
+	): Promise<void> {
+		await this.client
+			.delete(schema.userCertifications)
+			.where(
+				and(
+					eq(schema.userCertifications.userId, params.userId),
+					eq(schema.userCertifications.certificationId, params.certificationId),
+				),
+			);
 	}
 }

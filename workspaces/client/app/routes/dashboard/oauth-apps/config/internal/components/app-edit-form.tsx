@@ -5,6 +5,7 @@ import { Plus, Save, Trash, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
+import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
@@ -15,7 +16,6 @@ import { OAuthSchemas } from "~/schema/oauth";
 import type { OAuthScope } from "~/types/oauth";
 import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
-import { DeleteConfirmation } from "./delete-confirmation";
 
 const UpdateFormSchema = v.object({
 	name: OAuthSchemas.ApplicationName,

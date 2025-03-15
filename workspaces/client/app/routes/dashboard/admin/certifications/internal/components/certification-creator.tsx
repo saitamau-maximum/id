@@ -9,7 +9,7 @@ import { useCreateCertification } from "../hooks/use-create-certification";
 
 const CreateFormSchema = v.object({
 	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	description: v.string(),
 });
 
 type FormValues = v.InferInput<typeof CreateFormSchema>;

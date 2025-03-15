@@ -82,49 +82,51 @@ export const CertificationRequestList = ({ certifications }: Props) => {
 										}
 									</Table.Td>
 									<Table.Td>{certificationRequest.certifiedIn}</Table.Td>
-									<Table.Td
-										className={css({
-											display: "flex",
-											gap: 4,
-											alignItems: "center",
-											justifyContent: "center",
-										})}
-									>
-										<button
-											type="button"
+									<Table.Td>
+										<div
 											className={css({
-												cursor: "pointer",
-												"&:hover": {
-													color: "green.600",
-												},
+												display: "flex",
+												gap: 4,
+												alignItems: "center",
+												justifyContent: "center",
 											})}
-											onClick={() =>
-												handleApproveRequest(
-													certificationRequest.user.id,
-													certificationRequest.certificationId,
-												)
-											}
 										>
-											<Check size={20} />
-										</button>
-										/
-										<button
-											type="button"
-											className={css({
-												cursor: "pointer",
-												"&:hover": {
-													color: "rose.600",
-												},
-											})}
-											onClick={() =>
-												handleRejectRequest(
-													certificationRequest.user.id,
-													certificationRequest.certificationId,
-												)
-											}
-										>
-											<X size={20} />
-										</button>
+											<button
+												type="button"
+												className={css({
+													cursor: "pointer",
+													"&:hover": {
+														color: "green.600",
+													},
+												})}
+												onClick={() =>
+													handleApproveRequest(
+														certificationRequest.user.id,
+														certificationRequest.certificationId,
+													)
+												}
+											>
+												<Check size={20} />
+											</button>
+											/
+											<button
+												type="button"
+												className={css({
+													cursor: "pointer",
+													"&:hover": {
+														color: "rose.600",
+													},
+												})}
+												onClick={() =>
+													handleRejectRequest(
+														certificationRequest.user.id,
+														certificationRequest.certificationId,
+													)
+												}
+											>
+												<X size={20} />
+											</button>
+										</div>
 									</Table.Td>
 								</Table.Tr>
 							);

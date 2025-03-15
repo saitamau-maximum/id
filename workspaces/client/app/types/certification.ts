@@ -1,7 +1,7 @@
 export type Certification = {
 	id: string;
 	title: string;
-	description: string | null;
+	description: string;
 };
 
 export type UserCertification = Certification & {

@@ -3,6 +3,9 @@ import { Fragment, useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
+import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
+import { CertificationCard } from "~/components/feature/user/certification-card";
+import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -10,7 +13,11 @@ import { Switch } from "~/components/ui/switch";
 import { BIO_MAX_LENGTH, GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
-import { useCertifications } from "../hooks/use-certifications";
+import type { UserCertification } from "~/types/certification";
+import {
+	useCertifications,
+	useDeleteUserCertification,
+} from "../hooks/use-certifications";
 import { useSendCertificationRequest } from "../hooks/use-send-certification-request";
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
@@ -36,6 +43,8 @@ export const ProfileUpdateForm = () => {
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
 	const { data: certifications } = useCertifications();
+	const { mutate: deleteCertification, isPending: isPendingDeletion } =
+		useDeleteUserCertification();
 
 	const requestableCertifications = useMemo(() => {
 		const requestedIds = user?.certifications.map((c) => c.id) || [];
@@ -50,6 +59,19 @@ export const ProfileUpdateForm = () => {
 		if (res.type === "dismiss") return;
 		sendCertificationRequest(res.request);
 	}, [requestableCertifications, sendCertificationRequest]);
+
+	const handleCertDelete = useCallback(
+		async (certification: UserCertification) => {
+			const res = await ConfirmDialog.call({
+				title: "資格・試験の削除",
+				danger: true,
+				children: <DeleteConfirmation title={certification.title} />,
+			});
+			if (res.type === "dismiss") return;
+			deleteCertification(certification.id);
+		},
+		[deleteCertification],
+	);
 
 	const {
 		register,
@@ -177,6 +199,10 @@ export const ProfileUpdateForm = () => {
 				<legend>
 					<Form.LabelText>資格・試験</Form.LabelText>
 				</legend>
+				<CertificationCard
+					certifications={user?.certifications ?? []}
+					onClick={handleCertDelete}
+				/>
 				<button
 					type="button"
 					onClick={handleCertRequest}

@@ -115,6 +115,16 @@ export const CertificationRequest = createCallable<Props, Payload>(
 						{() =>
 							selectedCertification ? (
 								<div className={css({ maxHeight: "30vh", overflowY: "auto" })}>
+									<p
+										className={css({
+											color: "gray.500",
+											fontSize: "sm",
+											marginBottom: 4,
+										})}
+									>
+										{selectedCertification.description ||
+											"説明書きはありません"}
+									</p>
 									<Form.Field.TextInput
 										label="取得年 (合格発表の年を記入、年度ではない)"
 										placeholder={new Date().getFullYear().toString()}
