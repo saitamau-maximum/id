@@ -204,20 +204,14 @@ export const ProfileUpdateForm = () => {
 					certifications={user?.certifications ?? []}
 					onClick={handleCertDelete}
 				/>
-				<button
-					type="button"
-					onClick={handleCertRequest}
-					disabled={requestableCertifications.length === 0}
-				>
-					<ButtonLike
-						disabled={requestableCertifications.length === 0}
-						size="sm"
-						variant="secondary"
-					>
-						<Plus size={16} />
-						資格・試験の情報を申請する
-					</ButtonLike>
-				</button>
+				{requestableCertifications.length > 0 && (
+					<button type="button" onClick={handleCertRequest}>
+						<ButtonLike size="sm" variant="secondary">
+							<Plus size={16} />
+							資格・試験の情報を申請する
+						</ButtonLike>
+					</button>
+				)}
 			</Form.FieldSet>
 
 			<Form.FieldSet>
