@@ -4,17 +4,17 @@ import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { Form } from "~/components/ui/form";
+import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { CertificationUpdateParams } from "~/repository/certification";
 import type { Certification } from "~/types/certification";
+import { useCertifications } from "../hooks/use-certifications";
 import { useDeleteCertification } from "../hooks/use-delete-certification";
 import { useUpdateCertification } from "../hooks/use-update-certification";
 
-interface Props {
-	certifications: Certification[];
-}
+export const CertificationTable = () => {
+	const { data: certifications, isFetching } = useCertifications();
 
-export const CertificationTable = ({ certifications }: Props) => {
 	return (
 		<div>
 			<h2
@@ -38,7 +38,7 @@ export const CertificationTable = ({ certifications }: Props) => {
 					資格・試験はありません
 				</p>
 			) : (
-				<Table.Root>
+				<Table.Root loading={isFetching}>
 					<thead>
 						<Table.Tr>
 							<Table.Th>資格・試験</Table.Th>
@@ -110,18 +110,14 @@ const CertificationTableRow = ({ certification }: TableRowProps) => {
 							name="description"
 							defaultValue={certification.description ?? ""}
 						/>
-						<button
+						<IconButton
 							type="submit"
+							label="更新"
+							color="apply"
 							disabled={isPendingUpdate}
-							className={css({
-								cursor: "pointer",
-								"&:hover": {
-									color: "green.600",
-								},
-							})}
 						>
 							<Check size={20} />
-						</button>
+						</IconButton>
 					</form>
 				) : (
 					certification.description
@@ -134,40 +130,30 @@ const CertificationTableRow = ({ certification }: TableRowProps) => {
 						gap: 4,
 						alignItems: "center",
 						justifyContent: "center",
-						color: editing ? "gray.300" : "inherit",
+						userSelect: editing ? "none" : "auto",
 					})}
 				>
-					<button
+					<IconButton
 						type="button"
+						label="編集"
+						color="text"
 						disabled={isPendingDeletion || editing}
-						className={css({
-							cursor: editing ? "not-allowed" : "pointer",
-							color: editing ? "gray.300" : "inherit",
-							"&:hover": {
-								color: editing ? "gray.300" : "green.600",
-							},
-						})}
 						onClick={() => {
 							setEditing(true);
 						}}
 					>
-						<Edit size={20} />
-					</button>
+						<Edit size={16} />
+					</IconButton>
 					/
-					<button
+					<IconButton
 						type="button"
+						label="削除"
+						color="danger"
 						disabled={isPendingDeletion || editing}
-						className={css({
-							cursor: editing ? "not-allowed" : "pointer",
-							color: editing ? "gray.300" : "inherit",
-							"&:hover": {
-								color: editing ? "gray.300" : "rose.600",
-							},
-						})}
 						onClick={handleDeleteCertification}
 					>
-						<Trash size={20} />
-					</button>
+						<Trash size={16} />
+					</IconButton>
 				</div>
 			</Table.Td>
 		</Table.Tr>

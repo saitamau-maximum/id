@@ -48,6 +48,16 @@ const iconButtonStyle = cva({
 				color: "rose.600",
 			},
 		},
+		disabled: {
+			true: {
+				color: "token(colors.gray.300) !important",
+				cursor: "auto",
+
+				"&:hover": {
+					background: "transparent",
+				},
+			},
+		},
 	},
 });
 
@@ -56,11 +66,13 @@ export const IconButton = ({
 	label,
 	variant = "icon",
 	color = "text",
+	disabled,
 	...props
 }: Props) => (
 	<button
-		className={iconButtonStyle({ variant, color })}
+		className={iconButtonStyle({ variant, color, disabled })}
 		aria-label={label}
+		disabled={disabled}
 		{...props}
 	>
 		{children}
