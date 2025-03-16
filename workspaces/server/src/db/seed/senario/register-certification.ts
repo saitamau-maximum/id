@@ -37,7 +37,10 @@ export const registerCertificationSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
 	await client.batch([
-		client.insert(schema.certifications).values(DUMMY_CERTS),
+		client
+			.insert(schema.certifications)
+			.values(DUMMY_CERTS)
+			.onConflictDoNothing(),
 		client.insert(schema.userCertifications).values(DUMMY_RECORDS),
 	]);
 };
