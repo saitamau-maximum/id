@@ -5,7 +5,7 @@ import { UserDisplay } from "~/components/feature/user/user-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { CertificationRequestWithUser } from "~/repository/certification";
-import { useCertificationRequests } from "../hooks/use-certification-requests";
+import { useCertificationRequests } from "../../../internal/hooks/use-certification-requests";
 import { useCertifications } from "../hooks/use-certifications";
 import { useReviewRequest } from "../hooks/use-review-request";
 

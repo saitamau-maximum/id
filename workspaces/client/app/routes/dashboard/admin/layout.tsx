@@ -4,6 +4,7 @@ import { Outlet, useNavigate } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
 import { DashboardHeader } from "../internal/components/dashboard-title";
+import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
 
 const NAVIGATION = [
 	{
@@ -28,6 +29,7 @@ export default function AdminLayout() {
 	const navigate = useNavigate();
 
 	const { user, isLoading, isAuthorized } = useAuth();
+	const { data: requests } = useCertificationRequests();
 
 	useEffect(() => {
 		if (isLoading || !isAuthorized) {
@@ -47,7 +49,14 @@ export default function AdminLayout() {
 			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
 			<Tab.List>
 				{NAVIGATION.map((nav) => (
-					<Tab.Item key={nav.to} to={nav.to} isActive={nav.isActive}>
+					<Tab.Item
+						key={nav.to}
+						to={nav.to}
+						isActive={nav.isActive}
+						notification={
+							nav.label === "Certifications" ? requests.length : undefined
+						}
+					>
 						{nav.label}
 					</Tab.Item>
 				))}

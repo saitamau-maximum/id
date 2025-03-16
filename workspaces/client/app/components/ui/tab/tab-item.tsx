@@ -5,9 +5,15 @@ interface Props {
 	to: string;
 	isActive: (location: string) => boolean;
 	children: React.ReactNode;
+	notification?: number;
 }
 
-export const TabItem = ({ to, isActive, children }: Props) => {
+export const TabItem = ({
+	to,
+	isActive,
+	children,
+	notification = 0,
+}: Props) => {
 	const location = useLocation();
 
 	return (
@@ -19,6 +25,10 @@ export const TabItem = ({ to, isActive, children }: Props) => {
 				padding: "token(spacing.2) token(spacing.4)",
 				position: "relative",
 				transition: "background",
+				display: "flex",
+				alignItems: "center",
+				gap: 2,
+
 				_after: {
 					content: "''",
 					position: "absolute",
@@ -37,6 +47,26 @@ export const TabItem = ({ to, isActive, children }: Props) => {
 			})}
 		>
 			{children}
+			{notification > 0 && (
+				<div
+					className={css({
+						padding: "token(spacing.1)",
+						borderRadius: "full",
+						width: 4,
+						height: 4,
+						display: "inline-flex",
+						justifyContent: "center",
+						alignItems: "center",
+						backgroundColor: "gray.200",
+						color: "gray.700",
+						fontSize: "xs",
+						fontWeight: 500,
+						fontFamily: "sans",
+					})}
+				>
+					{notification}
+				</div>
+			)}
 		</Link>
 	);
 };
