@@ -129,6 +129,9 @@ export const CertificationRequest = createCallable<Props, Payload>(
 										label="取得年 (合格発表の年を記入、年度ではない)"
 										placeholder={new Date().getFullYear().toString()}
 										required
+										type="number"
+										min={2000}
+										max={new Date().getFullYear()}
 										onChange={(e) =>
 											setCertifiedIn(Number.parseInt(e.target.value, 10))
 										}
