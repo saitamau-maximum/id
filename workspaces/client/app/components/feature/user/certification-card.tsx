@@ -32,6 +32,7 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 				display: "flex",
 				alignItems: "center",
 				justifyContent: "start",
+				flexWrap: "wrap",
 			})}
 		>
 			{sortedCertifications.map((certification) => (
