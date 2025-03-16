@@ -83,10 +83,10 @@ const CertificationTableRow = ({ certification }: TableRowProps) => {
 	const [_, updateCertificationAction] = useActionState(
 		async (_: null, formData: FormData) => {
 			const description = formData.get("description");
+			if (typeof description !== "string") return null;
 
 			const param: CertificationUpdateParams = {
 				certificationId: certification.id,
-				// @ts-ignore @sor4chi たのんだ
 				description,
 			};
 
