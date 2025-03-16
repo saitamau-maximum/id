@@ -18,6 +18,10 @@ export const useDeleteCertification = () => {
 			queryClient.invalidateQueries({
 				queryKey: certificationRepository.getAllCertifications$$key(),
 			});
+			// 資格が削除された際、削除された資格を持つリクエストも削除されるため同時にリクエスト一覧も更新する
+			queryClient.invalidateQueries({
+				queryKey: certificationRepository.getAllCertificationRequests$$key(),
+			});
 		},
 		onError: () => {
 			pushToast({

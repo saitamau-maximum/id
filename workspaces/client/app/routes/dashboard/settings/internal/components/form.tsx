@@ -1,5 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Fragment, useCallback, useMemo, useState } from "react";
+import { Plus } from "react-feather";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -208,7 +209,12 @@ export const ProfileUpdateForm = () => {
 					onClick={handleCertRequest}
 					disabled={requestableCertifications.length === 0}
 				>
-					<ButtonLike disabled={requestableCertifications.length === 0}>
+					<ButtonLike
+						disabled={requestableCertifications.length === 0}
+						size="sm"
+						variant="secondary"
+					>
+						<Plus size={16} />
 						資格・試験の情報を申請する
 					</ButtonLike>
 				</button>

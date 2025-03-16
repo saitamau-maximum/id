@@ -22,6 +22,10 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 		);
 	}
 
+	const sortedCertifications = certifications.sort((a, b) => {
+		return b.certifiedIn - a.certifiedIn;
+	});
+
 	return (
 		<div
 			className={css({
@@ -30,7 +34,7 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 				justifyContent: "start",
 			})}
 		>
-			{certifications.map((certification) => (
+			{sortedCertifications.map((certification) => (
 				<span
 					className={css({
 						display: "inline-flex",

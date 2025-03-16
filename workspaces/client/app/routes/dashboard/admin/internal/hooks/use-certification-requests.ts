@@ -6,5 +6,6 @@ export const useCertificationRequests = () => {
 	return useQuery({
 		queryKey: certificationRepository.getAllCertificationRequests$$key(),
 		queryFn: certificationRepository.getAllCertificationRequests,
+		initialData: [],
 	});
 };
