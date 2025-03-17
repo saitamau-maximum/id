@@ -39,7 +39,10 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 			startAt: event.startAt.toISOString(),
 			endAt: event.endAt.toISOString(),
 		};
-		await this.client.update(schema.calendarEvents).set(updatedEvent);
+		await this.client
+			.update(schema.calendarEvents)
+			.set(updatedEvent)
+			.where(eq(schema.calendarEvents.id, event.id));
 	}
 
 	async deleteEvent(eventId: ICalendarEvent["id"]): Promise<void> {
