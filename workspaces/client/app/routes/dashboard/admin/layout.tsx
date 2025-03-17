@@ -23,6 +23,11 @@ const NAVIGATION = [
 		isActive: (location: string) =>
 			location.startsWith("/admin/certifications"),
 	},
+	{
+		label: "Events",
+		to: "/admin/events",
+		isActive: (location: string) => location.startsWith("/admin/events"),
+	},
 ];
 
 export default function AdminLayout() {
