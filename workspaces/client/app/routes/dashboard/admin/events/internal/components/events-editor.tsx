@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { Edit, Plus, Trash } from "react-feather";
+import { useCallback, useState } from "react";
+import { ChevronLeft, ChevronRight, Edit, Plus, Trash } from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
@@ -46,8 +46,22 @@ const formatTerm = (startAt: Date, endAt: Date) => {
 	})}`;
 };
 
+// dateから年度を取得する
+const getFiscalYear = (date: Date) => {
+	const year = date.getFullYear();
+	const month = date.getMonth() + 1;
+	if (month >= 4) {
+		return year;
+	}
+	return year - 1;
+};
+
 export const EventsEditor = () => {
 	const { data: events } = useCalendar();
+	// 選択中の年度
+	const [selectedFisicalYear, setSelectedFisicalYear] = useState(
+		getFiscalYear(new Date()),
+	);
 	const sortedEvents = [...events].sort(
 		(a, b) => b.startAt.getTime() - a.startAt.getTime(),
 	);
@@ -59,22 +73,59 @@ export const EventsEditor = () => {
 		createEvent(res.payload);
 	}, [createEvent]);
 
+	const filteredEvents = sortedEvents.filter(
+		(event) =>
+			getFiscalYear(event.startAt) === selectedFisicalYear ||
+			getFiscalYear(event.endAt) === selectedFisicalYear,
+	);
+
 	return (
 		<div>
 			<div
-				className={css({ display: "flex", justifyContent: "space-between" })}
+				className={css({
+					display: "flex",
+					justifyContent: "space-between",
+					alignItems: "center",
+					marginTop: 6,
+					marginBottom: 4,
+				})}
 			>
-				<h2
+				<div
 					className={css({
-						fontSize: "xl",
-						fontWeight: "bold",
-						color: "gray.600",
-						marginTop: 6,
-						marginBottom: 4,
+						display: "flex",
+						gap: 2,
+						alignItems: "center",
 					})}
 				>
-					イベント一覧
-				</h2>
+					<h2
+						className={css({
+							fontSize: "xl",
+							fontWeight: "bold",
+							color: "gray.600",
+						})}
+					>
+						イベント一覧
+					</h2>
+					<div
+						className={css({ display: "flex", gap: 1, alignItems: "center" })}
+					>
+						<IconButton
+							type="button"
+							label="前の年度"
+							onClick={() => setSelectedFisicalYear(selectedFisicalYear - 1)}
+						>
+							<ChevronLeft size={16} />
+						</IconButton>
+						<span>{selectedFisicalYear}年度</span>
+						<IconButton
+							type="button"
+							label="次の年度"
+							onClick={() => setSelectedFisicalYear(selectedFisicalYear + 1)}
+						>
+							<ChevronRight size={16} />
+						</IconButton>
+					</div>
+				</div>
 				<button type="button" onClick={handleCreateEvent}>
 					<ButtonLike variant="primary" size="sm">
 						<Plus size={16} />
@@ -92,7 +143,7 @@ export const EventsEditor = () => {
 					</Table.Tr>
 				</thead>
 				<tbody>
-					{sortedEvents.map((event) => (
+					{filteredEvents.map((event) => (
 						<EventTableRow event={event} key={event.id} />
 					))}
 				</tbody>
@@ -124,8 +175,32 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 	return (
 		<Table.Tr>
 			<Table.Td>{event.title}</Table.Td>
-			<Table.Td>{event.description}</Table.Td>
-			<Table.Td>{formatTerm(event.startAt, event.endAt)}</Table.Td>
+			<Table.Td>
+				<div
+					className={css({
+						color: "gray.500",
+						fontSize: "sm",
+						display: "-webkit-box",
+						WebkitLineClamp: 2,
+						boxOrient: "vertical",
+						overflow: "hidden",
+					})}
+				>
+					{event.description}
+				</div>
+			</Table.Td>
+			<Table.Td>
+				<span
+					className={css({
+						color: "gray.500",
+						fontSize: "sm",
+						display: "flex",
+						justifyContent: "space-between",
+					})}
+				>
+					{formatTerm(event.startAt, event.endAt)}
+				</span>
+			</Table.Td>
 			<Table.Td>
 				<div className={css({ display: "flex", gap: 2 })}>
 					<IconButton label="編集" onClick={handleEditEvent}>
