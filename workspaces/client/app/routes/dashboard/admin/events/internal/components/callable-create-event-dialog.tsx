@@ -7,7 +7,7 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { EventSchemas } from "~/schema/event";
+import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
 import type { CalendarEvent } from "~/types/event";
 
 type Payload =
@@ -75,12 +75,12 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 				<Form.Field.TextArea
 					label="説明"
 					required
-					rows={10}
+					rows={EVENT_DESCRIPTION_MAX_LINES}
 					error={errors.description?.message}
 					{...register("description")}
 				/>
 
-				<Form.Field.WithLabel label="開始日時">
+				<Form.Field.WithLabel label="開始日時" required>
 					{(id) => (
 						<>
 							<Form.Input
@@ -94,7 +94,7 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 					)}
 				</Form.Field.WithLabel>
 
-				<Form.Field.WithLabel label="終了日時">
+				<Form.Field.WithLabel label="終了日時" required>
 					{(id) => (
 						<>
 							<Form.Input
