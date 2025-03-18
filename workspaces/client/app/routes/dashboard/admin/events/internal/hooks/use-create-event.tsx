@@ -14,7 +14,7 @@ export const useCreateEvent = () => {
 		},
 		onSuccess: (event) => {
 			pushToast({
-				title: `イベント ${event.title} を作成しました`,
+				title: `イベント「${event.title}」を作成しました`,
 				type: "success",
 			});
 			queryClient.invalidateQueries({

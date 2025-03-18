@@ -14,7 +14,7 @@ import { useUpdateEvent } from "../hooks/use-update-event";
 import { CreateEventDialog } from "./callable-create-event-dialog";
 import { EditEventDialog } from "./callable-edit-event-dialog";
 
-const formatTerm = (startAt: Date, endAt: Date) => {
+const formatDuration = (startAt: Date, endAt: Date) => {
 	if (startAt.getDate() === endAt.getDate()) {
 		const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
 			hour: "2-digit",
@@ -198,7 +198,7 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 						justifyContent: "space-between",
 					})}
 				>
-					{formatTerm(event.startAt, event.endAt)}
+					{formatDuration(event.startAt, event.endAt)}
 				</span>
 			</Table.Td>
 			<Table.Td>

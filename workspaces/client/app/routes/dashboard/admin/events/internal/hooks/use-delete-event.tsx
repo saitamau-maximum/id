@@ -14,7 +14,7 @@ export const useDeleteEvent = () => {
 		},
 		onSuccess: (event) => {
 			pushToast({
-				title: `イベント ${event.title} を削除しました`,
+				title: `イベント「${event.title}」を削除しました`,
 				type: "success",
 			});
 			queryClient.invalidateQueries({

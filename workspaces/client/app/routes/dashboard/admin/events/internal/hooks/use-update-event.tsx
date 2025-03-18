@@ -14,7 +14,7 @@ export const useUpdateEvent = () => {
 		},
 		onSuccess: (event) => {
 			pushToast({
-				title: `イベント 「${event.title}」 を更新しました`,
+				title: `イベント「${event.title}」を更新しました`,
 				type: "success",
 			});
 			queryClient.invalidateQueries({
