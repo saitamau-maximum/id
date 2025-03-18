@@ -20,8 +20,8 @@ export const ProfileCard: React.FC<Props> = ({
 	shrinkRoles = false,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
-	const trancateRoles = shrinkRoles ? roles.slice(0, 3) : roles;
-	const rolesLeft = shrinkRoles ? roles.length - trancateRoles.length : 0;
+	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
+	const rolesLeft = shrinkRoles ? roles.length - trancatedRoles.length : 0;
 
 	return (
 		<div
@@ -110,7 +110,7 @@ export const ProfileCard: React.FC<Props> = ({
 									flexWrap: "wrap",
 								})}
 							>
-								{trancateRoles.map((role) => (
+								{trancatedRoles.map((role) => (
 									<RoleBadge key={role.name} role={role} />
 								))}
 								{rolesLeft > 0 && (

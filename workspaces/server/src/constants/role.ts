@@ -12,7 +12,7 @@ export const TEAM_ROLE_IDS = {
 	WEB: 5,
 	AI: 6,
 	CTF: 7,
-	MB: 8,
+	MOBILE: 8,
 	GAME: 9,
 	INFRA: 10,
 	DEV: 11,
@@ -74,8 +74,8 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		name: "CTF",
 		color: "#800080",
 	},
-	[ROLE_IDS.MB]: {
-		id: ROLE_IDS.MB,
+	[ROLE_IDS.MOBILE]: {
+		id: ROLE_IDS.MOBILE,
 		name: "モバイルアプリ",
 		color: "#FF1493",
 	},
