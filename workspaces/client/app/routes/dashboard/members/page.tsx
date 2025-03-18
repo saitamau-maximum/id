@@ -64,6 +64,7 @@ export default function Members() {
 								grade={user.grade}
 								initialized={user.initialized}
 								roles={user.roles}
+								shrinkRoles
 							/>
 						</Link>
 					) : (
