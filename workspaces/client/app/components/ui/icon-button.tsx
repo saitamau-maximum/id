@@ -72,6 +72,7 @@ export const IconButton = ({
 	<button
 		className={iconButtonStyle({ variant, color, disabled })}
 		aria-label={label}
+		title={label} // Add title attribute for tooltip
 		disabled={disabled}
 		{...props}
 	>

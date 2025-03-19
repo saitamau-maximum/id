@@ -11,9 +11,9 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { Switch } from "~/components/ui/switch";
-import { BIO_MAX_LENGTH, GRADE } from "~/constant";
+import { GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { UserSchemas } from "~/schema/user";
+import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
 import {
 	useCertifications,
@@ -244,7 +244,7 @@ export const ProfileUpdateForm = () => {
 					<div className={css({ height: "240px" })}>
 						<Form.Textarea
 							placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
-							rows={10}
+							rows={BIO_MAX_LINES}
 							{...register("bio")}
 						/>
 					</div>

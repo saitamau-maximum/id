@@ -31,6 +31,9 @@ export default [
 								),
 							]
 						: []),
+					...(FLAG.ENABLE_CALENDAR
+						? [route("events", "routes/dashboard/admin/events/page.tsx")]
+						: []),
 				]),
 			]),
 			...(FLAG.ENABLE_OAUTH_REGISTRATION

@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
+import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
 
@@ -23,6 +24,15 @@ const NAVIGATION = [
 		isActive: (location: string) =>
 			location.startsWith("/admin/certifications"),
 	},
+	...(FLAG.ENABLE_CALENDAR
+		? [
+				{
+					label: "Events",
+					to: "/admin/events",
+					isActive: (location: string) => location.startsWith("/admin/events"),
+				},
+			]
+		: []),
 ];
 
 export default function AdminLayout() {

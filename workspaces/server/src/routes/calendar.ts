@@ -1,15 +1,15 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
+import { authMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
 const createEventSchema = v.object({
-	userId: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
 	description: v.pipe(v.string(), v.nonEmpty()),
-	startAt: v.pipe(v.string(), v.isoDateTime(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoDateTime(), v.nonEmpty()),
+	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 });
 
 const updateEventSchema = v.object({
@@ -17,8 +17,8 @@ const updateEventSchema = v.object({
 	userId: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
 	description: v.pipe(v.string(), v.nonEmpty()),
-	startAt: v.pipe(v.string(), v.isoDateTime(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoDateTime(), v.nonEmpty()),
+	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 });
 
 const deleteEventSchema = v.object({
@@ -26,7 +26,7 @@ const deleteEventSchema = v.object({
 });
 
 const route = app
-	.get("/events", async (c) => {
+	.get("/events", authMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		try {
 			const events = await CalendarRepository.getAllEvents();
@@ -35,44 +35,57 @@ const route = app
 			return c.json({ error: "events not found" }, 404);
 		}
 	})
-	.post("/events", vValidator("json", createEventSchema), async (c) => {
-		const { CalendarRepository } = c.var;
-		const { userId, title, description, startAt, endAt } = c.req.valid("json");
-		const eventPayload = {
-			userId,
-			title,
-			description,
-			startAt: new Date(startAt),
-			endAt: new Date(endAt),
-		};
-		try {
-			await CalendarRepository.createEvent(eventPayload);
-			return c.json({ message: "event created" });
-		} catch (e) {
-			return c.json({ error: "event not created" }, 404);
-		}
-	})
-	.put("/events/:eventId", vValidator("json", updateEventSchema), async (c) => {
-		const { CalendarRepository } = c.var;
-		const { id, userId, title, description, startAt, endAt } =
-			c.req.valid("json");
-		const eventPayload = {
-			id,
-			userId,
-			title,
-			description,
-			startAt: new Date(startAt),
-			endAt: new Date(endAt),
-		};
-		try {
-			await CalendarRepository.updateEvent(eventPayload);
-			return c.json({ message: "event updated" });
-		} catch (e) {
-			return c.json({ error: "event not updated" }, 500);
-		}
-	})
+	.post(
+		"/events",
+		authMiddleware,
+		vValidator("json", createEventSchema),
+		async (c) => {
+			const { CalendarRepository } = c.var;
+			const { userId } = c.get("jwtPayload");
+			const { title, description, startAt, endAt } = c.req.valid("json");
+			const eventPayload = {
+				userId,
+				title,
+				description,
+				startAt: new Date(startAt),
+				endAt: new Date(endAt),
+			};
+			try {
+				await CalendarRepository.createEvent(eventPayload);
+				return c.json({ message: "event created" });
+			} catch (e) {
+				return c.json({ error: "event not created" }, 404);
+			}
+		},
+	)
+	.put(
+		"/events/:eventId",
+		authMiddleware,
+		vValidator("json", updateEventSchema),
+		async (c) => {
+			const { CalendarRepository } = c.var;
+			const { id, userId, title, description, startAt, endAt } =
+				c.req.valid("json");
+			const eventPayload = {
+				id,
+				userId,
+				title,
+				description,
+				startAt: new Date(startAt),
+				endAt: new Date(endAt),
+			};
+			try {
+				await CalendarRepository.updateEvent(eventPayload);
+				return c.json({ message: "event updated" });
+			} catch (e) {
+				console.error(e);
+				return c.json({ error: "failed to update event" }, 500);
+			}
+		},
+	)
 	.delete(
 		"/events/:eventId",
+		authMiddleware,
 		vValidator("json", deleteEventSchema),
 		async (c) => {
 			const { CalendarRepository } = c.var;
