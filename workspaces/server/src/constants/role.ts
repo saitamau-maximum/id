@@ -1,21 +1,44 @@
 export const JOB_ROLE_IDS = {
+	/** 管理者 */
 	ADMIN: 1,
+	/** 会計 */
+	ACCOUNTANT: 2,
+	/** 広報 */
+	PR: 3,
 } as const;
 
 export const STATUS_ROLE_IDS = {
-	MEMBER: 2,
-	ALUMNI: 3,
+	/**
+	 * メンバー (会費を払ってる人という区分)
+	 * - 卒業生でも会費を払っている人は含む
+	 * - 会費を払わなかった(==辞めた)人はこのロールを外すことでコンテンツアクセスを制限する
+	 */
+	MEMBER: 101,
+	/**
+	 * 卒業生 (Bachelor, Master, PhD のいずれかのタイミングで弊学を卒業した人)
+	 * - 卒業生でも会費を払うことでコンテンツアクセスを許可したい
+	 * - 現役との区別のためのロール
+	 */
+	ALUMNI: 102,
 } as const;
 
 export const TEAM_ROLE_IDS = {
-	CP: 4,
-	WEB: 5,
-	AI: 6,
-	CTF: 7,
-	MOBILE: 8,
-	GAME: 9,
-	INFRA: 10,
-	DEV: 11,
+	/** 開発 */
+	DEV: 201,
+	/** 競技プログラミング */
+	CP: 202,
+	/** Web */
+	WEB: 203,
+	/** AI */
+	AI: 204,
+	/** CTF */
+	CTF: 205,
+	/** モバイルアプリ */
+	MOBILE: 206,
+	/** ゲーム開発 */
+	GAME: 207,
+	/** インフラ */
+	INFRA: 208,
 } as const;
 
 export const ROLE_IDS = {
@@ -49,6 +72,16 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		name: "Member",
 		color: "#3BAC8C",
 	},
+	[ROLE_IDS.ACCOUNTANT]: {
+		id: ROLE_IDS.ACCOUNTANT,
+		name: "会計",
+		color: "#FF4500",
+	},
+	[ROLE_IDS.PR]: {
+		id: ROLE_IDS.PR,
+		name: "広報",
+		color: "#FF4500",
+	},
 	[ROLE_IDS.ALUMNI]: {
 		id: ROLE_IDS.ALUMNI,
 		name: "卒業生",
@@ -57,7 +90,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.CP]: {
 		id: ROLE_IDS.CP,
 		name: "競プロ",
-		color: "#c8aa00",
+		color: "#C8AA00",
 	},
 	[ROLE_IDS.WEB]: {
 		id: ROLE_IDS.WEB,
