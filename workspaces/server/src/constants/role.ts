@@ -65,7 +65,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.ADMIN]: {
 		id: ROLE_IDS.ADMIN,
 		name: "Admin",
-		color: "#ff6b08",
+		color: "#FF6B08",
 	},
 	[ROLE_IDS.MEMBER]: {
 		id: ROLE_IDS.MEMBER,
@@ -75,12 +75,12 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.ACCOUNTANT]: {
 		id: ROLE_IDS.ACCOUNTANT,
 		name: "会計",
-		color: "#FF4500",
+		color: "#548800",
 	},
 	[ROLE_IDS.PR]: {
 		id: ROLE_IDS.PR,
 		name: "広報",
-		color: "#FF4500",
+		color: "#5B00D3",
 	},
 	[ROLE_IDS.ALUMNI]: {
 		id: ROLE_IDS.ALUMNI,
@@ -95,7 +95,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.WEB]: {
 		id: ROLE_IDS.WEB,
 		name: "Web",
-		color: "#FF4500",
+		color: "#FF1493",
 	},
 	[ROLE_IDS.AI]: {
 		id: ROLE_IDS.AI,
@@ -110,7 +110,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.MOBILE]: {
 		id: ROLE_IDS.MOBILE,
 		name: "モバイルアプリ",
-		color: "#FF1493",
+		color: "#1F0084",
 	},
 	[ROLE_IDS.GAME]: {
 		id: ROLE_IDS.GAME,
