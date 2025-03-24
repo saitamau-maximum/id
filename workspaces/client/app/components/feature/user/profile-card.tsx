@@ -21,7 +21,7 @@ export const ProfileCard: React.FC<Props> = ({
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
-	const rolesLeft = shrinkRoles ? roles.length - trancatedRoles.length : 0;
+	const rolesLeft = roles.length - trancatedRoles.length;
 
 	return (
 		<div
