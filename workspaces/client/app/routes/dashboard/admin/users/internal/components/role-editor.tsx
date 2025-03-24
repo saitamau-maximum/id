@@ -37,7 +37,14 @@ export const RoleEditor = ({ userId, roles }: Props) => {
 			})}
 		>
 			{!editing && (
-				<div className={css({ display: "flex", gap: 2, alignItems: "center" })}>
+				<div
+					className={css({
+						display: "flex",
+						gap: 2,
+						alignItems: "center",
+						flexWrap: "wrap",
+					})}
+				>
 					{isPending
 						? "Loading..."
 						: roles.map((role) => <RoleBadge key={role.id} role={role} />)}
