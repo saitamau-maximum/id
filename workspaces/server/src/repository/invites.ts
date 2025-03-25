@@ -6,5 +6,5 @@ export interface IInvitesRepository {
 		issuedBy: string,
 		Token: string,
 	) => Promise<void>;
-	deleteOneTimeToken: () => Promise<void>;
+	deleteOneTimeToken: (id: string) => Promise<void>;
 }

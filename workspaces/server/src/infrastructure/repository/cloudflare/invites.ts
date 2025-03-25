@@ -1,9 +1,9 @@
-
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
     IInvitesRepository
 } from "../../../repository/invites";
+import { eq } from "drizzle-orm";
 
 export class CloudflareInvitesRepository
     implements IInvitesRepository
@@ -33,7 +33,10 @@ export class CloudflareInvitesRepository
             });
     }
 
-    async deleteOneTimeToken() {
-        await this.client.delete(schema.invites);
+    async deleteOneTimeToken(id: string) {
+        await this.client
+            .delete(schema.invites)
+            .where(eq(schema.invites.id, id))
+            .execute();
     }
 }

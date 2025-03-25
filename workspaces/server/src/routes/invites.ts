@@ -58,10 +58,11 @@ const route = app
 				});
 		},
 	)
-	.delete("/", async (c) => {
-		return await c.var.InvitesRepository.deleteOneTimeToken()
+	.delete("/:id", async (c) => {
+		const id = c.req.param("id");
+		return await c.var.InvitesRepository.deleteOneTimeToken(id)
 			.then(() => {
-				return c.text("OK", 200);
+				return c.json({ message: "token successfully deleted" });
 			})
 			.catch((e: Error) => {
 				console.error(e);
