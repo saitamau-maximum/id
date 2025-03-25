@@ -64,8 +64,5 @@ const route = app
 				return c.text("Internal Server Error", 500);
 			});
 	})
-	.all(async (c) => {
-		return c.text("Method Not Allowed", 405);
-	});
 
 export { route as inviteTokenRoute };
