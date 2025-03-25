@@ -1,9 +1,9 @@
 export interface IInvitesRepository {
-	createOneTimeToken: (
+	createInvite: (
 		expiresAt: Date,
 		remainingUse: number,
 		createdAt: Date,
 		issuedBy: string,
 	) => Promise<void>;
-	deleteOneTimeToken: (id: string) => Promise<void>;
+	deleteInvite: (id: string) => Promise<void>;
 }

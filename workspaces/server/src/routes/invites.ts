@@ -28,7 +28,7 @@ const route = app
 		c.header("Pragma", "no-cache");
 
 		// DB に格納して返す
-		return await c.var.InvitesRepository.createOneTimeToken(
+		return await c.var.InvitesRepository.createInvite(
 			expiresAt,
 			remainingUse,
 			createdAt,
@@ -49,7 +49,7 @@ const route = app
 	})
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
-		return await c.var.InvitesRepository.deleteOneTimeToken(id)
+		return await c.var.InvitesRepository.deleteInvite(id)
 			.then(() => {
 				return c.json({ message: "token successfully deleted" });
 			})

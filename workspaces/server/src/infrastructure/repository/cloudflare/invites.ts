@@ -10,7 +10,7 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createOneTimeToken(
+	async createInvite(
 		expiresAt: Date,
 		remainingUse: number,
 		createdAt: Date,
@@ -25,7 +25,7 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 		});
 	}
 
-	async deleteOneTimeToken(id: string) {
+	async deleteInvite(id: string) {
 		await this.client
 			.delete(schema.invites)
 			.where(eq(schema.invites.id, id))
