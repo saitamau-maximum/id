@@ -1,3 +1,5 @@
+import { vValidator } from "@hono/valibot-validator";
+import * as v from "valibot";
 import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
 import {
@@ -7,6 +9,11 @@ import {
 
 const app = factory.createApp();
 
+const createInviteSchema = v.object({
+	expiresAt: v.pipe(v.string(), v.isoTimestamp()),
+	remainingUse: v.number(),
+});
+
 const route = app
 	.use(authMiddleware)
 	.use(
@@ -14,9 +21,9 @@ const route = app
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 	)
-	.post("/", async (c) => {
-		const expiresAt = null;
-		const remainingUse = null;
+	.post("/", vValidator("json", createInviteSchema), async (c) => {
+		const expiresAt = c.req.valid("json").expiresAt;
+		const remainingUse = c.req.valid("json").remainingUse;
 		const createdAt = new Date();
 		const issuedBy = c.get("jwtPayload").userId;
 
@@ -26,7 +33,7 @@ const route = app
 		// DB に格納して返す
 		try {
 			await c.var.InvitesRepository.createInvite({
-				expiresAt,
+				expiresAt: new Date(expiresAt),
 				remainingUse,
 				createdAt,
 				issuedBy,
