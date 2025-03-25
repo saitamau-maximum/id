@@ -6,7 +6,7 @@ export interface InviteStructure {
 	issuedBy: string;
 }
 
-export interface IInvitesRepository {
+export interface IInviteRepository {
 	createInvite: (params: Omit<InviteStructure, "id">) => Promise<void>;
 	getInviteById: (id: string) => Promise<InviteStructure>;
 	reduceInviteUsage: (id: string) => Promise<void>;

@@ -2,11 +2,11 @@ import { eq, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
-	IInvitesRepository,
+	IInviteRepository,
 	InviteStructure,
-} from "../../../repository/invites";
+} from "../../../repository/invite";
 
-export class CloudflareInvitesRepository implements IInvitesRepository {
+export class CloudflareInviteRepository implements IInviteRepository {
 	private client: DrizzleD1Database<typeof schema>;
 
 	constructor(db: D1Database) {

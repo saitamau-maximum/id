@@ -76,4 +76,4 @@ const route = app
 		}
 	});
 
-export { route as inviteTokenRoute };
+export { route as inviteRoute };
