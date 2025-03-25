@@ -159,18 +159,15 @@ export const userCertificationsRelations = relations(
 	}),
 );
 
-export const invites = sqliteTable(
-	"invites",
-	{
-		id: text("id").primaryKey(),
-		expiresAt: integer("expires_at", { mode: "timestamp" }),
-		remainingUse: int("remaining_use"),
-		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-		issuedBy: text("issued_by")
-			.references(() => users.id)
-			.notNull(),
-	},
-);
+export const invites = sqliteTable("invites", {
+	id: text("id").primaryKey(),
+	expiresAt: integer("expires_at", { mode: "timestamp" }),
+	remainingUse: int("remaining_use"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	issuedBy: text("issued_by")
+		.references(() => users.id)
+		.notNull(),
+});
 
 export const invite_roles = sqliteTable(
 	"invite_roles",
