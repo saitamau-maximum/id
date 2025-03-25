@@ -15,13 +15,9 @@ const route = app
 		}),
 	)
 	.post("/", async (c) => {
-		// expiresAtは1時間後
-		const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-
-		const remainingUse = 1;
-
+		const expiresAt = null;
+		const remainingUse = null;
 		const createdAt = new Date();
-
 		const issuedBy = c.get("jwtPayload").userId;
 
 		c.header("Cache-Control", "no-store");
@@ -44,6 +40,28 @@ const route = app
 		} catch (e) {
 			console.error(e);
 			return c.text("Internal Server Error", 500);
+		}
+	})
+	.put("/:id", async (c) => {
+		const id = c.req.param("id");
+		try {
+			const invite = await c.var.InvitesRepository.getInviteById(id);
+
+			if (!invite) {
+				return c.text("Invite not found", 404);
+			}
+
+			if (invite.remainingUse === 0) {
+				return c.text("Invite has no remaining uses", 400);
+			}
+
+			await c.var.InvitesRepository.reduceInviteUsage(id);
+			return c.json({ message: "invite code successfully used" });
+		} catch (e) {
+			console.error(e);
+			return c.text("Internal Server Error", 500);
+		} finally {
+			console.log(`Use attempt for invite ID: ${id}`);
 		}
 	})
 	.delete("/:id", async (c) => {
