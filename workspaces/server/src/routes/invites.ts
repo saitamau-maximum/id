@@ -28,35 +28,35 @@ const route = app
 		c.header("Pragma", "no-cache");
 
 		// DB に格納して返す
-		return await c.var.InvitesRepository.createInvite(
-			expiresAt,
-			remainingUse,
-			createdAt,
-			issuedBy,
-		)
-			.then(() => {
-				return c.json({
-					expiresAt,
-					remainingUse,
-					createdAt,
-					issuedBy,
-				});
-			})
-			.catch((e: Error) => {
-				console.error(e);
-				return c.text("Internal Server Error", 500);
+		try {
+			await c.var.InvitesRepository.createInvite(
+				expiresAt,
+				remainingUse,
+				createdAt,
+				issuedBy,
+			);
+			return c.json({
+				expiresAt,
+				remainingUse,
+				createdAt,
+				issuedBy,
 			});
+		} catch (e) {
+			console.error(e);
+			return c.text("Internal Server Error", 500);
+		}
 	})
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
-		return await c.var.InvitesRepository.deleteInvite(id)
-			.then(() => {
-				return c.json({ message: "token successfully deleted" });
-			})
-			.catch((e: Error) => {
-				console.error(e);
-				return c.text("Internal Server Error", 500);
-			});
-	})
+		try {
+			await c.var.InvitesRepository.deleteInvite(id);
+			return c.json({ message: "invite code successfully deleted" });
+		} catch (e) {
+			console.error(e);
+			return c.text("Internal Server Error", 500);
+		} finally {
+			console.log(`Delete attempt for invite ID: ${id}`);
+		}
+	});
 
 export { route as inviteTokenRoute };
