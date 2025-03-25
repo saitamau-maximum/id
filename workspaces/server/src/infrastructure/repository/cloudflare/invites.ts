@@ -3,7 +3,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
 	IInvitesRepository,
-	InviteSchema,
+	InviteStructure,
 } from "../../../repository/invites";
 
 export class CloudflareInvitesRepository implements IInvitesRepository {
@@ -13,31 +13,21 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createInvite(
-		expiresAt: Date | null,
-		remainingUse: number | null,
-		createdAt: Date,
-		issuedBy: string,
-	) {
+	async createInvite(params: Omit<InviteStructure, "id">) {
 		await this.client.insert(schema.invites).values({
 			id: crypto.randomUUID(),
-			expiresAt,
-			remainingUse,
-			createdAt,
-			issuedBy,
+			...params,
 		});
 	}
 
-	async getInviteById(id: string): Promise<InviteSchema> {
+	async getInviteById(id: string): Promise<InviteStructure> {
 		// 指定したIDの招待コードを取得
-		const res = await this.client
-			.select()
-			.from(schema.invites)
-			.where(eq(schema.invites.id, id))
-			.limit(1)
-			.execute()
-			.then((rows) => rows[0]);
-		console.log(res);
+		const res = await this.client.query.invites.findFirst({
+			where: eq(schema.invites.id, id),
+		});
+		if (!res) {
+			throw new Error(`Invite with ID ${id} not found`);
+		}
 		return res;
 	}
 
