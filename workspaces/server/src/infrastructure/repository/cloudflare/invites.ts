@@ -15,7 +15,6 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 		remainingUse: number,
 		createdAt: Date,
 		issuedBy: string,
-		token: string,
 	) {
 		await this.client.insert(schema.invites).values({
 			id: crypto.randomUUID(),
@@ -23,7 +22,6 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 			remainingUse,
 			createdAt,
 			issuedBy,
-			token,
 		});
 	}
 

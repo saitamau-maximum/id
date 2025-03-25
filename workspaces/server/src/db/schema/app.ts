@@ -167,7 +167,6 @@ export const invites = sqliteTable(
 		remainingUse: int("remaining_use").notNull(),
 		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 		issuedBy: text("issued_by").notNull(),
-		token: text("access_token").notNull(),
 	},
 	(table) => ({
 		issuedByIdx: index("issued_by_idx").on(table.issuedBy),

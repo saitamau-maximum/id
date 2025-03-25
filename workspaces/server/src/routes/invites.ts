@@ -4,7 +4,6 @@ import {
 	authMiddleware,
 	roleAuthorizationMiddleware,
 } from "../middleware/auth";
-import { binaryToBase64 } from "../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
 
@@ -28,16 +27,12 @@ const route = app
 		c.header("Cache-Control", "no-store");
 		c.header("Pragma", "no-cache");
 
-		// token (312bit = 8bit * 39) を生成
-		const token = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
-
 		// DB に格納して返す
 		return await c.var.InvitesRepository.createOneTimeToken(
 			expiresAt,
 			remainingUse,
 			createdAt,
 			issuedBy,
-			token,
 		)
 			.then(() => {
 				return c.json({
@@ -45,7 +40,6 @@ const route = app
 					remainingUse,
 					createdAt,
 					issuedBy,
-					token,
 				});
 			})
 			.catch((e: Error) => {

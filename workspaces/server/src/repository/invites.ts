@@ -4,7 +4,6 @@ export interface IInvitesRepository {
 		remainingUse: number,
 		createdAt: Date,
 		issuedBy: string,
-		Token: string,
 	) => Promise<void>;
 	deleteOneTimeToken: (id: string) => Promise<void>;
 }

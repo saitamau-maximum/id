@@ -134,6 +134,13 @@
       "when": 1742869032691,
       "tag": "0018_nifty_boomerang",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1742879955181,
+      "tag": "0019_fixed_arachne",
+      "breakpoints": true
     }
   ]
 }
