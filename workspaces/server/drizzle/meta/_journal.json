@@ -141,6 +141,13 @@
       "when": 1742879955181,
       "tag": "0019_fixed_arachne",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "6",
+      "when": 1742880339813,
+      "tag": "0020_unknown_wolfpack",
+      "breakpoints": true
     }
   ]
 }

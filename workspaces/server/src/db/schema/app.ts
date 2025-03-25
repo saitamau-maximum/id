@@ -163,10 +163,12 @@ export const invites = sqliteTable(
 	"invites",
 	{
 		id: text("id").primaryKey(),
-		expiresAt: integer("expires_at", { mode: "timestamp" }).notNull(),
-		remainingUse: int("remaining_use").notNull(),
+		expiresAt: integer("expires_at", { mode: "timestamp" }),
+		remainingUse: int("remaining_use"),
 		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-		issuedBy: text("issued_by").notNull(),
+		issuedBy: text("issued_by")
+			.references(() => users.id)
+			.notNull(),
 	},
 	(table) => ({
 		issuedByIdx: index("issued_by_idx").on(table.issuedBy),
