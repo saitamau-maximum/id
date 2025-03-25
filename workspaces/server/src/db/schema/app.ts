@@ -170,10 +170,6 @@ export const invites = sqliteTable(
 			.references(() => users.id)
 			.notNull(),
 	},
-	(table) => ({
-		issuedByIdx: index("issued_by_idx").on(table.issuedBy),
-		createAtIdx: index("created_at_idx").on(table.createdAt),
-	}),
 );
 
 export const invite_roles = sqliteTable(

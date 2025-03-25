@@ -124,29 +124,8 @@
     {
       "idx": 17,
       "version": "6",
-      "when": 1742843798761,
-      "tag": "0017_chemical_dreadnoughts",
-      "breakpoints": true
-    },
-    {
-      "idx": 18,
-      "version": "6",
-      "when": 1742869032691,
-      "tag": "0018_nifty_boomerang",
-      "breakpoints": true
-    },
-    {
-      "idx": 19,
-      "version": "6",
-      "when": 1742879955181,
-      "tag": "0019_fixed_arachne",
-      "breakpoints": true
-    },
-    {
-      "idx": 20,
-      "version": "6",
-      "when": 1742880339813,
-      "tag": "0020_unknown_wolfpack",
+      "when": 1742923086778,
+      "tag": "0017_lumpy_justin_hammer",
       "breakpoints": true
     }
   ]

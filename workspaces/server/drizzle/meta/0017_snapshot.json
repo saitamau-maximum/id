@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "7082879c-789b-4f3d-baa6-3c84cc14d656",
+  "id": "fed13167-bae9-4820-ac90-da38f13b90cf",
   "prevId": "85ba3164-3e31-4f69-880b-916fd824c343",
   "tables": {
     "calendar_events": {
@@ -132,6 +132,52 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "invite_roles": {
+      "name": "invite_roles",
+      "columns": {
+        "invite_id": {
+          "name": "invite_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "role_id": {
+          "name": "role_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "invite_roles_invite_id_invites_id_fk": {
+          "name": "invite_roles_invite_id_invites_id_fk",
+          "tableFrom": "invite_roles",
+          "tableTo": "invites",
+          "columnsFrom": [
+            "invite_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "invite_roles_invite_id_role_id_pk": {
+          "columns": [
+            "invite_id",
+            "role_id"
+          ],
+          "name": "invite_roles_invite_id_role_id_pk"
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "invites": {
       "name": "invites",
       "columns": {
@@ -146,14 +192,14 @@
           "name": "expires_at",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "remaining_use": {
           "name": "remaining_use",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -169,32 +215,24 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
-        },
-        "access_token": {
-          "name": "access_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
         }
       },
-      "indexes": {
-        "issued_by_idx": {
-          "name": "issued_by_idx",
-          "columns": [
+      "indexes": {},
+      "foreignKeys": {
+        "invites_issued_by_users_id_fk": {
+          "name": "invites_issued_by_users_id_fk",
+          "tableFrom": "invites",
+          "tableTo": "users",
+          "columnsFrom": [
             "issued_by"
           ],
-          "isUnique": false
-        },
-        "created_at_idx": {
-          "name": "created_at_idx",
-          "columns": [
-            "created_at"
+          "columnsTo": [
+            "id"
           ],
-          "isUnique": false
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
-      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
