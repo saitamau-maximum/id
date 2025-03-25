@@ -18,9 +18,11 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { invitesAccessTokenRoute } from "./routes/invites";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
+import { CloudflareInvitesRepository } from "./infrastructure/repository/cloudflare/invites";
 
 const app = factory.createApp();
 
@@ -46,6 +48,7 @@ export const route = app
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),
 		);
+		c.set("InvitesRepository", new CloudflareInvitesRepository(c.env.DB));
 
 		c.set(
 			"ContributionCacheRepository",
@@ -84,6 +87,7 @@ export const route = app
 	.route("/oauth", oauthRoute)
 	.route("/admin", adminRoute)
 	.route("/calendar", calendarRoute)
-	.route("/certification", certificationRoute);
+	.route("/certification", certificationRoute)
+	.route("/invites", invitesAccessTokenRoute);
 
 export default app;
