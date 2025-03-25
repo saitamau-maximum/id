@@ -1,7 +1,10 @@
 import { eq, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
-import type { IInvitesRepository, InviteSchema } from "../../../repository/invites";
+import type {
+	IInvitesRepository,
+	InviteSchema,
+} from "../../../repository/invites";
 
 export class CloudflareInvitesRepository implements IInvitesRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -33,7 +36,7 @@ export class CloudflareInvitesRepository implements IInvitesRepository {
 			.where(eq(schema.invites.id, id))
 			.limit(1)
 			.execute()
-			.then(rows => rows[0]);
+			.then((rows) => rows[0]);
 		console.log(res);
 		return res;
 	}
