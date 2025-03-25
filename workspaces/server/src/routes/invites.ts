@@ -25,12 +25,12 @@ const route = app
 
 		// DB に格納して返す
 		try {
-			await c.var.InvitesRepository.createInvite(
+			await c.var.InvitesRepository.createInvite({
 				expiresAt,
 				remainingUse,
 				createdAt,
 				issuedBy,
-			);
+			});
 			return c.json({
 				expiresAt,
 				remainingUse,
@@ -38,7 +38,6 @@ const route = app
 				issuedBy,
 			});
 		} catch (e) {
-			console.error(e);
 			return c.text("Internal Server Error", 500);
 		}
 	})
@@ -58,10 +57,7 @@ const route = app
 			await c.var.InvitesRepository.reduceInviteUsage(id);
 			return c.json({ message: "invite code successfully used" });
 		} catch (e) {
-			console.error(e);
 			return c.text("Internal Server Error", 500);
-		} finally {
-			console.log(`Use attempt for invite ID: ${id}`);
 		}
 	})
 	.delete("/:id", async (c) => {
@@ -70,10 +66,7 @@ const route = app
 			await c.var.InvitesRepository.deleteInvite(id);
 			return c.json({ message: "invite code successfully deleted" });
 		} catch (e) {
-			console.error(e);
 			return c.text("Internal Server Error", 500);
-		} finally {
-			console.log(`Delete attempt for invite ID: ${id}`);
 		}
 	});
 
