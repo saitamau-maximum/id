@@ -6,6 +6,7 @@ import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
+import { CloudflareInvitesRepository } from "./infrastructure/repository/cloudflare/invites";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
@@ -22,7 +23,6 @@ import { inviteTokenRoute } from "./routes/invites";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
-import { CloudflareInvitesRepository } from "./infrastructure/repository/cloudflare/invites";
 
 const app = factory.createApp();
 
