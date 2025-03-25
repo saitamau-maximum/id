@@ -1,4 +1,4 @@
-export interface InviteSchema {
+export interface InviteStructure {
 	id: string;
 	expiresAt: Date | null;
 	remainingUse: number | null;
@@ -8,12 +8,9 @@ export interface InviteSchema {
 
 export interface IInvitesRepository {
 	createInvite: (
-		expiresAt: Date | null,
-		remainingUse: number | null,
-		createdAt: Date,
-		issuedBy: string,
+		params: Omit<InviteStructure, "id">
 	) => Promise<void>;
-	getInviteById: (id: string) => Promise<InviteSchema>;
+	getInviteById: (id: string) => Promise<InviteStructure>;
 	reduceInviteUsage: (id: string) => Promise<void>;
 	deleteInvite: (id: string) => Promise<void>;
 }
