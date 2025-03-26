@@ -15,7 +15,7 @@ import { CreateLocationDialog } from "./callable-create-location-dialog";
 import { EditLocationDialog } from "./callable-edit-location-dialog";
 
 export const LocationEditor = () => {
-	const { data: locations } = useLocations();
+	const { locations } = useLocations();
 	const { mutate: createLocation } = useCreateLocation();
 	const sortedLocation = [...locations].sort(
 		(a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
@@ -62,25 +62,37 @@ export const LocationEditor = () => {
 					</ButtonLike>
 				</button>
 			</div>
-			<Table.Root>
-				<thead>
-					<Table.Tr>
-						<Table.Th
-							className={css({
-								width: "100%",
-							})}
-						>
-							タイトル
-						</Table.Th>
-						<Table.Th>操作</Table.Th>
-					</Table.Tr>
-				</thead>
-				<tbody>
-					{sortedLocation.map((location) => (
-						<LocationTableRow location={location} key={location.id} />
-					))}
-				</tbody>
-			</Table.Root>
+			{locations.length === 0 ? (
+				<p
+					className={css({
+						color: "gray.500",
+						textAlign: "center",
+						marginTop: 8,
+					})}
+				>
+					活動場所はありません
+				</p>
+			) : (
+				<Table.Root>
+					<thead>
+						<Table.Tr>
+							<Table.Th
+								className={css({
+									width: "100%",
+								})}
+							>
+								タイトル
+							</Table.Th>
+							<Table.Th>操作</Table.Th>
+						</Table.Tr>
+					</thead>
+					<tbody>
+						{sortedLocation.map((location) => (
+							<LocationTableRow location={location} key={location.id} />
+						))}
+					</tbody>
+				</Table.Root>
+			)}
 		</div>
 	);
 };

@@ -9,6 +9,7 @@ const createEventSchema = v.object({
 	description: v.pipe(v.string(), v.nonEmpty()),
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+	locationId: v.optional(v.string()),
 });
 
 const updateEventSchema = v.object({
@@ -18,6 +19,7 @@ const updateEventSchema = v.object({
 	description: v.pipe(v.string(), v.nonEmpty()),
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+	locationId: v.optional(v.string()),
 });
 
 const deleteEventSchema = v.object({
@@ -37,13 +39,15 @@ const route = app
 	.post("/", vValidator("json", createEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
 		const { userId } = c.get("jwtPayload");
-		const { title, description, startAt, endAt } = c.req.valid("json");
+		const { title, description, startAt, endAt, locationId } =
+			c.req.valid("json");
 		const eventPayload = {
 			userId,
 			title,
 			description,
 			startAt: new Date(startAt),
 			endAt: new Date(endAt),
+			locationId,
 		};
 		try {
 			await CalendarRepository.createEvent(eventPayload);
@@ -54,7 +58,7 @@ const route = app
 	})
 	.put("/:id", vValidator("json", updateEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
-		const { id, userId, title, description, startAt, endAt } =
+		const { id, userId, title, description, startAt, endAt, locationId } =
 			c.req.valid("json");
 		const eventPayload = {
 			id,
@@ -63,6 +67,7 @@ const route = app
 			description,
 			startAt: new Date(startAt),
 			endAt: new Date(endAt),
+			locationId,
 		};
 		try {
 			await CalendarRepository.updateEvent(eventPayload);

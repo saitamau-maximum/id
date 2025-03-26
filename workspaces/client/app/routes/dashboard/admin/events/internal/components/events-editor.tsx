@@ -7,6 +7,7 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
+import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
 import { useCreateEvent } from "../hooks/use-create-event";
 import { useDeleteEvent } from "../hooks/use-delete-event";
@@ -150,6 +151,7 @@ export const EventsEditor = () => {
 							<Table.Th>タイトル</Table.Th>
 							<Table.Th>説明</Table.Th>
 							<Table.Th>期間</Table.Th>
+							<Table.Th>活動場所</Table.Th>
 							<Table.Th>操作</Table.Th>
 						</Table.Tr>
 					</thead>
@@ -167,6 +169,7 @@ export const EventsEditor = () => {
 const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 	const { mutate: deleteEvent } = useDeleteEvent();
 	const { mutate: updateEvent } = useUpdateEvent();
+	const { locations, locationMap } = useLocations();
 
 	const handleDeleteEvent = useCallback(async () => {
 		const res = await ConfirmDialog.call({
@@ -183,6 +186,8 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 		if (res.type === "dismiss") return;
 		updateEvent(res.payload);
 	}, [event, updateEvent]);
+
+	const location = event.locationId ? locationMap.get(event.locationId) : null;
 
 	return (
 		<Table.Tr>
@@ -212,6 +217,18 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 				>
 					{formatDuration(event.startAt, event.endAt)}
 				</span>
+			</Table.Td>
+			<Table.Td>
+				{location && (
+					<p
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+						})}
+					>
+						{location.name}
+					</p>
+				)}
 			</Table.Td>
 			<Table.Td>
 				<div className={css({ display: "flex", gap: 2, width: "fit-content" })}>

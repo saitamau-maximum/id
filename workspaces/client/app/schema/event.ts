@@ -29,4 +29,5 @@ export const EventSchemas = {
 		v.transform((v) => new Date(v)),
 		v.date(),
 	),
+	LocationId: v.nullable(v.string()),
 };

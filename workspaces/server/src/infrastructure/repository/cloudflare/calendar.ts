@@ -18,6 +18,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		const res = await this.client.query.calendarEvents.findMany();
 		return res.map((event) => ({
 			...event,
+			locationId: event.locationId ?? undefined,
 			startAt: new Date(event.startAt),
 			endAt: new Date(event.endAt),
 		}));

@@ -5,7 +5,9 @@ export interface ICalendarEvent {
 	description: string;
 	startAt: Date;
 	endAt: Date;
+	locationId?: string;
 }
+
 export type CreateEventPayload = Omit<ICalendarEvent, "id">;
 
 export interface ICalendarRepository {
