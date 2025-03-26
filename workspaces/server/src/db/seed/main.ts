@@ -8,6 +8,7 @@ import * as schema from "../schema";
 import { editUserRole } from "./senario/edit-user-role";
 import { registerCalendarSeed } from "./senario/register-calendar";
 import { registerCertificationSeed } from "./senario/register-certification";
+import { registerLocationSeed } from "./senario/register-location";
 import { registerOAuthAppSeed } from "./senario/register-oauth-app";
 import { registerUserSeed } from "./senario/register-user";
 import { reset } from "./senario/reset";
@@ -60,6 +61,7 @@ async function init() {
 				{ title: "OAuth アプリケーション登録", value: "register-oauth-app" },
 				{ title: "カレンダーイベント登録", value: "register-calendar" },
 				{ title: "資格一覧登録", value: "register-certification" },
+				{ title: "活動場所登録", value: "register-location" },
 				{ title: "ユーザーロール編集", value: "edit-user-role" },
 				{ title: "ユーザー初期登録リセット", value: "reset-register" },
 				{ title: "DBリセット", value: "reset" },
@@ -90,6 +92,9 @@ async function init() {
 				break;
 			case "register-certification":
 				await registerCertificationSeed(client);
+				break;
+			case "register-location":
+				await registerLocationSeed(client);
 				break;
 			case "edit-user-role":
 				await editUserRole(client);

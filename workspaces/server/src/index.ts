@@ -7,6 +7,7 @@ import { CloudflareContributionCacheRepository } from "./infrastructure/reposito
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
 import { CloudflareInviteRepository } from "./infrastructure/repository/cloudflare/invite";
+import { CloudflareLocationRepository } from "./infrastructure/repository/cloudflare/location";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
@@ -49,6 +50,7 @@ export const route = app
 			new CloudflareCertificationRepository(c.env.DB),
 		);
 		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
+		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
 
 		c.set(
 			"ContributionCacheRepository",
