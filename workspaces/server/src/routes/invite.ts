@@ -22,8 +22,7 @@ const route = app
 		}),
 	)
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
-		const expiresAt = c.req.valid("json").expiresAt;
-		const remainingUse = c.req.valid("json").remainingUse;
+		const { expiresAt, remainingUse } = c.req.valid("json");
 		const createdAt = new Date();
 		const issuedBy = c.get("jwtPayload").userId;
 
