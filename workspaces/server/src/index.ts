@@ -48,7 +48,7 @@ export const route = app
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),
 		);
-		c.set("InvitesRepository", new CloudflareInviteRepository(c.env.DB));
+		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
 
 		c.set(
 			"ContributionCacheRepository",

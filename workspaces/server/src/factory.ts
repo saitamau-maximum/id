@@ -29,7 +29,7 @@ export type HonoEnv = {
 		UserStorageRepository: IUserStorageRepository;
 		CalendarRepository: ICalendarRepository;
 		CertificationRepository: ICertificationRepository;
-		InvitesRepository: IInviteRepository;
+		InviteRepository: IInviteRepository;
 		tokenInfo?: Awaited<
 			ReturnType<IOAuthExternalRepository["getTokenByAccessToken"]>
 		>;

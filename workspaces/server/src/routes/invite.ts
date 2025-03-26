@@ -32,7 +32,7 @@ const route = app
 
 		// DB に格納して返す
 		try {
-			await c.var.InvitesRepository.createInvite({
+			await c.var.InviteRepository.createInvite({
 				expiresAt: new Date(expiresAt),
 				remainingUse,
 				createdAt,
@@ -51,7 +51,7 @@ const route = app
 	.put("/:id", async (c) => {
 		const id = c.req.param("id");
 		try {
-			const invite = await c.var.InvitesRepository.getInviteById(id);
+			const invite = await c.var.InviteRepository.getInviteById(id);
 
 			if (!invite) {
 				return c.text("Invite not found", 404);
@@ -67,7 +67,7 @@ const route = app
 				return c.text("Invite has expired", 400);
 			}
 
-			await c.var.InvitesRepository.reduceInviteUsage(id);
+			await c.var.InviteRepository.reduceInviteUsage(id);
 			return c.json({ message: "invite code successfully used" });
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
@@ -76,7 +76,7 @@ const route = app
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
 		try {
-			await c.var.InvitesRepository.deleteInvite(id);
+			await c.var.InviteRepository.deleteInvite(id);
 			return c.json({ message: "invite code successfully deleted" });
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
