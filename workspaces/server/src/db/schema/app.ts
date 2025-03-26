@@ -158,3 +158,26 @@ export const userCertificationsRelations = relations(
 		}),
 	}),
 );
+
+export const invites = sqliteTable("invites", {
+	id: text("id").primaryKey(),
+	expiresAt: integer("expires_at", { mode: "timestamp" }),
+	remainingUse: int("remaining_use"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	issuedBy: text("issued_by")
+		.references(() => users.id)
+		.notNull(),
+});
+
+export const invite_roles = sqliteTable(
+	"invite_roles",
+	{
+		inviteId: text("invite_id")
+			.references(() => invites.id)
+			.notNull(),
+		roleId: int("role_id", { mode: "number" }).notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.inviteId, table.roleId] }),
+	}),
+);
