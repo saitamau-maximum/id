@@ -133,21 +133,33 @@ export const EventsEditor = () => {
 					</ButtonLike>
 				</button>
 			</div>
-			<Table.Root>
-				<thead>
-					<Table.Tr>
-						<Table.Th>タイトル</Table.Th>
-						<Table.Th>説明</Table.Th>
-						<Table.Th>期間</Table.Th>
-						<Table.Th>操作</Table.Th>
-					</Table.Tr>
-				</thead>
-				<tbody>
-					{filteredEvents.map((event) => (
-						<EventTableRow event={event} key={event.id} />
-					))}
-				</tbody>
-			</Table.Root>
+			{filteredEvents.length === 0 ? (
+				<p
+					className={css({
+						color: "gray.500",
+						textAlign: "center",
+						marginTop: 8,
+					})}
+				>
+					イベントはありません
+				</p>
+			) : (
+				<Table.Root>
+					<thead>
+						<Table.Tr>
+							<Table.Th>タイトル</Table.Th>
+							<Table.Th>説明</Table.Th>
+							<Table.Th>期間</Table.Th>
+							<Table.Th>操作</Table.Th>
+						</Table.Tr>
+					</thead>
+					<tbody>
+						{filteredEvents.map((event) => (
+							<EventTableRow event={event} key={event.id} />
+						))}
+					</tbody>
+				</Table.Root>
+			)}
 		</div>
 	);
 };
@@ -202,7 +214,7 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 				</span>
 			</Table.Td>
 			<Table.Td>
-				<div className={css({ display: "flex", gap: 2 })}>
+				<div className={css({ display: "flex", gap: 2, width: "fit-content" })}>
 					<IconButton label="編集" onClick={handleEditEvent}>
 						<Edit size={16} />
 					</IconButton>
