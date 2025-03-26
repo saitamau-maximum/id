@@ -169,7 +169,7 @@ export const EventsEditor = () => {
 const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 	const { mutate: deleteEvent } = useDeleteEvent();
 	const { mutate: updateEvent } = useUpdateEvent();
-	const { locations, locationMap } = useLocations();
+	const { locationMap } = useLocations();
 
 	const handleDeleteEvent = useCallback(async () => {
 		const res = await ConfirmDialog.call({
