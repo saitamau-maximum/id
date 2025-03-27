@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { ChevronLeft, ChevronRight, Edit, Plus, Trash } from "react-feather";
+import {
+	ChevronLeft,
+	ChevronRight,
+	Edit,
+	Plus,
+	PlusSquare,
+	Trash,
+} from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
@@ -167,6 +174,7 @@ export const EventsEditor = () => {
 };
 
 const EventTableRow = ({ event }: { event: CalendarEvent }) => {
+	const { mutate: createEvent } = useCreateEvent();
 	const { mutate: deleteEvent } = useDeleteEvent();
 	const { mutate: updateEvent } = useUpdateEvent();
 	const { locationMap } = useLocations();
@@ -186,6 +194,12 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 		if (res.type === "dismiss") return;
 		updateEvent(res.payload);
 	}, [event, updateEvent]);
+
+	const handleDuplicateEvent = useCallback(async () => {
+		const res = await EditEventDialog.call({ event });
+		if (res.type === "dismiss") return;
+		createEvent(res.payload);
+	}, [event, createEvent]);
 
 	const location = event.locationId ? locationMap.get(event.locationId) : null;
 
@@ -232,6 +246,10 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 			</Table.Td>
 			<Table.Td>
 				<div className={css({ display: "flex", gap: 2, width: "fit-content" })}>
+					<IconButton label="複製" onClick={handleDuplicateEvent}>
+						<PlusSquare size={16} />
+					</IconButton>
+					/
 					<IconButton label="編集" onClick={handleEditEvent}>
 						<Edit size={16} />
 					</IconButton>
