@@ -7,8 +7,10 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
 import type { CalendarEvent } from "~/types/event";
+import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
 	event: CalendarEvent;
@@ -28,6 +30,7 @@ const UpdateFormSchema = v.object({
 	description: EventSchemas.Description,
 	startAt: EventSchemas.StartAt,
 	endAt: EventSchemas.EndAt,
+	locationId: EventSchemas.LocationId,
 });
 
 type UpdateFormValues = v.InferInput<typeof UpdateFormSchema>;
@@ -45,9 +48,11 @@ const formatHTMLDate = (date: Date) =>
 
 export const EditEventDialog = createCallable<Props, Payload>(
 	({ call, event }) => {
+		const { locations } = useLocations();
 		const {
 			handleSubmit,
 			register,
+			watch,
 			formState: { errors },
 		} = useForm<UpdateFormValues>({
 			resolver: valibotResolver(UpdateFormSchema),
@@ -56,6 +61,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 				description: event.description,
 				startAt: formatHTMLDate(event.startAt),
 				endAt: formatHTMLDate(event.endAt),
+				locationId: event.locationId ?? null,
 			},
 		});
 
@@ -65,6 +71,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 				...values,
 				startAt: new Date(values.startAt),
 				endAt: new Date(values.endAt),
+				locationId: values.locationId ?? undefined,
 			};
 			call.end({ type: "success", payload: updatedEvent });
 		};
@@ -93,12 +100,12 @@ export const EditEventDialog = createCallable<Props, Payload>(
 						{...register("title")}
 					/>
 
-					<Form.Field.TextArea
-						label="説明"
-						required
+					<DescriptionFormField
+						description={watch("description")}
 						rows={EVENT_DESCRIPTION_MAX_LINES}
 						error={errors.description?.message}
-						{...register("description")}
+						register={register("description")}
+						inlineOnly={true} //  イベントはインライン文法のみ
 					/>
 
 					<Form.Field.WithLabel label="開始日時" required>
@@ -128,6 +135,23 @@ export const EditEventDialog = createCallable<Props, Payload>(
 							</>
 						)}
 					</Form.Field.WithLabel>
+
+					<Form.FieldSet>
+						<legend>
+							<Form.LabelText>活動場所</Form.LabelText>
+						</legend>
+						<Form.RadioGroup>
+							{locations.map((location) => (
+								<Form.Radio
+									key={location.id}
+									value={location.id}
+									label={location.name}
+									{...register("locationId")}
+								/>
+							))}
+						</Form.RadioGroup>
+						<ErrorDisplay error={errors.locationId?.message} />
+					</Form.FieldSet>
 
 					<div
 						className={css({

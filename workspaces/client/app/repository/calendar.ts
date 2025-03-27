@@ -6,7 +6,7 @@ export interface ICalendarRepository {
 	getAllEvents$$key: () => unknown[];
 	createEvent: (event: Omit<CalendarEvent, "id" | "userId">) => Promise<void>;
 	updateEvent: (event: CalendarEvent) => Promise<void>;
-	deleteEvent: (eventId: CalendarEvent["id"]) => Promise<void>;
+	deleteEvent: (id: CalendarEvent["id"]) => Promise<void>;
 }
 
 export class CalendarRepositoryImpl implements ICalendarRepository {
@@ -40,9 +40,9 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 	}
 
 	async updateEvent(event: CalendarEvent) {
-		const res = await client.calendar.events[":eventId"].$put({
+		const res = await client.calendar.events[":id"].$put({
 			param: {
-				eventId: event.id,
+				id: event.id,
 			},
 			json: {
 				...event,
@@ -55,13 +55,10 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		}
 	}
 
-	async deleteEvent(eventId: CalendarEvent["id"]) {
-		const res = await client.calendar.events[":eventId"].$delete({
+	async deleteEvent(id: CalendarEvent["id"]) {
+		const res = await client.calendar.events[":id"].$delete({
 			param: {
-				eventId: eventId,
-			},
-			json: {
-				id: eventId,
+				id,
 			},
 		});
 		if (!res.ok) {

@@ -103,6 +103,9 @@ export const calendarEvents = sqliteTable(
 		description: text("description").notNull(),
 		startAt: text("start_at").notNull(),
 		endAt: text("end_at").notNull(),
+		locationId: text("location_id").references(() => locations.id, {
+			onDelete: "set null",
+		}),
 	},
 	(table) => ({
 		userIdx: index("user_idx").on(table.userId),
@@ -110,6 +113,24 @@ export const calendarEvents = sqliteTable(
 		endAtIdx: index("end_at_idx").on(table.endAt),
 	}),
 );
+
+export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
+	location: one(locations, {
+		fields: [calendarEvents.locationId],
+		references: [locations.id],
+	}),
+}));
+
+export const locations = sqliteTable("locations", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	description: text("description").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const locationsRelations = relations(locations, ({ many }) => ({
+	events: many(calendarEvents),
+}));
 
 export const certifications = sqliteTable("certifications", {
 	id: text("id").primaryKey(),

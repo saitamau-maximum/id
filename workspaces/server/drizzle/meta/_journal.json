@@ -127,6 +127,20 @@
       "when": 1742923086778,
       "tag": "0017_lumpy_justin_hammer",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1743019139310,
+      "tag": "0018_calm_grim_reaper",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1743019518790,
+      "tag": "0019_famous_leader",
+      "breakpoints": true
     }
   ]
 }
