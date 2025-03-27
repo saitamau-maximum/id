@@ -63,6 +63,7 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 			handleSubmit,
 			register,
 			setValue,
+			watch,
 			formState: { errors },
 		} = useForm<UpdateFormValues>({
 			resolver: valibotResolver(UpdateFormSchema),
@@ -129,7 +130,7 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 						</Switch.List>
 
 						{isDescirptionPreviewShown ? (
-							<DescriptionPreview description={location.description} />
+							<DescriptionPreview description={watch("description")} />
 						) : (
 							<Form.Field.TextArea
 								label="説明"
