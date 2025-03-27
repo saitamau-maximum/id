@@ -10,6 +10,7 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
 import type { CalendarEvent } from "~/types/event";
+import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
 	event: CalendarEvent;
@@ -51,6 +52,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 		const {
 			handleSubmit,
 			register,
+			watch,
 			formState: { errors },
 		} = useForm<UpdateFormValues>({
 			resolver: valibotResolver(UpdateFormSchema),
@@ -98,12 +100,12 @@ export const EditEventDialog = createCallable<Props, Payload>(
 						{...register("title")}
 					/>
 
-					<Form.Field.TextArea
-						label="説明"
-						required
+					<DescriptionFormField
+						description={watch("description")}
 						rows={EVENT_DESCRIPTION_MAX_LINES}
 						error={errors.description?.message}
-						{...register("description")}
+						register={register("description")}
+						inlineOnly={true} //  イベントはインライン文法のみ
 					/>
 
 					<Form.Field.WithLabel label="開始日時" required>

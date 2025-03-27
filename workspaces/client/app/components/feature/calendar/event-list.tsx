@@ -211,7 +211,7 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 						fontSize: "sm",
 					})}
 				>
-					<Document>{reactContent}</Document>
+					<Document inlineOnly>{reactContent}</Document>
 				</div>
 			</div>
 		</div>

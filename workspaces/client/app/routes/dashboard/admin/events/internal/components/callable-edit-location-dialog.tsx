@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -7,12 +7,13 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
-import { Switch } from "~/components/ui/switch";
-import { useMarkdown } from "~/hooks/use-markdown";
 import { useLocationDetail } from "~/routes/dashboard/calendar/hooks/use-location-detail";
-import { LOCATION_DESCRIPTION_MAX_LINES } from "~/schema/location";
-import { LocationSchemas } from "~/schema/location";
+import {
+	LOCATION_DESCRIPTION_MAX_LINES,
+	LocationSchemas,
+} from "~/schema/location";
 import type { Location } from "~/types/location";
+import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
 	locationId: Location["id"];
@@ -34,30 +35,9 @@ const UpdateFormSchema = v.object({
 
 type UpdateFormValues = v.InferInput<typeof UpdateFormSchema>;
 
-const DescriptionPreview = ({ description }: { description: string }) => {
-	const { reactContent } = useMarkdown(description);
-	return (
-		<div
-			className={css({
-				height: "auto",
-				maxHeight: "300px",
-				overflowY: "auto",
-				border: "1px solid",
-				borderColor: "gray.300",
-				padding: 2,
-				borderRadius: "md",
-			})}
-		>
-			{reactContent}
-		</div>
-	);
-};
-
 export const EditLocationDialog = createCallable<Props, Payload>(
 	({ call, locationId }) => {
 		const { data: location, isLoading } = useLocationDetail({ locationId });
-		const [isDescirptionPreviewShown, setIsDescirptionPreviewShown] =
-			useState(false);
 
 		const {
 			handleSubmit,
@@ -114,32 +94,13 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 							{...register("name")}
 						/>
 
-						<Switch.List>
-							<Switch.Item
-								isActive={!isDescirptionPreviewShown}
-								onClick={() => setIsDescirptionPreviewShown(false)}
-							>
-								Edit
-							</Switch.Item>
-							<Switch.Item
-								isActive={isDescirptionPreviewShown}
-								onClick={() => setIsDescirptionPreviewShown(true)}
-							>
-								Preview
-							</Switch.Item>
-						</Switch.List>
-
-						{isDescirptionPreviewShown ? (
-							<DescriptionPreview description={watch("description")} />
-						) : (
-							<Form.Field.TextArea
-								label="説明"
-								required
-								rows={LOCATION_DESCRIPTION_MAX_LINES}
-								error={errors.description?.message}
-								{...register("description")}
-							/>
-						)}
+						<DescriptionFormField
+							description={watch("description")}
+							rows={LOCATION_DESCRIPTION_MAX_LINES}
+							error={errors.description?.message}
+							register={register("description")}
+							inlineOnly={false} //  活動場所は画像などを埋め込むケースがあるため、ブロック文法も許可
+						/>
 
 						<div
 							className={css({

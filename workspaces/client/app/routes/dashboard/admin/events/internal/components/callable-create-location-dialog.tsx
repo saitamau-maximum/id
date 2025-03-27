@@ -1,5 +1,4 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { useState } from "react";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -7,12 +6,12 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
-import { useMarkdown } from "~/hooks/use-markdown";
 import {
 	LOCATION_DESCRIPTION_MAX_LINES,
 	LocationSchemas,
 } from "~/schema/location";
 import type { Location } from "~/types/location";
+import { DescriptionFormField } from "./detail-form-field";
 
 type Payload =
 	| {
@@ -30,30 +29,8 @@ const CreateFormSchema = v.object({
 
 type CreateFormValues = v.InferInput<typeof CreateFormSchema>;
 
-const DescriptionPreview = ({ description }: { description: string }) => {
-	const { reactContent } = useMarkdown(description);
-	return (
-		<div
-			className={css({
-				height: "auto",
-				maxHeight: "300px",
-				overflowY: "auto",
-				border: "1px solid",
-				borderColor: "gray.300",
-				padding: 2,
-				borderRadius: "md",
-			})}
-		>
-			{reactContent}
-		</div>
-	);
-};
-
 export const CreateLocationDialog = createCallable<void, Payload>(
 	({ call }) => {
-		const [isDescirptionPreviewShown, setIsDescirptionPreviewShown] =
-			useState(false);
-
 		const {
 			handleSubmit,
 			register,
@@ -96,17 +73,14 @@ export const CreateLocationDialog = createCallable<void, Payload>(
 						{...register("name")}
 					/>
 
-					{isDescirptionPreviewShown ? (
-						<DescriptionPreview description={watch("description")} />
-					) : (
-						<Form.Field.TextArea
-							label="説明"
-							required
-							rows={LOCATION_DESCRIPTION_MAX_LINES}
-							error={errors.description?.message}
-							{...register("description")}
-						/>
-					)}
+					<DescriptionFormField
+						description={watch("description")}
+						rows={LOCATION_DESCRIPTION_MAX_LINES}
+						error={errors.description?.message}
+						register={register("description")}
+						inlineOnly={false} //  活動場所は画像などを埋め込むケースがあるため、ブロック文法も許可
+					/>
+
 					<div
 						className={css({
 							display: "flex",
