@@ -5,7 +5,7 @@ import { EditLocationDialog } from "./internal/components/callable-edit-location
 import { EventsEditor } from "./internal/components/events-editor";
 import { LocationEditor } from "./internal/components/location-editor";
 
-export default function AdminCertifications() {
+export default function AdminEvents() {
 	return (
 		<div>
 			<EventsEditor />

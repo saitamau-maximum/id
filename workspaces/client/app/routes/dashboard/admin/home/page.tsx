@@ -1,6 +1,6 @@
 import { css } from "styled-system/css";
 
-export default function Home() {
+export default function AdminHome() {
 	return (
 		<div>
 			<div
