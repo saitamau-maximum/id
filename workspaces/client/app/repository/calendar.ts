@@ -60,9 +60,6 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 			param: {
 				id,
 			},
-			json: {
-				id,
-			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to delete event");

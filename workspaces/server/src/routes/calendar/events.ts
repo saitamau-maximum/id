@@ -13,17 +13,12 @@ const createEventSchema = v.object({
 });
 
 const updateEventSchema = v.object({
-	id: v.pipe(v.string(), v.nonEmpty()),
 	userId: v.pipe(v.string(), v.nonEmpty()),
 	title: v.pipe(v.string(), v.nonEmpty()),
 	description: v.pipe(v.string(), v.nonEmpty()),
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	locationId: v.optional(v.string()),
-});
-
-const deleteEventSchema = v.object({
-	id: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const route = app
@@ -58,8 +53,9 @@ const route = app
 	})
 	.put("/:id", vValidator("json", updateEventSchema), async (c) => {
 		const { CalendarRepository } = c.var;
-		const { id, userId, title, description, startAt, endAt, locationId } =
+		const { userId, title, description, startAt, endAt, locationId } =
 			c.req.valid("json");
+		const id = c.req.param("id");
 		const eventPayload = {
 			id,
 			userId,
@@ -76,7 +72,7 @@ const route = app
 			return c.json({ error: "failed to update event" }, 500);
 		}
 	})
-	.delete("/:id", vValidator("json", deleteEventSchema), async (c) => {
+	.delete("/:id", async (c) => {
 		const { CalendarRepository } = c.var;
 		const id = c.req.param("id");
 		try {
