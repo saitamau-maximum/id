@@ -58,10 +58,10 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 	async deleteEvent(id: CalendarEvent["id"]) {
 		const res = await client.calendar.events[":id"].$delete({
 			param: {
-				id: id,
+				id,
 			},
 			json: {
-				id: id,
+				id,
 			},
 		});
 		if (!res.ok) {
