@@ -77,7 +77,6 @@ const route = app
 			await LocationRepository.deleteLocation(id);
 			return c.json({ message: "location deleted" });
 		} catch (e) {
-			console.error(e);
 			return c.json({ error: "location not deleted" }, 404);
 		}
 	});

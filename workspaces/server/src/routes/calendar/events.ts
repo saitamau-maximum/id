@@ -73,7 +73,6 @@ const route = app
 			await CalendarRepository.updateEvent(eventPayload);
 			return c.json({ message: "event updated" });
 		} catch (e) {
-			console.error(e);
 			return c.json({ error: "failed to update event" }, 500);
 		}
 	})
