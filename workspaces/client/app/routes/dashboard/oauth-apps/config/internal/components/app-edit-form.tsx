@@ -25,7 +25,7 @@ const UpdateFormSchema = v.object({
 	icon: OAuthSchemas.Icon,
 });
 
-type FormValues = v.InferInput<typeof UpdateFormSchema>;
+type FormValues = v.InferOutput<typeof UpdateFormSchema>;
 
 const iconStyle = css({
 	padding: 1,

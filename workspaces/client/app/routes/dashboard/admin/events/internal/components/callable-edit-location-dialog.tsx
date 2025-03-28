@@ -33,7 +33,7 @@ const UpdateFormSchema = v.object({
 	description: LocationSchemas.Description,
 });
 
-type UpdateFormValues = v.InferInput<typeof UpdateFormSchema>;
+type UpdateFormValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const EditLocationDialog = createCallable<Props, Payload>(
 	({ call, locationId }) => {

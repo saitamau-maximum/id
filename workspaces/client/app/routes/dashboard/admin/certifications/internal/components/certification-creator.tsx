@@ -12,7 +12,7 @@ const CreateFormSchema = v.object({
 	description: v.string(),
 });
 
-type FormValues = v.InferInput<typeof CreateFormSchema>;
+type FormValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CertificationCreator = () => {
 	const { mutate, isPending } = useCreateCertification();

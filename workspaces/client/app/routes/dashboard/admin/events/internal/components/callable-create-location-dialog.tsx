@@ -27,7 +27,7 @@ const CreateFormSchema = v.object({
 	description: LocationSchemas.Description,
 });
 
-type CreateFormValues = v.InferInput<typeof CreateFormSchema>;
+type CreateFormValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CreateLocationDialog = createCallable<void, Payload>(
 	({ call }) => {

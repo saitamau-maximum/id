@@ -33,18 +33,7 @@ const UpdateFormSchema = v.object({
 	locationId: EventSchemas.LocationId,
 });
 
-type UpdateFormValues = v.InferInput<typeof UpdateFormSchema>;
-
-// HTMLの`datetime-local`のフォーマットは`YYYY-MM-DDTHH:mm`なので、タイムゾーンが含まれているとdefaultValueが機能しない
-// スウェーデンのタイムゾーンでフォーマットがそれなので`sv-SE`を指定
-const formatHTMLDate = (date: Date) =>
-	date.toLocaleTimeString("sv-SE", {
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-	});
+type UpdateFormValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const EditEventDialog = createCallable<Props, Payload>(
 	({ call, event }) => {
@@ -59,8 +48,8 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			defaultValues: {
 				title: event.title,
 				description: event.description,
-				startAt: formatHTMLDate(event.startAt),
-				endAt: formatHTMLDate(event.endAt),
+				startAt: event.startAt,
+				endAt: event.endAt,
 				locationId: event.locationId ?? null,
 			},
 		});
