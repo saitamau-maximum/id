@@ -20,14 +20,14 @@ export const useGenerateInvitation = () => {
 		},
 		onSuccess: async (data) => {
 			pushToast({
-				title: "招待リンクをしました",
+				title: "招待リンクを生成しました",
 				type: "success",
 			});
 			queryClient.invalidateQueries({
 				queryKey: invitationRepository.getInvitations$$key(),
 			});
 			await InformationDialog.call({
-				title: "招待リンクの生成に成功しました",
+				title: "招待リンク",
 				children: <InvitationURLDisplay title={data.title} id={data.id} />,
 			});
 		},

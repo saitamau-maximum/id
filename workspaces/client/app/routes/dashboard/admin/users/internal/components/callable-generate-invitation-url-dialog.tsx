@@ -62,7 +62,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 
 		return (
 			<Dialog
-				title="イベントを作成"
+				title="招待リンクの作成"
 				isOpen
 				isDismissable
 				onOpenChange={(isOpen) => {

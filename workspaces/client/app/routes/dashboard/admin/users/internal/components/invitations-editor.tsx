@@ -39,7 +39,7 @@ export const InvitationsEditor = () => {
 
 	const handleRowClick = useCallback(async (invitation: Invitation) => {
 		await InformationDialog.call({
-			title: "招待コード",
+			title: "招待リンク",
 			children: (
 				<InvitationURLDisplay title={invitation.title} id={invitation.id} />
 			),

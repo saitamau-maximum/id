@@ -20,7 +20,7 @@ export const InvitationURLDisplay = ({ title, id }: Props) => {
 		setCopied(true);
 		pushToast({
 			type: "success",
-			title: "クライアントIDをコピーしました",
+			title: "招待リンクをコピーしました",
 		});
 		setTimeout(() => setCopied(false), 3000);
 	}, [invitationURL, pushToast]);

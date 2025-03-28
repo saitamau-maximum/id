@@ -25,7 +25,7 @@ export class CloudflareInviteRepository implements IInviteRepository {
 			},
 		});
 
-		const a = res.map((invite) => ({
+		return res.map((invite) => ({
 			...invite,
 			expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
 			createdAt: new Date(invite.createdAt),
@@ -36,7 +36,6 @@ export class CloudflareInviteRepository implements IInviteRepository {
 				profileImageURL: invite.issuedBy.profile.profileImageURL ?? undefined,
 			},
 		}));
-		return a;
 	}
 
 	async createInvite(params: Omit<InviteStructure, "id">) {
