@@ -1,6 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
+import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
+import { roleAuthorizationMiddleware } from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -31,56 +33,76 @@ const route = app
 			return c.json({ error: "events not found" }, 404);
 		}
 	})
-	.post("/", vValidator("json", createEventSchema), async (c) => {
-		const { CalendarRepository } = c.var;
-		const { userId } = c.get("jwtPayload");
-		const { title, description, startAt, endAt, locationId } =
-			c.req.valid("json");
-		const eventPayload = {
-			userId,
-			title,
-			description,
-			startAt: new Date(startAt),
-			endAt: new Date(endAt),
-			locationId,
-		};
-		try {
-			await CalendarRepository.createEvent(eventPayload);
-			return c.json({ message: "event created" });
-		} catch (e) {
-			return c.json({ error: "event not created" }, 404);
-		}
-	})
-	.put("/:id", vValidator("json", updateEventSchema), async (c) => {
-		const { CalendarRepository } = c.var;
-		const { userId, title, description, startAt, endAt, locationId } =
-			c.req.valid("json");
-		const id = c.req.param("id");
-		const eventPayload = {
-			id,
-			userId,
-			title,
-			description,
-			startAt: new Date(startAt),
-			endAt: new Date(endAt),
-			locationId,
-		};
-		try {
-			await CalendarRepository.updateEvent(eventPayload);
-			return c.json({ message: "event updated" });
-		} catch (e) {
-			return c.json({ error: "failed to update event" }, 500);
-		}
-	})
-	.delete("/:id", async (c) => {
-		const { CalendarRepository } = c.var;
-		const id = c.req.param("id");
-		try {
-			await CalendarRepository.deleteEvent(id);
-			return c.json({ message: "event deleted" });
-		} catch (e) {
-			return c.json({ error: "event not deleted" }, 500);
-		}
-	});
+	.post(
+		"/",
+		roleAuthorizationMiddleware({
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+		}),
+		vValidator("json", createEventSchema),
+		async (c) => {
+			const { CalendarRepository } = c.var;
+			const { userId } = c.get("jwtPayload");
+			const { title, description, startAt, endAt, locationId } =
+				c.req.valid("json");
+			const eventPayload = {
+				userId,
+				title,
+				description,
+				startAt: new Date(startAt),
+				endAt: new Date(endAt),
+				locationId,
+			};
+			try {
+				await CalendarRepository.createEvent(eventPayload);
+				return c.json({ message: "event created" });
+			} catch (e) {
+				return c.json({ error: "event not created" }, 404);
+			}
+		},
+	)
+	.put(
+		"/:id",
+		roleAuthorizationMiddleware({
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+		}),
+		vValidator("json", updateEventSchema),
+		async (c) => {
+			const { CalendarRepository } = c.var;
+			const { userId, title, description, startAt, endAt, locationId } =
+				c.req.valid("json");
+			const id = c.req.param("id");
+			const eventPayload = {
+				id,
+				userId,
+				title,
+				description,
+				startAt: new Date(startAt),
+				endAt: new Date(endAt),
+				locationId,
+			};
+			try {
+				await CalendarRepository.updateEvent(eventPayload);
+				return c.json({ message: "event updated" });
+			} catch (e) {
+				return c.json({ error: "failed to update event" }, 500);
+			}
+		},
+	)
+	.delete(
+		"/:id",
+		roleAuthorizationMiddleware({
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+		}),
+		async (c) => {
+			const { CalendarRepository } = c.var;
+			const id = c.req.param("id");
+			try {
+				await CalendarRepository.deleteEvent(id);
+				return c.json({ message: "event deleted" });
+			} catch (e) {
+				return c.json({ error: "event not deleted" }, 500);
+			}
+		},
+	);
 
 export { route as calendarEventRoute };
