@@ -190,7 +190,7 @@ export const invites = sqliteTable("invites", {
 		.notNull(),
 });
 
-export const invite_roles = sqliteTable(
+export const inviteRoles = sqliteTable(
 	"invite_roles",
 	{
 		inviteId: text("invite_id")
