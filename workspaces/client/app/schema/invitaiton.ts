@@ -19,6 +19,10 @@ export const InvitationURLSchemas = {
 			v.string(),
 			v.transform((v) => new Date(v)),
 			v.date("有効期限は日付で入力してください"),
+			v.custom(
+				(v) => typeof v === "object" && v instanceof Date && v > new Date(),
+				"有効期限は未来の日付で入力してください",
+			),
 		),
 	),
 };
