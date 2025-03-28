@@ -11,6 +11,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
+import { RoleSelector } from "./components/feature/user/role-selector";
 import { UserSelector } from "./components/feature/user/user-selector";
 import { ConfirmDialog } from "./components/logic/callable/comfirm";
 import { InformationDialog } from "./components/logic/callable/information";
@@ -91,6 +92,7 @@ export default function App() {
 				<ToastProvider>
 					<Outlet />
 					<UserSelector.Root />
+					<RoleSelector.Root />
 					<ConfirmDialog.Root />
 					<InformationDialog.Root />
 				</ToastProvider>
