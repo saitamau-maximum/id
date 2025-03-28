@@ -48,7 +48,6 @@ export class CloudflareInviteRepository implements IInviteRepository {
 	}
 
 	async getInviteById(id: string): Promise<InviteStructure> {
-		// 指定したIDの招待コードを取得
 		const res = await this.client.query.invites.findFirst({
 			where: eq(schema.invites.id, id),
 		});

@@ -68,7 +68,7 @@ export const InvitationsEditor = () => {
 				<button type="button" onClick={handleGenerateInvitation}>
 					<ButtonLike variant="primary" size="sm">
 						<Plus size={16} />
-						招待コードを生成
+						招待リンクを生成
 					</ButtonLike>
 				</button>
 			</div>

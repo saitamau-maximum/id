@@ -10,15 +10,15 @@ export const InvitationURLSchemas = {
 		v.pipe(
 			v.string(),
 			v.transform((v) => Number.parseInt(v)),
-			v.integer(),
-			v.minValue(1),
+			v.integer("使用可能回数は整数で入力してください"),
+			v.minValue(1, "使用可能回数は1以上で入力してください"),
 		),
 	),
 	ExpiresAt: v.nullable(
 		v.pipe(
 			v.string(),
 			v.transform((v) => new Date(v)),
-			v.date(),
+			v.date("有効期限は日付で入力してください"),
 		),
 	),
 };

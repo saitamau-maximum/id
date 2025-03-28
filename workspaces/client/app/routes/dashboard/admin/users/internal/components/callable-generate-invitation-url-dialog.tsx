@@ -87,8 +87,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 
 					<Form.Field.TextInput
 						label="使用可能回数"
-						type="text"
-						inputMode="numeric"
+						type="number"
 						error={errors.remainingUse?.message}
 						{...register("remainingUse")}
 					/>

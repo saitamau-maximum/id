@@ -68,12 +68,12 @@ const route = app
 				return c.text("Invite not found", 404);
 			}
 
-			// 招待コードの残り使用回数について検証
+			// 招待リンクの残り使用回数について検証
 			if (invite.remainingUse !== null && invite.remainingUse <= 0) {
 				return c.text("Invite has no remaining uses", 400);
 			}
 
-			// 招待コードの有効期限について検証
+			// 招待リンクの有効期限について検証
 			if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
 				return c.text("Invite has expired", 400);
 			}
