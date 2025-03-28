@@ -10,8 +10,8 @@ import {
 const app = factory.createApp();
 
 const createInviteSchema = v.object({
-	expiresAt: v.pipe(v.string(), v.isoTimestamp()),
-	remainingUse: v.number(),
+	expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+	remainingUse: v.optional(v.pipe(v.number(), v.minValue(1))),
 });
 
 const route = app
@@ -32,6 +32,12 @@ const route = app
 	})
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
 		const { expiresAt, remainingUse } = c.req.valid("json");
+
+		// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
+		if (!expiresAt && !remainingUse) {
+			return c.text("Bad Request", 400);
+		}
+
 		const createdAt = new Date();
 		const issuedByUserId = c.get("jwtPayload").userId;
 
@@ -40,18 +46,13 @@ const route = app
 
 		// DB に格納して返す
 		try {
-			await c.var.InviteRepository.createInvite({
-				expiresAt: new Date(expiresAt),
-				remainingUse,
+			const id = await c.var.InviteRepository.createInvite({
+				expiresAt: expiresAt ? new Date(expiresAt) : null,
+				remainingUse: remainingUse ?? null,
 				createdAt,
 				issuedByUserId,
 			});
-			return c.json({
-				expiresAt,
-				remainingUse,
-				createdAt,
-				issuedByUserId,
-			});
+			return c.json({ id });
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}

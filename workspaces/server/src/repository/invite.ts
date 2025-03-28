@@ -19,7 +19,7 @@ export type InviteWithUser = InviteStructure & {
 
 export interface IInviteRepository {
 	getAllInvites: () => Promise<InviteWithUser[]>;
-	createInvite: (params: Omit<InviteStructure, "id">) => Promise<void>;
+	createInvite: (params: Omit<InviteStructure, "id">) => Promise<string>;
 	getInviteById: (id: string) => Promise<InviteStructure>;
 	reduceInviteUsage: (id: string) => Promise<void>;
 	deleteInvite: (id: string) => Promise<void>;

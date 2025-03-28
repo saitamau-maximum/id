@@ -40,10 +40,12 @@ export class CloudflareInviteRepository implements IInviteRepository {
 	}
 
 	async createInvite(params: Omit<InviteStructure, "id">) {
+		const inviteId = crypto.randomUUID();
 		await this.client.insert(schema.invites).values({
-			id: crypto.randomUUID(),
+			id: inviteId,
 			...params,
 		});
+		return inviteId;
 	}
 
 	async getInviteById(id: string): Promise<InviteStructure> {

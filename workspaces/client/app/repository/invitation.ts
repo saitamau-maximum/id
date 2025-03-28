@@ -1,9 +1,18 @@
 import type { Invitation } from "~/types/invitation";
 import { client } from "~/utils/hono";
 
+interface GenerateInvitationOptions {
+	expiresAt: Date | null;
+	remainingUse: number | null;
+}
+
 export interface IInvitationRepository {
 	getInvitations: () => Promise<Invitation[]>;
 	getInvitations$$key: () => unknown[];
+	generateInvitation: ({
+		expiresAt,
+		remainingUse,
+	}: GenerateInvitationOptions) => Promise<string>;
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
@@ -12,7 +21,6 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch apps");
 		}
-		// return res.json();
 		const data = await res.json();
 		return data.map((invitation) => ({
 			...invitation,
@@ -23,5 +31,22 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 
 	getInvitations$$key() {
 		return ["apps"];
+	}
+
+	async generateInvitation({
+		expiresAt,
+		remainingUse,
+	}: GenerateInvitationOptions): Promise<string> {
+		const res = await client.invite.$post({
+			json: {
+				expiresAt: expiresAt?.toISOString(),
+				remainingUse: remainingUse ?? undefined,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to fetch apps");
+		}
+		const data = await res.json();
+		return data.id;
 	}
 }
