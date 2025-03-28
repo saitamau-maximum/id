@@ -6,5 +6,6 @@ export const useAllUsers = () => {
 	return useQuery({
 		queryKey: userRepository.getAllUsers$$key(),
 		queryFn: userRepository.getAllUsers,
+		initialData: [],
 	});
 };

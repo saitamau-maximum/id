@@ -182,15 +182,23 @@ export const userCertificationsRelations = relations(
 
 export const invites = sqliteTable("invites", {
 	id: text("id").primaryKey(),
+	title: text("title").notNull(),
 	expiresAt: integer("expires_at", { mode: "timestamp" }),
 	remainingUse: int("remaining_use"),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-	issuedBy: text("issued_by")
+	issuedByUserId: text("issued_by")
 		.references(() => users.id)
 		.notNull(),
 });
 
-export const invite_roles = sqliteTable(
+export const invitesRelations = relations(invites, ({ one }) => ({
+	issuedBy: one(users, {
+		fields: [invites.issuedByUserId],
+		references: [users.id],
+	}),
+}));
+
+export const inviteRoles = sqliteTable(
 	"invite_roles",
 	{
 		inviteId: text("invite_id")

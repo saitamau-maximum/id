@@ -10,8 +10,9 @@ import {
 const app = factory.createApp();
 
 const createInviteSchema = v.object({
-	expiresAt: v.pipe(v.string(), v.isoTimestamp()),
-	remainingUse: v.number(),
+	title: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64)),
+	expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+	remainingUse: v.optional(v.pipe(v.number(), v.minValue(1))),
 });
 
 const route = app
@@ -21,28 +22,39 @@ const route = app
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 	)
+	.get("/", async (c) => {
+		const { InviteRepository } = c.var;
+		try {
+			const invites = await InviteRepository.getAllInvites();
+			return c.json(invites);
+		} catch (e) {
+			return c.text("Internal Server Error", 500);
+		}
+	})
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
-		const { expiresAt, remainingUse } = c.req.valid("json");
+		const { expiresAt, remainingUse, title } = c.req.valid("json");
+
+		// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
+		if (!expiresAt && !remainingUse) {
+			return c.text("Bad Request", 400);
+		}
+
 		const createdAt = new Date();
-		const issuedBy = c.get("jwtPayload").userId;
+		const issuedByUserId = c.get("jwtPayload").userId;
 
 		c.header("Cache-Control", "no-store");
 		c.header("Pragma", "no-cache");
 
 		// DB に格納して返す
 		try {
-			await c.var.InviteRepository.createInvite({
-				expiresAt: new Date(expiresAt),
-				remainingUse,
+			const id = await c.var.InviteRepository.createInvite({
+				title: title,
+				expiresAt: expiresAt ? new Date(expiresAt) : null,
+				remainingUse: remainingUse ?? null,
 				createdAt,
-				issuedBy,
+				issuedByUserId,
 			});
-			return c.json({
-				expiresAt,
-				remainingUse,
-				createdAt,
-				issuedBy,
-			});
+			return c.json({ id });
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}
@@ -56,12 +68,12 @@ const route = app
 				return c.text("Invite not found", 404);
 			}
 
-			// 招待コードの残り使用回数について検証
+			// 招待リンクの残り使用回数について検証
 			if (invite.remainingUse !== null && invite.remainingUse <= 0) {
 				return c.text("Invite has no remaining uses", 400);
 			}
 
-			// 招待コードの有効期限について検証
+			// 招待リンクの有効期限について検証
 			if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
 				return c.text("Invite has expired", 400);
 			}

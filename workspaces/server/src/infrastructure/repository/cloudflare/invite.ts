@@ -4,6 +4,7 @@ import * as schema from "../../../db/schema";
 import type {
 	IInviteRepository,
 	InviteStructure,
+	InviteWithUser,
 } from "../../../repository/invite";
 
 export class CloudflareInviteRepository implements IInviteRepository {
@@ -13,15 +14,40 @@ export class CloudflareInviteRepository implements IInviteRepository {
 		this.client = drizzle(db, { schema });
 	}
 
+	async getAllInvites(): Promise<InviteWithUser[]> {
+		const res = await this.client.query.invites.findMany({
+			with: {
+				issuedBy: {
+					with: {
+						profile: true,
+					},
+				},
+			},
+		});
+
+		return res.map((invite) => ({
+			...invite,
+			expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
+			createdAt: new Date(invite.createdAt),
+			issuedBy: {
+				id: invite.issuedBy.id,
+				displayName: invite.issuedBy.profile.displayName ?? undefined,
+				displayId: invite.issuedBy.profile.displayId ?? undefined,
+				profileImageURL: invite.issuedBy.profile.profileImageURL ?? undefined,
+			},
+		}));
+	}
+
 	async createInvite(params: Omit<InviteStructure, "id">) {
+		const inviteId = crypto.randomUUID();
 		await this.client.insert(schema.invites).values({
-			id: crypto.randomUUID(),
+			id: inviteId,
 			...params,
 		});
+		return inviteId;
 	}
 
 	async getInviteById(id: string): Promise<InviteStructure> {
-		// 指定したIDの招待コードを取得
 		const res = await this.client.query.invites.findFirst({
 			where: eq(schema.invites.id, id),
 		});

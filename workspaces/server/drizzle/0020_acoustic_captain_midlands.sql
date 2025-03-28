@@ -1,0 +1,1 @@
+ALTER TABLE `invites` ADD `title` text NOT NULL;
