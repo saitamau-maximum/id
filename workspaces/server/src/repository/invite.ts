@@ -3,10 +3,22 @@ export interface InviteStructure {
 	expiresAt: Date | null;
 	remainingUse: number | null;
 	createdAt: Date;
-	issuedBy: string;
+	issuedByUserId: string;
 }
 
+export type IssuerInfo = {
+	id: string;
+	displayId?: string;
+	displayName?: string;
+	profileImageURL?: string;
+};
+
+export type InviteWithUser = InviteStructure & {
+	issuedBy: IssuerInfo;
+};
+
 export interface IInviteRepository {
+	getAllInvites: () => Promise<InviteWithUser[]>;
 	createInvite: (params: Omit<InviteStructure, "id">) => Promise<void>;
 	getInviteById: (id: string) => Promise<InviteStructure>;
 	reduceInviteUsage: (id: string) => Promise<void>;

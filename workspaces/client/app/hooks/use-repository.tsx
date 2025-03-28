@@ -3,6 +3,7 @@ import { DefaultRepositories } from "~/repository";
 import type { IAuthRepository } from "~/repository/auth";
 import type { ICalendarRepository } from "~/repository/calendar";
 import type { ICertificationRepository } from "~/repository/certification";
+import type { IInvitationRepository } from "~/repository/invitation";
 import type { ILocationRepository } from "~/repository/location";
 import type { IMemberRepository } from "~/repository/member";
 import type { IOAuthAppsRepository } from "~/repository/oauth-apps";
@@ -16,6 +17,7 @@ export interface RepositoryContextProps {
 	calendarRepository: ICalendarRepository;
 	certificationRepository: ICertificationRepository;
 	locationRepository: ILocationRepository;
+	invitationRepository: IInvitationRepository;
 }
 
 export const RepositoryContext =

@@ -185,10 +185,17 @@ export const invites = sqliteTable("invites", {
 	expiresAt: integer("expires_at", { mode: "timestamp" }),
 	remainingUse: int("remaining_use"),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
-	issuedBy: text("issued_by")
+	issuedByUserId: text("issued_by")
 		.references(() => users.id)
 		.notNull(),
 });
+
+export const invitesRelations = relations(invites, ({ one }) => ({
+	issuedBy: one(users, {
+		fields: [invites.issuedByUserId],
+		references: [users.id],
+	}),
+}));
 
 export const inviteRoles = sqliteTable(
 	"invite_roles",

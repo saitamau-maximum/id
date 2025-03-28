@@ -4,6 +4,7 @@ import * as schema from "../../../db/schema";
 import type {
 	IInviteRepository,
 	InviteStructure,
+	InviteWithUser,
 } from "../../../repository/invite";
 
 export class CloudflareInviteRepository implements IInviteRepository {
@@ -11,6 +12,31 @@ export class CloudflareInviteRepository implements IInviteRepository {
 
 	constructor(db: D1Database) {
 		this.client = drizzle(db, { schema });
+	}
+
+	async getAllInvites(): Promise<InviteWithUser[]> {
+		const res = await this.client.query.invites.findMany({
+			with: {
+				issuedBy: {
+					with: {
+						profile: true,
+					},
+				},
+			},
+		});
+
+		const a = res.map((invite) => ({
+			...invite,
+			expiresAt: invite.expiresAt ? new Date(invite.expiresAt) : null,
+			createdAt: new Date(invite.createdAt),
+			issuedBy: {
+				id: invite.issuedBy.id,
+				displayName: invite.issuedBy.profile.displayName ?? undefined,
+				displayId: invite.issuedBy.profile.displayId ?? undefined,
+				profileImageURL: invite.issuedBy.profile.profileImageURL ?? undefined,
+			},
+		}));
+		return a;
 	}
 
 	async createInvite(params: Omit<InviteStructure, "id">) {

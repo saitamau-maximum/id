@@ -21,10 +21,19 @@ const route = app
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 	)
+	.get("/", async (c) => {
+		const { InviteRepository } = c.var;
+		try {
+			const invites = await InviteRepository.getAllInvites();
+			return c.json(invites);
+		} catch (e) {
+			return c.text("Internal Server Error", 500);
+		}
+	})
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
 		const { expiresAt, remainingUse } = c.req.valid("json");
 		const createdAt = new Date();
-		const issuedBy = c.get("jwtPayload").userId;
+		const issuedByUserId = c.get("jwtPayload").userId;
 
 		c.header("Cache-Control", "no-store");
 		c.header("Pragma", "no-cache");
@@ -35,13 +44,13 @@ const route = app
 				expiresAt: new Date(expiresAt),
 				remainingUse,
 				createdAt,
-				issuedBy,
+				issuedByUserId,
 			});
 			return c.json({
 				expiresAt,
 				remainingUse,
 				createdAt,
-				issuedBy,
+				issuedByUserId,
 			});
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
