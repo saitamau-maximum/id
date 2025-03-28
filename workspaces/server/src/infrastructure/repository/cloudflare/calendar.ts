@@ -24,6 +24,21 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		}));
 	}
 
+	async getAllEventsWithLocation(): Promise<ICalendarEvent[]> {
+		const res = await this.client.query.calendarEvents.findMany({
+			with: {
+				location: true,
+			},
+		});
+
+		return res.map((event) => ({
+			...event,
+			locationId: event.locationId ?? undefined,
+			startAt: new Date(event.startAt),
+			endAt: new Date(event.endAt),
+		}));
+	}
+
 	async createEvent(event: CreateEventPayload): Promise<void> {
 		const newEvent = {
 			...event,
