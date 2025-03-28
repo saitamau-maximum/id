@@ -29,7 +29,7 @@ const CreateFormSchema = v.object({
 	locationId: EventSchemas.LocationId,
 });
 
-type CreateFormValues = v.InferInput<typeof CreateFormSchema>;
+type CreateFormValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 	const { locations } = useLocations();

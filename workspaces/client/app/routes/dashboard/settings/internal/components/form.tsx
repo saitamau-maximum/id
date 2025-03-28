@@ -36,7 +36,7 @@ const UpdateFormSchema = v.object({
 	bio: UserSchemas.Bio,
 });
 
-type FormValues = v.InferInput<typeof UpdateFormSchema>;
+type FormValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();

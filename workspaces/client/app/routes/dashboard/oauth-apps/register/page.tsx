@@ -22,7 +22,7 @@ const RegisterFormSchema = v.object({
 	icon: OAuthSchemas.Icon,
 });
 
-type FormValues = v.InferInput<typeof RegisterFormSchema>;
+type FormValues = v.InferOutput<typeof RegisterFormSchema>;
 
 const iconStyle = css({
 	padding: 1,
