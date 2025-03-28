@@ -1,14 +1,11 @@
 import { css } from "styled-system/css";
 import { Table } from "~/components/ui/table";
-
-import type { User } from "~/types/user";
+import { useAllUsers } from "../hooks/use-all-user";
 import { RoleEditor } from "./role-editor";
 
-interface Props {
-	users: User[];
-}
+export const UsersTable = () => {
+	const { data: users } = useAllUsers();
 
-export const UsersTable = ({ users }: Props) => {
 	return (
 		<Table.Root>
 			<thead>
@@ -26,29 +23,31 @@ export const UsersTable = ({ users }: Props) => {
 				{users.map((user) => (
 					<Table.Tr key={user.id}>
 						<Table.Td>{user.displayName}</Table.Td>
-						<Table.Td>@{user.displayId}</Table.Td>
+						<Table.Td>{user.displayId && `@${user.displayId}`}</Table.Td>
 						<Table.Td>
-							<div>
-								<span
-									className={css({
-										display: "block",
-										fontSize: "xs",
-										color: "gray.500",
-										whiteSpace: "nowrap",
-									})}
-								>
-									{user.realNameKana}
-								</span>
-								<span
-									className={css({
-										display: "block",
-										fontSize: "md",
-										whiteSpace: "nowrap",
-									})}
-								>
-									{user.realName}
-								</span>
-							</div>
+							{(user.realNameKana || user.realName) && (
+								<div>
+									<span
+										className={css({
+											display: "block",
+											fontSize: "xs",
+											color: "gray.500",
+											whiteSpace: "nowrap",
+										})}
+									>
+										{user.realNameKana}
+									</span>
+									<span
+										className={css({
+											display: "block",
+											fontSize: "md",
+											whiteSpace: "nowrap",
+										})}
+									>
+										{user.realName}
+									</span>
+								</div>
+							)}
 						</Table.Td>
 						<Table.Td>
 							<div>

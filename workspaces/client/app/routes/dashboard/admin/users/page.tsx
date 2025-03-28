@@ -1,11 +1,20 @@
+import { css } from "styled-system/css";
 import { UsersTable } from "./internal/components/table";
-import { useAllUsers } from "./internal/hooks/use-all-user";
 
 export default function AdminUsers() {
-	const users = useAllUsers();
 	return (
 		<div>
-			<UsersTable users={users.data ?? []} />
+			<h2
+				className={css({
+					fontSize: "xl",
+					fontWeight: "bold",
+					color: "gray.600",
+					marginBottom: 4,
+				})}
+			>
+				ユーザー
+			</h2>
+			<UsersTable />
 		</div>
 	);
 }
