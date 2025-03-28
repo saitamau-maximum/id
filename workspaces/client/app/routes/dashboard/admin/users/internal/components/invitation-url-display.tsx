@@ -5,12 +5,15 @@ import { IconButton } from "~/components/ui/icon-button";
 import { useToast } from "~/hooks/use-toast";
 
 interface Props {
-	invitationURL: string;
+	title: string;
+	id: string;
 }
 
-export const GeneratedInvitationURLDisplay = ({ invitationURL }: Props) => {
+export const InvitationURLDisplay = ({ title, id }: Props) => {
 	const [copied, setCopied] = useState(false);
 	const { pushToast } = useToast();
+
+	const invitationURL = `${window.location.origin}/invitation/${id}`;
 
 	const handleCopyClientId = useCallback(() => {
 		navigator.clipboard.writeText(invitationURL);
@@ -31,6 +34,16 @@ export const GeneratedInvitationURLDisplay = ({ invitationURL }: Props) => {
 				margin: "token(spacing.8) 0",
 			})}
 		>
+			<span
+				className={css({
+					fontSize: "lg",
+					fontWeight: "bold",
+					color: "gray.600",
+					marginBottom: 4,
+				})}
+			>
+				{title}
+			</span>
 			<div
 				className={css({
 					display: "grid",
@@ -62,9 +75,6 @@ export const GeneratedInvitationURLDisplay = ({ invitationURL }: Props) => {
 					)}
 				</IconButton>
 			</div>
-			<p className={css({ fontSize: "sm", color: "gray.600", marginTop: 2 })}>
-				このシークレットは一度しか表示されません。必ずコピーして安全な場所に保存してください。
-			</p>
 		</div>
 	);
 };

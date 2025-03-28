@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import { GeneratedInvitationURLDisplay } from "../components/generated-invitation-url-display";
+import type { GenerateInvitationOptions } from "~/repository/invitation";
+import { InvitationURLDisplay } from "../components/invitation-url-display";
 
 export const useGenerateInvitation = () => {
 	const { invitationRepository } = useRepository();
@@ -10,8 +11,14 @@ export const useGenerateInvitation = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: invitationRepository.generateInvitation,
-		onSuccess: async (id) => {
+		mutationFn: async (opt: GenerateInvitationOptions) => {
+			const id = await invitationRepository.generateInvitation(opt);
+			return {
+				id,
+				...opt,
+			};
+		},
+		onSuccess: async (data) => {
 			pushToast({
 				title: "招待リンクをしました",
 				type: "success",
@@ -21,11 +28,7 @@ export const useGenerateInvitation = () => {
 			});
 			await InformationDialog.call({
 				title: "招待リンクの生成に成功しました",
-				children: (
-					<GeneratedInvitationURLDisplay
-						invitationURL={`${window.location.origin}/invitation/${id}`}
-					/>
-				),
+				children: <InvitationURLDisplay title={data.title} id={data.id} />,
 			});
 		},
 		onError: () => {

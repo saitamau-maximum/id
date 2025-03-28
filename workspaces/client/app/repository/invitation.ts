@@ -1,7 +1,7 @@
 import type { Invitation } from "~/types/invitation";
 import { client } from "~/utils/hono";
 
-interface GenerateInvitationOptions {
+export interface GenerateInvitationOptions {
 	title: string;
 	expiresAt: Date | null;
 	remainingUse: number | null;

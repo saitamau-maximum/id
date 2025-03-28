@@ -2,11 +2,14 @@ import { useCallback } from "react";
 import { Plus } from "react-feather";
 import { css } from "styled-system/css";
 import { UserDisplay } from "~/components/feature/user/user-display";
+import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
-import { useGenerateInvitation } from "../hooks/use-generate-invitation-code";
+import type { Invitation } from "~/types/invitation";
+import { useGenerateInvitation } from "../hooks/use-generate-invitation";
 import { useInvitations } from "../hooks/use-invitations";
 import { GenerateInvitationURLDialog } from "./callable-generate-invitation-url-dialog";
+import { InvitationURLDisplay } from "./invitation-url-display";
 
 const formatLocalDate = (date: Date | null) => {
 	if (!date) return "";
@@ -33,6 +36,15 @@ export const InvitationsEditor = () => {
 			remainingUse: res.payload.remainingUse,
 		});
 	}, [generateInvitation]);
+
+	const handleRowClick = useCallback(async (invitation: Invitation) => {
+		await InformationDialog.call({
+			title: "招待コード",
+			children: (
+				<InvitationURLDisplay title={invitation.title} id={invitation.id} />
+			),
+		});
+	}, []);
 
 	return (
 		<div>
@@ -73,7 +85,10 @@ export const InvitationsEditor = () => {
 					</thead>
 					<tbody>
 						{invitations.map((invitation) => (
-							<Table.Tr key={invitation.id}>
+							<Table.Tr
+								key={invitation.id}
+								onClick={() => handleRowClick(invitation)}
+							>
 								<Table.Td>{invitation.title}</Table.Td>
 								<Table.Td>
 									{invitation.remainingUse && (
