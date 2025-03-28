@@ -182,6 +182,7 @@ export const userCertificationsRelations = relations(
 
 export const invites = sqliteTable("invites", {
 	id: text("id").primaryKey(),
+	title: text("title").notNull(),
 	expiresAt: integer("expires_at", { mode: "timestamp" }),
 	remainingUse: int("remaining_use"),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),

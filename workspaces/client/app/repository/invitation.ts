@@ -2,6 +2,7 @@ import type { Invitation } from "~/types/invitation";
 import { client } from "~/utils/hono";
 
 interface GenerateInvitationOptions {
+	title: string;
 	expiresAt: Date | null;
 	remainingUse: number | null;
 }
@@ -10,6 +11,7 @@ export interface IInvitationRepository {
 	getInvitations: () => Promise<Invitation[]>;
 	getInvitations$$key: () => unknown[];
 	generateInvitation: ({
+		title,
 		expiresAt,
 		remainingUse,
 	}: GenerateInvitationOptions) => Promise<string>;
@@ -34,11 +36,13 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 	}
 
 	async generateInvitation({
+		title,
 		expiresAt,
 		remainingUse,
 	}: GenerateInvitationOptions): Promise<string> {
 		const res = await client.invite.$post({
 			json: {
+				title,
 				expiresAt: expiresAt?.toISOString(),
 				remainingUse: remainingUse ?? undefined,
 			},

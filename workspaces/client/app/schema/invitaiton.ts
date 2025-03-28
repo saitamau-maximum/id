@@ -1,6 +1,11 @@
 import * as v from "valibot";
 
 export const InvitationURLSchemas = {
+	Title: v.pipe(
+		v.string(),
+		v.nonEmpty("タイトルを入力してください"),
+		v.maxLength(64, "タイトルは64文字以下で入力してください"),
+	),
 	RemainingUse: v.nullable(
 		v.pipe(
 			v.string(),

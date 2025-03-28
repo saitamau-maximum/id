@@ -1,5 +1,6 @@
 export interface InviteStructure {
 	id: string;
+	title: string;
 	expiresAt: Date | null;
 	remainingUse: number | null;
 	createdAt: Date;

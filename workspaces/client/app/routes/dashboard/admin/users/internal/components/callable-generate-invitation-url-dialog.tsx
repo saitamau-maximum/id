@@ -15,6 +15,7 @@ type Payload =
 			payload: {
 				expiresAt: Date | null;
 				remainingUse: number | null;
+				title: string;
 			};
 	  }
 	| {
@@ -22,6 +23,7 @@ type Payload =
 	  };
 
 const CreateFormSchema = v.object({
+	title: InvitationURLSchemas.Title,
 	expiresAt: InvitationURLSchemas.ExpiresAt,
 	remainingUse: InvitationURLSchemas.RemainingUse,
 });
@@ -75,6 +77,14 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 						gridTemplateColumns: "1fr",
 					})}
 				>
+					<Form.Field.TextInput
+						label="タイトル"
+						type="text"
+						error={errors.title?.message}
+						required
+						{...register("title")}
+					/>
+
 					<Form.Field.TextInput
 						label="使用可能回数"
 						type="text"

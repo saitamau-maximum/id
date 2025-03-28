@@ -1,5 +1,6 @@
 export interface Invitation {
 	id: string;
+	title: string;
 	expiresAt: Date | null;
 	remainingUse: number | null;
 	createdAt: Date;

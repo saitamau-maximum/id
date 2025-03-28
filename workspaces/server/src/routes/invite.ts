@@ -10,6 +10,7 @@ import {
 const app = factory.createApp();
 
 const createInviteSchema = v.object({
+	title: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64)),
 	expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
 	remainingUse: v.optional(v.pipe(v.number(), v.minValue(1))),
 });
@@ -31,7 +32,7 @@ const route = app
 		}
 	})
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
-		const { expiresAt, remainingUse } = c.req.valid("json");
+		const { expiresAt, remainingUse, title } = c.req.valid("json");
 
 		// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
 		if (!expiresAt && !remainingUse) {
@@ -47,6 +48,7 @@ const route = app
 		// DB に格納して返す
 		try {
 			const id = await c.var.InviteRepository.createInvite({
+				title: title,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
 				remainingUse: remainingUse ?? null,
 				createdAt,

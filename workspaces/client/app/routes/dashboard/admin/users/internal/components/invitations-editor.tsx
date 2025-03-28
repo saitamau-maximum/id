@@ -28,6 +28,7 @@ export const InvitationsEditor = () => {
 		const res = await GenerateInvitationURLDialog.call();
 		if (res.type === "dismiss") return;
 		generateInvitation({
+			title: res.payload.title,
 			expiresAt: res.payload.expiresAt,
 			remainingUse: res.payload.remainingUse,
 		});
@@ -63,6 +64,7 @@ export const InvitationsEditor = () => {
 				<Table.Root>
 					<thead>
 						<Table.Tr>
+							<Table.Th>タイトル</Table.Th>
 							<Table.Th>残り使用回数</Table.Th>
 							<Table.Th>期限</Table.Th>
 							<Table.Th>作成日</Table.Th>
@@ -72,6 +74,7 @@ export const InvitationsEditor = () => {
 					<tbody>
 						{invitations.map((invitation) => (
 							<Table.Tr key={invitation.id}>
+								<Table.Td>{invitation.title}</Table.Td>
 								<Table.Td>
 									{invitation.remainingUse && (
 										<div
