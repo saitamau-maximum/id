@@ -123,13 +123,32 @@ const route = app
 			const userOctokit = new Octokit({ auth: access_token });
 			const { data: user } = await userOctokit.request("GET /user");
 
-			const isMember = await c.var.OrganizationRepository.checkIsMember(
-				user.login,
-			);
+			const invitationId = getCookie(c, COOKIE_NAME.INVITATION_ID);
+			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			if (!isMember) {
-				// いったん Maximum Member じゃない場合はログインさせないようにする
-				return c.text("not a member", 403);
+			if (invitationId) {
+				// 招待コードがある場合は、招待コードを検証する
+				try {
+					const invitation =
+						await c.var.InviteRepository.getInviteById(invitationId);
+					if (
+						!invitation ||
+						(invitation.remainingUse !== null && invitation.remainingUse <= 0)
+					) {
+						return c.text("invalid invitation code", 400);
+					}
+					await c.var.InviteRepository.reduceInviteUsage(invitationId);
+				} catch {
+					return c.text("invalid invitation code", 400);
+				}
+			} else {
+				// 招待コードがない場合は、Organization に所属していることを確認する
+				const isMember = await c.var.OrganizationRepository.checkIsMember(
+					user.login,
+				);
+				if (!isMember) {
+					return c.text("invitation code required for non-members", 403);
+				}
 			}
 
 			let foundUserId = null;
@@ -145,6 +164,7 @@ const route = app
 				foundUserId = await c.var.UserRepository.createUser(
 					String(user.id),
 					OAUTH_PROVIDER_IDS.GITHUB,
+					invitationId,
 					{
 						email: user.email ?? undefined,
 						displayName: user.login,
