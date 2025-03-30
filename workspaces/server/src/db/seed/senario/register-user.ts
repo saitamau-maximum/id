@@ -28,6 +28,8 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User One!",
 		},
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
+		isPending: true,
+		invitationId: "bbdb4b03-9f66-4349-b8fd-e250ed670d1d",
 	},
 	{
 		id: DUMMY_USER_IDS.USER2,
@@ -45,6 +47,8 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Two!",
 		},
 		roles: [ROLE_IDS.MEMBER],
+		isPending: false,
+		invitationId: "bbdb4b03-9f66-4349-b8fd-e250ed670d1d",
 	},
 	{
 		id: DUMMY_USER_IDS.USER3,
@@ -62,6 +66,8 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Three!",
 		},
 		roles: [ROLE_IDS.MEMBER],
+		isPending: false,
+		invitationId: null,
 	},
 ];
 
@@ -74,6 +80,8 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfour",
 			email: "user4@example.com",
 		},
+		isPending: true,
+		invitationId: "bbdb4b03-9f66-4349-b8fd-e250ed670d1d",
 	},
 	{
 		id: DUMMY_USER_IDS.USER5,
@@ -83,6 +91,8 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfive",
 			email: "user5@example.com",
 		},
+		isPending: false,
+		invitationId: null,
 	},
 ];
 
@@ -133,6 +143,8 @@ export const registerUserSeed = async (
 			client.insert(schema.users).values({
 				id: user.id,
 				initializedAt: new Date(),
+				isPending: user.isPending,
+				invitationId: user.invitationId,
 			}),
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
@@ -161,6 +173,7 @@ export const registerUserSeed = async (
 		await client.batch([
 			client.insert(schema.users).values({
 				id: user.id,
+				isPending: user.isPending,
 			}),
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
