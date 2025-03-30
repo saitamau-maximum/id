@@ -1,5 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
+import { setCookie } from "hono/cookie";
+import { cors } from "hono/cors";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../constants/cookie";
 import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
 import {
@@ -16,6 +19,31 @@ const createInviteSchema = v.object({
 });
 
 const route = app
+	.use(
+		cors({
+			origin: (origin, c) => {
+				const clientOrigin = c.env.CLIENT_ORIGIN;
+				if (origin === clientOrigin) {
+					return origin;
+				}
+				return clientOrigin;
+			},
+			credentials: true,
+		}),
+	)
+	.get("/:id", async (c) => {
+		const id = c.req.param("id");
+		setCookie(c, COOKIE_NAME.INVITATION_ID, id, {
+			maxAge: 60 * 60 * 24, // 1 day
+			sameSite: "lax",
+			// TODO: setup bypass for dev
+			// httpOnly: true,
+			// secure: true,
+		});
+		return c.json({ success: true });
+	});
+
+const protectedInviteRoute = app
 	.use(authMiddleware)
 	.use(
 		roleAuthorizationMiddleware({
@@ -94,4 +122,4 @@ const route = app
 		}
 	});
 
-export { route as inviteRoute };
+export { route as inviteRoute, protectedInviteRoute };
