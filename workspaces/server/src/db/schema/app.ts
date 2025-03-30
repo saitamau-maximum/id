@@ -21,12 +21,19 @@ export const users = sqliteTable("users", {
 	id: text("id").primaryKey(),
 	/* 初期登録日時。NULLの場合は未初期化 */
 	initializedAt: integer("initialized_at", { mode: "timestamp" }),
+	isPending: integer("is_pending", { mode: "boolean" }).notNull(),
+	/* 招待コード経由で登録した場合に初期化される */
+	invitationId: text("invitation_id"),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
 	profile: one(userProfiles, {
 		fields: [users.id],
 		references: [userProfiles.userId],
+	}),
+	invitation: one(invites, {
+		fields: [users.invitationId],
+		references: [invites.id],
 	}),
 	oauthOwningClients: many(oauthClients),
 	oauthManagingClients: many(oauthClients),
