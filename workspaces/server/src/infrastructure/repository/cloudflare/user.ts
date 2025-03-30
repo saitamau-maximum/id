@@ -21,15 +21,20 @@ export class CloudflareUserRepository implements IUserRepository {
 	async createUser(
 		providerUserId: string,
 		providerId: number,
+		invitationId: string | undefined,
 		payload: Partial<Profile> = {},
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
+		const insertingUserData = {
+			id: userId,
+			isPending: !!invitationId, // 招待リンクからの登録の場合は仮登録ユーザーとする
+			...(invitationId && { invitationId }), // 仮登録ユーザーの場合は招待コードを保存する
+		};
+
 		// d1にはtransactionがないのでbatchで両方成功を期待する
 		const [_, res] = await this.client.batch([
-			this.client.insert(schema.users).values({
-				id: userId,
-			}),
+			this.client.insert(schema.users).values(insertingUserData),
 			this.client.insert(schema.oauthConnections).values({
 				userId,
 				providerId,
