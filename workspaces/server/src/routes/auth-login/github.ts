@@ -140,7 +140,9 @@ const route = app
 				return true;
 			};
 
-			const consumeInvitation = async (invitationId: string): Promise<boolean> => {
+			const consumeInvitation = async (
+				invitationId: string,
+			): Promise<boolean> => {
 				try {
 					const invitation =
 						await c.var.InviteRepository.getInviteById(invitationId);
