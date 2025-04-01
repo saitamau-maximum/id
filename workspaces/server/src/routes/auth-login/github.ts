@@ -127,7 +127,7 @@ const route = app
 			const invitationId = getCookie(c, COOKIE_NAME.INVITATION_ID);
 			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			const isInvitationValid = (invitation: InviteStructure): boolean => {
+			const isValidInvitation = (invitation: InviteStructure): boolean => {
 				if (!invitation) return false;
 
 				// 利用可能回数の検証
@@ -140,11 +140,11 @@ const route = app
 				return true;
 			};
 
-			const useInvitation = async (invitationId: string): Promise<boolean> => {
+			const consumeInvitation = async (invitationId: string): Promise<boolean> => {
 				try {
 					const invitation =
 						await c.var.InviteRepository.getInviteById(invitationId);
-					if (!isInvitationValid(invitation)) return false;
+					if (!isValidInvitation(invitation)) return false;
 					await c.var.InviteRepository.reduceInviteUsage(invitationId);
 					return true;
 				} catch {
@@ -154,7 +154,7 @@ const route = app
 
 			if (invitationId) {
 				// 招待コードがある場合は、招待コードを検証する
-				const completed = await useInvitation(invitationId);
+				const completed = await consumeInvitation(invitationId);
 				if (!completed) {
 					return c.text("invalid invitation code", 400);
 				}
