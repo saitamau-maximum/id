@@ -30,18 +30,12 @@ const getCookieOptions = (isLocal: boolean): CookieOptions => ({
 });
 
 const route = app
-	.use(
-		cors({
-			origin: (origin, c) => {
-				const clientOrigin = c.env.CLIENT_ORIGIN;
-				if (origin === clientOrigin) {
-					return origin;
-				}
-				return clientOrigin;
-			},
+	.use((c, next) => {
+		return cors({
+			origin: c.env.CLIENT_ORIGIN, // ALLOW_ORIGIN を用いると dev 環境で Cookie をセットできなくなる
 			credentials: true,
-		}),
-	)
+		})(c, next);
+	})
 	.get("/:id", async (c) => {
 		const id = c.req.param("id");
 		const requestUrl = new URL(c.req.url);
