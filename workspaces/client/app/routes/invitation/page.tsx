@@ -16,21 +16,18 @@ export default function Invitation() {
 					credentials: "include",
 				});
 				if (!response.ok) {
-					pushToast({
-						type: "error",
-						title:
-							"招待コードの取得に失敗しました。時間をおいて再度お試しください。",
-					});
 					throw new Error("Failed to fetch invitation");
 				}
-				navigate("/login");
+				setTimeout(() => {
+					navigate("/login");
+				}, 1800);
 			} catch (error) {
 				pushToast({
 					type: "error",
-					title:
-						"招待コードの取得に失敗しました。時間をおいて再度お試しください。",
+					title: "招待コードの取得に失敗しました",
+					description:
+						"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
 				});
-				console.error("Error fetching invitation:", error);
 			}
 		};
 		fetchInvitation();
