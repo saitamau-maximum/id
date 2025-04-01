@@ -13,6 +13,7 @@ import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
+import type { InviteStructure } from "../../repository/invite";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
@@ -126,19 +127,35 @@ const route = app
 			const invitationId = getCookie(c, COOKIE_NAME.INVITATION_ID);
 			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			if (invitationId) {
-				// 招待コードがある場合は、招待コードを検証する
+			const isInvitationValid = (invitation: InviteStructure): boolean => {
+				if (!invitation) return false;
+
+				// 利用可能回数の検証
+				if (invitation.remainingUse !== null && invitation.remainingUse <= 0)
+					return false;
+				// 有効期限の検証
+				if (invitation.expiresAt !== null && invitation.expiresAt < new Date())
+					return false;
+
+				return true;
+			};
+
+			const useInvitation = async (invitationId: string): Promise<boolean> => {
 				try {
 					const invitation =
 						await c.var.InviteRepository.getInviteById(invitationId);
-					if (
-						!invitation ||
-						(invitation.remainingUse !== null && invitation.remainingUse <= 0)
-					) {
-						return c.text("invalid invitation code", 400);
-					}
+					if (!isInvitationValid(invitation)) return false;
 					await c.var.InviteRepository.reduceInviteUsage(invitationId);
+					return true;
 				} catch {
+					return false;
+				}
+			};
+
+			if (invitationId) {
+				// 招待コードがある場合は、招待コードを検証する
+				const completed = await useInvitation(invitationId);
+				if (!completed) {
 					return c.text("invalid invitation code", 400);
 				}
 			} else {
