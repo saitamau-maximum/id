@@ -54,6 +54,7 @@ export const userProfiles = sqliteTable(
 		studentId: text("student_id"),
 		grade: text("grade"),
 		bio: text("bio"),
+		updatedAt: integer("updated_at", { mode: "timestamp" }),
 	},
 	(table) => ({
 		gradeIdx: index("grade_idx").on(table.grade),
