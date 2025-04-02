@@ -18,6 +18,7 @@ export type User = {
 	studentId?: string;
 	grade?: string;
 	bio?: string;
+	updatedAt?: Date;
 };
 
 export type UserWithCertifications = User & {

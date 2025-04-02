@@ -12,7 +12,11 @@ export class AuthRepositoryImpl implements IAuthRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch user");
 		}
-		return res.json();
+		const data = await res.json();
+		return {
+			...data,
+			updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
+		};
 	}
 	me$$key() {
 		return ["auth"];
