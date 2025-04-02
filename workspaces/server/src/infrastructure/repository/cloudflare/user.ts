@@ -111,6 +111,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				certifiedIn: cert.certifiedIn,
 				isApproved: cert.isApproved,
 			})),
+			updatedAt: user.profile.updatedAt ?? undefined,
 		};
 	}
 
@@ -140,6 +141,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			updatedAt: new Date(),
 		};
 
 		const [_, res] = await this.client.batch([
@@ -184,6 +186,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: payload.studentId,
 			grade: payload.grade,
 			bio: payload.bio,
+			updatedAt: new Date(),
 		};
 
 		const res = await this.client
@@ -292,6 +295,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.profile.grade ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			bio: user.profile.bio ?? undefined,
+			updatedAt: user.profile.updatedAt ?? undefined,
 		}));
 	}
 
