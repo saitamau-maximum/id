@@ -20,7 +20,7 @@ export interface IInvitationRepository {
 		remainingUse,
 	}: GenerateInvitationOptions) => Promise<string>;
 	fetchInvitation: (params: FetchInvitationParams) => Promise<boolean>;
-	fetchInvitation$$key: () => unknown[];
+	fetchInvitation$$key: (invitationId: string) => unknown[];
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
@@ -79,7 +79,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		return res.ok;
 	}
 
-	fetchInvitation$$key(): unknown[] {
-		return ["invitation"];
+	fetchInvitation$$key(invitationId: string): unknown[] {
+		return ["invitation", invitationId];
 	}
 }
