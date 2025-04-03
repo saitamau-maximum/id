@@ -161,7 +161,9 @@ const route = app
 				}
 			} else if (invitationId === undefined) {
 				// 招待コードが存在しない場合、Organization のメンバーかどうかを確認する
-				const isMember = await c.var.OrganizationRepository.checkIsMember(user.login);
+				const isMember = await c.var.OrganizationRepository.checkIsMember(
+					user.login,
+				);
 				if (!isMember) {
 					return c.text("invitation code required for non-members", 403);
 				}

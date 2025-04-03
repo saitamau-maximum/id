@@ -70,7 +70,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 			{
 				init: {
 					credentials: "include",
-				}
+				},
 			},
 		);
 		if (!res.ok) {
