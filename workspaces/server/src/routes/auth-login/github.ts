@@ -123,7 +123,7 @@ const route = app
 			const userOctokit = new Octokit({ auth: access_token });
 			const { data: user } = await userOctokit.request("GET /user");
 
-			const invitationId = getSignedCookie(
+			const invitationId = await getSignedCookie(
 				c,
 				c.env.SECRET,
 				COOKIE_NAME.INVITATION_ID,
@@ -153,20 +153,21 @@ const route = app
 				}
 			};
 
-			if (invitationId) {
-				// 招待コードがある場合は、招待コードを検証する
-				const completed = await consumeInvitation(invitationId);
-				if (!completed) {
+			if (typeof invitationId === "string") {
+				// 招待コードの署名検証に成功しているので、コードを検証する
+				const valid = await consumeInvitation(invitationId);
+				if (!valid) {
 					return c.text("invalid invitation code", 400);
 				}
-			} else {
-				// 招待コードがない場合は、Organization に所属していることを確認する
-				const isMember = await c.var.OrganizationRepository.checkIsMember(
-					user.login,
-				);
+			} else if (invitationId === undefined) {
+				// 招待コードが存在しない場合、Organization のメンバーかどうかを確認する
+				const isMember = await c.var.OrganizationRepository.checkIsMember(user.login);
 				if (!isMember) {
 					return c.text("invitation code required for non-members", 403);
 				}
+			} else {
+				// invitationId が false など、署名検証に失敗している場合
+				return c.text("invalid invitation code", 400);
 			}
 
 			let foundUserId = null;
