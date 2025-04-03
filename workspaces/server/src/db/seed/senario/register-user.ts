@@ -20,6 +20,11 @@ export const DUMMY_INVITATION = {
 	issuedByUserId: DUMMY_USER_IDS.USER1,
 };
 
+export const DUMMY_INVITE_ROLE = {
+	inviteId: DUMMY_INVITATION.id,
+	roleId: ROLE_IDS.MEMBER,
+};
+
 export const DUMMY_INITIALIZED_USERS = [
 	{
 		id: DUMMY_USER_IDS.USER1,
@@ -211,4 +216,6 @@ export const registerUserSeed = async (
 			name: connection.login,
 		});
 	}
+
+	await client.insert(schema.inviteRoles).values(DUMMY_INVITE_ROLE);
 };
