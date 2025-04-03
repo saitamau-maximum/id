@@ -26,9 +26,6 @@ export const users = sqliteTable("users", {
 	/* 招待コード経由で登録した場合に初期化される */
 	invitationId: text("invitation_id").references(
 		(): AnySQLiteColumn => invites.id,
-		{
-			onDelete: "set null",
-		},
 	),
 });
 
