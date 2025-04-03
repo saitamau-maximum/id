@@ -4,7 +4,8 @@ CREATE TABLE `users` (
   `id` text PRIMARY KEY NOT NULL,
   `initialized_at` integer,
   `is_pending` integer NOT NULL DEFAULT 1,  -- 新規ユーザーのデフォルト値は 1 にする
-  `invitation_id` text
+  `invitation_id` text,
+  FOREIGN KEY (`invitation_id`) REFERENCES invites(id)
 );
 
 -- 既存ユーザーについては is_pending = 0 とする
