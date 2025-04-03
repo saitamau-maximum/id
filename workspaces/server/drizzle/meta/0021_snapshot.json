@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "54ae2886-729c-48c1-a9f6-7ca19129886e",
+  "id": "bb5a241a-e219-474e-86f7-1a57e1f0d504",
   "prevId": "e44d16b5-9179-4f3a-ac74-b4eceb359192",
   "tables": {
     "calendar_events": {
@@ -471,6 +471,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -567,20 +574,6 @@
         "initialized_at": {
           "name": "initialized_at",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "is_pending": {
-          "name": "is_pending",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "invitation_id": {
-          "name": "invitation_id",
-          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false

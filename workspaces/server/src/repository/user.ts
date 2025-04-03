@@ -19,6 +19,7 @@ export type Profile = {
 	studentId: string;
 	grade: string;
 	bio: string;
+	updatedAt: Date;
 };
 
 export type User = {
