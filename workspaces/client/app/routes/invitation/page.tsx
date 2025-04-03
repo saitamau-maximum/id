@@ -12,14 +12,17 @@ export default function Invitation() {
 	const { pushToast } = useToast();
 	const { invitationRepository } = useRepository();
 
+	if (!id) {
+		navigate("/login");
+		return null;
+	}
+
 	const { isLoading, error } = useQuery({
-		queryKey: invitationRepository.fetchInvitation$$key(),
-		queryFn: id
-			? async () => {
-					const params: FetchInvitationParams = { invitationId: id };
-					return invitationRepository.fetchInvitation(params);
-				}
-			: undefined, // id がない場合は queryFn を実行しない
+		queryKey: invitationRepository.fetchInvitation$$key(id),
+		queryFn: async () => {
+			const params: FetchInvitationParams = { invitationId: id };
+			return invitationRepository.fetchInvitation(params);
+		},
 	});
 
 	useEffect(() => {
