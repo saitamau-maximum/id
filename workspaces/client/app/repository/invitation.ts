@@ -61,11 +61,18 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 	}
 
 	async fetchInvitation(params: FetchInvitationParams): Promise<boolean> {
-		const res = await client.invite[":id"].$get({
-			param: {
-				id: params.invitationId,
+		const res = await client.invite[":id"].$get(
+			{
+				param: {
+					id: params.invitationId,
+				},
 			},
-		});
+			{
+				init: {
+					credentials: "include",
+				}
+			},
+		);
 		if (!res.ok) {
 			throw new Error("Failed to fetch invitation");
 		}
