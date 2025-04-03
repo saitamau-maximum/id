@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 import {
+	type AnySQLiteColumn,
 	index,
 	int,
 	integer,
@@ -23,7 +24,12 @@ export const users = sqliteTable("users", {
 	initializedAt: integer("initialized_at", { mode: "timestamp" }),
 	isPending: integer("is_pending", { mode: "boolean" }).notNull().default(true),
 	/* 招待コード経由で登録した場合に初期化される */
-	invitationId: text("invitation_id"),
+	invitationId: text("invitation_id").references(
+		(): AnySQLiteColumn => invites.id,
+		{
+			onDelete: "set null",
+		},
+	),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({
