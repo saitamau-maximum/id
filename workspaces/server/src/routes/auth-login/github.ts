@@ -123,7 +123,11 @@ const route = app
 			const userOctokit = new Octokit({ auth: access_token });
 			const { data: user } = await userOctokit.request("GET /user");
 
-			const invitationId = getCookie(c, COOKIE_NAME.INVITATION_ID);
+			const invitationId = getSignedCookie(
+				c,
+				c.env.SECRET,
+				COOKIE_NAME.INVITATION_ID,
+			);
 			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
 			const consumeInvitation = async (

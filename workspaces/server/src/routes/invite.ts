@@ -1,5 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import { setCookie } from "hono/cookie";
+import { setSignedCookie } from "hono/cookie";
 import { cors } from "hono/cors";
 import type { CookieOptions } from "hono/utils/cookie";
 import * as v from "valibot";
@@ -39,10 +39,11 @@ const route = app
 	.get("/:id", async (c) => {
 		const id = c.req.param("id");
 		const requestUrl = new URL(c.req.url);
-		setCookie(
+		setSignedCookie(
 			c,
 			COOKIE_NAME.INVITATION_ID,
 			id,
+			c.env.SECRET,
 			getCookieOptions(requestUrl.protocol === "http:"),
 		);
 
