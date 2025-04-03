@@ -2,7 +2,10 @@ import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
-import { roleAuthorizationMiddleware } from "../../middleware/auth";
+import {
+	authMiddleware,
+	roleAuthorizationMiddleware,
+} from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -18,6 +21,7 @@ const updateLocationSchema = v.object({
 });
 
 const route = app
+	.use(authMiddleware)
 	.get("/", async (c) => {
 		const { LocationRepository } = c.var;
 
