@@ -42,7 +42,6 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User One!",
 		},
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
-		isPending: false,
 		invitationId: null,
 	},
 	{
@@ -61,7 +60,6 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Two!",
 		},
 		roles: [ROLE_IDS.MEMBER],
-		isPending: true,
 		invitationId: DUMMY_INVITATION.id,
 	},
 	{
@@ -80,7 +78,6 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Three!",
 		},
 		roles: [ROLE_IDS.MEMBER],
-		isPending: false,
 		invitationId: DUMMY_INVITATION.id,
 	},
 ];
@@ -94,7 +91,6 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfour",
 			email: "user4@example.com",
 		},
-		isPending: true,
 		invitationId: DUMMY_INVITATION.id,
 	},
 	{
@@ -105,7 +101,6 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfive",
 			email: "user5@example.com",
 		},
-		isPending: false,
 		invitationId: null,
 	},
 ];
@@ -163,7 +158,6 @@ export const registerUserSeed = async (
 				.values({
 					id: user.id,
 					initializedAt: new Date(),
-					isPending: user.isPending,
 					invitationId: user.invitationId,
 				})
 				.onConflictDoNothing(), // user1 の重複 INSERT を無視する為の処理
@@ -194,7 +188,6 @@ export const registerUserSeed = async (
 		await client.batch([
 			client.insert(schema.users).values({
 				id: user.id,
-				isPending: user.isPending,
 				invitationId: user.invitationId,
 			}),
 			client.insert(schema.userProfiles).values({

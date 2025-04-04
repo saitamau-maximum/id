@@ -28,7 +28,6 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		const insertingUserData = {
 			id: userId,
-			isPending: !!invitationId, // 招待リンクからの登録の場合は仮登録ユーザーとする
 			...(invitationId && { invitationId }), // 仮登録ユーザーの場合は招待コードを保存する
 		};
 

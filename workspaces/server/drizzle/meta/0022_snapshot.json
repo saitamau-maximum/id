@@ -578,14 +578,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "is_pending": {
-          "name": "is_pending",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
-        },
         "invitation_id": {
           "name": "invitation_id",
           "type": "text",

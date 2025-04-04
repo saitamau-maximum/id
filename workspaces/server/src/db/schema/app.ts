@@ -22,8 +22,7 @@ export const users = sqliteTable("users", {
 	id: text("id").primaryKey(),
 	/* 初期登録日時。NULLの場合は未初期化 */
 	initializedAt: integer("initialized_at", { mode: "timestamp" }),
-	isPending: integer("is_pending", { mode: "boolean" }).notNull().default(true),
-	/* 招待コード経由で登録した場合に初期化される */
+	/* 仮登録の場合は招待コードが初期化される。本登録が完了すると null となる。 */
 	invitationId: text("invitation_id").references(
 		(): AnySQLiteColumn => invites.id,
 	),
