@@ -31,7 +31,7 @@ const getCookieOptions = (isLocal: boolean): CookieOptions => ({
 
 // dev 環境における c.env.ALLOW_ORIGIN は "*" であるため Set-Cookie を受け入れられない
 // そのため CORS の設定には c.env.CLIENT_ORIGIN を用いる
-const route = app
+const publicRoute = app
 	.use((c, next) => {
 		return cors({
 			origin: c.env.CLIENT_ORIGIN,
@@ -52,7 +52,7 @@ const route = app
 		return c.json({ success: true });
 	});
 
-const protectedInviteRoute = app
+const protectedRoute = app
 	.use(authMiddleware)
 	.use(
 		roleAuthorizationMiddleware({
@@ -131,4 +131,5 @@ const protectedInviteRoute = app
 		}
 	});
 
-export { route as inviteRoute, protectedInviteRoute };
+const route = app.route("/", publicRoute).route("/", protectedRoute);
+export { route as inviteRoute };

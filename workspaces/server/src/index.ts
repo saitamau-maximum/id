@@ -20,7 +20,7 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
-import { inviteRoute, protectedInviteRoute } from "./routes/invite";
+import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
@@ -90,7 +90,6 @@ export const route = app
 	.route("/admin", adminRoute)
 	.route("/calendar", calendarRoute)
 	.route("/certification", certificationRoute)
-	.route("/invite", protectedInviteRoute)
 	.route("/invite", inviteRoute);
 
 export default app;
