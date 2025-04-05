@@ -29,10 +29,12 @@ const getCookieOptions = (isLocal: boolean): CookieOptions => ({
 	maxAge: INVITATION_COOKIE_EXP,
 });
 
+// dev 環境における c.env.ALLOW_ORIGIN は "*" であるため Set-Cookie を受け入れられない
+// そのため CORS の設定には c.env.CLIENT_ORIGIN を用いる
 const route = app
 	.use((c, next) => {
 		return cors({
-			origin: c.env.CLIENT_ORIGIN, // ALLOW_ORIGIN を用いると dev 環境で Cookie をセットできなくなる
+			origin: c.env.CLIENT_ORIGIN,
 			credentials: true,
 		})(c, next);
 	})
