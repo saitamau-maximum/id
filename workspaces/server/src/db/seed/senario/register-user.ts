@@ -11,6 +11,20 @@ export const DUMMY_USER_IDS = {
 	USER5: "user5",
 };
 
+export const DUMMY_INVITATION = {
+	id: "deadbeef-0000-0000-0000",
+	title: "Dummy Invitation",
+	expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // expires in 7 days
+	remainingUse: 3,
+	createdAt: new Date(),
+	issuedByUserId: DUMMY_USER_IDS.USER1,
+};
+
+export const DUMMY_INVITE_ROLE = {
+	inviteId: DUMMY_INVITATION.id,
+	roleId: ROLE_IDS.MEMBER,
+};
+
 export const DUMMY_INITIALIZED_USERS = [
 	{
 		id: DUMMY_USER_IDS.USER1,
@@ -28,6 +42,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User One!",
 		},
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
+		invitationId: null,
 	},
 	{
 		id: DUMMY_USER_IDS.USER2,
@@ -45,6 +60,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Two!",
 		},
 		roles: [ROLE_IDS.MEMBER],
+		invitationId: DUMMY_INVITATION.id,
 	},
 	{
 		id: DUMMY_USER_IDS.USER3,
@@ -62,6 +78,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			bio: "Hello, I'm User Three!",
 		},
 		roles: [ROLE_IDS.MEMBER],
+		invitationId: DUMMY_INVITATION.id,
 	},
 ];
 
@@ -74,6 +91,7 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfour",
 			email: "user4@example.com",
 		},
+		invitationId: DUMMY_INVITATION.id,
 	},
 	{
 		id: DUMMY_USER_IDS.USER5,
@@ -83,6 +101,7 @@ export const DUMMY_UNINITIALIZED_USERS = [
 			displayName: "userfive",
 			email: "user5@example.com",
 		},
+		invitationId: null,
 	},
 ];
 
@@ -128,12 +147,20 @@ export const DUMMY_OAUTH_CONNECTIONS = [
 export const registerUserSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
+	// invitation が user1 を参照しているので先に INSERT
+	await client.insert(schema.users).values(DUMMY_INITIALIZED_USERS[0]);
+	await client.insert(schema.invites).values(DUMMY_INVITATION);
+
 	for (const user of DUMMY_INITIALIZED_USERS) {
 		await client.batch([
-			client.insert(schema.users).values({
-				id: user.id,
-				initializedAt: new Date(),
-			}),
+			client
+				.insert(schema.users)
+				.values({
+					id: user.id,
+					initializedAt: new Date(),
+					invitationId: user.invitationId,
+				})
+				.onConflictDoNothing(), // user1 の重複 INSERT を無視する為の処理
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
 				userId: user.id,
@@ -161,6 +188,7 @@ export const registerUserSeed = async (
 		await client.batch([
 			client.insert(schema.users).values({
 				id: user.id,
+				invitationId: user.invitationId,
 			}),
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
@@ -181,4 +209,6 @@ export const registerUserSeed = async (
 			name: connection.login,
 		});
 	}
+
+	await client.insert(schema.inviteRoles).values(DUMMY_INVITE_ROLE);
 };

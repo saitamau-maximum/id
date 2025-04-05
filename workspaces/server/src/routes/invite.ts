@@ -1,5 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
+import { setSignedCookie } from "hono/cookie";
+import { cors } from "hono/cors";
+import type { CookieOptions } from "hono/utils/cookie";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../constants/cookie";
 import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
 import {
@@ -9,13 +13,46 @@ import {
 
 const app = factory.createApp();
 
+const INVITATION_COOKIE_EXP = 60 * 60 * 24; // 1 day
+
 const createInviteSchema = v.object({
 	title: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64)),
 	expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
 	remainingUse: v.optional(v.pipe(v.number(), v.minValue(1))),
 });
 
-const route = app
+const getCookieOptions = (isLocal: boolean): CookieOptions => ({
+	path: "/",
+	secure: !isLocal,
+	sameSite: "lax", // "strict" にすると OAuth の callback を経由した際に読み取れなくなる
+	httpOnly: true,
+	maxAge: INVITATION_COOKIE_EXP,
+});
+
+// dev 環境における c.env.ALLOW_ORIGIN は "*" であるため Set-Cookie を受け入れられない
+// そのため CORS の設定には c.env.CLIENT_ORIGIN を用いる
+const publicRoute = app
+	.use((c, next) => {
+		return cors({
+			origin: c.env.CLIENT_ORIGIN,
+			credentials: true,
+		})(c, next);
+	})
+	.get("/:id", async (c) => {
+		const id = c.req.param("id");
+		const requestUrl = new URL(c.req.url);
+		setSignedCookie(
+			c,
+			COOKIE_NAME.INVITATION_ID,
+			id,
+			c.env.SECRET,
+			getCookieOptions(requestUrl.protocol === "http:"),
+		);
+
+		return c.json({ success: true });
+	});
+
+const protectedRoute = app
 	.use(authMiddleware)
 	.use(
 		roleAuthorizationMiddleware({
@@ -94,4 +131,5 @@ const route = app
 		}
 	});
 
+const route = app.route("/", publicRoute).route("/", protectedRoute);
 export { route as inviteRoute };

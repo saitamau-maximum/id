@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "bb5a241a-e219-474e-86f7-1a57e1f0d504",
-  "prevId": "e44d16b5-9179-4f3a-ac74-b4eceb359192",
+  "id": "37be7446-f9b6-4347-8e01-afdc3214a02f",
+  "prevId": "bb5a241a-e219-474e-86f7-1a57e1f0d504",
   "tables": {
     "calendar_events": {
       "name": "calendar_events",
@@ -577,10 +577,31 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "users_invitation_id_invites_id_fk": {
+          "name": "users_invitation_id_invites_id_fk",
+          "tableFrom": "users",
+          "tableTo": "invites",
+          "columnsFrom": [
+            "invitation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
