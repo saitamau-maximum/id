@@ -18,43 +18,65 @@ export class CloudflareUserRepository implements IUserRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createUser(
+	private async createUserInternal(
 		providerUserId: string,
 		providerId: number,
-		invitationId: string | undefined,
-		payload: Partial<Profile> = {},
+		payload: Partial<Profile>,
+		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
-		const insertingUserData = {
-			id: userId,
-			...(invitationId && { invitationId }), // 仮登録ユーザーの場合は招待コードを保存する
-		};
-
-		// d1にはtransactionがないのでbatchで両方成功を期待する
-		const [_, res] = await this.client.batch([
-			this.client.insert(schema.users).values(insertingUserData),
+		const { displayName, email, profileImageURL } = payload;
+		const batchOps = [
+			this.client.insert(schema.users).values({
+				id: userId,
+				...(invitationId && { invitationId }),
+			}),
 			this.client.insert(schema.oauthConnections).values({
 				userId,
 				providerId,
 				providerUserId,
-				email: payload.email,
-				name: payload.displayName,
-				profileImageUrl: payload.profileImageURL,
+				email,
+				name: displayName,
+				profileImageUrl: profileImageURL,
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
 				userId,
-				displayName: payload.displayName,
-				profileImageURL: payload.profileImageURL,
+				displayName,
+				profileImageURL,
 			}),
-		]);
+		] as const;
+
+		const [_, res] = await this.client.batch(batchOps);
 
 		if (res.success) {
 			return userId;
 		}
 
 		throw new Error("Failed to create user");
+	}
+
+	async createUser(
+		providerUserId: string,
+		providerId: number,
+		payload: Partial<Profile> = {},
+	): Promise<string> {
+		return this.createUserInternal(providerUserId, providerId, payload);
+	}
+
+	async createTemporaryUser(
+		providerUserId: string,
+		providerId: number,
+		invitationId: string,
+		payload: Partial<Profile> = {},
+	): Promise<string> {
+		return this.createUserInternal(
+			providerUserId,
+			providerId,
+			payload,
+			invitationId,
+		);
 	}
 
 	async fetchUserIdByProviderInfo(
