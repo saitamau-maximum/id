@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getFiscalYearStartDate } from "~/utils/fiscal-year";
+import { getFiscalYearStartDate } from "~/utils/date";
 import { useRepository } from "./use-repository";
 
 export function useAuth() {
