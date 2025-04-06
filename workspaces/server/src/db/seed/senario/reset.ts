@@ -6,6 +6,7 @@ export const reset = async (client: DrizzleD1Database<typeof schema>) => {
 	await client.delete(schema.oauthClientCallbacks);
 	await client.delete(schema.oauthClientScopes);
 	await client.delete(schema.oauthClientSecrets);
+	await client.delete(schema.oauthClientManagers);
 	await client.delete(schema.oauthClients);
 	await client.delete(schema.oauthTokenScopes);
 	await client.delete(schema.oauthTokens);
