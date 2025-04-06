@@ -18,6 +18,25 @@ const NAVIGATION = [
 		to: "/admin/users",
 		isActive: (location: string) => location.startsWith("/admin/users"),
 	},
+	...(FLAG.ENABLE_INVITE
+		? [
+				{
+					label: "Invites",
+					to: "/admin/invites",
+					isActive: (location: string) => location.startsWith("/admin/invites"),
+				},
+			]
+		: []),
+	{
+		label: "Roles",
+		to: "/admin/roles",
+		isActive: (location: string) => location.startsWith("/admin/roles"),
+	},
+	{
+		label: "Groups",
+		to: "/admin/groups",
+		isActive: (location: string) => location.startsWith("/admin/groups"),
+	},
 	{
 		label: "Certifications",
 		to: "/admin/certifications",
@@ -33,11 +52,6 @@ const NAVIGATION = [
 				},
 			]
 		: []),
-	{
-		label: "Invites",
-		to: "/admin/invites",
-		isActive: (location: string) => location.startsWith("/admin/invites"),
-	},
 ];
 
 export default function AdminLayout() {

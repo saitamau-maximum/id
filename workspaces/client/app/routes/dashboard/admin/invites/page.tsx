@@ -1,5 +1,4 @@
 import { css } from "styled-system/css";
-import { FLAG } from "~/utils/flag";
 import { GenerateInvitationURLDialog } from "./internal/components/callable-generate-invitation-url-dialog";
 import { InvitationsEditor } from "./internal/components/invitations-editor";
 import { PendingUsersTable } from "./internal/components/table";
@@ -13,7 +12,7 @@ export default function AdminUsers() {
 				gap: 8,
 			})}
 		>
-			{FLAG.ENABLE_INVITE && <InvitationsEditor />}
+			<InvitationsEditor />
 			<div>
 				<h2
 					className={css({
