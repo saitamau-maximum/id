@@ -8,8 +8,7 @@ import type { User } from "~/types/user";
 import { useApproveInvitation } from "../hooks/use-approve-invitation";
 import { useProvisionalUsers } from "../hooks/use-provisional-users";
 import { useRejectInvitation } from "../hooks/use-reject-invitation";
-import { ApproveConfirmation } from "./approve-confirmation";
-import { RejectConfirmation } from "./reject-confirmation";
+import { ConfirmationDialog } from "./confirmation-dialog";
 
 export const ProvisionalUsersTable = () => {
 	const { data: users } = useProvisionalUsers();
@@ -46,7 +45,7 @@ const UserTableRow = ({
 	const handleSubmit = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "招待を承認",
-			children: <ApproveConfirmation title={user.displayName} />,
+			children: <ConfirmationDialog title={user.displayName} type="approve" />,
 		});
 		if (res.type === "dismiss") return;
 		approveInvitation(user.id);
@@ -55,7 +54,7 @@ const UserTableRow = ({
 	const handleReject = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "招待を却下",
-			children: <RejectConfirmation title={user.displayName} />,
+			children: <ConfirmationDialog title={user.displayName} type="reject" />,
 			danger: true,
 		});
 		if (res.type === "dismiss") return;
