@@ -1,4 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
+import { validator } from "hono/validator";
 import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
@@ -43,6 +44,12 @@ const route = app
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 		vValidator("json", createEventSchema),
+		validator("json", (value, c) => {
+			if (new Date(value.startAt) >= new Date(value.endAt)) {
+				return c.json({ error: "startAt must be before endAt" }, 400);
+			}
+			return value;
+		}),
 		async (c) => {
 			const { CalendarRepository } = c.var;
 			const { userId } = c.get("jwtPayload");
@@ -70,6 +77,12 @@ const route = app
 			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 		}),
 		vValidator("json", updateEventSchema),
+		validator("json", (value, c) => {
+			if (new Date(value.startAt) >= new Date(value.endAt)) {
+				return c.json({ error: "startAt must be before endAt" }, 400);
+			}
+			return value;
+		}),
 		async (c) => {
 			const { CalendarRepository } = c.var;
 			const { userId, title, description, startAt, endAt, locationId } =
