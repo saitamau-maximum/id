@@ -303,7 +303,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return roles.map((role) => role.roleId);
 	}
 
-	async fetchAllUsers(): Promise<User[]> {
+	async fetchApprovedUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
@@ -352,7 +352,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchAllPendingUsers(): Promise<User[]> {
+	async fetchPendingUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
 			with: {
@@ -376,7 +376,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}));
 	}
 
-	async approveUser(userId: string): Promise<void> {
+	async approveProvisionalUser(userId: string): Promise<void> {
 		const res = await this.client
 			.update(schema.users)
 			.set({
