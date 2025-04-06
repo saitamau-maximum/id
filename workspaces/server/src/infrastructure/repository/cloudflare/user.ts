@@ -1,4 +1,4 @@
-import { type InferInsertModel, eq, isNotNull } from "drizzle-orm";
+import { type InferInsertModel, eq, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
@@ -228,6 +228,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMembers(): Promise<Member[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
 				profile: true,
 				roles: true,
@@ -304,9 +305,10 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchAllUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
-				roles: true,
 				profile: true,
+				roles: true,
 			},
 		});
 
