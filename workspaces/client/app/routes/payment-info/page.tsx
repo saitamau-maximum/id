@@ -71,10 +71,6 @@ export default function PaymentInfo() {
 					margin: "auto",
 					color: "gray.600",
 					padding: 8,
-					gap: 4,
-					display: "flex",
-					flexDirection: "column",
-					justifyContent: "center",
 				})}
 			>
 				<Progress steps={registrationSteps} />
@@ -83,6 +79,8 @@ export default function PaymentInfo() {
 						fontSize: "2xl",
 						fontWeight: "bold",
 						color: "gray.700",
+						marginTop: 8,
+						marginBottom: 4,
 					})}
 				>
 					サークル費のお支払い
@@ -105,23 +103,24 @@ export default function PaymentInfo() {
 						<Table.Td>3456237</Table.Td>
 					</Table.Tr>
 				</Table.Root>
-				<p>
+				<p className={css({ marginTop: 4 })}>
 					口座名義人が <Emphasize>マキシマム</Emphasize> であることを確認し、{" "}
 					<Emphasize>{(remainingMonth * 250).toLocaleString()} 円</Emphasize>{" "}
 					をお振込みください。 振込手数料はご負担願います。
 				</p>
-				<p>
+				<p className={css({ marginTop: 8 })}>
 					Admin が <Emphasize>入金を確認でき次第、本登録完了</Emphasize>{" "}
 					とさせていただきます。
 					確認までに数日かかる場合がありますので、ご了承ください。
 				</p>
-				{/* <p>
+				{/* <p className={css({ marginTop: 2 })}>
 					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。 4
 					月中の活動開始時にアナウンスします。
 				</p> */}
 				<p
 					className={css({
 						fontSize: "sm",
+						marginTop: 8,
 					})}
 				>
 					ページを閉じても、再度アクセスすればまた表示されます。
