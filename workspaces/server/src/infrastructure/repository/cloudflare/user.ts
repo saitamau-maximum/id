@@ -1,4 +1,4 @@
-import { type InferInsertModel, eq } from "drizzle-orm";
+import { type InferInsertModel, eq, isNotNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
@@ -348,5 +348,29 @@ export class CloudflareUserRepository implements IUserRepository {
 		if (!res2.success) {
 			throw new Error("Failed to update user role");
 		}
+	}
+
+	async fetchAllPendingUsers(): Promise<User[]> {
+		const users = await this.client.query.users.findMany({
+			where: isNotNull(schema.users.invitationId),
+			with: {
+				profile: true,
+				roles: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			grade: user.profile.grade ?? undefined,
+			bio: user.profile.bio ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+		}));
 	}
 }

@@ -49,6 +49,15 @@ const route = app
 				return c.json({ error: "Internal Server Error" }, 500);
 			}
 		},
-	);
+	)
+	.get("/pending", async (c) => {
+		const { UserRepository } = c.var;
+		try {
+			const users = await UserRepository.fetchAllPendingUsers();
+			return c.json(users);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	});
 
 export { route as adminUsersRoute };

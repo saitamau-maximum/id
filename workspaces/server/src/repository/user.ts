@@ -79,4 +79,5 @@ export interface IUserRepository {
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
 	fetchRolesByUserId: (userId: string) => Promise<number[]>;
+	fetchAllPendingUsers: () => Promise<User[]>;
 }
