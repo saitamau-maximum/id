@@ -392,4 +392,14 @@ export class CloudflareUserRepository implements IUserRepository {
 			throw new Error("Failed to approve user");
 		}
 	}
+
+	async rejectProvisionalUser(userId: string): Promise<void> {
+		const res = await this.client
+			.delete(schema.users)
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to reject user");
+		}
+	}
 }

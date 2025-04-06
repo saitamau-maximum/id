@@ -81,4 +81,5 @@ export interface IUserRepository {
 	fetchRolesByUserId: (userId: string) => Promise<number[]>;
 	fetchProvisionalUsers: () => Promise<User[]>;
 	approveProvisionalUser: (userId: string) => Promise<void>;
+	rejectProvisionalUser: (userId: string) => Promise<void>;
 }

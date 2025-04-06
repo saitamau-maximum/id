@@ -59,13 +59,24 @@ const route = app
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
 	})
-	.put("/approve/:userId", async (c) => {
+	.put("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
 		try {
 			await UserRepository.approveProvisionalUser(userId);
 			return c.text("ok", 200);
 		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	})
+	.delete("/:userId/reject", async (c) => {
+		const userId = c.req.param("userId");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.rejectProvisionalUser(userId);
+			return c.text("ok", 200);
+		} catch (e) {
+			console.error(e);
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
 	});
