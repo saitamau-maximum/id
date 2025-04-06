@@ -53,14 +53,7 @@ export default function Invitation() {
 		}
 
 		mutation.mutate(id);
-	}, [
-		isLoading,
-		authorized,
-		shouldOnboarding,
-		id,
-		navigate,
-		mutation,
-	]);
+	}, [isLoading, authorized, shouldOnboarding, id, navigate, mutation]);
 
 	return null;
 }
