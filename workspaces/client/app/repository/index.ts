@@ -4,6 +4,7 @@ import { CertificationRepositoryImpl } from "./certification";
 import { InvitationRepositoryImpl } from "./invitation";
 import { LocationRepositoryImpl } from "./location";
 import { MemberRepositoryImpl } from "./member";
+import { MiscRepositoryImpl } from "./misc";
 import { OAuthAppsRepositoryImpl } from "./oauth-apps";
 import { UserRepositoryImpl } from "./user";
 
@@ -16,4 +17,5 @@ export const DefaultRepositories = {
 	certificationRepository: new CertificationRepositoryImpl(),
 	locationRepository: new LocationRepositoryImpl(),
 	invitationRepository: new InvitationRepositoryImpl(),
+	miscRepository: new MiscRepositoryImpl(),
 };

@@ -13,6 +13,7 @@ interface Env {
 	GITHUB_APP_PRIVKEY: string;
 	GITHUB_OAUTH_SECRET: string;
 	GITHUB_OAUTH_ID: string;
+	DISCORD_INVITATION_URL: string;
 	STORAGE: R2Bucket;
 	DB: D1Database;
 }
