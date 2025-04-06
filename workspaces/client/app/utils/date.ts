@@ -18,3 +18,16 @@ export const getFiscalYearStartDate = () => {
 	}
 	return new Date(year - 1, 3, 1);
 };
+
+// DateをHTML5のDatePickerの形式に変換する
+export const toHTMLDatePickerFormat = (date: Date) => {
+	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+	return utcDate.toISOString().slice(0, 10);
+};
+
+// DateをHTML5のTimePickerの形式に変換する
+export const toHTMLDateTimePickerFormat = (date: Date) => {
+	console.log(date.getTimezoneOffset());
+	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+	return utcDate.toISOString().slice(0, 16);
+};

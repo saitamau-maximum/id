@@ -10,6 +10,7 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
 import type { CalendarEvent } from "~/types/event";
+import { toHTMLDateTimePickerFormat } from "~/utils/date";
 import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
@@ -50,8 +51,8 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			defaultValues: {
 				title: event.title,
 				description: event.description,
-				startAt: event.startAt.toISOString().slice(0, 16), // YYYY-MM-DDTHH:mm (for HTML5)
-				endAt: event.endAt.toISOString().slice(0, 16),
+				startAt: toHTMLDateTimePickerFormat(event.startAt),
+				endAt: toHTMLDateTimePickerFormat(event.endAt),
 				locationId: event.locationId ?? null,
 			},
 		});
