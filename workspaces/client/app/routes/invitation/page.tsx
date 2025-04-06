@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router";
-import { JWT_STORAGE_KEY } from "~/constant";
+import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
@@ -11,6 +11,10 @@ export default function Invitation() {
 	const navigate = useNavigate();
 	const { pushToast } = useToast();
 	const { invitationRepository } = useRepository();
+	const { isLoading, isAuthorized, isInitialized } = useAuth();
+
+	const authorized = !isLoading && isAuthorized;
+	const shouldOnboarding = !isLoading && isAuthorized && !isInitialized;
 
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
@@ -33,19 +37,30 @@ export default function Invitation() {
 	});
 
 	useEffect(() => {
-		// 既にログインしている場合に /invite に Preflight request が発生しないようにする
-		if (localStorage.getItem(JWT_STORAGE_KEY)) {
-			localStorage.removeItem(JWT_STORAGE_KEY);
-		}
+		// useAuth と useMutation の初期化が終わるまで何もしない (error 時も return)
+		if (isLoading || mutation.isPending || mutation.error) return;
 
-		if (!id) {
+		// useParams の id が存在しないか、認証済みの場合は /login にリダイレクト
+		if (!id || authorized) {
 			navigate("/login");
 			return;
 		}
 
-		if (mutation.isPending || mutation.error) return;
+		// 認証済みかつ初期登録が済んでいない場合は /onboarding にリダイレクト
+		if (shouldOnboarding) {
+			navigate("/onboarding");
+			return;
+		}
+
 		mutation.mutate(id);
-	}, [mutation, id, navigate]);
+	}, [
+		isLoading,
+		authorized,
+		shouldOnboarding,
+		id,
+		navigate,
+		mutation,
+	]);
 
 	return null;
 }
