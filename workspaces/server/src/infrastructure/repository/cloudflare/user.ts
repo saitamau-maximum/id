@@ -118,7 +118,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
@@ -236,7 +236,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return users.map((user) => ({
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
@@ -274,7 +274,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.user.id,
-			initialized: !!user.user.initializedAt,
+			initializedAt: user.user.initializedAt,
 			isProvisional: !!user.user.invitationId,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
@@ -312,7 +312,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return users.map((user) => ({
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,

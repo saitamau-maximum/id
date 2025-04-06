@@ -12,7 +12,7 @@ export function useAuth() {
 	return {
 		isLoading,
 		user: data,
-		isInitialized: !!data?.initialized,
+		isInitialized: !!data?.initializedAt,
 		isAuthorized: !error,
 		isProvisional: !!data?.isProvisional,
 		// 今年度の最初の日付以降に更新されたか

@@ -194,7 +194,7 @@ const route = app
 			const userInfo = await c.var.UserRepository.fetchUserProfileById(userId);
 
 			// 初期登録まだ
-			if (!userInfo.initialized) {
+			if (!userInfo.initializedAt) {
 				return c.text("not implemented", 503);
 			}
 

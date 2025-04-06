@@ -40,7 +40,7 @@ export default function Members() {
 				})}
 			>
 				{filteredMembers.map((user) =>
-					user.initialized ? (
+					user.initializedAt ? (
 						<Link
 							key={user.id}
 							to={`/members/${user.displayId}`}
@@ -62,7 +62,7 @@ export default function Members() {
 								displayId={user.displayId}
 								profileImageURL={user.profileImageURL}
 								grade={user.grade}
-								initialized={user.initialized}
+								initialized={true}
 								roles={user.roles}
 								shrinkRoles
 							/>
@@ -76,7 +76,7 @@ export default function Members() {
 							displayId={user.displayId}
 							profileImageURL={user.profileImageURL}
 							grade={user.grade}
-							initialized={user.initialized}
+							initialized={false}
 							roles={user.roles}
 						/>
 					),

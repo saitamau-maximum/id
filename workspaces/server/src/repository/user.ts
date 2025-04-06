@@ -24,7 +24,7 @@ export type Profile = {
 
 export type User = {
 	id: string;
-	initialized: boolean;
+	initializedAt: Date | null;
 	// 現状は authMiddleware を介しているため招待コードを載せる実装にしてもよいが、
 	// 将来的に public API から招待コードが外部に漏洩するリスクを考慮し "仮登録か？" 状態だけ返すようにする
 	isProvisional: boolean;

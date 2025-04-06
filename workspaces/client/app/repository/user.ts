@@ -117,6 +117,9 @@ export class UserRepositoryImpl implements IUserRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
+			initializedAt: user.initializedAt
+				? new Date(user.initializedAt)
+				: undefined,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 		}));
 	}
