@@ -43,6 +43,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			handleSubmit,
 			register,
 			watch,
+			setError,
 			formState: { errors },
 		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
 			resolver: valibotResolver(UpdateFormSchema),
@@ -56,6 +57,12 @@ export const EditEventDialog = createCallable<Props, Payload>(
 		});
 
 		const onSubmit = async (values: UpdateFormOutputValues) => {
+			if (values.startAt >= values.endAt) {
+				setError("root", {
+					message: "終了日時は開始日時よりも後にしてください",
+				});
+				return;
+			}
 			const updatedEvent: CalendarEvent = {
 				...event,
 				...values,
@@ -142,6 +149,8 @@ export const EditEventDialog = createCallable<Props, Payload>(
 						</Form.RadioGroup>
 						<ErrorDisplay error={errors.locationId?.message} />
 					</Form.FieldSet>
+
+					<ErrorDisplay error={errors.root?.message} />
 
 					<div
 						className={css({
