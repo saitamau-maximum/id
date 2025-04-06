@@ -51,7 +51,7 @@ export const userProfiles = sqliteTable(
 	{
 		id: text("id").primaryKey(),
 		userId: text("user_id")
-			.references(() => users.id)
+			.references(() => users.id, { onDelete: "cascade" })
 			.notNull(),
 		displayName: text("display_name"),
 		realName: text("real_name"),
@@ -87,7 +87,7 @@ export const userRoles = sqliteTable(
 	{
 		userId: text("user_id")
 			.notNull()
-			.references(() => users.id),
+			.references(() => users.id, { onDelete: "cascade" }),
 		roleId: int("role_id", { mode: "number" }).notNull(),
 	},
 	(table) => ({
@@ -107,7 +107,7 @@ export const calendarEvents = sqliteTable(
 	{
 		id: text("id").primaryKey(),
 		userId: text("user_id")
-			.references(() => users.id)
+			.references(() => users.id, { onDelete: "cascade" })
 			.notNull(),
 		title: text("title").notNull(),
 		description: text("description").notNull(),
@@ -152,7 +152,7 @@ export const userCertifications = sqliteTable(
 	"user_certifications",
 	{
 		userId: text("user_id")
-			.references(() => users.id)
+			.references(() => users.id, { onDelete: "cascade" })
 			.notNull(),
 		certificationId: text("certification_id")
 			.references(() => certifications.id)
@@ -197,7 +197,7 @@ export const invites = sqliteTable("invites", {
 	remainingUse: int("remaining_use"),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	issuedByUserId: text("issued_by")
-		.references(() => users.id)
+		.references(() => users.id, { onDelete: "cascade" })
 		.notNull(),
 });
 
