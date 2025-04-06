@@ -1,12 +1,15 @@
 import { useCallback } from "react";
+import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
-import { ButtonLike } from "~/components/ui/button-like";
+import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { User } from "~/types/user";
 import { useApproveInvitation } from "../hooks/use-approve-invitation";
 import { useProvisionalUsers } from "../hooks/use-provisional-users";
+import { useRejectInvitation } from "../hooks/use-reject-invitation";
 import { ApproveConfirmation } from "./approve-confirmation";
+import { RejectConfirmation } from "./reject-confirmation";
 
 export const ProvisionalUsersTable = () => {
 	const { data: users } = useProvisionalUsers();
@@ -20,7 +23,7 @@ export const ProvisionalUsersTable = () => {
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
-					<Table.Th>操作</Table.Th>
+					<Table.Th>承認 / 却下</Table.Th>
 				</Table.Tr>
 			</thead>
 			<tbody>
@@ -38,6 +41,8 @@ const UserTableRow = ({
 	user: User;
 }) => {
 	const { mutate: approveInvitation } = useApproveInvitation();
+	const { mutate: rejectInvitation } = useRejectInvitation();
+
 	const handleSubmit = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "招待を承認",
@@ -46,6 +51,16 @@ const UserTableRow = ({
 		if (res.type === "dismiss") return;
 		approveInvitation(user.id);
 	}, [user, approveInvitation]);
+
+	const handleReject = useCallback(async () => {
+		const res = await ConfirmDialog.call({
+			title: "招待を却下",
+			children: <RejectConfirmation title={user.displayName} />,
+			danger: true,
+		});
+		if (res.type === "dismiss") return;
+		rejectInvitation(user.id);
+	}, [user, rejectInvitation]);
 
 	return (
 		<Table.Tr key={user.id}>
@@ -101,17 +116,32 @@ const UserTableRow = ({
 			<Table.Td>{user.studentId}</Table.Td>
 			<Table.Td>{user.grade}</Table.Td>
 			<Table.Td>
-				{/* TODO: 今後承認を拒否するボタン・機能を追加 */}
 				<div
 					className={css({
 						display: "flex",
 						gap: 2,
 						alignItems: "center",
+						justifyContent: "center",
+						userSelect: "none",
 					})}
 				>
-					<button type="button" onClick={handleSubmit}>
-						<ButtonLike variant="primary">承認</ButtonLike>
-					</button>
+					<IconButton
+						type="button"
+						label="承認"
+						onClick={handleSubmit}
+						color="apply"
+					>
+						<Check size={20} />
+					</IconButton>
+					/
+					<IconButton
+						type="button"
+						label="却下"
+						onClick={handleReject}
+						color="danger"
+					>
+						<X size={20} />
+					</IconButton>
 				</div>
 			</Table.Td>
 		</Table.Tr>

@@ -2,18 +2,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
-export const useApproveInvitation = () => {
+export const useRejectInvitation = () => {
 	const { userRepository } = useRepository();
 	const { pushToast } = useToast();
 	const queryClient = useQueryClient();
 
 	return useMutation({
 		mutationFn: async (userId: string) => {
-			await userRepository.approveInvitation(userId);
+			await userRepository.rejectInvitation(userId);
 		},
 		onSuccess: async () => {
 			pushToast({
-				title: "承認しました",
+				title: "却下しました",
 				type: "success",
 			});
 			queryClient.invalidateQueries({
@@ -22,7 +22,7 @@ export const useApproveInvitation = () => {
 		},
 		onError: () => {
 			pushToast({
-				title: "承認できませんでした",
+				title: "却下できませんでした",
 				description: "再度お試しください",
 				type: "error",
 			});

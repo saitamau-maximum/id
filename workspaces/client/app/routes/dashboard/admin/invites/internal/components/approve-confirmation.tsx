@@ -32,16 +32,6 @@ export const ApproveConfirmation = ({ title }: Props) => {
 			>
 				このユーザーを承認しますか？
 			</p>
-			<p
-				className={css({
-					textAlign: "center",
-					color: "rose.400",
-					fontWeight: "bold",
-					fontSize: "sm",
-				})}
-			>
-				※この操作は取り消せません
-			</p>
 		</div>
 	);
 };

@@ -41,6 +41,7 @@ export interface IUserRepository {
 	getAllProvisionalUsers: () => Promise<User[]>;
 	getAllProvisionalUsers$$key: () => unknown[];
 	approveInvitation: (userId: string) => Promise<void>;
+	rejectInvitation: (userId: string) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -176,13 +177,24 @@ export class UserRepositoryImpl implements IUserRepository {
 	}
 
 	async approveInvitation(userId: string) {
-		const res = await client.admin.users.approve[":userId"].$put({
+		const res = await client.admin.users[":userId"].approve.$put({
 			param: {
 				userId,
 			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to approve invitation");
+		}
+	}
+
+	async rejectInvitation(userId: string) {
+		const res = await client.admin.users[":userId"].reject.$delete({
+			param: {
+				userId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to reject invitation");
 		}
 	}
 }
