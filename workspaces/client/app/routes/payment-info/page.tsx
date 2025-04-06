@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { Progress } from "~/components/ui/progess";
 import { Table } from "~/components/ui/table";
 
 import { useAuth } from "~/hooks/use-auth";
@@ -36,6 +37,13 @@ export default function PaymentInfo() {
 	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
 	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
 
+	const registrationSteps = [
+		{ label: "仮登録", isActive: true, isCompleted: true },
+		{ label: "入金", isActive: true, isCompleted: false },
+		{ label: "承認", isActive: false, isCompleted: false },
+		{ label: "完了", isActive: false, isCompleted: false },
+	];
+
 	return (
 		<div
 			className={css({
@@ -59,6 +67,7 @@ export default function PaymentInfo() {
 					justifyContent: "center",
 				})}
 			>
+				<Progress steps={registrationSteps} />
 				<h1
 					className={css({
 						fontSize: "2xl",
