@@ -7,6 +7,10 @@ export interface GenerateInvitationOptions {
 	remainingUse: number | null;
 }
 
+export interface FetchInvitationParams {
+	invitationId: string;
+}
+
 export interface IInvitationRepository {
 	getInvitations: () => Promise<Invitation[]>;
 	getInvitations$$key: () => unknown[];
@@ -15,6 +19,8 @@ export interface IInvitationRepository {
 		expiresAt,
 		remainingUse,
 	}: GenerateInvitationOptions) => Promise<string>;
+	fetchInvitation: (params: FetchInvitationParams) => Promise<boolean>;
+	fetchInvitation$$key: (invitationId: string) => unknown[];
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
@@ -52,5 +58,28 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		}
 		const data = await res.json();
 		return data.id;
+	}
+
+	async fetchInvitation(params: FetchInvitationParams): Promise<boolean> {
+		const res = await client.invite[":id"].$get(
+			{
+				param: {
+					id: params.invitationId,
+				},
+			},
+			{
+				init: {
+					credentials: "include",
+				},
+			},
+		);
+		if (!res.ok) {
+			throw new Error("Failed to fetch invitation");
+		}
+		return res.ok;
+	}
+
+	fetchInvitation$$key(invitationId: string): unknown[] {
+		return ["invitation", invitationId];
 	}
 }

@@ -59,6 +59,12 @@ export interface IUserRepository {
 		providerId: number,
 		payload: Partial<Profile>,
 	) => Promise<string>;
+	createTemporaryUser: (
+		providerUserId: string,
+		providerId: number,
+		invitationId: string,
+		payload: Partial<Profile>,
+	) => Promise<string>;
 	fetchUserIdByProviderInfo: (
 		providerUserId: string,
 		providerId: number,
