@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/hooks/use-auth";
+import { useInvitation } from "~/hooks/use-invitation";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
@@ -12,6 +13,7 @@ export default function Invitation() {
 	const { pushToast } = useToast();
 	const { invitationRepository } = useRepository();
 	const { isLoading, isAuthorized, isInitialized } = useAuth();
+	const { setIsInvited } = useInvitation();
 
 	const authorized = !isLoading && isAuthorized;
 	const shouldOnboarding = !isLoading && isAuthorized && !isInitialized;
@@ -25,15 +27,17 @@ export default function Invitation() {
 				throw new Error("Failed to fetch invitation");
 			}
 		},
-		onSuccess: () => navigate("/login"),
-		onError: () => {
+		onSuccess: () => {
+			setIsInvited(true);
+			navigate("/login");
+		},
+		onError: () =>
 			pushToast({
 				type: "error",
 				title: "招待コードの取得に失敗しました",
 				description:
 					"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
-			});
-		},
+			}),
 	});
 
 	useEffect(() => {

@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
-import { AnchorLike } from "~/components/ui/anchor-like";
 import { useAuth } from "~/hooks/use-auth";
+import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
@@ -13,6 +13,7 @@ export default function Login() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
+	const { isInvited } = useInvitation();
 
 	const shouldProceed = !isLoading && isAuthorized;
 
@@ -91,15 +92,11 @@ export default function Login() {
 				Maximum IDPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
-				<br />
-				<a
-					href="https://github.com/saitamau-maximum"
-					className={css({ color: "blue.500" })}
-				>
-					<AnchorLike>Github Organization</AnchorLike>
-				</a>
-				に所属している方であれば <br />
-				どなたでもログイン可能です。
+				{isInvited && (
+					<p>
+						招待を受け入れるには以下のボタンから GitHub アカウントでログインしてください。
+					</p>
+					)}
 			</p>
 			{FLAG.ENABLE_LOGIN ? (
 				<a
