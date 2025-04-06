@@ -3,7 +3,7 @@ import { GenerateInvitationURLDialog } from "./internal/components/callable-gene
 import { InvitationsEditor } from "./internal/components/invitations-editor";
 import { PendingUsersTable } from "./internal/components/table";
 
-export default function AdminUsers() {
+export default function AdminInvites() {
 	return (
 		<div
 			className={css({

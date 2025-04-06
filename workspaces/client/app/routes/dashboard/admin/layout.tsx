@@ -28,16 +28,6 @@ const NAVIGATION = [
 			]
 		: []),
 	{
-		label: "Roles",
-		to: "/admin/roles",
-		isActive: (location: string) => location.startsWith("/admin/roles"),
-	},
-	{
-		label: "Groups",
-		to: "/admin/groups",
-		isActive: (location: string) => location.startsWith("/admin/groups"),
-	},
-	{
 		label: "Certifications",
 		to: "/admin/certifications",
 		isActive: (location: string) =>
