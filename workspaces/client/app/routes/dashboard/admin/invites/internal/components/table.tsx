@@ -1,12 +1,15 @@
+import { useCallback } from "react";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import type { User } from "~/types/user";
+import { useApprove } from "../hooks/use-approve-invitation";
 import { usePendingUsers } from "../hooks/use-pending-users";
+import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ApproveConfirmation } from "./approve-confirmation";
 
 export const PendingUsersTable = () => {
 	const { data: users } = usePendingUsers();
-
 	return (
 		<Table.Root>
 			<thead>
@@ -34,6 +37,16 @@ const UserTableRow = ({
 }: {
 	user: User;
 }) => {
+	const { mutate: approve } = useApprove();
+	const handleSubmit = useCallback(async () => {
+		const res = await ConfirmDialog.call({
+			title: "招待を承認",
+			children: <ApproveConfirmation title={user.displayName}/>,
+		});
+		if (res.type === "dismiss") return;
+		approve(user.id);
+	}, [user, approve]);
+
 	return (
 		<Table.Tr key={user.id}>
 			<Table.Td>{user.displayName}</Table.Td>
@@ -96,7 +109,9 @@ const UserTableRow = ({
 						alignItems: "center",
 					})}
 				>
-					<ButtonLike variant="primary">承認</ButtonLike>
+					<button type="button" onClick={handleSubmit}>
+						<ButtonLike variant="primary">承認</ButtonLike>
+					</button>
 				</div>
 			</Table.Td>
 		</Table.Tr>

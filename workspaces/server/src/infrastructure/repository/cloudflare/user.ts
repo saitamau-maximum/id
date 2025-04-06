@@ -375,4 +375,17 @@ export class CloudflareUserRepository implements IUserRepository {
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
+
+	async approveUser(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				invitationId: null,
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to approve user");
+		}
+	}
 }

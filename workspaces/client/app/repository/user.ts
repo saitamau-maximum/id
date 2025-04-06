@@ -40,6 +40,7 @@ export interface IUserRepository {
 	updateUserProfileImage: (file: File) => Promise<void>;
 	getAllPendingUsers: () => Promise<User[]>;
 	getAllPendingUsers$$key: () => unknown[];
+	approveInvitation: (userId: string) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -172,5 +173,16 @@ export class UserRepositoryImpl implements IUserRepository {
 
 	getAllPendingUsers$$key() {
 		return ["pending-users"];
+	}
+
+	async approveInvitation(userId: string) {
+		const res = await client.admin.users.approve[":userId"].$put({
+			param: {
+				userId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to approve invitation");
+		}
 	}
 }

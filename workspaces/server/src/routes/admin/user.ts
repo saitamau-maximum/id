@@ -58,6 +58,16 @@ const route = app
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
+	})
+	.put("/approve/:userId", async (c) => {
+		const userId = c.req.param("userId");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.approveUser(userId);
+			return c.text("ok", 200);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
 	});
 
 export { route as adminUsersRoute };
