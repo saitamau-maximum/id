@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useParams } from "react-router";
 import { useNavigate } from "react-router";
+import { JWT_STORAGE_KEY } from "~/constant";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
@@ -20,9 +21,7 @@ export default function Invitation() {
 				throw new Error("Failed to fetch invitation");
 			}
 		},
-		onSuccess: () => {
-			navigate("/login");
-		},
+		onSuccess: () => navigate("/login"),
 		onError: () => {
 			pushToast({
 				type: "error",
@@ -34,6 +33,11 @@ export default function Invitation() {
 	});
 
 	useEffect(() => {
+		// 既にログインしている場合に /invite に Preflight request が発生しないようにする
+		if (localStorage.getItem(JWT_STORAGE_KEY)) {
+			localStorage.removeItem(JWT_STORAGE_KEY);
+		}
+
 		if (!id) {
 			navigate("/login");
 			return;
