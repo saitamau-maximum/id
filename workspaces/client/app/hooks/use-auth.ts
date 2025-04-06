@@ -14,6 +14,7 @@ export function useAuth() {
 		user: data,
 		isInitialized: !!data?.initialized,
 		isAuthorized: !error,
+		isProvisional: !!data?.isProvisional,
 		// 今年度の最初の日付以降に更新されたか
 		hasFiscalYearUpdated:
 			data?.updatedAt && data.updatedAt >= getFiscalYearStartDate(),

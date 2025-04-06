@@ -25,6 +25,9 @@ export type Profile = {
 export type User = {
 	id: string;
 	initialized: boolean;
+	// 現状は authMiddleware を介しているため招待コードを載せる実装にしてもよいが、
+	// 将来的に public API から招待コードが外部に漏洩するリスクを考慮し "仮登録か？" 状態だけ返すようにする
+	isProvisional: boolean;
 	roles: Role[];
 } & Partial<Profile>;
 
@@ -32,22 +35,19 @@ export type UserWithCertifications = User & {
 	certifications: Certification[];
 };
 
-export type Member = {
-	id: string;
-	initialized: boolean;
-	roles: Role[];
-} & Partial<
-	Pick<
-		Profile,
-		| "displayName"
-		| "realName"
-		| "realNameKana"
-		| "displayId"
-		| "profileImageURL"
-		| "grade"
-		| "bio"
-	>
->;
+export type Member = User &
+	Partial<
+		Pick<
+			Profile,
+			| "displayName"
+			| "realName"
+			| "realNameKana"
+			| "displayId"
+			| "profileImageURL"
+			| "grade"
+			| "bio"
+		>
+	>;
 
 export type MemberWithCertifications = Member & {
 	certifications: Certification[];
