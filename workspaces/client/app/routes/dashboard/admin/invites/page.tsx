@@ -1,7 +1,7 @@
 import { css } from "styled-system/css";
 import { GenerateInvitationURLDialog } from "./internal/components/callable-generate-invitation-url-dialog";
 import { InvitationsEditor } from "./internal/components/invitations-editor";
-import { PendingUsersTable } from "./internal/components/table";
+import { ProvisionalUsersTable } from "./internal/components/table";
 
 export default function AdminInvites() {
 	return (
@@ -24,7 +24,7 @@ export default function AdminInvites() {
 				>
 					承認待ちユーザー
 				</h2>
-				<PendingUsersTable />
+				<ProvisionalUsersTable />
 			</div>
 			<GenerateInvitationURLDialog.Root />
 		</div>

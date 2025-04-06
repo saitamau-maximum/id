@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 
-export const usePendingUsers = () => {
+export const useProvisionalUsers = () => {
 	const { userRepository } = useRepository();
 	return useQuery({
-		queryKey: userRepository.getAllPendingUsers$$key(),
-		queryFn: userRepository.getAllPendingUsers,
+		queryKey: userRepository.getAllProvisionalUsers$$key(),
+		queryFn: userRepository.getAllProvisionalUsers,
 		initialData: [],
 	});
 };

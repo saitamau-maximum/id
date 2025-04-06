@@ -38,8 +38,8 @@ export interface IUserRepository {
 	getAllUsers$$key: () => unknown[];
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
 	updateUserProfileImage: (file: File) => Promise<void>;
-	getAllPendingUsers: () => Promise<User[]>;
-	getAllPendingUsers$$key: () => unknown[];
+	getAllProvisionalUsers: () => Promise<User[]>;
+	getAllProvisionalUsers$$key: () => unknown[];
 	approveInvitation: (userId: string) => Promise<void>;
 }
 
@@ -156,10 +156,10 @@ export class UserRepositoryImpl implements IUserRepository {
 		}
 	}
 
-	async getAllPendingUsers() {
-		const res = await client.admin.users.pending.$get();
+	async getAllProvisionalUsers() {
+		const res = await client.admin.users.provisional.$get();
 		if (!res.ok) {
-			throw new Error("Failed to fetch pending users");
+			throw new Error("Failed to fetch provisional users");
 		}
 		const data = await res.json();
 		return data.map((user) => ({
@@ -171,8 +171,8 @@ export class UserRepositoryImpl implements IUserRepository {
 		}));
 	}
 
-	getAllPendingUsers$$key() {
-		return ["pending-users"];
+	getAllProvisionalUsers$$key() {
+		return ["provisional-users"];
 	}
 
 	async approveInvitation(userId: string) {

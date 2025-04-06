@@ -352,7 +352,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchPendingUsers(): Promise<User[]> {
+	async fetchProvisionalUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
 			with: {

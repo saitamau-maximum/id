@@ -5,11 +5,11 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import type { User } from "~/types/user";
 import { useApproveInvitation } from "../hooks/use-approve-invitation";
-import { usePendingUsers } from "../hooks/use-pending-users";
+import { useProvisionalUsers } from "../hooks/use-provisional-users";
 import { ApproveConfirmation } from "./approve-confirmation";
 
-export const PendingUsersTable = () => {
-	const { data: users } = usePendingUsers();
+export const ProvisionalUsersTable = () => {
+	const { data: users } = useProvisionalUsers();
 	return (
 		<Table.Root>
 			<thead>

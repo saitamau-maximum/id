@@ -17,7 +17,7 @@ export const useApproveInvitation = () => {
 				type: "success",
 			});
 			queryClient.invalidateQueries({
-				queryKey: userRepository.getAllPendingUsers$$key(),
+				queryKey: userRepository.getAllProvisionalUsers$$key(),
 			});
 		},
 		onError: () => {

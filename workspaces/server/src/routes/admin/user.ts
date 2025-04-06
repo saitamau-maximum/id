@@ -50,10 +50,10 @@ const route = app
 			}
 		},
 	)
-	.get("/pending", async (c) => {
+	.get("/provisional", async (c) => {
 		const { UserRepository } = c.var;
 		try {
-			const users = await UserRepository.fetchPendingUsers();
+			const users = await UserRepository.fetchProvisionalUsers();
 			return c.json(users);
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);
