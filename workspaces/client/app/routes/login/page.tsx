@@ -94,9 +94,10 @@ export default function Login() {
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
 				{isInvited && (
 					<p>
-						招待を受け入れるには以下のボタンから GitHub アカウントでログインしてください。
+						招待を受け入れるには以下のボタンから GitHub
+						アカウントでログインしてください。
 					</p>
-					)}
+				)}
 			</p>
 			{FLAG.ENABLE_LOGIN ? (
 				<a
