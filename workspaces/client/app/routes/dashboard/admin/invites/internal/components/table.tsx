@@ -37,15 +37,15 @@ const UserTableRow = ({
 }: {
 	user: User;
 }) => {
-	const { mutate: approve } = useApproveInvitation();
+	const { mutate: approveInvitation } = useApproveInvitation();
 	const handleSubmit = useCallback(async () => {
 		const res = await ConfirmDialog.call({
 			title: "招待を承認",
 			children: <ApproveConfirmation title={user.displayName} />,
 		});
 		if (res.type === "dismiss") return;
-		approve(user.id);
-	}, [user, approve]);
+		approveInvitation(user.id);
+	}, [user, approveInvitation]);
 
 	return (
 		<Table.Tr key={user.id}>
