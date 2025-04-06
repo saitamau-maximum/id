@@ -177,7 +177,7 @@ export class UserRepositoryImpl implements IUserRepository {
 	}
 
 	async approveInvitation(userId: string) {
-		const res = await client.admin.users[":userId"].approve.$put({
+		const res = await client.admin.users[":userId"].approve.$post({
 			param: {
 				userId,
 			},
@@ -188,7 +188,7 @@ export class UserRepositoryImpl implements IUserRepository {
 	}
 
 	async rejectInvitation(userId: string) {
-		const res = await client.admin.users[":userId"].reject.$delete({
+		const res = await client.admin.users[":userId"].reject.$post({
 			param: {
 				userId,
 			},

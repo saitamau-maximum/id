@@ -59,7 +59,7 @@ const route = app
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
 	})
-	.put("/:userId/approve", async (c) => {
+	.post("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
 		try {
@@ -69,7 +69,7 @@ const route = app
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
 	})
-	.delete("/:userId/reject", async (c) => {
+	.post("/:userId/reject", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
 		try {
