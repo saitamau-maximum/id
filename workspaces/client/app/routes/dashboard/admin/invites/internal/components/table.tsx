@@ -2,7 +2,7 @@ import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import type { User } from "~/types/user";
-import { usePendingUsers } from "../hooks/use-all-user";
+import { usePendingUsers } from "../hooks/use-pending-users";
 
 export const PendingUsersTable = () => {
 	const { data: users } = usePendingUsers();
