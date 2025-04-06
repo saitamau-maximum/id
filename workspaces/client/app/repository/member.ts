@@ -23,7 +23,13 @@ export class MemberRepositoryImpl implements IMemberRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch members");
 		}
-		return res.json();
+		const data = await res.json();
+		return data.map((member) => ({
+			...member,
+			initializedAt: member.initializedAt
+				? new Date(member.initializedAt)
+				: undefined,
+		}));
 	}
 
 	getMembers$$key() {
@@ -62,7 +68,13 @@ export class MemberRepositoryImpl implements IMemberRepository {
 			throw new Error("Failed to fetch profile");
 		}
 
-		return res.json();
+		const data = await res.json();
+		return {
+			...data,
+			initializedAt: data.initializedAt
+				? new Date(data.initializedAt)
+				: undefined,
+		};
 	}
 
 	getProfileByUserDisplayID$$key(userDisplayId: string) {

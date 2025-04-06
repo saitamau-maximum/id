@@ -7,24 +7,32 @@ import { Sidebar } from "./internal/components/sidebar";
 
 export default function Dashboard() {
 	const navigate = useNavigate();
-	const { isLoading, isAuthorized, isInitialized } = useAuth();
-
-	// 読み込みが終わっていてかつ認証されていない場合はログイン画面にリダイレクト
-	const shouldLogin = !isLoading && !isAuthorized;
-	// 読み込みが終わっていてかつ初期登録がまだの場合は初期登録画面にリダイレクト
-	const shouldOnboarding = !isLoading && isAuthorized && !isInitialized;
+	const { isLoading, isAuthorized, isInitialized, isProvisional } = useAuth();
 
 	useEffect(() => {
-		if (shouldLogin) {
-			navigate("/login");
-		}
-		if (shouldOnboarding) {
-			navigate("/onboarding");
-		}
-	}, [shouldLogin, shouldOnboarding, navigate]);
+		if (isLoading) return;
 
-	// 認証済みかつ初期登録済みの場合以外は何も表示しない
-	if (!isAuthorized || !isInitialized) {
+		// 認証されていない場合はログイン画面へ
+		if (!isAuthorized) {
+			navigate("/login");
+			return;
+		}
+
+		// 初期登録がまだの場合は初期登録画面へ
+		if (!isInitialized) {
+			navigate("/onboarding");
+			return;
+		}
+
+		// 仮登録ユーザーの場合は入金情報画面へ
+		if (isProvisional) {
+			navigate("/payment-info");
+			return;
+		}
+	}, [isLoading, isAuthorized, isInitialized, isProvisional, navigate]);
+
+	// リダイレクトされるべき場合は何も表示しない
+	if (isLoading || !isAuthorized || !isInitialized || isProvisional) {
 		return null;
 	}
 

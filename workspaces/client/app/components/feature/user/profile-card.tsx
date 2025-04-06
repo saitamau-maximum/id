@@ -4,7 +4,8 @@ import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications"> & {
+type Props = Omit<Member, "certifications" | "initializedAt"> & {
+	initialized: boolean;
 	shrinkRoles?: boolean;
 };
 

@@ -55,6 +55,7 @@ export default [
 		...(FLAG.ENABLE_INVITE
 			? prefix("invitation", [route(":id", "routes/invitation/page.tsx")])
 			: []),
+		route("payment-info", "routes/payment-info/page.tsx"),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("verify", "routes/verify.tsx"),
 		route("login", "routes/login/page.tsx"),

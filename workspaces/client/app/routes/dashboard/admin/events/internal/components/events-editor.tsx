@@ -16,6 +16,7 @@ import { Table } from "~/components/ui/table";
 import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
+import { getFiscalYear } from "~/utils/fiscal-year";
 import { useCreateEvent } from "../hooks/use-create-event";
 import { useDeleteEvent } from "../hooks/use-delete-event";
 import { useUpdateEvent } from "../hooks/use-update-event";
@@ -52,16 +53,6 @@ const formatDuration = (startAt: Date, endAt: Date) => {
 		hour: "2-digit",
 		minute: "2-digit",
 	})}`;
-};
-
-// dateから年度を取得する
-const getFiscalYear = (date: Date) => {
-	const year = date.getFullYear();
-	const month = date.getMonth() + 1;
-	if (month >= 4) {
-		return year;
-	}
-	return year - 1;
 };
 
 export const EventsEditor = () => {

@@ -15,6 +15,9 @@ export class AuthRepositoryImpl implements IAuthRepository {
 		const data = await res.json();
 		return {
 			...data,
+			initializedAt: data.initializedAt
+				? new Date(data.initializedAt)
+				: undefined,
 			updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
 		};
 	}
