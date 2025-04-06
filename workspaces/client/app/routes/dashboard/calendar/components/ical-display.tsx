@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
-import { Check, Copy } from "react-feather";
+import { ArrowUpRight, Check, Copy } from "react-feather";
 import { css } from "styled-system/css";
+import { AnchorLike } from "~/components/ui/anchor-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { useToast } from "~/hooks/use-toast";
 
@@ -67,7 +68,22 @@ export const ICalDisplay = ({ url }: Props) => {
 					)}
 				</IconButton>
 			</div>
-			<p>"iCal"を使ってGoogle CalendarやApple Calendarなどと同期できます</p>
+			<p className={css({ textAlign: "center", color: "gray.600" })}>
+				"iCal"を使ってGoogle CalendarやApple Calendarなどと同期できます
+				<br />
+				登録方法は
+				<a
+					href="https://github.com/saitamau-maximum/id/wiki/add-ical"
+					target="_blank"
+					rel="noreferrer"
+				>
+					<AnchorLike>
+						こちら
+						<ArrowUpRight size={16} />
+					</AnchorLike>
+				</a>
+				をご覧ください
+			</p>
 		</div>
 	);
 };
