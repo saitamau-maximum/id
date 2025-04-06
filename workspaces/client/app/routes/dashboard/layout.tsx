@@ -9,29 +9,30 @@ export default function Dashboard() {
 	const navigate = useNavigate();
 	const { isLoading, isAuthorized, isInitialized, isProvisional } = useAuth();
 
-	// 認証されていない場合: ログイン画面へリダイレクト
-	const shouldLogin = !isAuthorized;
-	// 初期登録がまだの場合: 初期登録画面へリダイレクト
-	const shouldOnboarding = isAuthorized && !isInitialized;
-	// 仮登録ユーザー: 入金情報画面へリダイレクト
-	const shouldPaymentInfo = isAuthorized && isInitialized && isProvisional;
-
 	useEffect(() => {
 		if (isLoading) return;
 
-		if (shouldLogin) {
+		// 認証されていない場合はログイン画面へ
+		if (!isAuthorized) {
 			navigate("/login");
+			return;
 		}
-		if (shouldOnboarding) {
-			navigate("/onboarding");
-		}
-		if (shouldPaymentInfo) {
-			navigate("/payment-info");
-		}
-	}, [isLoading, shouldLogin, shouldOnboarding, shouldPaymentInfo, navigate]);
 
-	// 認証済みかつ初期登録済みかつ本登録ユーザーの場合以外は何も表示しない
-	if (!isAuthorized || !isInitialized || isProvisional) {
+		// 初期登録がまだの場合は初期登録画面へ
+		if (!isInitialized) {
+			navigate("/onboarding");
+			return;
+		}
+
+		// 仮登録ユーザーの場合は入金情報画面へ
+		if (isProvisional) {
+			navigate("/payment-info");
+			return;
+		}
+	}, [isLoading, isAuthorized, isInitialized, isProvisional, navigate]);
+
+	// リダイレクトされるべき場合は何も表示しない
+	if (isLoading || !isAuthorized || !isInitialized || isProvisional) {
 		return null;
 	}
 
