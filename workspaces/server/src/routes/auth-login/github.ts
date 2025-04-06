@@ -131,12 +131,12 @@ const route = app
 			);
 			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			const userIdStr = String(user.id);
+			const githubUserIdStr = String(user.id);
 			let foundUserId: string | null;
 			try {
 				// ユーザーの存在確認
 				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					userIdStr,
+					githubUserIdStr,
 					OAUTH_PROVIDER_IDS.GITHUB,
 				);
 			} catch {
@@ -169,7 +169,7 @@ const route = app
 					}
 					// 招待コードが有効な場合、仮登録処理を行う
 					foundUserId = await c.var.UserRepository.createTemporaryUser(
-						userIdStr,
+						githubUserIdStr,
 						OAUTH_PROVIDER_IDS.GITHUB,
 						invitationId,
 						{
@@ -187,7 +187,7 @@ const route = app
 						return c.text("invitation code required for non-members", 403);
 					// Organization のメンバーであれば、本登録処理を行う
 					foundUserId = await c.var.UserRepository.createUser(
-						userIdStr,
+						githubUserIdStr,
 						OAUTH_PROVIDER_IDS.GITHUB,
 						{
 							email: user.email ?? undefined,
