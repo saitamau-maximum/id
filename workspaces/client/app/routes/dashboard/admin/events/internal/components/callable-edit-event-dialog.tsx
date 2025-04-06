@@ -33,7 +33,8 @@ const UpdateFormSchema = v.object({
 	locationId: EventSchemas.LocationId,
 });
 
-type UpdateFormValues = v.InferOutput<typeof UpdateFormSchema>;
+type UpdateFormInputValues = v.InferInput<typeof UpdateFormSchema>;
+type UpdateFormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const EditEventDialog = createCallable<Props, Payload>(
 	({ call, event }) => {
@@ -43,23 +44,23 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			register,
 			watch,
 			formState: { errors },
-		} = useForm<UpdateFormValues>({
+		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
 			resolver: valibotResolver(UpdateFormSchema),
 			defaultValues: {
 				title: event.title,
 				description: event.description,
-				startAt: event.startAt,
-				endAt: event.endAt,
+				startAt: event.startAt.toISOString().slice(0, 16), // YYYY-MM-DDTHH:mm (for HTML5)
+				endAt: event.endAt.toISOString().slice(0, 16),
 				locationId: event.locationId ?? null,
 			},
 		});
 
-		const onSubmit = async (values: UpdateFormValues) => {
+		const onSubmit = async (values: UpdateFormOutputValues) => {
 			const updatedEvent: CalendarEvent = {
 				...event,
 				...values,
-				startAt: new Date(values.startAt),
-				endAt: new Date(values.endAt),
+				startAt: values.startAt,
+				endAt: values.endAt,
 				locationId: values.locationId ?? undefined,
 			};
 			call.end({ type: "success", payload: updatedEvent });
