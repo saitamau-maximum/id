@@ -11,7 +11,7 @@ export const oauthClients = sqliteTable("oauth_clients", {
 	logoUrl: text("logo_url"),
 	ownerId: text("owner_id")
 		.notNull()
-		.references(() => users.id, { onDelete: "cascade" }),
+		.references(() => users.id),
 });
 
 export const oauthClientManagers = sqliteTable(
@@ -22,7 +22,7 @@ export const oauthClientManagers = sqliteTable(
 			.references(() => oauthClients.id),
 		userId: text("user_id")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => users.id),
 	},
 	(table) => ({
 		pk: primaryKey({ columns: [table.clientId, table.userId] }),
@@ -39,7 +39,7 @@ export const oauthClientSecrets = sqliteTable(
 		description: text("description"),
 		issuedBy: text("issued_by")
 			.notNull()
-			.references(() => users.id, { onDelete: "cascade" }),
+			.references(() => users.id),
 		issuedAt: int("issued_at", { mode: "timestamp_ms" }).notNull(),
 	},
 	(table) => ({
@@ -80,7 +80,7 @@ export const oauthTokens = sqliteTable("oauth_tokens", {
 		.references(() => oauthClients.id),
 	userId: text("user_id")
 		.notNull()
-		.references(() => users.id, { onDelete: "cascade" }),
+		.references(() => users.id),
 	code: text("code").notNull().unique(),
 	codeExpiresAt: int("code_expires_at", { mode: "timestamp_ms" }).notNull(),
 	codeUsed: int("code_used", { mode: "boolean" }).notNull(),
