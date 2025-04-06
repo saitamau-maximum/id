@@ -13,7 +13,7 @@ export const useApproveInvitation = () => {
 		},
 		onSuccess: async () => {
 			pushToast({
-				title: "承認に成功しました",
+				title: "承認しました",
 				type: "success",
 			});
 			queryClient.invalidateQueries({
@@ -22,7 +22,7 @@ export const useApproveInvitation = () => {
 		},
 		onError: () => {
 			pushToast({
-				title: "承認に失敗しました",
+				title: "承認できませんでした",
 				type: "error",
 			});
 		},
