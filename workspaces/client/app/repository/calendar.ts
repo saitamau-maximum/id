@@ -7,6 +7,7 @@ export interface ICalendarRepository {
 	createEvent: (event: Omit<CalendarEvent, "id" | "userId">) => Promise<void>;
 	updateEvent: (event: CalendarEvent) => Promise<void>;
 	deleteEvent: (id: CalendarEvent["id"]) => Promise<void>;
+	generateURL: () => Promise<string>;
 }
 
 export class CalendarRepositoryImpl implements ICalendarRepository {
@@ -64,5 +65,13 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		if (!res.ok) {
 			throw new Error("Failed to delete event");
 		}
+	}
+
+	async generateURL() {
+		const res = await client.calendar["generate-url"].$post();
+		if (!res.ok) {
+			throw new Error("Failed to generate url");
+		}
+		return res.text();
 	}
 }

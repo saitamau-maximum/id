@@ -1,10 +1,12 @@
-import { useMemo, useState } from "react";
-import { ArrowRight } from "react-feather";
+import { useCallback, useMemo, useState } from "react";
+import { ArrowRight, ArrowUpRight } from "react-feather";
 import { css } from "styled-system/css";
 import { Calendar } from "~/components/feature/calendar/calendar";
 import { EventList } from "~/components/feature/calendar/event-list";
+import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
 import { DashboardHeader } from "../internal/components/dashboard-title";
+import { ICalDisplay } from "./components/ical-display";
 import { useCalendar } from "./hooks/use-calendar";
 
 const formatYYYYMMDD = (date: Date) =>
@@ -13,7 +15,7 @@ const formatYYYYMMDD = (date: Date) =>
 	).padStart(2, "0")}`;
 
 export default function CalendarHome() {
-	const { data } = useCalendar();
+	const { data, generateICalUrl } = useCalendar();
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
 	// 今日以降のイベントを今日に近い方から6つ表示する
@@ -39,6 +41,14 @@ export default function CalendarHome() {
 		);
 		return filtered;
 	}, [data, selectedDate]);
+
+	const handleAddToOwnCalendar = useCallback(async () => {
+		const url = await generateICalUrl();
+		await InformationDialog.call({
+			title: "自身のカレンダーに追加",
+			children: <ICalDisplay url={url} />,
+		});
+	}, [generateICalUrl]);
 
 	if (!data) {
 		return null;
@@ -69,12 +79,28 @@ export default function CalendarHome() {
 					},
 				})}
 			>
-				<Calendar
-					events={data}
-					label="Event Calendar"
-					onDateClick={(date) => setSelectedDate(date)}
-					targetDate={selectedDate ?? undefined}
-				/>
+				<div
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						justifyContent: "center",
+						alignItems: "center",
+						gap: 4,
+					})}
+				>
+					<Calendar
+						events={data}
+						label="Event Calendar"
+						onDateClick={(date) => setSelectedDate(date)}
+						targetDate={selectedDate ?? undefined}
+					/>
+					<button type="button" onClick={handleAddToOwnCalendar}>
+						<ButtonLike size="sm" variant="text">
+							自分のカレンダーに追加
+							<ArrowUpRight size={16} />
+						</ButtonLike>
+					</button>
+				</div>
 				<div className={css({ width: "100%" })}>
 					<div
 						className={css({
