@@ -78,4 +78,10 @@ export const UserSchemas = {
 			`自己紹介は${BIO_MAX_LINES}行以下で入力してください`,
 		),
 	),
+	SocialLinks: v.array(
+		v.object({
+			string: v.string(),
+			url: v.string(),
+		}),
+	),
 };

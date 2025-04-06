@@ -73,6 +73,8 @@ export const ProfileUpdateForm = () => {
 		},
 		[deleteCertification],
 	);
+	const [links, setLinks] = useState<string[]>([]);
+	const [newLink, setNewLink] = useState<string>("");
 
 	const {
 		register,
@@ -96,6 +98,22 @@ export const ProfileUpdateForm = () => {
 
 	const bio = watch("bio");
 	const bioLength = bio?.length || 0;
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setNewLink(e.target.value);
+	};
+
+	const handleAddLink = () => {
+		if (newLink) {
+			setLinks([...links, newLink]);
+			setNewLink("");
+		}
+	};
+
+	const handleDeleteLink = (index: number) => {
+		const newLinks = links.filter((_, i) => i !== index);
+		setLinks(newLinks);
+	};
 
 	return (
 		<form
@@ -259,6 +277,85 @@ export const ProfileUpdateForm = () => {
 				>
 					{bioLength} / {BIO_MAX_LENGTH}
 				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<h1>ソーシャルリンクを設定する</h1>
+
+				<div
+					style={{
+						marginBottom: "20px",
+						display: "flex",
+						gap: "10px",
+					}}
+				>
+					<Form.Input
+						type="text"
+						value={newLink}
+						onChange={handleChange}
+						placeholder="https://example.com"
+						className={css({
+							padding: "8px",
+							borderRadius: "4px",
+						})}
+					/>
+					<ButtonLike
+						onClick={handleAddLink}
+						className={css({
+							backgroundColor: "#4CAF50",
+							color: "white",
+							padding: "8px 16px",
+							border: "none",
+							borderRadius: "4px",
+							cursor: "pointer",
+						})}
+					>
+						追加
+					</ButtonLike>
+				</div>
+
+				{/* 追加されたリンクの表示 */}
+				<div>
+					{links.map((link, index) => (
+						<div
+							key={index}
+							style={{
+								marginBottom: "10px",
+								display: "flex",
+								gap: "10px",
+								alignItems: "center",
+							}}
+						>
+							{/* 表示用のinput（変更不可） */}
+							<Form.Input
+								type="text"
+								value={link}
+								placeholder="https://example.com"
+								disabled
+								className={css({
+									width: "100%",
+									padding: "8px",
+									borderRadius: "4px",
+									marginBottom: "5px",
+								})}
+							/>
+
+							{/* 削除ボタン */}
+							<ButtonLike
+								onClick={() => handleDeleteLink(index)}
+								className={css({
+									backgroundColor: "#4caf50",
+									color: "white",
+									padding: "5px 10px",
+									border: "none",
+									borderRadius: "4px",
+									cursor: "pointer",
+								})}
+							>
+								削除
+							</ButtonLike>
+						</div>
+					))}
+				</div>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>
