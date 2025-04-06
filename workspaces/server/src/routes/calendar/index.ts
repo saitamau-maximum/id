@@ -1,15 +1,37 @@
+import { vValidator } from "@hono/valibot-validator";
+import { sign, verify } from "hono/jwt";
 import { type EventAttributes, createEvents } from "ics";
+import * as v from "valibot";
 import { factory } from "../../factory";
+import { authMiddleware } from "../../middleware/auth";
 import { calendarEventRoute } from "./events";
 import { calendarLocationRoute } from "./location";
 
 const app = factory.createApp();
 
+const iCalParamSchema = v.object({
+	token: v.pipe(v.string(), v.nonEmpty()),
+});
+
 const route = app
 	// 活動場所等が筒抜けになると怖いので、基本的には認証が必要とする
 	.route("/events", calendarEventRoute)
 	.route("/locations", calendarLocationRoute)
-	.get("/calendar.ics", async (c) => {
+	.post("/generate-url", authMiddleware, async (c) => {
+		const { userId } = c.get("jwtPayload");
+		// 毎回同じトークンを生成するのはあまり良くないので、ランダムな文字列を付与する
+		const randomString = Math.random().toString(36).slice(2);
+		const token = await sign({ userId, randomString }, c.env.SECRET);
+		const requestUrl = new URL(c.req.url);
+		return c.text(`${requestUrl.origin}/calendar/calendar.ics?token=${token}`);
+	})
+	.get("/calendar.ics", vValidator("query", iCalParamSchema), async (c) => {
+		const { token } = c.req.valid("query");
+		try {
+			await verify(token, c.env.SECRET);
+		} catch (e) {
+			return c.text("Unauthorized", 401);
+		}
 		const { CalendarRepository } = c.var;
 		try {
 			const events = await CalendarRepository.getAllEventsWithLocation();
@@ -32,6 +54,7 @@ const route = app
 				description: event.description,
 				location: event.location?.name,
 				url: `${c.env.CLIENT_ORIGIN}/calendar`,
+				uid: event.id,
 			}));
 
 			const { error, value } = createEvents(icsEvents);
