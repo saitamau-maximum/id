@@ -4,9 +4,11 @@ import { css } from "styled-system/css";
 import { Table } from "~/components/ui/table";
 
 import { useAuth } from "~/hooks/use-auth";
+import { getFiscalYear } from "~/utils/fiscal-year";
 
 export default function PaymentInfo() {
-	const { isLoading, isInitialized, isAuthorized, isProvisional } = useAuth();
+	const { isLoading, isInitialized, isAuthorized, isProvisional, user } =
+		useAuth();
 	const navigate = useNavigate();
 
 	// そのうち本登録ユーザーでも表示できるようにする？
@@ -17,7 +19,22 @@ export default function PaymentInfo() {
 		if (!shouldProceed) navigate("/");
 	}, [shouldProceed, navigate]);
 
-	if (!shouldProceed) return null;
+	if (!shouldProceed || !user) return null;
+
+	// isInitialized が true の時点で initializedAt は必ず存在するはず
+	if (!user.initializedAt) throw new Error("initializedAt is null");
+
+	// 今年度登録したユーザーは、 3 月までの残り月数から会費を計算する
+	// そうでない場合、会費は 1 年分とする
+	const remainingMonth =
+		getFiscalYear(user.initializedAt) === getFiscalYear(new Date())
+			? 12 - ((user.initializedAt.getMonth() - 3 + 12) % 12)
+			: 12;
+	// 4 月登録: 12 - (3 - 3 + 12) % 12 = 12
+	// 5 月登録: 12 - (4 - 3 + 12) % 12 = 11
+	// ...
+	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
+	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
 
 	return (
 		<div
@@ -68,7 +85,7 @@ export default function PaymentInfo() {
 				</Table.Tr>
 				<Table.Tr>
 					<Table.Th>振込金額</Table.Th>
-					<Table.Td>xx 円</Table.Td>
+					<Table.Td>{(remainingMonth * 250).toLocaleString()} 円</Table.Td>
 				</Table.Tr>
 			</Table.Root>
 			<p>口座名義人が正しいことを確認してから振り込んでください。</p>
