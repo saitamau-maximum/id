@@ -44,15 +44,10 @@ export default function Invitation() {
 		// useAuth と useMutation の初期化が終わるまで何もしない (error 時も return)
 		if (isLoading || mutation.isPending || mutation.error) return;
 
-		// useParams の id が存在しないか、認証済みの場合は /login にリダイレクト
-		if (!id || authorized) {
-			navigate("/login");
-			return;
-		}
-
-		// 認証済みかつ初期登録が済んでいない場合は /onboarding にリダイレクト
-		if (shouldOnboarding) {
-			navigate("/onboarding");
+		// useParams の id が存在しない　 または 認証済み
+		// または 認証済みかつ初期登録が済んでいない場合は / にリダイレクト
+		if (!id || authorized || shouldOnboarding) {
+			navigate("/");
 			return;
 		}
 
