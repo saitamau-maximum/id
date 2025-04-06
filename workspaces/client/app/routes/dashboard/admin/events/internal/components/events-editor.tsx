@@ -16,7 +16,7 @@ import { Table } from "~/components/ui/table";
 import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
-import { getFiscalYear } from "~/utils/fiscal-year";
+import { getFiscalYear } from "~/utils/date";
 import { useCreateEvent } from "../hooks/use-create-event";
 import { useDeleteEvent } from "../hooks/use-delete-event";
 import { useUpdateEvent } from "../hooks/use-update-event";

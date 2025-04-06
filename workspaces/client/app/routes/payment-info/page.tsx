@@ -5,7 +5,7 @@ import { Progress } from "~/components/ui/progess";
 import { Table } from "~/components/ui/table";
 
 import { useAuth } from "~/hooks/use-auth";
-import { getFiscalYear } from "~/utils/fiscal-year";
+import { getFiscalYear } from "~/utils/date";
 
 const Emphasize = ({ children }: { children: React.ReactNode }) => (
 	<span
