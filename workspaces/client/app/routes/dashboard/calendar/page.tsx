@@ -5,6 +5,7 @@ import { Calendar } from "~/components/feature/calendar/calendar";
 import { EventList } from "~/components/feature/calendar/event-list";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
+import { useDeviceType } from "~/hooks/use-device-type";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { ICalDisplay } from "./components/ical-display";
 import { useCalendar } from "./hooks/use-calendar";
@@ -15,6 +16,7 @@ const formatYYYYMMDD = (date: Date) =>
 	).padStart(2, "0")}`;
 
 export default function CalendarHome() {
+	const { deviceType } = useDeviceType();
 	const { data, generateICalUrl } = useCalendar();
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -67,7 +69,10 @@ export default function CalendarHome() {
 					flexDirection: "column",
 					alignItems: "center",
 					gap: 4,
-					marginTop: 24,
+					marginTop: {
+						base: 0,
+						md: 24,
+					},
 					maxWidth: 1024,
 					width: "100%",
 					margin: "0 auto",
@@ -93,6 +98,7 @@ export default function CalendarHome() {
 						label="Event Calendar"
 						onDateClick={(date) => setSelectedDate(date)}
 						targetDate={selectedDate ?? undefined}
+						variant={deviceType === "pc" ? "md" : "sm"}
 					/>
 					<button type="button" onClick={handleAddToOwnCalendar}>
 						<ButtonLike size="sm" variant="text">
@@ -110,21 +116,34 @@ export default function CalendarHome() {
 							marginBottom: 4,
 						})}
 					>
-						<h2
-							className={css({
-								fontSize: "xl",
-								color: "gray.700",
-								fontWeight: "bold",
-							})}
-						>
-							{selectedDate
-								? `活動予定 - ${selectedDate.toLocaleDateString("ja-JP", {
+						<div>
+							<h2
+								className={css({
+									fontSize: {
+										base: "md",
+										md: "xl",
+									},
+									color: "gray.700",
+									fontWeight: "bold",
+								})}
+							>
+								{selectedDate ? "活動予定" : "直近の活動予定"}
+							</h2>
+							{selectedDate && (
+								<p
+									className={css({
+										color: "gray.500",
+										fontSize: "sm",
+									})}
+								>
+									{selectedDate.toLocaleDateString("ja-JP", {
 										year: "numeric",
 										month: "long",
 										day: "numeric",
-									})}`
-								: "直近の活動予定"}
-						</h2>
+									})}
+								</p>
+							)}
+						</div>
 						{selectedDate !== null && (
 							<button type="button" onClick={() => setSelectedDate(null)}>
 								<ButtonLike size="sm" variant="text">
