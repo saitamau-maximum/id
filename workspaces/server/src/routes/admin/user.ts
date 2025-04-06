@@ -76,7 +76,6 @@ const route = app
 			await UserRepository.rejectProvisionalUser(userId);
 			return c.text("ok", 200);
 		} catch (e) {
-			console.error(e);
 			return c.json({ error: "Internal Server Error" }, 500);
 		}
 	});
