@@ -5,8 +5,10 @@ import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
 	Member,
+	MemberWithCertifications,
 	Profile,
 	User,
+	UserWithCertifications,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -70,12 +72,17 @@ export class CloudflareUserRepository implements IUserRepository {
 		return res.userId;
 	}
 
-	async fetchUserProfileById(userId: string): Promise<User> {
+	async fetchUserProfileById(userId: string): Promise<UserWithCertifications> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
 				roles: true,
 				profile: true,
+				certifications: {
+					with: {
+						certification: true,
+					},
+				},
 			},
 		});
 
@@ -97,6 +104,14 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.profile.grade ?? undefined,
 			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			certifications: user.certifications.map((cert) => ({
+				id: cert.certification.id,
+				title: cert.certification.title,
+				description: cert.certification.description,
+				certifiedIn: cert.certifiedIn,
+				isApproved: cert.isApproved,
+			})),
+			updatedAt: user.profile.updatedAt ?? undefined,
 		};
 	}
 
@@ -126,6 +141,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			updatedAt: new Date(),
 		};
 
 		const [_, res] = await this.client.batch([
@@ -170,6 +186,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: payload.studentId,
 			grade: payload.grade,
 			bio: payload.bio,
+			updatedAt: new Date(),
 		};
 
 		const res = await this.client
@@ -204,13 +221,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		}));
 	}
 
-	async fetchMemberByDisplayId(displayId: string): Promise<Member> {
+	async fetchMemberByDisplayId(
+		displayId: string,
+	): Promise<MemberWithCertifications> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
 				user: {
 					with: {
 						roles: true,
+						certifications: {
+							with: {
+								certification: true,
+							},
+						},
 					},
 				},
 			},
@@ -231,6 +255,13 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.grade ?? undefined,
 			bio: user.bio ?? undefined,
 			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			certifications: user.user.certifications.map((cert) => ({
+				id: cert.certification.id,
+				title: cert.certification.title,
+				description: cert.certification.description,
+				certifiedIn: cert.certifiedIn,
+				isApproved: cert.isApproved,
+			})),
 		};
 	}
 
@@ -264,6 +295,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.profile.grade ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			bio: user.profile.bio ?? undefined,
+			updatedAt: user.profile.updatedAt ?? undefined,
 		}));
 	}
 

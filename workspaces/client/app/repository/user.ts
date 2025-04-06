@@ -114,7 +114,11 @@ export class UserRepositoryImpl implements IUserRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch users");
 		}
-		return res.json();
+		const data = await res.json();
+		return data.map((user) => ({
+			...user,
+			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
+		}));
 	}
 
 	getAllUsers$$key() {

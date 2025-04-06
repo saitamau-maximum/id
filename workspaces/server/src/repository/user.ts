@@ -1,5 +1,13 @@
 import type { Role } from "../constants/role";
 
+export type Certification = {
+	id: string;
+	title: string;
+	description: string;
+	certifiedIn: number;
+	isApproved: boolean;
+};
+
 export type Profile = {
 	displayName: string;
 	realName: string;
@@ -11,6 +19,7 @@ export type Profile = {
 	studentId: string;
 	grade: string;
 	bio: string;
+	updatedAt: Date;
 };
 
 export type User = {
@@ -18,6 +27,10 @@ export type User = {
 	initialized: boolean;
 	roles: Role[];
 } & Partial<Profile>;
+
+export type UserWithCertifications = User & {
+	certifications: Certification[];
+};
 
 export type Member = {
 	id: string;
@@ -36,6 +49,10 @@ export type Member = {
 	>
 >;
 
+export type MemberWithCertifications = Member & {
+	certifications: Certification[];
+};
+
 export interface IUserRepository {
 	createUser: (
 		providerUserId: string,
@@ -46,10 +63,12 @@ export interface IUserRepository {
 		providerUserId: string,
 		providerId: number,
 	) => Promise<string>;
-	fetchUserProfileById: (userId: string) => Promise<User>;
+	fetchUserProfileById: (userId: string) => Promise<UserWithCertifications>;
 	fetchAllUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
-	fetchMemberByDisplayId: (displayId: string) => Promise<Member>;
+	fetchMemberByDisplayId: (
+		displayId: string,
+	) => Promise<MemberWithCertifications>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;

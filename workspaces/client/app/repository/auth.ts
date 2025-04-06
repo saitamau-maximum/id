@@ -1,8 +1,8 @@
-import type { User } from "~/types/user";
+import type { UserWithCertifications } from "~/types/user";
 import { client } from "~/utils/hono";
 
 export interface IAuthRepository {
-	me: () => Promise<User>;
+	me: () => Promise<UserWithCertifications>;
 	me$$key(): unknown[];
 }
 
@@ -12,7 +12,11 @@ export class AuthRepositoryImpl implements IAuthRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch user");
 		}
-		return res.json();
+		const data = await res.json();
+		return {
+			...data,
+			updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
+		};
 	}
 	me$$key() {
 		return ["auth"];

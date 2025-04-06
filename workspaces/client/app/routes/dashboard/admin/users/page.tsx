@@ -1,11 +1,33 @@
+import { css } from "styled-system/css";
+import { FLAG } from "~/utils/flag";
+import { GenerateInvitationURLDialog } from "./internal/components/callable-generate-invitation-url-dialog";
+import { InvitationsEditor } from "./internal/components/invitations-editor";
 import { UsersTable } from "./internal/components/table";
-import { useAllUsers } from "./internal/hooks/use-all-user";
 
 export default function AdminUsers() {
-	const users = useAllUsers();
 	return (
-		<div>
-			<UsersTable users={users.data ?? []} />
+		<div
+			className={css({
+				display: "flex",
+				flexDirection: "column",
+				gap: 8,
+			})}
+		>
+			{FLAG.ENABLE_INVITE && <InvitationsEditor />}
+			<div>
+				<h2
+					className={css({
+						fontSize: "xl",
+						fontWeight: "bold",
+						color: "gray.600",
+						marginBottom: 4,
+					})}
+				>
+					ユーザー
+				</h2>
+				<UsersTable />
+			</div>
+			<GenerateInvitationURLDialog.Root />
 		</div>
 	);
 }

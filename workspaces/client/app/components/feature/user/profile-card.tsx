@@ -1,11 +1,11 @@
 import { css } from "styled-system/css";
+import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { Role } from "~/types/role";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
-type Props = Member & {
-	roles: Role[];
+type Props = Omit<Member, "certifications"> & {
+	shrinkRoles?: boolean;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -17,8 +17,12 @@ export const ProfileCard: React.FC<Props> = ({
 	initialized,
 	roles,
 	bio,
+	shrinkRoles = false,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
+	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
+	const rolesLeft = roles.length - trancatedRoles.length;
+
 	return (
 		<div
 			className={css({
@@ -97,7 +101,7 @@ export const ProfileCard: React.FC<Props> = ({
 								{grade}
 							</span>
 						)}
-						{roles.length > 0 && (
+						{shrinkRoles && roles.length > 0 && (
 							<div
 								className={css({
 									display: "flex",
@@ -106,9 +110,22 @@ export const ProfileCard: React.FC<Props> = ({
 									flexWrap: "wrap",
 								})}
 							>
-								{roles.map((role) => (
+								{trancatedRoles.map((role) => (
 									<RoleBadge key={role.name} role={role} />
 								))}
+								{rolesLeft > 0 && (
+									<span
+										className={css({
+											color: "gray.500",
+											fontSize: "md",
+											mdDown: {
+												fontSize: "sm",
+											},
+										})}
+									>
+										+{rolesLeft}
+									</span>
+								)}
 							</div>
 						)}
 						{!initialized && (
@@ -183,21 +200,33 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			{bio && (
+			{!shrinkRoles && roles.length > 0 && (
 				<div
+					className={css({
+						display: "flex",
+						gap: 2,
+						alignItems: "center",
+						flexWrap: "wrap",
+					})}
+				>
+					{roles.map((role) => (
+						<RoleBadge key={role.name} role={role} />
+					))}
+				</div>
+			)}
+			{bio && (
+				<Document
+					inlineOnly
 					className={css({
 						color: "gray.500",
 						fontSize: "md",
 						mdDown: {
 							fontSize: "sm",
 						},
-						overflowWrap: "break-word",
-						lineHeight: "1.5",
-						whiteSpace: "pre-wrap",
 					})}
 				>
 					{bioPreviewContent}
-				</div>
+				</Document>
 			)}
 		</div>
 	);

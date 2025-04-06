@@ -34,6 +34,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthIssuedTokens: many(oauthTokens),
 	oauthConnections: many(oauthConnections),
 	roles: many(userRoles),
+	certifications: many(userCertifications),
 }));
 
 export const userProfiles = sqliteTable(
@@ -53,6 +54,7 @@ export const userProfiles = sqliteTable(
 		studentId: text("student_id"),
 		grade: text("grade"),
 		bio: text("bio"),
+		updatedAt: integer("updated_at", { mode: "timestamp" }),
 	},
 	(table) => ({
 		gradeIdx: index("grade_idx").on(table.grade),
@@ -123,10 +125,110 @@ export const calendarEvents = sqliteTable(
 		description: text("description").notNull(),
 		startAt: text("start_at").notNull(),
 		endAt: text("end_at").notNull(),
+		locationId: text("location_id").references(() => locations.id, {
+			onDelete: "set null",
+		}),
 	},
 	(table) => ({
 		userIdx: index("user_idx").on(table.userId),
 		startAtIdx: index("start_at_idx").on(table.startAt),
 		endAtIdx: index("end_at_idx").on(table.endAt),
+	}),
+);
+
+export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
+	location: one(locations, {
+		fields: [calendarEvents.locationId],
+		references: [locations.id],
+	}),
+}));
+
+export const locations = sqliteTable("locations", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	description: text("description").notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const locationsRelations = relations(locations, ({ many }) => ({
+	events: many(calendarEvents),
+}));
+
+export const certifications = sqliteTable("certifications", {
+	id: text("id").primaryKey(),
+	title: text("title").notNull().unique(),
+	description: text("description").notNull().default(""),
+});
+
+export const userCertifications = sqliteTable(
+	"user_certifications",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		certificationId: text("certification_id")
+			.references(() => certifications.id)
+			.notNull(),
+		// 「タイムスタンプとしていつ資格を取得したか」は微妙なので、年のみ管理する
+		certifiedIn: integer("certified_in").notNull(),
+		isApproved: integer("is_approved", { mode: "boolean" })
+			.notNull()
+			.default(false),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.userId, table.certificationId] }),
+		userCertifiedAtIdx: index("user_certifiedat_idx").on(
+			table.userId,
+			table.certifiedIn,
+		),
+	}),
+);
+
+export const certificationRelations = relations(certifications, ({ many }) => ({
+	userCertifications: many(userCertifications),
+}));
+
+export const userCertificationsRelations = relations(
+	userCertifications,
+	({ one }) => ({
+		certification: one(certifications, {
+			fields: [userCertifications.certificationId],
+			references: [certifications.id],
+		}),
+		user: one(users, {
+			fields: [userCertifications.userId],
+			references: [users.id],
+		}),
+	}),
+);
+
+export const invites = sqliteTable("invites", {
+	id: text("id").primaryKey(),
+	title: text("title").notNull(),
+	expiresAt: integer("expires_at", { mode: "timestamp" }),
+	remainingUse: int("remaining_use"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	issuedByUserId: text("issued_by")
+		.references(() => users.id)
+		.notNull(),
+});
+
+export const invitesRelations = relations(invites, ({ one }) => ({
+	issuedBy: one(users, {
+		fields: [invites.issuedByUserId],
+		references: [users.id],
+	}),
+}));
+
+export const inviteRoles = sqliteTable(
+	"invite_roles",
+	{
+		inviteId: text("invite_id")
+			.references(() => invites.id)
+			.notNull(),
+		roleId: int("role_id", { mode: "number" }).notNull(),
+	},
+	(table) => ({
+		pk: primaryKey({ columns: [table.inviteId, table.roleId] }),
 	}),
 );

@@ -15,6 +15,7 @@ export const RoleBadge = ({ role }: Props) => {
 				borderRadius: 8,
 				fontSize: 12,
 				fontWeight: 500,
+				whiteSpace: "nowrap",
 			})}
 			style={{
 				backgroundColor: `${role.color}22`,

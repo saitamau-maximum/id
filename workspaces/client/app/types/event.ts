@@ -1,0 +1,11 @@
+import type { Location } from "./location";
+
+export interface CalendarEvent {
+	id: string;
+	userId: string;
+	title: string;
+	description: string;
+	startAt: Date;
+	endAt: Date;
+	locationId?: Location["id"];
+}

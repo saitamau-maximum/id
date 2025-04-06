@@ -10,6 +10,9 @@ export const AnchorLike = ({ className, ...props }: Props) => {
 			className={cx(
 				className,
 				css({
+					display: "inline-flex",
+					alignItems: "center",
+					gap: 1,
 					color: "green.600",
 					textDecoration: "underline",
 					transition: "color",

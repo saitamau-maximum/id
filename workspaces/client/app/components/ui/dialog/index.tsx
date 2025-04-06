@@ -63,7 +63,8 @@ type ModalProps = Omit<ComponentProps<typeof RAModal>, "className">;
 const StyledRAModal = (props: ModalProps) => (
 	<RAModal
 		className={css({
-			minWidth: "min(calc(100vw - 32px), 400px)", // dialog 分の padding があるので 32px
+			maxWidth: "min(calc(100vw - 32px), 800px)", // dialog 分の padding があるので 32px
+			width: "100%",
 			boxShadow: "0 8px 20px rgba(0 0 0 / 0.1)",
 			borderRadius: 6,
 			background: "white",

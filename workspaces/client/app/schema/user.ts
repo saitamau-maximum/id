@@ -1,8 +1,12 @@
 import * as v from "valibot";
-import { BIO_MAX_LENGTH, BIO_MAX_NEWLINE, RESERVED_WORDS } from "~/constant";
+import { RESERVED_WORDS } from "~/constant";
+import { MaxLines } from "~/utils/valibot";
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
+
+export const BIO_MAX_LENGTH = 255; // Bioは255文字まで許容
+export const BIO_MAX_LINES = 10; // Bioは10行まで許容
 
 export const UserSchemas = {
 	DisplayId: v.pipe(
@@ -69,12 +73,9 @@ export const UserSchemas = {
 			BIO_MAX_LENGTH,
 			`自己紹介は${BIO_MAX_LENGTH}文字以下で入力してください`,
 		),
-		v.custom((input) => {
-			const newlineCount = (input as string).match(/\n/g)?.length || 0;
-			if (newlineCount > BIO_MAX_NEWLINE) {
-				return false;
-			}
-			return true;
-		}, `自己紹介は${BIO_MAX_NEWLINE}行以下で入力してください`),
+		MaxLines(
+			BIO_MAX_LINES,
+			`自己紹介は${BIO_MAX_LINES}行以下で入力してください`,
+		),
 	),
 };

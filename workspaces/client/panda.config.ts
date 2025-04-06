@@ -50,6 +50,20 @@ export default defineConfig({
 						backgroundPosition: "0 50%",
 					},
 				},
+				pulseShadow: {
+					"0%": {
+						boxShadow: "0 0 0 0 rgba(0, 0, 0, 0.25)",
+						opacity: 1,
+					},
+					"20%": {
+						boxShadow: "0 0 0 6px rgba(0, 0, 0, 0)",
+						opacity: 1,
+					},
+					"100%": {
+						boxShadow: "0 0 0 0 rgba(0, 0, 0, 0)",
+						opacity: 1,
+					},
+				},
 			},
 		},
 	},

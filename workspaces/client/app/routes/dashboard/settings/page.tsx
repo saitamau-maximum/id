@@ -1,4 +1,5 @@
 import { css } from "styled-system/css";
+import { CertificationRequest } from "./internal/components/certification-request";
 import { ProfileUpdateForm } from "./internal/components/form";
 import { ProfileImageEditor } from "./internal/components/profile-image-editor";
 
@@ -38,6 +39,7 @@ export default function Settings() {
 				<ProfileImageEditor />
 				<ProfileUpdateForm />
 			</div>
+			<CertificationRequest.Root />
 		</div>
 	);
 }

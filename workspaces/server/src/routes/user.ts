@@ -236,7 +236,6 @@ const route = app
 
 				return c.text("ok", 200);
 			} catch (e) {
-				console.error(e);
 				return c.text("Failed to upload profile image", 500);
 			}
 		},
@@ -251,7 +250,6 @@ const route = app
 			c.header("Content-Type", "image/webp");
 			return stream(c, (s) => s.pipe(body));
 		} catch (e) {
-			console.error(e);
 			return c.text("Not found", 404);
 		}
 	})

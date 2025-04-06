@@ -18,6 +18,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		const res = await this.client.query.calendarEvents.findMany();
 		return res.map((event) => ({
 			...event,
+			locationId: event.locationId ?? undefined,
 			startAt: new Date(event.startAt),
 			endAt: new Date(event.endAt),
 		}));
@@ -39,7 +40,10 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 			startAt: event.startAt.toISOString(),
 			endAt: event.endAt.toISOString(),
 		};
-		await this.client.update(schema.calendarEvents).set(updatedEvent);
+		await this.client
+			.update(schema.calendarEvents)
+			.set(updatedEvent)
+			.where(eq(schema.calendarEvents.id, event.id));
 	}
 
 	async deleteEvent(eventId: ICalendarEvent["id"]): Promise<void> {

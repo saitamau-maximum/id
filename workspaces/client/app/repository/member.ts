@@ -1,4 +1,4 @@
-import type { Member } from "~/types/user";
+import type { Member, MemberWithCertifications } from "~/types/user";
 import { client } from "~/utils/hono";
 
 export interface IMemberRepository {
@@ -12,7 +12,9 @@ export interface IMemberRepository {
 	}>;
 	getContributionsByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 	getProfileByUserDisplayID$$key: (userDisplayId: string) => unknown[];
-	getProfileByUserDisplayID: (userDisplayId: string) => Promise<Member>;
+	getProfileByUserDisplayID: (
+		userDisplayId: string,
+	) => Promise<MemberWithCertifications>;
 }
 
 export class MemberRepositoryImpl implements IMemberRepository {

@@ -1,4 +1,5 @@
 import { css } from "styled-system/css";
+import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
 
 type BioPreviewProps = {
@@ -11,14 +12,6 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 	return (
 		<div
 			className={css({
-				color: "gray.500",
-				fontSize: "md",
-				mdDown: {
-					fontSize: "sm",
-				},
-				overflowWrap: "break-word",
-				lineHeight: "1.5",
-				whiteSpace: "pre-wrap",
 				padding: "token(spacing.2) token(spacing.4)",
 				borderRadius: 6,
 				borderWidth: 1,
@@ -27,9 +20,21 @@ export const BioPreview = ({ bio }: BioPreviewProps) => {
 				outline: "none",
 				width: "100%",
 				height: "240px",
+				overflowY: "auto",
 			})}
 		>
-			{bioPreviewContent}
+			<Document
+				inlineOnly
+				className={css({
+					color: "gray.500",
+					fontSize: "md",
+					mdDown: {
+						fontSize: "sm",
+					},
+				})}
+			>
+				{bioPreviewContent}
+			</Document>
 		</div>
 	);
 };

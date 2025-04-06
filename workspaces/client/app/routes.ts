@@ -15,12 +15,25 @@ export default [
 				index("routes/dashboard/members/page.tsx"),
 				route(":userDisplayId", "routes/dashboard/members/profile/page.tsx"),
 			]),
-			route("calendar", "routes/dashboard/calendar/page.tsx"),
+			...(FLAG.ENABLE_CALENDAR
+				? [route("calendar", "routes/dashboard/calendar/page.tsx")]
+				: []),
 			route("settings", "routes/dashboard/settings/page.tsx"),
 			...prefix("admin", [
 				layout("routes/dashboard/admin/layout.tsx", [
 					index("routes/dashboard/admin/home/page.tsx"),
 					route("users", "routes/dashboard/admin/users/page.tsx"),
+					...(FLAG.ENABLE_CERTIFICATION
+						? [
+								route(
+									"certifications",
+									"routes/dashboard/admin/certifications/page.tsx",
+								),
+							]
+						: []),
+					...(FLAG.ENABLE_CALENDAR
+						? [route("events", "routes/dashboard/admin/events/page.tsx")]
+						: []),
 				]),
 			]),
 			...(FLAG.ENABLE_OAUTH_REGISTRATION

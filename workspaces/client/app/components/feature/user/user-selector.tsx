@@ -70,6 +70,8 @@ export const UserSelector = createCallable<Props, Payload>(
 					className={css({
 						display: "grid",
 						gap: 4,
+						maxWidth: 800,
+						width: "100%",
 					})}
 				>
 					<Form.Field.TextInput
@@ -77,9 +79,16 @@ export const UserSelector = createCallable<Props, Payload>(
 						onChange={(e) => setFilter(e.target.value)}
 						placeholder="ユーザー名で絞り込み"
 					/>
-					<div className={css({ display: "grid", gap: 4 })}>
+					<div
+						className={css({
+							display: "grid",
+							gap: 4,
+							maxHeight: "30vh",
+							overflowY: "auto",
+						})}
+					>
 						<Form.SelectGroup>
-							{unselectedFilterdUsers.map((user, i) => (
+							{unselectedFilterdUsers.map((user) => (
 								<Form.Select
 									key={user.id}
 									value={user.id}
@@ -97,25 +106,39 @@ export const UserSelector = createCallable<Props, Payload>(
 						</Form.SelectGroup>
 					</div>
 					<Form.Field.WithLabel label="選択済みユーザー">
-						{() => (
-							<Form.SelectGroup>
-								{selectedUsers.map((user) => (
-									<Form.Select
-										key={user.id}
-										value={user.id}
-										label={user.displayName ?? ""}
-										onChange={() => onToggleUser(user.id)}
-										checked={selectedUserIds.includes(user.id)}
-									>
-										<UserDisplay
-											name={user.displayName ?? ""}
-											displayId={user.displayId ?? ""}
-											iconURL={user.profileImageURL ?? ""}
-										/>
-									</Form.Select>
-								))}
-							</Form.SelectGroup>
-						)}
+						{() =>
+							selectedUsers.length > 0 ? (
+								<div className={css({ maxHeight: "30vh", overflowY: "auto" })}>
+									<Form.SelectGroup>
+										{selectedUsers.map((user) => (
+											<Form.Select
+												key={user.id}
+												value={user.id}
+												label={user.displayName ?? ""}
+												onChange={() => onToggleUser(user.id)}
+												checked={selectedUserIds.includes(user.id)}
+											>
+												<UserDisplay
+													name={user.displayName ?? ""}
+													displayId={user.displayId ?? ""}
+													iconURL={user.profileImageURL ?? ""}
+												/>
+											</Form.Select>
+										))}
+									</Form.SelectGroup>
+								</div>
+							) : (
+								<p
+									className={css({
+										color: "gray.500",
+										textAlign: "center",
+										fontSize: "sm",
+									})}
+								>
+									選択されているユーザーはいません
+								</p>
+							)
+						}
 					</Form.Field.WithLabel>
 					<div
 						className={css({

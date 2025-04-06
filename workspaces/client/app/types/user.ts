@@ -1,3 +1,4 @@
+import type { UserCertification } from "./certification";
 import type { Role } from "./role";
 
 /**
@@ -17,6 +18,11 @@ export type User = {
 	studentId?: string;
 	grade?: string;
 	bio?: string;
+	updatedAt?: Date;
+};
+
+export type UserWithCertifications = User & {
+	certifications: UserCertification[];
 };
 
 /**
@@ -43,3 +49,7 @@ export type Member = Pick<
 	| "grade"
 	| "bio"
 >;
+
+export type MemberWithCertifications = Member & {
+	certifications: UserCertification[];
+};
