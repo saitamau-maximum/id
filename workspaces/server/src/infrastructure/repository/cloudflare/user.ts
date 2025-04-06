@@ -358,6 +358,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				profile: true,
 				roles: true,
+				invitation: true,
 			},
 		});
 
@@ -377,6 +378,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			bio: user.profile.bio ?? undefined,
 			updatedAt: user.profile.updatedAt ?? undefined,
+			invitationTitle: user.invitation?.title ?? undefined,
 		}));
 	}
 

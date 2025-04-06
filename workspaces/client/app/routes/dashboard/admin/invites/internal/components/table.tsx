@@ -1,3 +1,4 @@
+import type {} from "node_modules/react-router/dist/development/route-data-aSUFWnQ6.mjs";
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
@@ -22,6 +23,7 @@ export const ProvisionalUsersTable = () => {
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
+					<Table.Th>招待タイトル</Table.Th>
 					<Table.Th>承認 / 却下</Table.Th>
 				</Table.Tr>
 			</thead>
@@ -37,7 +39,9 @@ export const ProvisionalUsersTable = () => {
 const UserTableRow = ({
 	user,
 }: {
-	user: User;
+	user: User & {
+		invitationTitle?: string;
+	};
 }) => {
 	const { mutate: approveInvitation } = useApproveInvitation();
 	const { mutate: rejectInvitation } = useRejectInvitation();
@@ -114,6 +118,7 @@ const UserTableRow = ({
 			</Table.Td>
 			<Table.Td>{user.studentId}</Table.Td>
 			<Table.Td>{user.grade}</Table.Td>
+			<Table.Td>{user.invitationTitle}</Table.Td>
 			<Table.Td>
 				<div
 					className={css({
