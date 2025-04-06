@@ -131,52 +131,45 @@ const route = app
 			);
 			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			if (typeof invitationId === "string") {
-				// 招待コードの署名検証に成功しているので、コードを検証する
-				try {
-					const invitation =
-						await c.var.InviteRepository.getInviteById(invitationId);
-					if (!invitation) return c.text(INVITATION_ERROR_MESSAGE, 400);
-					// 利用可能回数の検証
-					if (invitation.remainingUse !== null && invitation.remainingUse <= 0)
-						return c.text(INVITATION_ERROR_MESSAGE, 400);
-					// 有効期限の検証
-					if (
-						invitation.expiresAt !== null &&
-						invitation.expiresAt < new Date()
-					)
-						return c.text(INVITATION_ERROR_MESSAGE, 400);
-					await c.var.InviteRepository.reduceInviteUsage(invitationId);
-				} catch {
-					return c.text(INVITATION_ERROR_MESSAGE, 400);
-				}
-			} else if (invitationId === undefined) {
-				// 招待コードが存在しない場合、Organization のメンバーかどうかを確認する
-				const isMember = await c.var.OrganizationRepository.checkIsMember(
-					user.login,
-				);
-				if (!isMember) {
-					return c.text("invitation code required for non-members", 403);
-				}
-			} else {
-				// invitationId が false など、署名検証に失敗している場合
-				return c.text(INVITATION_ERROR_MESSAGE, 400);
-			}
-
-			let foundUserId = null;
+			const userIdStr = String(user.id);
+			let foundUserId: string | null;
 			try {
-				// ユーザーが存在するか確認
-				const id = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					String(user.id),
+				// ユーザーの存在確認
+				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
+					userIdStr,
 					OAUTH_PROVIDER_IDS.GITHUB,
 				);
-				foundUserId = id;
-			} catch (e) {
-				// もしユーザーが見つからなかったら新規作成
+			} catch {
+				// ユーザーが存在しなかった場合
 				if (typeof invitationId === "string") {
-					// 招待コードがある場合は仮登録
+					// 招待コードの署名検証に成功しているので、コードを検証する
+					try {
+						const invitation =
+							await c.var.InviteRepository.getInviteById(invitationId);
+						if (!invitation) return c.text(INVITATION_ERROR_MESSAGE, 400);
+
+						// 利用可能回数の検証
+						if (
+							invitation.remainingUse !== null &&
+							invitation.remainingUse <= 0
+						)
+							return c.text(INVITATION_ERROR_MESSAGE, 400);
+
+						// 有効期限の検証
+						if (
+							invitation.expiresAt !== null &&
+							invitation.expiresAt < new Date()
+						)
+							return c.text(INVITATION_ERROR_MESSAGE, 400);
+
+						// 招待コードが有効な場合は消費する
+						await c.var.InviteRepository.reduceInviteUsage(invitationId);
+					} catch {
+						return c.text(INVITATION_ERROR_MESSAGE, 400);
+					}
+					// 招待コードが有効な場合、仮登録処理を行う
 					foundUserId = await c.var.UserRepository.createTemporaryUser(
-						String(user.id),
+						userIdStr,
 						OAUTH_PROVIDER_IDS.GITHUB,
 						invitationId,
 						{
@@ -185,10 +178,16 @@ const route = app
 							profileImageURL: user.avatar_url,
 						},
 					);
-				} else {
-					// GitHub Organization のメンバーであれば本登録
+				} else if (invitationId === undefined) {
+					// 招待コードが提供されなかった場合、GitHub Organization メンバーかどうかを確認する処理
+					const isMember = await c.var.OrganizationRepository.checkIsMember(
+						user.login,
+					);
+					if (!isMember)
+						return c.text("invitation code required for non-members", 403);
+					// Organization のメンバーであれば、本登録処理を行う
 					foundUserId = await c.var.UserRepository.createUser(
-						String(user.id),
+						userIdStr,
 						OAUTH_PROVIDER_IDS.GITHUB,
 						{
 							email: user.email ?? undefined,
@@ -196,6 +195,9 @@ const route = app
 							profileImageURL: user.avatar_url,
 						},
 					);
+				} else {
+					// invitationId が不正な場合の処理
+					return c.text(INVITATION_ERROR_MESSAGE, 400);
 				}
 			}
 

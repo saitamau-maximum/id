@@ -91,7 +91,7 @@ export const InvitationsEditor = () => {
 							>
 								<Table.Td>{invitation.title}</Table.Td>
 								<Table.Td>
-									{invitation.remainingUse && (
+									{invitation.remainingUse !== null && (
 										<div
 											className={css({
 												display: "flex",
