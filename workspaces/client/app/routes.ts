@@ -23,6 +23,7 @@ export default [
 				layout("routes/dashboard/admin/layout.tsx", [
 					index("routes/dashboard/admin/home/page.tsx"),
 					route("users", "routes/dashboard/admin/users/page.tsx"),
+					route("invites", "routes/dashboard/admin/invites/page.tsx"),
 					...(FLAG.ENABLE_CERTIFICATION
 						? [
 								route(
