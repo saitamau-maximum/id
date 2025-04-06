@@ -370,9 +370,13 @@ export class CloudflareUserRepository implements IUserRepository {
 			realNameKana: user.profile.realNameKana ?? undefined,
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
+			academicEmail: user.profile.academicEmail ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			bio: user.profile.bio ?? undefined,
+			updatedAt: user.profile.updatedAt ?? undefined,
 		}));
 	}
 
