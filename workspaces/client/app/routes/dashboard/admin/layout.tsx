@@ -37,7 +37,7 @@ const NAVIGATION = [
 		label: "Invites",
 		to: "/admin/invites",
 		isActive: (location: string) => location.startsWith("/admin/invites"),
-	}
+	},
 ];
 
 export default function AdminLayout() {

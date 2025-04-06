@@ -10,6 +10,7 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
 import type { CalendarEvent } from "~/types/event";
+import { toHTMLDateTimePickerFormat } from "~/utils/date";
 import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
@@ -33,7 +34,8 @@ const UpdateFormSchema = v.object({
 	locationId: EventSchemas.LocationId,
 });
 
-type UpdateFormValues = v.InferOutput<typeof UpdateFormSchema>;
+type UpdateFormInputValues = v.InferInput<typeof UpdateFormSchema>;
+type UpdateFormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const EditEventDialog = createCallable<Props, Payload>(
 	({ call, event }) => {
@@ -42,24 +44,31 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			handleSubmit,
 			register,
 			watch,
+			setError,
 			formState: { errors },
-		} = useForm<UpdateFormValues>({
+		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
 			resolver: valibotResolver(UpdateFormSchema),
 			defaultValues: {
 				title: event.title,
 				description: event.description,
-				startAt: event.startAt,
-				endAt: event.endAt,
+				startAt: toHTMLDateTimePickerFormat(event.startAt),
+				endAt: toHTMLDateTimePickerFormat(event.endAt),
 				locationId: event.locationId ?? null,
 			},
 		});
 
-		const onSubmit = async (values: UpdateFormValues) => {
+		const onSubmit = async (values: UpdateFormOutputValues) => {
+			if (values.startAt >= values.endAt) {
+				setError("root", {
+					message: "終了日時は開始日時よりも後にしてください",
+				});
+				return;
+			}
 			const updatedEvent: CalendarEvent = {
 				...event,
 				...values,
-				startAt: new Date(values.startAt),
-				endAt: new Date(values.endAt),
+				startAt: values.startAt,
+				endAt: values.endAt,
 				locationId: values.locationId ?? undefined,
 			};
 			call.end({ type: "success", payload: updatedEvent });
@@ -141,6 +150,8 @@ export const EditEventDialog = createCallable<Props, Payload>(
 						</Form.RadioGroup>
 						<ErrorDisplay error={errors.locationId?.message} />
 					</Form.FieldSet>
+
+					<ErrorDisplay error={errors.root?.message} />
 
 					<div
 						className={css({

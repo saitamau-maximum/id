@@ -1,10 +1,22 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { Progress } from "~/components/ui/progess";
 import { Table } from "~/components/ui/table";
 
 import { useAuth } from "~/hooks/use-auth";
-import { getFiscalYear } from "~/utils/fiscal-year";
+import { getFiscalYear } from "~/utils/date";
+
+const Emphasize = ({ children }: { children: React.ReactNode }) => (
+	<span
+		className={css({
+			fontWeight: "bold",
+			color: "green.600",
+		})}
+	>
+		{children}
+	</span>
+);
 
 export default function PaymentInfo() {
 	const { isLoading, isInitialized, isAuthorized, isProvisional, user } =
@@ -36,6 +48,13 @@ export default function PaymentInfo() {
 	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
 	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
 
+	const registrationSteps = [
+		{ label: "仮登録", isActive: true, isCompleted: true },
+		{ label: "入金", isActive: true, isCompleted: false },
+		{ label: "承認", isActive: false, isCompleted: false },
+		{ label: "完了", isActive: false, isCompleted: false },
+	];
+
 	return (
 		<div
 			className={css({
@@ -50,67 +69,64 @@ export default function PaymentInfo() {
 					maxWidth: 1024,
 					minHeight: "100%",
 					margin: "auto",
-					color: "gray.600",
 					padding: 8,
-					gap: 4,
+					color: "gray.600",
 					display: "flex",
 					flexDirection: "column",
-					alignItems: "center",
 					justifyContent: "center",
 				})}
 			>
+				<Progress steps={registrationSteps} />
 				<h1
 					className={css({
 						fontSize: "2xl",
 						fontWeight: "bold",
 						color: "gray.700",
+						marginTop: 8,
+						marginBottom: 4,
 					})}
 				>
 					サークル費のお支払い
 				</h1>
-				<p>下記口座に入金をお願いします。 振込手数料はご負担ください。</p>
 				<Table.Root>
 					<Table.Tr>
-						<Table.Th>銀行名</Table.Th>
+						<Table.Th className={css({ width: "120px" })}>銀行名</Table.Th>
 						<Table.Td>青木信用金庫</Table.Td>
 					</Table.Tr>
 					<Table.Tr>
-						<Table.Th>支店名</Table.Th>
+						<Table.Th className={css({ width: "120px" })}>支店名</Table.Th>
 						<Table.Td>埼大通支店</Table.Td>
 					</Table.Tr>
 					<Table.Tr>
-						<Table.Th>預金種目</Table.Th>
+						<Table.Th className={css({ width: "120px" })}>預金種目</Table.Th>
 						<Table.Td>普通</Table.Td>
 					</Table.Tr>
 					<Table.Tr>
-						<Table.Th>口座番号</Table.Th>
+						<Table.Th className={css({ width: "120px" })}>口座番号</Table.Th>
 						<Table.Td>3456237</Table.Td>
 					</Table.Tr>
-					<Table.Tr>
-						<Table.Th>口座名義人</Table.Th>
-						<Table.Td>マキシマム</Table.Td>
-					</Table.Tr>
-					<Table.Tr>
-						<Table.Th>振込金額</Table.Th>
-						<Table.Td>{(remainingMonth * 250).toLocaleString()} 円</Table.Td>
-					</Table.Tr>
 				</Table.Root>
-				<p>口座名義人が正しいことを確認してから振り込んでください。</p>
-				<p>
-					振込依頼人はご自身の名前をフルネームで入力してください。
-					<br />
-					その他の名前で振り込まれた場合、受け付けられない場合があります。
+				<p className={css({ marginTop: 4 })}>
+					口座名義人が <Emphasize>マキシマム</Emphasize> であることを確認し、{" "}
+					<Emphasize>{(remainingMonth * 250).toLocaleString()} 円</Emphasize>{" "}
+					をお振込みください。 振込手数料はご負担願います。
 				</p>
-				<hr />
-				<p>
-					Admin が入金を確認でき次第、本登録完了とさせていただきます。
-					<br />
+				<p className={css({ marginTop: 4 })}>
+					Admin が <Emphasize>入金を確認でき次第、本登録完了</Emphasize>{" "}
+					とさせていただきます。
 					確認までに数日かかる場合がありますので、ご了承ください。
 				</p>
-				<p>
-					本登録完了後は自動的にページが遷移します。
-					<br />
-					ページを閉じても再度アクセスすればまた表示されますのでご安心ください。
+				{/* <p className={css({ marginTop: 2 })}>
+					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。
+				</p> */}
+				<p
+					className={css({
+						fontSize: "sm",
+						marginTop: 4,
+					})}
+				>
+					ページを閉じても、再度アクセスすればまた表示されます。
+					ご安心ください。
 				</p>
 			</div>
 		</div>

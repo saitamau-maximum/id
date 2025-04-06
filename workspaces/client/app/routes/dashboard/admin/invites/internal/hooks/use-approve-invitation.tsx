@@ -8,9 +8,9 @@ export const useApprove = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-        mutationFn: async (userId: string) => {
-            await userRepository.approveInvitation(userId);
-        },
+		mutationFn: async (userId: string) => {
+			await userRepository.approveInvitation(userId);
+		},
 		onSuccess: async () => {
 			pushToast({
 				title: "承認に成功しました",
