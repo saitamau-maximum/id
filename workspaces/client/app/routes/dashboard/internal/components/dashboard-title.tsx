@@ -14,7 +14,11 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
 		>
 			<h1
 				className={css({
-					fontSize: "4xl",
+					fontSize: {
+						base: "2xl",
+						"@dashboard/xl": "3xl",
+						"@dashboard/4xl": "4xl",
+					},
 					fontWeight: "bold",
 					color: "gray.600",
 				})}
@@ -22,7 +26,16 @@ export const DashboardHeader = ({ title, subtitle }: Props) => {
 				{title}
 			</h1>
 			{subtitle && (
-				<span className={css({ color: "gray.500", fontSize: "md" })}>
+				<span
+					className={css({
+						color: "gray.500",
+						fontSize: {
+							base: "sm",
+							"@dashboard/xl": "md",
+							"@dashboard/4xl": "lg",
+						},
+					})}
+				>
 					{subtitle}
 				</span>
 			)}
