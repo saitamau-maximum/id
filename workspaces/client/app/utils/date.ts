@@ -1,3 +1,7 @@
+const MILLIS = 1; // 1
+const SECONDS = MILLIS * 1000; // 1 * 1000
+const MINUTES = SECONDS * 60; // 1 * 1000 * 60
+
 // dateから年度を取得する
 export const getFiscalYear = (date: Date) => {
 	const year = date.getFullYear();
@@ -21,13 +25,12 @@ export const getFiscalYearStartDate = () => {
 
 // DateをHTML5のDatePickerの形式に変換する
 export const toHTMLDatePickerFormat = (date: Date) => {
-	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * MINUTES);
 	return utcDate.toISOString().slice(0, 10);
 };
 
 // DateをHTML5のTimePickerの形式に変換する
 export const toHTMLDateTimePickerFormat = (date: Date) => {
-	console.log(date.getTimezoneOffset());
-	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+	const utcDate = new Date(date.getTime() - date.getTimezoneOffset() * MINUTES);
 	return utcDate.toISOString().slice(0, 16);
 };
