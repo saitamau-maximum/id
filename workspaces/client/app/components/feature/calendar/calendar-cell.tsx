@@ -7,6 +7,7 @@ interface CellProps {
 	events: CalendarEvent[];
 	onDateClick?: (date: Date) => void;
 	active?: boolean;
+	variant: "sm" | "md";
 }
 
 export const CalendarCell = ({
@@ -14,6 +15,7 @@ export const CalendarCell = ({
 	events,
 	onDateClick,
 	active = false,
+	variant,
 }: CellProps) => {
 	const cellEvents = events.filter((event) => {
 		if (cell.type === "empty") return false;
@@ -45,8 +47,9 @@ export const CalendarCell = ({
 				<button
 					type="button"
 					className={css({
-						width: "40px",
-						height: "40px",
+						width: variant === "sm" ? "32px" : "40px",
+						height: variant === "sm" ? "32px" : "40px",
+						fontSize: variant === "sm" ? "sm" : "md",
 						display: "grid",
 						placeItems: "center",
 						borderRadius: "50%",

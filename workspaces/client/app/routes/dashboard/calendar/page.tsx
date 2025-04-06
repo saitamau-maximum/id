@@ -5,6 +5,7 @@ import { Calendar } from "~/components/feature/calendar/calendar";
 import { EventList } from "~/components/feature/calendar/event-list";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
+import { useDeviceType } from "~/hooks/use-device-type";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { ICalDisplay } from "./components/ical-display";
 import { useCalendar } from "./hooks/use-calendar";
@@ -15,6 +16,7 @@ const formatYYYYMMDD = (date: Date) =>
 	).padStart(2, "0")}`;
 
 export default function CalendarHome() {
+	const { deviceType } = useDeviceType();
 	const { data, generateICalUrl } = useCalendar();
 	const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
@@ -93,6 +95,7 @@ export default function CalendarHome() {
 						label="Event Calendar"
 						onDateClick={(date) => setSelectedDate(date)}
 						targetDate={selectedDate ?? undefined}
+						variant={deviceType === "pc" ? "md" : "sm"}
 					/>
 					<button type="button" onClick={handleAddToOwnCalendar}>
 						<ButtonLike size="sm" variant="text">

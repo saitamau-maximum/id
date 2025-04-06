@@ -10,6 +10,7 @@ interface Props {
 	events: CalendarEvent[];
 	onDateClick?: (date: Date) => void;
 	targetDate?: Date;
+	variant?: "sm" | "md";
 }
 const MONTH_IDX_JAN = 0;
 const MONTH_IDX_DEC = 11;
@@ -48,7 +49,13 @@ const controllerButtonStyle = css({
 	},
 });
 
-export const Calendar = ({ label, events, onDateClick, targetDate }: Props) => {
+export const Calendar = ({
+	label,
+	events,
+	onDateClick,
+	targetDate,
+	variant = "sm",
+}: Props) => {
 	const [displayedCalendar, setDisplayedCalendar] = useState<TCalendarState>({
 		year: new Date().getFullYear(),
 		month: new Date().getMonth(),
@@ -138,6 +145,7 @@ export const Calendar = ({ label, events, onDateClick, targetDate }: Props) => {
 					alignItems: "center",
 					justifyContent: "space-between",
 					width: "100%",
+					padding: 1,
 				})}
 			>
 				<span
@@ -196,6 +204,7 @@ export const Calendar = ({ label, events, onDateClick, targetDate }: Props) => {
 									cell={cell}
 									events={events}
 									onDateClick={onDateClick}
+									variant={variant}
 									active={
 										targetDate &&
 										targetDate.getFullYear() === displayedCalendar.year &&
