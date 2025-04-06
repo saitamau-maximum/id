@@ -16,7 +16,6 @@ export default function Invitation() {
 	const { setIsInvited } = useInvitation();
 
 	const authorized = !isLoading && isAuthorized;
-	const shouldOnboarding = !isLoading && isAuthorized && !isInitialized;
 
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
@@ -46,13 +45,13 @@ export default function Invitation() {
 
 		// useParams の id が存在しない　 または 認証済み
 		// または 認証済みかつ初期登録が済んでいない場合は / にリダイレクト
-		if (!id || authorized || shouldOnboarding) {
+		if (!id || authorized) {
 			navigate("/");
 			return;
 		}
 
 		mutation.mutate(id);
-	}, [isLoading, authorized, shouldOnboarding, id, navigate, mutation]);
+	}, [isLoading, authorized, id, navigate, mutation]);
 
 	return null;
 }
