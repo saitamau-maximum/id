@@ -108,19 +108,18 @@ export default function PaymentInfo() {
 					<Emphasize>{(remainingMonth * 250).toLocaleString()} 円</Emphasize>{" "}
 					をお振込みください。 振込手数料はご負担願います。
 				</p>
-				<p className={css({ marginTop: 8 })}>
+				<p className={css({ marginTop: 4 })}>
 					Admin が <Emphasize>入金を確認でき次第、本登録完了</Emphasize>{" "}
 					とさせていただきます。
 					確認までに数日かかる場合がありますので、ご了承ください。
 				</p>
 				{/* <p className={css({ marginTop: 2 })}>
-					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。 4
-					月中の活動開始時にアナウンスします。
+					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。
 				</p> */}
 				<p
 					className={css({
 						fontSize: "sm",
-						marginTop: 8,
+						marginTop: 4,
 					})}
 				>
 					ページを閉じても、再度アクセスすればまた表示されます。
