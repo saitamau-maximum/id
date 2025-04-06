@@ -69,8 +69,11 @@ export default function PaymentInfo() {
 					maxWidth: 1024,
 					minHeight: "100%",
 					margin: "auto",
-					color: "gray.600",
 					padding: 8,
+					color: "gray.600",
+					display: "flex",
+					flexDirection: "column",
+					justifyContent: "center",
 				})}
 			>
 				<Progress steps={registrationSteps} />
