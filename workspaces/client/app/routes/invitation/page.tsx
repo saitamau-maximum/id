@@ -38,7 +38,8 @@ export default function Invitation() {
 			navigate("/login");
 			return;
 		}
-		if (mutation.isPending) return;
+
+		if (mutation.isPending || mutation.error) return;
 		mutation.mutate(id);
 	}, [mutation, id, navigate]);
 
