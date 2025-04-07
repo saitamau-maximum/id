@@ -138,8 +138,8 @@ importers:
         specifier: 1.0.0
         version: 1.0.0(typescript@5.8.3)
       wasm-image-optimization:
-        specifier: ^1.1.2
-        version: 1.1.2
+        specifier: ^1.2.28
+        version: 1.2.28
     devDependencies:
       '@miniflare/d1':
         specifier: ^2.14.4
@@ -4178,8 +4178,8 @@ packages:
       yaml:
         optional: true
 
-  wasm-image-optimization@1.1.2:
-    resolution: {integrity: sha512-GQqo7vFZyEVenGPJNf6mcRa/ZkVGGFKnZrjQJ6+DX0aCNn6UKvTFCmwq/1vOTbM625poMyZJI/9KVkyAz8JETQ==}
+  wasm-image-optimization@1.2.28:
+    resolution: {integrity: sha512-mjhJXHSd/5kqASdRL/2skvVMNSv23NwQY3w/yGqQM0dbJjwSAY8BJtAaD9qrt69TZjvNmJl09EwOHRRi3ah/Ug==}
 
   which@2.0.2:
     resolution: {integrity: sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==}
@@ -4199,6 +4199,9 @@ packages:
   wordwrapjs@5.1.0:
     resolution: {integrity: sha512-JNjcULU2e4KJwUNv6CHgI46UvDGitb6dGryHajXTDiLgg1/RiGoPSDw4kZfYnwGtEXf2ZMeIewDQgFGzkCB2Sg==}
     engines: {node: '>=12.17'}
+
+  worker-lib@2.0.7:
+    resolution: {integrity: sha512-LkT+hMUakAAakGPtWVY3ZSJ91BgcXpPYzwcpJbkC2LXzwYiIiSgKxWxt1EM8s9c/z6Va6xZ49lELDvMSjwgbpA==}
 
   workerd@1.20250404.0:
     resolution: {integrity: sha512-dvXsRdy49/vd4nPENpTDFjbPvR3XdPa8lJrxcnDKL1XtoioYXflq3ys8ljuu+X71ojqAAjnQj62AzrmmKM095g==}
@@ -8864,7 +8867,9 @@ snapshots:
       lightningcss: 1.25.1
       tsx: 4.19.3
 
-  wasm-image-optimization@1.1.2: {}
+  wasm-image-optimization@1.2.28:
+    dependencies:
+      worker-lib: 2.0.7
 
   which@2.0.2:
     dependencies:
@@ -8879,6 +8884,8 @@ snapshots:
       isexe: 3.1.1
 
   wordwrapjs@5.1.0: {}
+
+  worker-lib@2.0.7: {}
 
   workerd@1.20250404.0:
     optionalDependencies:
