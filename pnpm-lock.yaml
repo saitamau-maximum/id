@@ -135,7 +135,7 @@ importers:
         specifier: ^4.1.2
         version: 4.1.2
       valibot:
-        specifier: 1.0.0
+        specifier: ^1.0.0
         version: 1.0.0(typescript@5.8.3)
       wasm-image-optimization:
         specifier: ^1.2.28

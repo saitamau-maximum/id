@@ -27,7 +27,7 @@
 		"drizzle-orm": "^0.41.0",
 		"hono": "^4.6.13",
 		"octokit": "^4.1.2",
-		"valibot": "1.0.0",
+		"valibot": "^1.0.0",
 		"wasm-image-optimization": "^1.2.28"
 	},
 	"devDependencies": {
