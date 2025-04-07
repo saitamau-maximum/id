@@ -23,7 +23,7 @@ const route = app
 	.get("/list", async (c) => {
 		const { UserRepository } = c.var;
 		try {
-			const users = await UserRepository.fetchAllUsers();
+			const users = await UserRepository.fetchApprovedUsers();
 			return c.json(users);
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);
@@ -49,6 +49,35 @@ const route = app
 				return c.json({ error: "Internal Server Error" }, 500);
 			}
 		},
-	);
+	)
+	.get("/provisional", async (c) => {
+		const { UserRepository } = c.var;
+		try {
+			const users = await UserRepository.fetchProvisionalUsers();
+			return c.json(users);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	})
+	.post("/:userId/approve", async (c) => {
+		const userId = c.req.param("userId");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.approveProvisionalUser(userId);
+			return c.text("ok", 200);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	})
+	.post("/:userId/reject", async (c) => {
+		const userId = c.req.param("userId");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.rejectProvisionalUser(userId);
+			return c.text("ok", 200);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	});
 
 export { route as adminUsersRoute };

@@ -70,7 +70,7 @@ export interface IUserRepository {
 		providerId: number,
 	) => Promise<string>;
 	fetchUserProfileById: (userId: string) => Promise<UserWithCertifications>;
-	fetchAllUsers: () => Promise<User[]>;
+	fetchApprovedUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
 	fetchMemberByDisplayId: (
 		displayId: string,
@@ -79,4 +79,7 @@ export interface IUserRepository {
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
 	fetchRolesByUserId: (userId: string) => Promise<number[]>;
+	fetchProvisionalUsers: () => Promise<User[]>;
+	approveProvisionalUser: (userId: string) => Promise<void>;
+	rejectProvisionalUser: (userId: string) => Promise<void>;
 }

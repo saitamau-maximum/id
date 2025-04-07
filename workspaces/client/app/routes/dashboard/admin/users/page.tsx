@@ -1,7 +1,4 @@
 import { css } from "styled-system/css";
-import { FLAG } from "~/utils/flag";
-import { GenerateInvitationURLDialog } from "./internal/components/callable-generate-invitation-url-dialog";
-import { InvitationsEditor } from "./internal/components/invitations-editor";
 import { UsersTable } from "./internal/components/table";
 
 export default function AdminUsers() {
@@ -13,7 +10,6 @@ export default function AdminUsers() {
 				gap: 8,
 			})}
 		>
-			{FLAG.ENABLE_INVITE && <InvitationsEditor />}
 			<div>
 				<h2
 					className={css({
@@ -27,7 +23,6 @@ export default function AdminUsers() {
 				</h2>
 				<UsersTable />
 			</div>
-			<GenerateInvitationURLDialog.Root />
 		</div>
 	);
 }

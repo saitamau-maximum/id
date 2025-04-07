@@ -1,4 +1,4 @@
-import { type InferInsertModel, eq } from "drizzle-orm";
+import { type InferInsertModel, eq, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
@@ -228,6 +228,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMembers(): Promise<Member[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
 				profile: true,
 				roles: true,
@@ -302,11 +303,12 @@ export class CloudflareUserRepository implements IUserRepository {
 		return roles.map((role) => role.roleId);
 	}
 
-	async fetchAllUsers(): Promise<User[]> {
+	async fetchApprovedUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
-				roles: true,
 				profile: true,
+				roles: true,
 			},
 		});
 
@@ -347,6 +349,60 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		if (!res2.success) {
 			throw new Error("Failed to update user role");
+		}
+	}
+
+	async fetchProvisionalUsers(): Promise<User[]> {
+		const users = await this.client.query.users.findMany({
+			where: isNotNull(schema.users.invitationId),
+			with: {
+				profile: true,
+				roles: true,
+				invitation: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			academicEmail: user.profile.academicEmail ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			bio: user.profile.bio ?? undefined,
+			updatedAt: user.profile.updatedAt ?? undefined,
+			invitationTitle: user.invitation?.title ?? undefined,
+			invitationId: user.invitation?.id ?? undefined,
+		}));
+	}
+
+	async approveProvisionalUser(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				invitationId: null,
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to approve user");
+		}
+	}
+
+	async rejectProvisionalUser(userId: string): Promise<void> {
+		const res = await this.client
+			.delete(schema.users)
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to reject user");
 		}
 	}
 }

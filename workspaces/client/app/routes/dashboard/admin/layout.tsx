@@ -18,6 +18,15 @@ const NAVIGATION = [
 		to: "/admin/users",
 		isActive: (location: string) => location.startsWith("/admin/users"),
 	},
+	...(FLAG.ENABLE_INVITE
+		? [
+				{
+					label: "Invites",
+					to: "/admin/invites",
+					isActive: (location: string) => location.startsWith("/admin/invites"),
+				},
+			]
+		: []),
 	{
 		label: "Certifications",
 		to: "/admin/certifications",
