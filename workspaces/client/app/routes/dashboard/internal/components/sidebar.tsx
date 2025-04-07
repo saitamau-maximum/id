@@ -6,6 +6,7 @@ import { css } from "styled-system/css";
 import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
+import { useRepository } from "~/hooks/use-repository";
 import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 
@@ -135,11 +136,17 @@ export const Sidebar = () => {
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const navigate = useNavigate();
+	const { miscRepository } = useRepository();
 
 	const handleLogout = useCallback(() => {
 		localStorage.removeItem(JWT_STORAGE_KEY);
 		refetch();
 	}, [refetch]);
+
+	const handleRecieveDiscordInvitation = useCallback(async () => {
+		const url = await miscRepository.getDiscordInvitationURL();
+		window.open(url, "_blank", "noopener,noreferrer");
+	}, [miscRepository]);
 
 	if (!user) {
 		return null;
@@ -366,6 +373,18 @@ export const Sidebar = () => {
 									OAuth Apps
 								</Menu.Item>
 							)}
+							<Menu.Item onAction={handleRecieveDiscordInvitation}>
+								<img
+									src="/discord.svg"
+									alt="Discord"
+									width={20}
+									height={20}
+									className={css({
+										color: "gray.500",
+									})}
+								/>
+								Discordに参加する
+							</Menu.Item>
 							<Menu.Item
 								onAction={() => {
 									setIsMenuOpen(false);

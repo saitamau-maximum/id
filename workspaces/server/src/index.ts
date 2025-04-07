@@ -22,6 +22,7 @@ import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
+import { miscRoute } from "./routes/misc";
 import { oauthRoute } from "./routes/oauth";
 import { userRoute } from "./routes/user";
 
@@ -90,6 +91,7 @@ export const route = app
 	.route("/admin", adminRoute)
 	.route("/calendar", calendarRoute)
 	.route("/certification", certificationRoute)
-	.route("/invite", inviteRoute);
+	.route("/invite", inviteRoute)
+	.route("/misc", miscRoute);
 
 export default app;
