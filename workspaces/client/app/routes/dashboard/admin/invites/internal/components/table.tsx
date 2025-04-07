@@ -1,4 +1,3 @@
-import type {} from "node_modules/react-router/dist/development/route-data-aSUFWnQ6.mjs";
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
