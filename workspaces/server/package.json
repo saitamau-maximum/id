@@ -23,10 +23,10 @@
 	},
 	"dependencies": {
 		"@hono/valibot-validator": "^0.5.2",
-		"@octokit/auth-app": "^7.1.4",
+		"@octokit/auth-app": "^7.2.0",
 		"drizzle-orm": "^0.41.0",
 		"hono": "^4.6.13",
-		"octokit": "^4.1.0",
+		"octokit": "^4.1.2",
 		"valibot": "1.0.0",
 		"wasm-image-optimization": "^1.1.2"
 	},
