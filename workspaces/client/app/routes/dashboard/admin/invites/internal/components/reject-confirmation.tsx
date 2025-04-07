@@ -40,16 +40,8 @@ export const RejectConfirmation = ({ title }: Props) => {
 					fontSize: "sm",
 				})}
 			>
-				登録されたユーザー情報はデータベースから削除されます
-			</p>
-			<p
-				className={css({
-					textAlign: "center",
-					color: "rose.400",
-					fontWeight: "bold",
-					fontSize: "sm",
-				})}
-			>
+				登録されたユーザー情報は削除されます。もう一度招待する場合は、再度入力してもらう必要があります。
+				<br />
 				※この操作は取り消せません
 			</p>
 		</div>
