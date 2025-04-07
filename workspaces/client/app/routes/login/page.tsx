@@ -5,7 +5,6 @@ import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { env } from "~/utils/env";
-import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
 
 export default function Login() {
@@ -99,15 +98,11 @@ export default function Login() {
 					</p>
 				)}
 			</p>
-			{FLAG.ENABLE_LOGIN ? (
-				<a
-					href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
-				>
-					<LoginButtonLike />
-				</a>
-			) : (
-				<LoginButtonLike disabled />
-			)}
+			<a
+				href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
+			>
+				<LoginButtonLike />
+			</a>
 		</div>
 	);
 }

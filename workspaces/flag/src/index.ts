@@ -1,9 +1,7 @@
 const FLAGS_DEFAULT = {
-	ENABLE_LOGIN: true,
-	ENABLE_OAUTH_REGISTRATION: true,
-	ENABLE_CERTIFICATION: true,
-	ENABLE_CALENDAR: true,
-	ENABLE_INVITE: true,
+	ENABLE_CERTIFICATION: true, // merged in 2025-03-16
+	ENABLE_CALENDAR: true, // merged in 2025-03-28
+	ENABLE_INVITE: true, // merged in 2025-04-07
 };
 
 export const DEV_FLAGS = {

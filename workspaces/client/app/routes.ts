@@ -39,21 +39,13 @@ export default [
 						: []),
 				]),
 			]),
-			...(FLAG.ENABLE_OAUTH_REGISTRATION
-				? prefix("oauth-apps", [
-						layout("routes/dashboard/oauth-apps/layout.tsx", [
-							index("routes/dashboard/oauth-apps/home/page.tsx"),
-							route(
-								":oauthAppId",
-								"routes/dashboard/oauth-apps/config/page.tsx",
-							),
-							route(
-								"register",
-								"routes/dashboard/oauth-apps/register/page.tsx",
-							),
-						]),
-					])
-				: []),
+			...prefix("oauth-apps", [
+				layout("routes/dashboard/oauth-apps/layout.tsx", [
+					index("routes/dashboard/oauth-apps/home/page.tsx"),
+					route(":oauthAppId", "routes/dashboard/oauth-apps/config/page.tsx"),
+					route("register", "routes/dashboard/oauth-apps/register/page.tsx"),
+				]),
+			]),
 		]),
 		...(FLAG.ENABLE_INVITE
 			? prefix("invitation", [route(":id", "routes/invitation/page.tsx")])
