@@ -3,12 +3,11 @@ const FLAGS_DEFAULT = {
 	ENABLE_OAUTH_REGISTRATION: true,
 	ENABLE_CERTIFICATION: true,
 	ENABLE_CALENDAR: true,
-	ENABLE_INVITE: false,
+	ENABLE_INVITE: true,
 };
 
 export const DEV_FLAGS = {
 	...FLAGS_DEFAULT,
-	ENABLE_INVITE: true,
 };
 
 export const PROD_FLAGS = {
