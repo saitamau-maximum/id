@@ -31,7 +31,6 @@
 		"wasm-image-optimization": "^1.1.2"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20241112.0",
 		"@miniflare/d1": "^2.14.4",
 		"@miniflare/shared": "^2.14.4",
 		"@types/minimist": "^1.2.5",
@@ -43,6 +42,6 @@
 		"prompts": "^2.4.2",
 		"tsx": "^4.19.2",
 		"typescript": "^5.8.3",
-		"wrangler": "^3.95.0"
+		"wrangler": "^4.7.2"
 	}
 }
