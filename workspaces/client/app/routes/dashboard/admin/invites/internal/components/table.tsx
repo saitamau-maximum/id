@@ -23,7 +23,7 @@ export const ProvisionalUsersTable = () => {
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
-					<Table.Th>招待タイトル</Table.Th>
+					<Table.Th>招待元</Table.Th>
 					<Table.Th>承認 / 却下</Table.Th>
 				</Table.Tr>
 			</thead>
@@ -41,6 +41,7 @@ const UserTableRow = ({
 }: {
 	user: User & {
 		invitationTitle?: string;
+		invitationId?: string;
 	};
 }) => {
 	const { mutate: approveInvitation } = useApproveInvitation();
@@ -118,7 +119,28 @@ const UserTableRow = ({
 			</Table.Td>
 			<Table.Td>{user.studentId}</Table.Td>
 			<Table.Td>{user.grade}</Table.Td>
-			<Table.Td>{user.invitationTitle}</Table.Td>
+			<Table.Td>
+				<div>
+					<code
+						className={css({
+							display: "block",
+							fontSize: "sm",
+							whiteSpace: "nowrap",
+						})}
+					>
+						{user.invitationTitle}
+					</code>
+					<code
+						className={css({
+							display: "block",
+							fontSize: "sm",
+							whiteSpace: "nowrap",
+						})}
+					>
+						{user.invitationId}
+					</code>
+				</div>
+			</Table.Td>
 			<Table.Td>
 				<div
 					className={css({

@@ -379,6 +379,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			bio: user.profile.bio ?? undefined,
 			updatedAt: user.profile.updatedAt ?? undefined,
 			invitationTitle: user.invitation?.title ?? undefined,
+			invitationId: user.invitation?.id ?? undefined,
 		}));
 	}
 
