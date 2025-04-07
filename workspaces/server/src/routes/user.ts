@@ -73,12 +73,15 @@ const updateProfileImageSchema = v.object({
 });
 
 const socialLinkSchema = v.object({
-	providerId: v.number(),
-	url: v.pipe(v.string(), v.nonEmpty(), v.url()),
-});
-
-const deleteSocialLinkSchema = v.object({
-	providerId: v.number(),
+	links: v.pipe(
+		v.array(
+			v.object({
+				providerId: v.number(),
+				url: v.pipe(v.string(), v.nonEmpty()),
+			}),
+		),
+		v.nonEmpty()
+	),
 });
 
 const route = app
@@ -253,48 +256,22 @@ const route = app
 			return c.text("Not found", 404);
 		}
 	})
-	.post(
-		"/social-link",
-		authMiddleware,
-		vValidator("json", socialLinkSchema),
-		async (c) => {
-			const { SocialLinkRepository } = c.var;
-			const { userId } = c.get("jwtPayload");
-			const { providerId } = c.req.valid("json");
-
-			// providerId が有効なものかチェックする
-			if (!Object.values(SOCIAL_SERVICES_IDS).includes(providerId)) {
-				return c.text("Invalid providerId", 400);
-			}
-
-			try {
-				await SocialLinkRepository.createSocialLink({
-					userId: userId,
-					...c.req.valid("json"),
-				});
-				return c.text("ok", 200);
-			} catch (e) {
-				console.error(e);
-				return c.text("Failed to create social link", 500);
-			}
-		},
-	)
 	.put(
 		"/social-link",
 		authMiddleware,
 		vValidator("json", socialLinkSchema),
 		async (c) => {
 			const payload = c.get("jwtPayload");
+			const { links } = c.req.valid("json");
 			const { SocialLinkRepository } = c.var;
 
 			try {
-				await SocialLinkRepository.updateSocialLink({
+				await SocialLinkRepository.updateSocialLinks({
 					userId: payload.userId,
-					...c.req.valid("json"),
+					links
 				});
 				return c.text("ok", 200);
 			} catch (e) {
-				console.error(e);
 				return c.text("Failed to update social link", 500);
 			}
 		},
@@ -307,29 +284,8 @@ const route = app
 			const body = await SocialLinkRepository.getSocialLinksByUserId(userId);
 			return c.json(body, 200);
 		} catch (e) {
-			console.error(e);
 			return c.text("Failed to get social link", 500);
 		}
 	})
-	.delete(
-		"/social-link",
-		authMiddleware,
-		vValidator("json", deleteSocialLinkSchema),	
-		async (c) => {
-			const payload = c.get("jwtPayload");
-			const { SocialLinkRepository } = c.var;
-
-			try {
-				await SocialLinkRepository.deleteSocialLink({
-					userId: payload.userId,
-					...c.req.valid("json"),
-				});
-				return c.text("ok", 200);
-			} catch (e) {
-				console.error(e);
-				return c.text("Failed to delete social link", 500);
-			}
-		},
-	);
 
 export { route as userRoute };

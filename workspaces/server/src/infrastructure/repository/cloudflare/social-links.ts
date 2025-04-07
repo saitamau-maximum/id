@@ -4,7 +4,6 @@ import * as schema from "../../../db/schema";
 import type {
 	ISocialLink,
 	ISocialLinkRepository,
-	DeleteSocialLinkPayload,
 } from "../../../repository/social-link";
 
 export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
@@ -16,7 +15,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 
 	async getSocialLinksByUserId(
 		userId: string,
-	): Promise<Omit<ISocialLink, "userId">[]> {
+	): Promise<ISocialLink> {
 		const res = await this.client.query.socialLinks.findMany({
 			columns: {
 				userId: false,
@@ -30,36 +29,37 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 			throw new Error("Social services not found");
 		}
 
-		return res;
+		const links = res.map((link) => ({
+			providerId: link.providerId,
+			url: link.url,
+		}));
+
+		return {
+			userId,
+			links,
+		};
 	}
 
-	async createSocialLink(socialLinks: ISocialLink): Promise<void> {
-		const res = await this.client
-			.insert(schema.socialLinks)
-			.values(socialLinks);
-		if (!res) {
-			throw new Error("Failed to create social link");
-		}
-	}
-
-	async updateSocialLink(socialLink: ISocialLink): Promise<void> {
-		const res = await this.client.update(schema.socialLinks).set(socialLink);
-		if (!res) {
-			throw new Error("Failed to update social link");
-		}
-	}
-
-	async deleteSocialLink(socialLink: DeleteSocialLinkPayload): Promise<void> {
-		const res = await this.client
+	async updateSocialLinks(socialLinks: ISocialLink): Promise<void> {
+		const { userId, links } = socialLinks;
+		try {
+		await this.client
 			.delete(schema.socialLinks)
-			.where(
-				and(
-					eq(schema.socialLinks.userId, socialLink.userId),
-					eq(schema.socialLinks.providerId, socialLink.providerId),
-				),
-			);
-		if (!res) {
-			throw new Error("Failed to delete social link");
+			.where(eq(schema.socialLinks.userId, userId))
+			.execute();
+
+		await this.client
+			.insert(schema.socialLinks)
+			.values(
+				links.map((link) => ({
+					userId,
+					providerId: link.providerId,
+					url: link.url,
+				})),
+			)
+			.execute();
+		} catch (error) {
+			throw new Error("Failed to update social links");
 		}
 	}
 }
