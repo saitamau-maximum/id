@@ -357,22 +357,20 @@ export const Sidebar = () => {
 								/>
 								Settings
 							</Menu.Item>
-							{FLAG.ENABLE_OAUTH_REGISTRATION && (
-								<Menu.Item
-									onAction={() => {
-										setIsMenuOpen(false);
-										navigate("/oauth-apps");
-									}}
-								>
-									<Key
-										size={20}
-										className={css({
-											color: "gray.500",
-										})}
-									/>
-									OAuth Apps
-								</Menu.Item>
-							)}
+							<Menu.Item
+								onAction={() => {
+									setIsMenuOpen(false);
+									navigate("/oauth-apps");
+								}}
+							>
+								<Key
+									size={20}
+									className={css({
+										color: "gray.500",
+									})}
+								/>
+								OAuth Apps
+							</Menu.Item>
 							<Menu.Item onAction={handleRecieveDiscordInvitation}>
 								<img
 									src="/discord.svg"
