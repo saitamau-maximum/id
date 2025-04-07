@@ -84,8 +84,8 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
       valibot:
-        specifier: 0.42.1
-        version: 0.42.1(typescript@5.8.3)
+        specifier: 1.0.0
+        version: 1.0.0(typescript@5.8.3)
     devDependencies:
       '@pandacss/dev':
         specifier: ^0.51.1
@@ -121,7 +121,7 @@ importers:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.5.2
-        version: 0.5.2(hono@4.6.13)(valibot@0.42.1(typescript@5.8.3))
+        version: 0.5.2(hono@4.6.13)(valibot@1.0.0(typescript@5.8.3))
       '@octokit/auth-app':
         specifier: ^7.1.4
         version: 7.1.4
@@ -135,8 +135,8 @@ importers:
         specifier: ^4.1.0
         version: 4.1.0
       valibot:
-        specifier: 0.42.1
-        version: 0.42.1(typescript@5.8.3)
+        specifier: 1.0.0
+        version: 1.0.0(typescript@5.8.3)
       wasm-image-optimization:
         specifier: ^1.1.2
         version: 1.1.2
@@ -4288,8 +4288,8 @@ packages:
       typescript:
         optional: true
 
-  valibot@0.42.1:
-    resolution: {integrity: sha512-3keXV29Ar5b//Hqi4MbSdV7lfVp6zuYLZuA9V1PvQUsXqogr+u5lvLPLk3A4f74VUXDnf/JfWMN6sB+koJ/FFw==}
+  valibot@1.0.0:
+    resolution: {integrity: sha512-1Hc0ihzWxBar6NGeZv7fPLY0QuxFMyxwYR2sF1Blu7Wq7EnremwY2W02tit2ij2VJT8HcSkHAQqmFfl77f73Yw==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -5189,10 +5189,10 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@hono/valibot-validator@0.5.2(hono@4.6.13)(valibot@0.42.1(typescript@5.8.3))':
+  '@hono/valibot-validator@0.5.2(hono@4.6.13)(valibot@1.0.0(typescript@5.8.3))':
     dependencies:
       hono: 4.6.13
-      valibot: 0.42.1(typescript@5.8.3)
+      valibot: 1.0.0(typescript@5.8.3)
 
   '@hookform/resolvers@3.10.0(react-hook-form@7.55.0(react@19.0.0))':
     dependencies:
@@ -9094,7 +9094,7 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  valibot@0.42.1(typescript@5.8.3):
+  valibot@1.0.0(typescript@5.8.3):
     optionalDependencies:
       typescript: 5.8.3
 
