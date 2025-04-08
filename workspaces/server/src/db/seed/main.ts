@@ -15,16 +15,15 @@ import { resetRegister } from "./senario/reset-register";
 
 const argv = minimist<{
 	help?: boolean;
-	url: string;
 }>(process.argv, {
 	default: { help: false },
-	alias: { h: "help", u: "url" },
+	alias: { h: "help" },
 	string: ["_"],
 });
 
 // prettier-ignore
 const helpMessage = `\
-Usage: seed [DATABASE_URL]
+Usage: seed
 
 Options:
 	-h, --help     Display this message
@@ -34,15 +33,6 @@ async function init() {
 	const help = argv.help;
 	if (help) {
 		console.log(helpMessage);
-		return;
-	}
-
-	const DATABASE_URL = argv.url;
-	if (!DATABASE_URL) {
-		console.error("DATABASE_URL is required");
-		console.log(
-			"`pnpm apply:migrations:local` を実行していない可能性があります",
-		);
 		return;
 	}
 
