@@ -383,7 +383,6 @@ export class CloudflareUserRepository implements IUserRepository {
 		}));
 	}
 
-	// TODO: 付与するロールを選択できるようにする
 	async approveProvisionalUser(userId: string): Promise<void> {
 		const res = await this.client
 			.update(schema.users)
@@ -395,6 +394,9 @@ export class CloudflareUserRepository implements IUserRepository {
 		if (!res.success) {
 			throw new Error("Failed to approve user");
 		}
+
+		// 仮実装でMEMBERロールを付与
+		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
 	}
 
 	async rejectProvisionalUser(userId: string): Promise<void> {

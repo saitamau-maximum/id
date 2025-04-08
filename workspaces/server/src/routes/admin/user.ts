@@ -64,8 +64,6 @@ const route = app
 		const { UserRepository } = c.var;
 		try {
 			await UserRepository.approveProvisionalUser(userId);
-			// 仮実装でMEMBERロールを付与
-			await UserRepository.updateUserRole(userId, [ROLE_IDS.MEMBER]);
 			return c.text("ok", 200);
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);
