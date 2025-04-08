@@ -1,6 +1,6 @@
 import { Link } from "react-router";
 import { css } from "styled-system/css";
-import { ProfileCard } from "~/components/feature/user/profile-card";
+import { MemberCard } from "~/components/feature/user/member-card";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { FilterForm } from "./internal/components/filter-form";
 import { useMembers } from "./internal/hooks/use-members";
@@ -54,7 +54,7 @@ export default function Members() {
 								},
 							})}
 						>
-							<ProfileCard
+							<MemberCard
 								key={user.id}
 								id={user.id}
 								displayName={user.displayName}
@@ -68,7 +68,7 @@ export default function Members() {
 							/>
 						</Link>
 					) : (
-						<ProfileCard
+						<MemberCard
 							key={user.id}
 							id={user.id}
 							displayName={user.displayName}
