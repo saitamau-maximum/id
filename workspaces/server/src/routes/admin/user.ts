@@ -62,8 +62,10 @@ const route = app
 	.post("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
+		// TODO: 付与するロールを選択できるようにする
 		try {
 			await UserRepository.approveProvisionalUser(userId);
+			// 仮実装でMEMBERロールを付与
 			await UserRepository.updateUserRole(userId, [ROLE_IDS.MEMBER]);
 			return c.text("ok", 200);
 		} catch (e) {
