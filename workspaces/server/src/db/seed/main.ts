@@ -65,9 +65,8 @@ async function init() {
 	);
 
 	const mf = new Miniflare({
-		// d1Persist には .wrangler/.../d1 が入る
 		d1Persist: ".wrangler/state/v3/d1",
-		// d1Databases.DB には wrangler.toml の database_id が入る
+		// wrangler.toml の database_id を入れる
 		d1Databases: { DB: "dev" },
 		modules: true,
 		script: "",
@@ -107,6 +106,9 @@ async function init() {
 		}
 	} catch (e) {
 		console.error(e);
+		console.log(
+			"`pnpm apply:migrations:local` を実行していない可能性があります",
+		);
 	}
 	await mf.dispose();
 }
