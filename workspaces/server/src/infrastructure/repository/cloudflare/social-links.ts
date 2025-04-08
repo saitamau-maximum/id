@@ -20,6 +20,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 			columns: {
 				userId: false,
 				providerId: true,
+				handle: true,
 				url: true,
 			},
 			where: eq(schema.socialLinks.userId, userId),
@@ -31,6 +32,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 
 		const links = res.map((link) => ({
 			providerId: link.providerId,
+			handle: link.handle,
 			url: link.url,
 		}));
 
@@ -54,6 +56,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 				links.map((link) => ({
 					userId,
 					providerId: link.providerId,
+					handle: link.handle,
 					url: link.url,
 				})),
 			)

@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { SOCIAL_SERVICES_IDS } from "../constants/social";
+import { SOCIAL_SERVICES_IDS, detectProviderId, SOCIAL_SERVICE_BY_ID } from "../constants/social";
 import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
@@ -13,6 +13,24 @@ const app = factory.createApp();
 const normalizeRealName = (text: string) => {
 	return text.trim().replace(/\s+/g, " ");
 };
+
+// URLをパースして、handleとproviderIdを取得する
+const parseSocialLink = (url: string) => {
+	const providerId = detectProviderId(url);
+
+	const u = new URL(url);
+	if (providerId === SOCIAL_SERVICES_IDS.OTHER) {
+		return {
+			providerId,
+			handle: u.href.replace(/^(https?:\/\/)?/, "").split("/")[0],
+		}
+	}
+	
+	return {
+		providerId,
+		handle: u.pathname.slice(1),
+	}
+}
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
@@ -74,12 +92,7 @@ const updateProfileImageSchema = v.object({
 
 const socialLinkSchema = v.object({
 	links: v.pipe(
-		v.array(
-			v.object({
-				providerId: v.number(),
-				url: v.pipe(v.string(), v.nonEmpty()),
-			}),
-		),
+		v.array(v.string()),
 		v.nonEmpty()
 	),
 });
@@ -265,10 +278,19 @@ const route = app
 			const { links } = c.req.valid("json");
 			const { SocialLinkRepository } = c.var;
 
+			const parsedLinks = links.map((link) => {
+				const { providerId, handle } = parseSocialLink(link);
+				return {
+					providerId,
+					handle,
+					url: link,
+				};
+			});
+
 			try {
 				await SocialLinkRepository.updateSocialLinks({
 					userId: payload.userId,
-					links
+					links: parsedLinks,
 				});
 				return c.text("ok", 200);
 			} catch (e) {
