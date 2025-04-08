@@ -394,6 +394,9 @@ export class CloudflareUserRepository implements IUserRepository {
 		if (!res.success) {
 			throw new Error("Failed to approve user");
 		}
+
+		// 仮実装でMEMBERロールを付与
+		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
 	}
 
 	async rejectProvisionalUser(userId: string): Promise<void> {
