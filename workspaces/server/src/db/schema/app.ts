@@ -104,8 +104,8 @@ export const socialLinks = sqliteTable(
 		url: text("url").notNull(),
 	},
 	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.providerId] }),
-	}),
+		pk: primaryKey({ columns: [table.userId, table.providerId, table.handle] }),
+	})
 );
 
 export const socialLinksRelations = relations(socialLinks, ({ one }) => ({
