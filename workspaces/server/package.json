@@ -38,6 +38,7 @@
 		"better-sqlite3": "^11.9.1",
 		"drizzle-kit": "^0.30.6",
 		"ics": "^3.8.1",
+		"miniflare": "^4.20250405.0",
 		"minimist": "^1.2.8",
 		"prompts": "^2.4.2",
 		"tsx": "^4.19.3",
