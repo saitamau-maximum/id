@@ -12,12 +12,12 @@
 		"check": "biome check ./app && pnpm run typecheck"
 	},
 	"dependencies": {
-		"@hookform/resolvers": "^3.10.0",
+		"@hookform/resolvers": "^5.0.1",
 		"@idp/flag": "workspace:*",
 		"@idp/server": "workspace:*",
 		"@react-router/node": "^7.5.0",
 		"@react-router/serve": "^7.5.0",
-		"@tanstack/react-query": "^5.62.15",
+		"@tanstack/react-query": "^5.72.0",
 		"autoprefixer": "^10.4.21",
 		"hono": "^4.7.5",
 		"react": "^19.1.0",

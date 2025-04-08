@@ -22,7 +22,8 @@ const RegisterFormSchema = v.object({
 	grade: UserSchemas.Grade,
 });
 
-type FormValues = v.InferOutput<typeof RegisterFormSchema>;
+type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
+type FormOutputValues = v.InferOutput<typeof RegisterFormSchema>;
 
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
@@ -32,7 +33,7 @@ export const RegisterForm = () => {
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<FormValues>({
+	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(RegisterFormSchema),
 		defaultValues: {
 			displayName: user?.displayName,

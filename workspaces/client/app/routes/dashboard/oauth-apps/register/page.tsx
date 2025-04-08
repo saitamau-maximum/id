@@ -22,7 +22,8 @@ const RegisterFormSchema = v.object({
 	icon: OAuthSchemas.Icon,
 });
 
-type FormValues = v.InferOutput<typeof RegisterFormSchema>;
+type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
+type FormOutputValues = v.InferOutput<typeof RegisterFormSchema>;
 
 const iconStyle = css({
 	padding: 1,
@@ -55,7 +56,7 @@ export default function Register() {
 		handleSubmit,
 		setValue,
 		formState: { errors },
-	} = useForm<FormValues>({
+	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(RegisterFormSchema),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる

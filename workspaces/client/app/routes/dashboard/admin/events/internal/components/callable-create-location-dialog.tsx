@@ -27,7 +27,8 @@ const CreateFormSchema = v.object({
 	description: LocationSchemas.Description,
 });
 
-type CreateFormValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
+type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CreateLocationDialog = createCallable<void, Payload>(
 	({ call }) => {
@@ -36,11 +37,11 @@ export const CreateLocationDialog = createCallable<void, Payload>(
 			register,
 			formState: { errors },
 			watch,
-		} = useForm<CreateFormValues>({
+		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
 			resolver: valibotResolver(CreateFormSchema),
 		});
 
-		const onSubmit = async (values: CreateFormValues) => {
+		const onSubmit = async (values: CreateFormOutputValues) => {
 			call.end({
 				type: "success",
 				payload: {

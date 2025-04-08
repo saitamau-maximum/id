@@ -36,7 +36,8 @@ const UpdateFormSchema = v.object({
 	bio: UserSchemas.Bio,
 });
 
-type FormValues = v.InferOutput<typeof UpdateFormSchema>;
+type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
+type FormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
@@ -79,7 +80,7 @@ export const ProfileUpdateForm = () => {
 		handleSubmit,
 		watch,
 		formState: { errors },
-	} = useForm<FormValues>({
+	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UpdateFormSchema),
 		defaultValues: {
 			displayName: user?.displayName,
