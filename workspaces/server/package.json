@@ -31,11 +31,8 @@
 		"wasm-image-optimization": "^1.2.28"
 	},
 	"devDependencies": {
-		"@miniflare/d1": "^2.14.4",
-		"@miniflare/shared": "^2.14.4",
 		"@types/minimist": "^1.2.5",
 		"@types/prompts": "^2.4.9",
-		"better-sqlite3": "^11.9.1",
 		"drizzle-kit": "^0.30.6",
 		"ics": "^3.8.1",
 		"miniflare": "^4.20250405.0",
