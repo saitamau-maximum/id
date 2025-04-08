@@ -1,4 +1,3 @@
-import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { MemberCard } from "~/components/feature/user/member-card";
 import { DashboardHeader } from "../internal/components/dashboard-title";
@@ -36,51 +35,22 @@ export default function Members() {
 				className={css({
 					display: "flex",
 					flexWrap: "wrap",
-					gap: 8,
+					gap: 4,
 				})}
 			>
-				{filteredMembers.map((user) =>
-					user.initializedAt ? (
-						<Link
-							key={user.id}
-							to={`/members/${user.displayId}`}
-							className={css({
-								cursor: "pointer",
-								borderRadius: "xl",
-								padding: 2,
-								transition: "background",
-								_hover: {
-									backgroundColor: "gray.100",
-								},
-							})}
-						>
-							<MemberCard
-								key={user.id}
-								id={user.id}
-								displayName={user.displayName}
-								realName={user.realName}
-								displayId={user.displayId}
-								profileImageURL={user.profileImageURL}
-								grade={user.grade}
-								initialized={true}
-								roles={user.roles}
-								shrinkRoles
-							/>
-						</Link>
-					) : (
-						<MemberCard
-							key={user.id}
-							id={user.id}
-							displayName={user.displayName}
-							realName={user.realName}
-							displayId={user.displayId}
-							profileImageURL={user.profileImageURL}
-							grade={user.grade}
-							initialized={false}
-							roles={user.roles}
-						/>
-					),
-				)}
+				{filteredMembers.map((user) => (
+					<MemberCard
+						key={user.id}
+						id={user.id}
+						displayName={user.displayName}
+						realName={user.realName}
+						displayId={user.displayId}
+						profileImageURL={user.profileImageURL}
+						grade={user.grade}
+						initialized={!!user.initializedAt}
+						roles={user.roles}
+					/>
+				))}
 			</div>
 		</div>
 	);
