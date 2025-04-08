@@ -1,10 +1,12 @@
 import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
+import { parseSocialLink } from "../../../utils/parse-social-link";
 import type {
 	ISocialLink,
 	ISocialLinkRepository,
 } from "../../../repository/social-link";
+import { SOCIAL_SERVICE_BY_ID } from "../../../constants/social";
 
 export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -31,7 +33,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 		}
 
 		const links = res.map((link) => ({
-			providerId: link.providerId,
+			providerId: SOCIAL_SERVICE_BY_ID[link.providerId],
 			handle: link.handle,
 			url: link.url,
 		}));
@@ -42,8 +44,12 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 		};
 	}
 
-	async updateSocialLinks(socialLinks: ISocialLink): Promise<void> {
-		const { userId, links } = socialLinks;
+	async updateSocialLinks(userId: string, links: string[]): Promise<void> {
+		const parsedLinks = links.map((link) => parseSocialLink(link));
+
+		console.log("Parsed Links");
+		console.log(parsedLinks);
+		
 		try {
 		await this.client
 			.delete(schema.socialLinks)
@@ -53,7 +59,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 		await this.client
 			.insert(schema.socialLinks)
 			.values(
-				links.map((link) => ({
+				parsedLinks.map((link) => ({
 					userId,
 					providerId: link.providerId,
 					handle: link.handle,
@@ -62,6 +68,7 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 			)
 			.execute();
 		} catch (error) {
+			console.error(error);
 			throw new Error("Failed to update social links");
 		}
 	}

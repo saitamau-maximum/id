@@ -14,24 +14,6 @@ const normalizeRealName = (text: string) => {
 	return text.trim().replace(/\s+/g, " ");
 };
 
-// URLをパースして、handleとproviderIdを取得する
-const parseSocialLink = (url: string) => {
-	const providerId = detectProviderId(url);
-
-	const u = new URL(url);
-	if (providerId === SOCIAL_SERVICES_IDS.OTHER) {
-		return {
-			providerId,
-			handle: u.href.replace(/^(https?:\/\/)?/, "").split("/")[0],
-		}
-	}
-	
-	return {
-		providerId,
-		handle: u.pathname.slice(1),
-	}
-}
-
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
@@ -278,20 +260,11 @@ const route = app
 			const { links } = c.req.valid("json");
 			const { SocialLinkRepository } = c.var;
 
-			const parsedLinks = links.map((link) => {
-				const { providerId, handle } = parseSocialLink(link);
-				return {
-					providerId,
-					handle,
-					url: link,
-				};
-			});
-
 			try {
-				await SocialLinkRepository.updateSocialLinks({
-					userId: payload.userId,
-					links: parsedLinks,
-				});
+				await SocialLinkRepository.updateSocialLinks(
+					payload.userId,
+					links,
+				);
 				return c.text("ok", 200);
 			} catch (e) {
 				return c.text("Failed to update social link", 500);
