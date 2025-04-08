@@ -383,6 +383,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}));
 	}
 
+	// TODO: 付与するロールを選択できるようにする
 	async approveProvisionalUser(userId: string): Promise<void> {
 		const res = await this.client
 			.update(schema.users)
