@@ -28,7 +28,8 @@ const CreateFormSchema = v.object({
 	remainingUse: InvitationURLSchemas.RemainingUse,
 });
 
-type CreateFormValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
+type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 	({ call }) => {
@@ -37,7 +38,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 			register,
 			setError,
 			formState: { errors },
-		} = useForm<CreateFormValues>({
+		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
 			resolver: valibotResolver(CreateFormSchema),
 			defaultValues: {
 				expiresAt: null,
@@ -45,7 +46,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 			},
 		});
 
-		const onSubmit = async (values: CreateFormValues) => {
+		const onSubmit = async (values: CreateFormOutputValues) => {
 			if (!values.expiresAt && !values.remainingUse) {
 				setError("root", {
 					message: "使用可能回数または有効期限のいずれかは必須です",

@@ -11,7 +11,7 @@
 		"apply:migrations:prod": "wrangler d1 migrations apply --env production --remote idp-db",
 		"deploy:preview": "wrangler deploy --env preview",
 		"deploy:prod": "wrangler deploy --env production",
-		"seed": "NODE_NO_WARNINGS=1 tsx ./src/db/seed/main.ts --url $(find .wrangler/state/v3/d1/miniflare-D1DatabaseObject -type f -name '*.sqlite' -print -quit)",
+		"seed": "NODE_NO_WARNINGS=1 tsx ./src/db/seed/main.ts",
 		"fix": "biome check --write ./src",
 		"check": "biome check ./src"
 	},
@@ -23,26 +23,23 @@
 	},
 	"dependencies": {
 		"@hono/valibot-validator": "^0.5.2",
-		"@octokit/auth-app": "^7.1.4",
-		"drizzle-orm": "^0.36.1",
-		"hono": "^4.6.13",
-		"octokit": "^4.1.0",
-		"valibot": "0.42.1",
-		"wasm-image-optimization": "^1.1.2"
+		"@octokit/auth-app": "^7.2.0",
+		"drizzle-orm": "^0.41.0",
+		"hono": "^4.7.5",
+		"octokit": "^4.1.2",
+		"valibot": "^1.0.0",
+		"wasm-image-optimization": "^1.2.28"
 	},
 	"devDependencies": {
-		"@cloudflare/workers-types": "^4.20241112.0",
-		"@miniflare/d1": "^2.14.4",
-		"@miniflare/shared": "^2.14.4",
 		"@types/minimist": "^1.2.5",
 		"@types/prompts": "^2.4.9",
-		"better-sqlite3": "^11.8.1",
-		"drizzle-kit": "^0.28.0",
+		"drizzle-kit": "^0.30.6",
 		"ics": "^3.8.1",
+		"miniflare": "^4.20250405.0",
 		"minimist": "^1.2.8",
 		"prompts": "^2.4.2",
-		"tsx": "^4.19.2",
-		"typescript": "^5.7.2",
-		"wrangler": "^3.95.0"
+		"tsx": "^4.19.3",
+		"typescript": "^5.8.3",
+		"wrangler": "^4.8.0"
 	}
 }

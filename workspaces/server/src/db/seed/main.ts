@@ -1,9 +1,8 @@
 import minimist from "minimist";
 import prompts from "prompts";
 
-import { D1Database, D1DatabaseAPI } from "@miniflare/d1";
-import { createSQLiteDB } from "@miniflare/shared";
 import { drizzle } from "drizzle-orm/d1";
+import { Miniflare } from "miniflare";
 import * as schema from "../schema";
 import { editUserRole } from "./senario/edit-user-role";
 import { registerCalendarSeed } from "./senario/register-calendar";
@@ -16,16 +15,15 @@ import { resetRegister } from "./senario/reset-register";
 
 const argv = minimist<{
 	help?: boolean;
-	url: string;
 }>(process.argv, {
 	default: { help: false },
-	alias: { h: "help", u: "url" },
+	alias: { h: "help" },
 	string: ["_"],
 });
 
 // prettier-ignore
 const helpMessage = `\
-Usage: seed [DATABASE_URL]
+Usage: seed
 
 Options:
 	-h, --help     Display this message
@@ -35,15 +33,6 @@ async function init() {
 	const help = argv.help;
 	if (help) {
 		console.log(helpMessage);
-		return;
-	}
-
-	const DATABASE_URL = argv.url;
-	if (!DATABASE_URL) {
-		console.error("DATABASE_URL is required");
-		console.log(
-			"`pnpm apply:migrations:local` を実行していない可能性があります",
-		);
 		return;
 	}
 
@@ -75,8 +64,14 @@ async function init() {
 		},
 	);
 
-	const sqliteDb = await createSQLiteDB(DATABASE_URL);
-	const d1database = new D1Database(new D1DatabaseAPI(sqliteDb));
+	const mf = new Miniflare({
+		d1Persist: ".wrangler/state/v3/d1",
+		// wrangler.toml の database_id を入れる
+		d1Databases: { DB: "dev" },
+		modules: true,
+		script: "",
+	});
+	const d1database = await mf.getD1Database("DB");
 	const client = drizzle(d1database, { schema });
 
 	try {
@@ -107,12 +102,15 @@ async function init() {
 				break;
 			default:
 				console.error("Invalid senario");
-				return;
+				break;
 		}
 	} catch (e) {
 		console.error(e);
-		return;
+		console.log(
+			"`pnpm apply:migrations:local` を実行していない可能性があります",
+		);
 	}
+	await mf.dispose();
 }
 
 init().catch((e) => {

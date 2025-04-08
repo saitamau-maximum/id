@@ -1,2 +1,8 @@
 packages:
-  - 'workspaces/*'
+  - workspaces/*
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - esbuild
+  - sharp
+  - workerd
