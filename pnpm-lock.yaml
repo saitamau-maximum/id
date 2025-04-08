@@ -38,6 +38,9 @@ importers:
       hono:
         specifier: ^4.7.5
         version: 4.7.5
+      isbot:
+        specifier: ^5.1.25
+        version: 5.1.25
       react:
         specifier: ^19.1.0
         version: 19.1.0
@@ -2950,6 +2953,10 @@ packages:
   is-what@4.1.16:
     resolution: {integrity: sha512-ZhMwEosbFJkA0YhFnNDgTM4ZxDRsS6HqTo7qsZM08fehyRYIYa0yHu5R6mgo1n/8MgaPBXiPimPD77baVFYg+A==}
     engines: {node: '>=12.13'}
+
+  isbot@5.1.25:
+    resolution: {integrity: sha512-mqU76fmT7cpGG0JX1EzhCZIC+xovpH6TD2SAK18alonk0RG/RgChpGduJTYzRaq9a0COoFA99M9JVtEUOcScIw==}
+    engines: {node: '>=18'}
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
@@ -7330,6 +7337,8 @@ snapshots:
   is-plain-obj@4.1.0: {}
 
   is-what@4.1.16: {}
+
+  isbot@5.1.25: {}
 
   isexe@2.0.0: {}
 
