@@ -6,7 +6,6 @@ import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	initialized: boolean;
-	shrinkRoles?: boolean;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -18,11 +17,8 @@ export const ProfileCard: React.FC<Props> = ({
 	initialized,
 	roles,
 	bio,
-	shrinkRoles = false,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
-	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
-	const rolesLeft = roles.length - trancatedRoles.length;
 
 	return (
 		<div
@@ -102,33 +98,6 @@ export const ProfileCard: React.FC<Props> = ({
 								{grade}
 							</span>
 						)}
-						{shrinkRoles && roles.length > 0 && (
-							<div
-								className={css({
-									display: "flex",
-									gap: 2,
-									alignItems: "center",
-									flexWrap: "wrap",
-								})}
-							>
-								{trancatedRoles.map((role) => (
-									<RoleBadge key={role.name} role={role} />
-								))}
-								{rolesLeft > 0 && (
-									<span
-										className={css({
-											color: "gray.500",
-											fontSize: "md",
-											mdDown: {
-												fontSize: "sm",
-											},
-										})}
-									>
-										+{rolesLeft}
-									</span>
-								)}
-							</div>
-						)}
 						{!initialized && (
 							<div
 								className={css({
@@ -201,7 +170,7 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			{!shrinkRoles && roles.length > 0 && (
+			{roles.length > 0 && (
 				<div
 					className={css({
 						display: "flex",
