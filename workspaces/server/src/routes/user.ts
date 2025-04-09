@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { SOCIAL_SERVICES_IDS, detectProviderId, SOCIAL_SERVICE_BY_ID } from "../constants/social";
+import { SOCIAL_SERVICES_IDS } from "../constants/social";
 import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";

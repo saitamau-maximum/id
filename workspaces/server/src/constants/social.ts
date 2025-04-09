@@ -29,16 +29,3 @@ export const SOCIAL_SERVICE_BY_ID = {
 	[SOCIAL_SERVICES_IDS.AOJ]: "AOJ",
 	[SOCIAL_SERVICES_IDS.OTHER]: "Other",
 };
-
-export const detectProviderId = (url: string) => {
-	const host = new URL(url).host;
-	const providerId = SOCIAL_SERVICES_HOST_NAMES.find(
-		(service) => service.host === host,
-	)?.id;
-
-	if (providerId) {
-		return providerId;
-	}
-	// SOCIAL_SERVICES_HOST_NAMESにない場合はOTHERを返す
-	return SOCIAL_SERVICES_IDS.OTHER;
-}
