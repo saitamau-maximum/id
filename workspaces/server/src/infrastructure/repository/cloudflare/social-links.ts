@@ -47,9 +47,6 @@ export class CloudflareSocialLinkRepository implements ISocialLinkRepository {
 	async updateSocialLinks(userId: string, links: string[]): Promise<void> {
 		const parsedLinks = links.map((link) => parseSocialLink(link));
 
-		console.log("Parsed Links");
-		console.log(parsedLinks);
-		
 		try {
 		await this.client
 			.delete(schema.socialLinks)
