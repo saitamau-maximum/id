@@ -116,9 +116,9 @@ export default function PaymentInfo() {
 					とさせていただきます。
 					確認までに数日かかる場合がありますので、ご了承ください。
 				</p>
-				{/* <p className={css({ marginTop: 2 })}>
+				<p className={css({ marginTop: 2 })}>
 					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。
-				</p> */}
+				</p>
 				<p
 					className={css({
 						fontSize: "sm",
