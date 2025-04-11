@@ -125,8 +125,6 @@ const route = app
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;
 
-			console.log(c);
-
 			const {
 				displayName,
 				realName,
