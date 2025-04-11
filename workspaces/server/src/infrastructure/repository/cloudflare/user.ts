@@ -388,6 +388,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			.update(schema.users)
 			.set({
 				invitationId: null,
+				lastPaymentConfirmedAt: new Date(),
 			})
 			.where(eq(schema.users.id, userId));
 
