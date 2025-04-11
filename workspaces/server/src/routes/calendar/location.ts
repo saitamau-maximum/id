@@ -1,10 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
-import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
+	adminOnlyMiddleware,
+	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
 const app = factory.createApp();
@@ -21,8 +20,7 @@ const updateLocationSchema = v.object({
 });
 
 const route = app
-	.use(authMiddleware)
-	.get("/", async (c) => {
+	.get("/", memberOnlyMiddleware, async (c) => {
 		const { LocationRepository } = c.var;
 
 		try {
@@ -32,7 +30,7 @@ const route = app
 			return c.json({ error: "location not found" }, 404);
 		}
 	})
-	.get("/:id", async (c) => {
+	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { LocationRepository } = c.var;
 
@@ -45,9 +43,7 @@ const route = app
 	})
 	.post(
 		"/",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
+		adminOnlyMiddleware,
 		vValidator("json", createLocationSchema),
 		async (c) => {
 			const { name, description } = c.req.valid("json");
@@ -67,9 +63,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
+		adminOnlyMiddleware,
 		vValidator("json", updateLocationSchema),
 		async (c) => {
 			const id = c.req.param("id");
@@ -89,22 +83,16 @@ const route = app
 			}
 		},
 	)
-	.delete(
-		"/:id",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
-		async (c) => {
-			const id = c.req.param("id");
-			const { LocationRepository } = c.var;
+	.delete("/:id", adminOnlyMiddleware, async (c) => {
+		const id = c.req.param("id");
+		const { LocationRepository } = c.var;
 
-			try {
-				await LocationRepository.deleteLocation(id);
-				return c.json({ message: "location deleted" });
-			} catch (e) {
-				return c.json({ error: "location not deleted" }, 404);
-			}
-		},
-	);
+		try {
+			await LocationRepository.deleteLocation(id);
+			return c.json({ message: "location deleted" });
+		} catch (e) {
+			return c.json({ error: "location not deleted" }, 404);
+		}
+	});
 
 export { route as calendarLocationRoute };

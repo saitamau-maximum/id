@@ -1,19 +1,10 @@
-import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
-import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
-} from "../middleware/auth";
+import { memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
 const memberOnlyRoute = app
-	.use(authMiddleware)
-	.use(
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.MEMBER],
-		}),
-	)
+	.use(memberOnlyMiddleware)
 	.get("/discord/invitation", async (c) => {
 		if (!c.env.DISCORD_INVITATION_URL) {
 			return c.text("Discord invitation URL is not set", 500);

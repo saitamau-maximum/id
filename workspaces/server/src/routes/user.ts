@@ -5,7 +5,7 @@ import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
 import { factory } from "../factory";
-import { authMiddleware } from "../middleware/auth";
+import { authMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
@@ -112,7 +112,7 @@ const route = app
 	)
 	.put(
 		"/update",
-		authMiddleware,
+		memberOnlyMiddleware,
 		vValidator("json", updateSchema),
 		async (c) => {
 			const payload = c.get("jwtPayload");
@@ -149,7 +149,7 @@ const route = app
 			return c.text("ok", 200);
 		},
 	)
-	.get("/contributions", authMiddleware, async (c) => {
+	.get("/contributions", memberOnlyMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const {
 			ContributionRepository,
@@ -192,7 +192,7 @@ const route = app
 	})
 	.put(
 		"/profile-image",
-		authMiddleware,
+		memberOnlyMiddleware,
 		vValidator("form", updateProfileImageSchema),
 		async (c) => {
 			const payload = c.get("jwtPayload");
