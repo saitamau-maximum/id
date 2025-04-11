@@ -78,10 +78,13 @@ export const UserSchemas = {
 			`自己紹介は${BIO_MAX_LINES}行以下で入力してください`,
 		),
 	),
-	SocialLinks: v.array(
-		v.object({
-			string: v.string(),
-			url: v.string(),
-		}),
-	),
+	SocialLinks: v.pipe(
+		v.array(
+			v.pipe(
+				v.string(),
+				v.url("URLの形式が正しくありません"),
+			),
+		),
+		v.nonEmpty("SNSリンクを入力してください"),
+	)
 };

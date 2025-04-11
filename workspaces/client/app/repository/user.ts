@@ -22,6 +22,7 @@ export interface ProfileUpdateParams {
 	studentId: string;
 	grade: string;
 	bio: string;
+	socialLinks: string[];
 }
 
 export interface IUserRepository {
@@ -78,6 +79,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		studentId,
 		grade,
 		bio,
+		socialLinks,
 	}: ProfileUpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
@@ -90,6 +92,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				studentId,
 				grade,
 				bio,
+				socialLinks,
 			},
 		});
 		if (!res.ok) {

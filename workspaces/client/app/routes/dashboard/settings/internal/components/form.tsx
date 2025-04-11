@@ -34,6 +34,7 @@ const UpdateFormSchema = v.object({
 	studentId: UserSchemas.StudentId,
 	grade: UserSchemas.Grade,
 	bio: UserSchemas.Bio,
+	socialLinks: UserSchemas.SocialLinks,
 });
 
 type FormValues = v.InferOutput<typeof UpdateFormSchema>;
