@@ -120,6 +120,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -239,6 +240,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -277,6 +279,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.user.id,
 			initializedAt: user.user.initializedAt,
 			isProvisional: !!user.user.invitationId,
+			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
 			realNameKana: user.realNameKana ?? undefined,
@@ -316,6 +319,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -366,6 +370,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -394,6 +399,22 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		if (!res.success) {
 			throw new Error("Failed to approve user");
+		}
+
+		// 仮実装でMEMBERロールを付与
+		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
+	}
+
+	async confirmPayment(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				lastPaymentConfirmedAt: new Date(),
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to confirm payment");
 		}
 
 		// 仮実装でMEMBERロールを付与
