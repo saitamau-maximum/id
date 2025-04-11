@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `last_payment_confirmed_at` integer;
