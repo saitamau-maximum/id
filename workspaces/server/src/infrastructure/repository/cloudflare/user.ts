@@ -189,12 +189,25 @@ export class CloudflareUserRepository implements IUserRepository {
 			updatedAt: new Date(),
 		};
 
-		const res = await this.client
-			.update(schema.userProfiles)
-			.set(value)
-			.where(eq(schema.userProfiles.userId, userId));
+		try {
+			await this.client.transaction(async (tx) => {
+				await tx.update(schema.userProfiles)
+					.set(value)
+					.where(eq(schema.userProfiles.userId, userId));
 
-		if (!res.success) {
+				await tx.delete(schema.socialLinks)
+					.where(eq(schema.socialLinks.userId, userId));
+
+				await tx.insert(schema.socialLinks)
+					.values(
+						// TODO: 型をちゃんとする
+						(payload.socialLinks ?? []).map((link) => ({
+							userId,
+							url: link,
+						})),
+					);
+			});
+		} catch (err) {
 			throw new Error("Failed to update user");
 		}
 	}

@@ -14,7 +14,7 @@ import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/c
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
-import { CloudflareSocialLinkRepository } from "./infrastructure/repository/cloudflare/social-links";
+// import { CloudflareSocialLinkRepository } from "./infrastructure/repository/cloudflare/social-links";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
@@ -46,7 +46,7 @@ export const route = app
 			new CloudflareOAuthInternalRepository(c.env.DB),
 		);
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
-		c.set("SocialLinkRepository", new CloudflareSocialLinkRepository(c.env.DB));
+		// c.set("SocialLinkRepository", new CloudflareSocialLinkRepository(c.env.DB));
 		
 		c.set(
 			"CertificationRepository",

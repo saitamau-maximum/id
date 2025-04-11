@@ -43,6 +43,12 @@ const ProfileSchema = v.object({
 	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
+	socialLinks: v.array(
+		v.pipe(
+			v.string(),
+			v.url()
+		)
+	)
 });
 
 const registerSchema = v.object({
@@ -66,17 +72,11 @@ const updateSchema = v.object({
 	studentId: ProfileSchema.entries.studentId,
 	grade: ProfileSchema.entries.grade,
 	bio: ProfileSchema.entries.bio,
+	socialLinks: ProfileSchema.entries.socialLinks,
 });
 
 const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
-});
-
-const socialLinkSchema = v.object({
-	links: v.pipe(
-		v.array(v.string()),
-		v.nonEmpty()
-	),
 });
 
 const route = app
@@ -125,6 +125,8 @@ const route = app
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;
 
+			console.log(c);
+
 			const {
 				displayName,
 				realName,
@@ -135,6 +137,7 @@ const route = app
 				studentId,
 				grade,
 				bio,
+				socialLinks,	
 			} = c.req.valid("json");
 
 			const normalizedDisplayName = normalizeRealName(displayName);
@@ -151,6 +154,7 @@ const route = app
 				studentId,
 				grade,
 				bio,
+				socialLinks,
 			});
 
 			return c.text("ok", 200);
@@ -250,37 +254,6 @@ const route = app
 		} catch (e) {
 			return c.text("Not found", 404);
 		}
-	})
-	.put(
-		"/social-link",
-		authMiddleware,
-		vValidator("json", socialLinkSchema),
-		async (c) => {
-			const payload = c.get("jwtPayload");
-			const { links } = c.req.valid("json");
-			const { SocialLinkRepository } = c.var;
-
-			try {
-				await SocialLinkRepository.updateSocialLinks(
-					payload.userId,
-					links,
-				);
-				return c.text("ok", 200);
-			} catch (e) {
-				return c.text("Failed to update social link", 500);
-			}
-		},
-	)
-	.get("/social-link/:userId", async (c) => {
-		const { SocialLinkRepository } = c.var;
-		const userId = c.req.param("userId");
-
-		try {
-			const body = await SocialLinkRepository.getSocialLinksByUserId(userId);
-			return c.json(body, 200);
-		} catch (e) {
-			return c.text("Failed to get social link", 500);
-		}
-	})
+	});
 
 export { route as userRoute };

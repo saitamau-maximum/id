@@ -17,6 +17,7 @@ export const detectProviderId = (url: string) => {
 export const parseSocialLink = (url: string) => {
 	const providerId = detectProviderId(url);
 
+	// TODO: 今のままだとすべてのソーシャルリンクに対応してhandleを抽出できないため修正する
 	const u = new URL(url);
 	if (providerId === SOCIAL_SERVICES_IDS.OTHER) {
 		return {

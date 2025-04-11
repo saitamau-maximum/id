@@ -99,12 +99,10 @@ export const socialLinks = sqliteTable(
 		userId: text("user_id")
 			.references(() => users.id)
 			.notNull(),
-		providerId: int("provider_id").notNull(),
-		handle: text("handle").notNull(),
 		url: text("url").notNull(),
 	},
 	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.providerId, table.handle] }),
+		pk: primaryKey({ columns: [table.userId, table.url] }),
 	})
 );
 

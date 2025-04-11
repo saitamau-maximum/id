@@ -19,6 +19,7 @@ export type Profile = {
 	studentId: string;
 	grade: string;
 	bio: string;
+	socialLinks: string[];
 	updatedAt: Date;
 };
 
