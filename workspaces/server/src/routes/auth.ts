@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
-import { authMiddleware } from "../middleware/auth";
+import { memberOnlyMiddleware } from "../middleware/auth";
 import { authLoginRoute } from "./auth-login";
 
 const app = factory.createApp();
@@ -24,7 +24,7 @@ const route = app
 
 		return c.json({ jwt });
 	})
-	.get("/me", authMiddleware, async (c) => {
+	.get("/me", memberOnlyMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
 		try {
