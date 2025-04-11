@@ -18,6 +18,7 @@ export type User = {
 	studentId?: string;
 	grade?: string;
 	bio?: string;
+	socialLinks?: string[];
 	updatedAt?: Date;
 };
 

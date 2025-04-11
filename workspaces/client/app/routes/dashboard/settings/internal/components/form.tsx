@@ -1,7 +1,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Fragment, useCallback, useMemo, useState } from "react";
-import { Plus } from "react-feather";
-import { useForm } from "react-hook-form";
+import { Plus, X } from "react-feather";
+import { useFieldArray, useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
@@ -23,6 +23,7 @@ import { useSendCertificationRequest } from "../hooks/use-send-certification-req
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
+import { IconButton } from "~/components/ui/icon-button";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -74,13 +75,12 @@ export const ProfileUpdateForm = () => {
 		},
 		[deleteCertification],
 	);
-	const [links, setLinks] = useState<string[]>([]);
-	const [newLink, setNewLink] = useState<string>("");
 
 	const {
 		register,
 		handleSubmit,
 		watch,
+		control,
 		formState: { errors },
 	} = useForm<FormValues>({
 		resolver: valibotResolver(UpdateFormSchema),
@@ -94,31 +94,33 @@ export const ProfileUpdateForm = () => {
 			studentId: user?.studentId,
 			grade: user?.grade,
 			bio: user?.bio,
+			socialLinks: 
+				user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
+	});
+
+	const {
+		fields: socialLinks,
+		append: appendSocialLink,
+		remove: removeSocialLink,
+	} = useFieldArray({
+		control,
+		name: "socialLinks",
 	});
 
 	const bio = watch("bio");
 	const bioLength = bio?.length || 0;
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setNewLink(e.target.value);
-	};
-
-	const handleAddLink = () => {
-		if (newLink) {
-			setLinks([...links, newLink]);
-			setNewLink("");
-		}
-	};
-
-	const handleDeleteLink = (index: number) => {
-		const newLinks = links.filter((_, i) => i !== index);
-		setLinks(newLinks);
-	};
-
 	return (
 		<form
-			onSubmit={handleSubmit((d) => mutate(d))}
+			onSubmit={handleSubmit((d) => {
+				const socialLinks = d.socialLinks.map((link) => link.value);
+				const payload = {
+					...d,
+					socialLinks,
+				};
+				mutate(payload);
+			})}
 			className={css({
 				width: "100%",
 				display: "flex",
@@ -280,82 +282,41 @@ export const ProfileUpdateForm = () => {
 				</p>
 			</Form.FieldSet>
 			<Form.FieldSet>
-				<h1>ソーシャルリンクを設定する</h1>
-
-				<div
-					style={{
-						marginBottom: "20px",
-						display: "flex",
-						gap: "10px",
-					}}
-				>
-					<Form.Input
-						type="text"
-						value={newLink}
-						onChange={handleChange}
-						placeholder="https://example.com"
-						className={css({
-							padding: "8px",
-							borderRadius: "4px",
-						})}
-					/>
-					<ButtonLike
-						onClick={handleAddLink}
-						className={css({
-							backgroundColor: "#4CAF50",
-							color: "white",
-							padding: "8px 16px",
-							border: "none",
-							borderRadius: "4px",
-							cursor: "pointer",
-						})}
-					>
-						追加
-					</ButtonLike>
-				</div>
-
-				{/* 追加されたリンクの表示 */}
+				<legend>
+					<Form.LabelText>ソーシャルリンク</Form.LabelText>
+				</legend>
 				<div>
-					{links.map((link, index) => (
+					{socialLinks.map((field, index) => (
 						<div
-							key={index}
-							style={{
-								marginBottom: "10px",
-								display: "flex",
-								gap: "10px",
-								alignItems: "center",
-							}}
+							key={field.id}
+							className={css({
+								display: "grid",
+								gridTemplateColumns: "1fr auto",
+								gap: 4,
+								placeItems: "center",
+							})}
 						>
-							{/* 表示用のinput（変更不可） */}
 							<Form.Input
-								type="text"
-								value={link}
 								placeholder="https://example.com"
-								disabled
-								className={css({
-									width: "100%",
-									padding: "8px",
-									borderRadius: "4px",
-									marginBottom: "5px",
-								})}
+								{...register(`socialLinks.${index}.value`)}
 							/>
-
-							{/* 削除ボタン */}
-							<ButtonLike
-								onClick={() => handleDeleteLink(index)}
-								className={css({
-									backgroundColor: "#4caf50",
-									color: "white",
-									padding: "5px 10px",
-									border: "none",
-									borderRadius: "4px",
-									cursor: "pointer",
-								})}
+							<IconButton 
+								label="Remove social link"
+								onClick={() => removeSocialLink(index)}
 							>
-								削除
-							</ButtonLike>
+								<X size={16} />
+							</IconButton>
 						</div>
 					))}
+					<button
+						type="button"
+						onClick={() => appendSocialLink({ value: ""})}
+					>
+						<ButtonLike variant="text" size="sm">
+							<Plus size={16} />
+							Add
+						</ButtonLike>
+					</button>
 				</div>
 			</Form.FieldSet>
 
