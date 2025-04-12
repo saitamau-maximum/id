@@ -26,7 +26,7 @@ export const users = sqliteTable("users", {
 	invitationId: text("invitation_id").references(
 		(): AnySQLiteColumn => invites.id,
 	),
-	/* 最後に会費を"支払ったことを確認した"日時 (払った日時ではない)。NULLかつ年度移行期間(毎年4月中)は、会費未納でもinvitationIdがNULLであれば会員とみなす。 */
+	/* 最後に会費を"支払ったことを確認した"日時 (払った日時ではない)。 */
 	lastPaymentConfirmedAt: integer("last_payment_confirmed_at", {
 		mode: "timestamp",
 	}),
