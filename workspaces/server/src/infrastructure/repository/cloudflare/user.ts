@@ -236,7 +236,13 @@ export class CloudflareUserRepository implements IUserRepository {
 			},
 		});
 
-		return users.map((user) => ({
+		// メンバーのみを取得
+		// TODO: SQLでフィルタする
+		const members = users.filter((user) =>
+			user.roles.some((role) => role.roleId === ROLE_IDS.MEMBER),
+		);
+
+		return members.map((user) => ({
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
