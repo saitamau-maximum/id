@@ -437,7 +437,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			throw new Error("Failed to confirm payment");
 		}
 
-		// 仮実装でMEMBERロールを付与
 		await this.addUserRole(userId, ROLE_IDS.MEMBER);
 	}
 
