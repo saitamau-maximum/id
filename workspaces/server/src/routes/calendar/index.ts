@@ -41,7 +41,7 @@ const route = app
 				return c.text("Unauthorized", 401);
 			}
 			if (!user.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
-				return c.text("Unauthorized", 401);
+				return c.text("Forbidden", 403);
 			}
 		} catch (e) {
 			return c.text("Unauthorized", 401);
