@@ -35,6 +35,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthConnections: many(oauthConnections),
 	roles: many(userRoles),
 	certifications: many(userCertifications),
+	socialLinks: many(socialLinks),
 }));
 
 export const userProfiles = sqliteTable(

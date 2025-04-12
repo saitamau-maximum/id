@@ -83,6 +83,7 @@ export class CloudflareUserRepository implements IUserRepository {
 						certification: true,
 					},
 				},
+				socialLinks: true,
 			},
 		});
 
@@ -103,6 +104,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
 			bio: user.profile.bio ?? undefined,
+			socialLinks: user.socialLinks.map((link) => link.url),
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			certifications: user.certifications.map((cert) => ({
 				id: cert.certification.id,
