@@ -1,11 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
-import { ROLE_BY_ID, ROLE_IDS } from "../../constants/role";
+import { ROLE_BY_ID } from "../../constants/role";
 import { factory } from "../../factory";
-import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
-} from "../../middleware/auth";
+import { adminOnlyMiddleware } from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -14,12 +11,7 @@ const UpdateRoleRequestSchema = v.object({
 });
 
 const route = app
-	.use(authMiddleware)
-	.use(
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
-	)
+	.use(adminOnlyMiddleware)
 	.get("/list", async (c) => {
 		const { UserRepository } = c.var;
 		try {
