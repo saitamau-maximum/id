@@ -79,6 +79,7 @@ export interface IUserRepository {
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	addUserRole: (userId: string, roleId: number) => Promise<void>;
 	fetchRolesByUserId: (userId: string) => Promise<number[]>;
 	fetchProvisionalUsers: () => Promise<User[]>;
 	approveProvisionalUser: (userId: string) => Promise<void>;

@@ -362,6 +362,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
+	async addUserRole(userId: string, roleId: number): Promise<void> {
+		const res = await this.client
+			.insert(schema.userRoles)
+			.values({
+				userId,
+				roleId,
+			})
+			.onConflictDoNothing();
+
+		if (!res.success) {
+			throw new Error("Failed to add user role");
+		}
+	}
+
 	async fetchProvisionalUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
@@ -408,7 +422,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 
 		// 仮実装でMEMBERロールを付与
-		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
 	}
 
 	async confirmPayment(userId: string): Promise<void> {
@@ -424,7 +438,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 
 		// 仮実装でMEMBERロールを付与
-		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
 	}
 
 	async rejectProvisionalUser(userId: string): Promise<void> {
