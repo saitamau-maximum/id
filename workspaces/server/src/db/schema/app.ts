@@ -26,6 +26,10 @@ export const users = sqliteTable("users", {
 	invitationId: text("invitation_id").references(
 		(): AnySQLiteColumn => invites.id,
 	),
+	/* 最後に会費を"支払ったことを確認した"日時 (払った日時ではない)。 */
+	lastPaymentConfirmedAt: integer("last_payment_confirmed_at", {
+		mode: "timestamp",
+	}),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

@@ -7,6 +7,7 @@ import type { Role } from "./role";
 export type User = {
 	id: string;
 	initializedAt?: Date;
+	lastPaymentConfirmedAt?: Date;
 	isProvisional: boolean;
 	roles: Role[];
 	displayName?: string;

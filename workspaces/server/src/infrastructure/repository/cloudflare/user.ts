@@ -120,6 +120,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -235,10 +236,17 @@ export class CloudflareUserRepository implements IUserRepository {
 			},
 		});
 
-		return users.map((user) => ({
+		// メンバーのみを取得
+		// TODO: SQLでフィルタする
+		const members = users.filter((user) =>
+			user.roles.some((role) => role.roleId === ROLE_IDS.MEMBER),
+		);
+
+		return members.map((user) => ({
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -277,6 +285,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.user.id,
 			initializedAt: user.user.initializedAt,
 			isProvisional: !!user.user.invitationId,
+			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
 			realNameKana: user.realNameKana ?? undefined,
@@ -316,6 +325,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -352,6 +362,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
+	async addUserRole(userId: string, roleId: number): Promise<void> {
+		const res = await this.client
+			.insert(schema.userRoles)
+			.values({
+				userId,
+				roleId,
+			})
+			.onConflictDoNothing();
+
+		if (!res.success) {
+			throw new Error("Failed to add user role");
+		}
+	}
+
 	async fetchProvisionalUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
@@ -366,6 +390,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -388,6 +413,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			.update(schema.users)
 			.set({
 				invitationId: null,
+				lastPaymentConfirmedAt: new Date(),
 			})
 			.where(eq(schema.users.id, userId));
 
@@ -396,7 +422,22 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 
 		// 仮実装でMEMBERロールを付与
-		await this.updateUserRole(userId, [ROLE_IDS.MEMBER]);
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
+	}
+
+	async confirmPayment(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				lastPaymentConfirmedAt: new Date(),
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to confirm payment");
+		}
+
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
 	}
 
 	async rejectProvisionalUser(userId: string): Promise<void> {
