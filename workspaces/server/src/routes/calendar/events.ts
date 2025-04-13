@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import { validator } from "hono/validator";
 import * as v from "valibot";
-import { ROLE_IDS } from "../../constants/role";
+import { ROLE_IDS, LEADER_ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
 	authMiddleware,
@@ -41,7 +41,7 @@ const route = app
 	.post(
 		"/",
 		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN, ...Object.values(LEADER_ROLE_IDS)],
 		}),
 		vValidator("json", createEventSchema),
 		validator("json", (value, c) => {
@@ -74,7 +74,7 @@ const route = app
 	.put(
 		"/:id",
 		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN, ...(Object.values(LEADER_ROLE_IDS) as number[])],
 		}),
 		vValidator("json", updateEventSchema),
 		validator("json", (value, c) => {
@@ -108,7 +108,7 @@ const route = app
 	.delete(
 		"/:id",
 		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+			ALLOWED_ROLES: [ROLE_IDS.ADMIN, ...Object.values(LEADER_ROLE_IDS)],
 		}),
 		async (c) => {
 			const { CalendarRepository } = c.var;
