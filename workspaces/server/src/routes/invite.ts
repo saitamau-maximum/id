@@ -86,40 +86,6 @@ const protectedRoute = app
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}
-	})
-	.put("/:id", async (c) => {
-		const id = c.req.param("id");
-		try {
-			const invite = await c.var.InviteRepository.getInviteById(id);
-
-			if (!invite) {
-				return c.text("Invite not found", 404);
-			}
-
-			// 招待リンクの残り使用回数について検証
-			if (invite.remainingUse !== null && invite.remainingUse <= 0) {
-				return c.text("Invite has no remaining uses", 400);
-			}
-
-			// 招待リンクの有効期限について検証
-			if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
-				return c.text("Invite has expired", 400);
-			}
-
-			await c.var.InviteRepository.reduceInviteUsage(id);
-			return c.json({ message: "invite code successfully used" });
-		} catch (e) {
-			return c.text("Internal Server Error", 500);
-		}
-	})
-	.delete("/:id", async (c) => {
-		const id = c.req.param("id");
-		try {
-			await c.var.InviteRepository.deleteInvite(id);
-			return c.json({ message: "invite code successfully deleted" });
-		} catch (e) {
-			return c.text("Internal Server Error", 500);
-		}
 	});
 
 const route = app.route("/", publicRoute).route("/", protectedRoute);
