@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { MemberCard } from "~/components/feature/user/member-card";
-import { AnchorLike } from "~/components/ui/anchor-like";
 import { Details } from "~/components/ui/details";
 import { Progress } from "~/components/ui/progess";
 import { Table } from "~/components/ui/table";
@@ -138,9 +137,8 @@ export default function PaymentInfo() {
 				>
 					<Details summary="方法1: 対面での支払い">
 						<p>
-							対面の活動に参加し、運営メンバーに{" "}
+							対面の活動に参加し、会計担当に{" "}
 							<Emphasize>この画面を見せて</Emphasize> 現金でお支払いください。
-							運営メンバーは、サークルの活動に参加しているメンバーであれば誰でも構いません。
 						</p>
 					</Details>
 					<Details summary="方法2: 銀行振込での支払い">
@@ -196,11 +194,8 @@ export default function PaymentInfo() {
 				>
 					ページを閉じても、再度アクセス(GitHubでログイン)すればまた表示されますので、ご安心ください。
 					<br />
-					その他、不明点があれば、気軽に
-					<a href="https://x.com/Maximum03400346">
-						<AnchorLike>公式X</AnchorLike>
-					</a>
-					やメンバーへお尋ねください。
+					その他、不明点があれば、気軽に新歓用 Discord
+					サーバーやメンバーへお尋ねください。
 				</p>
 			</div>
 		</div>
