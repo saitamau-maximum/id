@@ -5,6 +5,7 @@ import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt" | "bio"> & {
 	initialized: boolean;
+	displayOnly?: boolean;
 };
 
 export const MemberCard: React.FC<Props> = ({
@@ -16,6 +17,7 @@ export const MemberCard: React.FC<Props> = ({
 	grade,
 	initialized,
 	roles,
+	displayOnly = false,
 }) => {
 	const truncatedRoles = roles.slice(0, 3);
 	const rolesLeft = roles.length - truncatedRoles.length;
@@ -198,7 +200,7 @@ export const MemberCard: React.FC<Props> = ({
 		</div>
 	);
 
-	if (!initialized) {
+	if (!initialized || displayOnly) {
 		return Inner;
 	}
 
