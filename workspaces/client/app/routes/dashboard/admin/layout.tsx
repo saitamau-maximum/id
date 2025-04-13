@@ -1,5 +1,3 @@
-import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
-import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
@@ -64,18 +62,13 @@ const NAVIGATION = [
 ];
 
 export default function AdminLayout() {
-	const { user, isLoading, isAuthorized } = useAuth();
+	const { user } = useAuth();
 	const { data: requests } = useCertificationRequests();
 
-	useEffect(() => {
-		if (isLoading || !isAuthorized) {
-			return;
-		}
-	}, [isLoading, isAuthorized]);
-
-	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
+	if (!user) {
 		return null;
 	}
+
 	return (
 		<div>
 			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
