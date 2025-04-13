@@ -6,6 +6,8 @@ import { useAuth } from "~/hooks/use-auth";
 import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
+import type { User } from "~/types/user";
+import { USER_ALLOWED_ROLES } from "./users/layout";
 
 const NAVIGATION = [
 	{
@@ -14,6 +16,8 @@ const NAVIGATION = [
 		isActive: (location: string) => location === "/admin",
 	},
 	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) => (USER_ALLOWED_ROLES as number[]).includes(r.id)),
 		label: "Users",
 		to: "/admin/users",
 		isActive: (location: string) => location.startsWith("/admin/users"),
@@ -54,12 +58,9 @@ export default function AdminLayout() {
 		if (isLoading || !isAuthorized) {
 			return;
 		}
-		if (!user?.roles.some((role) => role.id === ROLE_IDS.ADMIN)) {
-			navigate("/");
-		}
-	}, [isLoading, isAuthorized, user, navigate]);
+	}, [isLoading, isAuthorized]);
 
-	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.ADMIN)) {
+	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
 		return null;
 	}
 
@@ -68,6 +69,7 @@ export default function AdminLayout() {
 			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
 			<Tab.List>
 				{NAVIGATION.map((nav) => (
+					(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
 					<Tab.Item
 						key={nav.to}
 						to={nav.to}
@@ -78,7 +80,7 @@ export default function AdminLayout() {
 					>
 						{nav.label}
 					</Tab.Item>
-				))}
+				)))}
 			</Tab.List>
 			<Outlet />
 		</div>

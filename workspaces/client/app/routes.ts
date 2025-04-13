@@ -22,7 +22,11 @@ export default [
 			...prefix("admin", [
 				layout("routes/dashboard/admin/layout.tsx", [
 					index("routes/dashboard/admin/home/page.tsx"),
-					route("users", "routes/dashboard/admin/users/page.tsx"),
+					...prefix("users", [
+						layout("routes/dashboard/admin/users/layout.tsx", [
+							index("routes/dashboard/admin/users/page.tsx"),
+						]),
+					]),
 					...(FLAG.ENABLE_INVITE
 						? [route("invites", "routes/dashboard/admin/invites/page.tsx")]
 						: []),
