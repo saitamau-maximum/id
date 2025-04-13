@@ -63,13 +63,13 @@ const route = app
 			const githubConn = oauthConnections.find(
 				(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 			);
-			if (!githubConn || !githubConn.userId) {
+			if (!githubConn || !githubConn.providerUserId) {
 				return c.text("User not found", 404);
 			}
 
 			// 念のため int としてパースして検証
-			const githubUserId = Number.parseInt(githubConn.userId, 10);
-			if (githubUserId.toString() !== githubConn.userId) {
+			const githubUserId = Number.parseInt(githubConn.providerUserId, 10);
+			if (githubUserId.toString() !== githubConn.providerUserId) {
 				return c.text("Invalid GitHub user ID", 500);
 			}
 			// GitHub Organization に追加
