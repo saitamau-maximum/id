@@ -3,9 +3,12 @@ import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
+import { SocialIcon } from "~/components/ui/social-icon";
+import { parseSocialLink } from "~/utils/parse-social-link";
 
 type Props = Omit<Member, "certifications"> & {
 	shrinkRoles?: boolean;
+	socialLinks?: string[];
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -17,11 +20,21 @@ export const ProfileCard: React.FC<Props> = ({
 	initialized,
 	roles,
 	bio,
+	socialLinks,
 	shrinkRoles = false,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
 	const rolesLeft = roles.length - trancatedRoles.length;
+
+	const socialLinksDetail = socialLinks?.map((link: string) => {
+		const {	service, handle } = parseSocialLink(link);
+		return {
+			service: service,
+			handle,
+			url: link,
+		};
+	});
 
 	return (
 		<div
@@ -200,34 +213,77 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			{!shrinkRoles && roles.length > 0 && (
-				<div
-					className={css({
-						display: "flex",
-						gap: 2,
-						alignItems: "center",
-						flexWrap: "wrap",
-					})}
-				>
-					{roles.map((role) => (
-						<RoleBadge key={role.name} role={role} />
-					))}
+			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>
+				{(socialLinksDetail ?? []).length > 0 && (
+					<div
+						className={css({
+							display: "flex",
+							flexDirection: "column",
+							gap: "4px",
+							alignItems: "flex-start",
+							minWidth: "120px",
+						})}
+					>
+						{socialLinksDetail?.map((link) => (
+							<a
+								key={link.url}
+								href={link.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className={css({
+									display: "flex",
+									alignItems: "center",
+									gap: 2,
+									textDecoration: "none",
+									fontSize: "lg",
+								})}
+							>
+								<SocialIcon service={link.service} />
+								<span
+									className={css({
+										fontSize: "sm",
+										mdDown: {
+											fontSize: "sm",
+										},
+									})}
+								>
+									{link.handle}
+								</span>
+							</a>
+						))}
+					</div>
+				)}
+				<div>
+					{!shrinkRoles && roles.length > 0 && (
+						<div
+							className={css({
+								display: "flex",
+								gap: 2,
+								alignItems: "center",
+								flexWrap: "wrap",
+							})}
+						>
+							{roles.map((role) => (
+								<RoleBadge key={role.name} role={role} />
+							))}
+						</div>
+					)}
+					{bio && (
+						<Document
+							inlineOnly
+							className={css({
+								color: "gray.500",
+								fontSize: "md",
+								mdDown: {
+									fontSize: "sm",
+								},
+							})}
+						>
+							{bioPreviewContent}
+						</Document>
+					)}
 				</div>
-			)}
-			{bio && (
-				<Document
-					inlineOnly
-					className={css({
-						color: "gray.500",
-						fontSize: "md",
-						mdDown: {
-							fontSize: "sm",
-						},
-					})}
-				>
-					{bioPreviewContent}
-				</Document>
-			)}
+			</div>
 		</div>
 	);
 };

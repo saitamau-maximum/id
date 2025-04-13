@@ -62,6 +62,7 @@ export default function Home() {
 						initialized={user.initialized}
 						roles={user.roles}
 						bio={user.bio}
+						socialLinks={user.socialLinks}
 					/>
 				</div>
 				{FLAG.ENABLE_CERTIFICATION && (
