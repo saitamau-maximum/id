@@ -3,7 +3,7 @@ import { validator } from "hono/validator";
 import * as v from "valibot";
 import { factory } from "../../factory";
 import {
-	adminOnlyMiddleware,
+	adminAndLeaderOnlyMiddleware,
 	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
@@ -38,7 +38,7 @@ const route = app
 	})
 	.post(
 		"/",
-		adminOnlyMiddleware,
+		adminAndLeaderOnlyMiddleware,
 		vValidator("json", createEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -69,7 +69,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		adminOnlyMiddleware,
+		adminAndLeaderOnlyMiddleware,
 		vValidator("json", updateEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -99,7 +99,7 @@ const route = app
 			}
 		},
 	)
-	.delete("/:id", adminOnlyMiddleware, async (c) => {
+	.delete("/:id", adminAndLeaderOnlyMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const id = c.req.param("id");
 		try {
