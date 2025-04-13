@@ -10,7 +10,6 @@ import type { IOAuthExternalRepository } from "./repository/oauth-external";
 import type { IOAuthInternalRepository } from "./repository/oauth-internal";
 import type { IOrganizationRepository } from "./repository/organization";
 import type { ISessionRepository } from "./repository/session";
-import type { ISocialLinkRepository } from "./repository/social-link";
 import type {
 	IOAuthAppStorageRepository,
 	IUserStorageRepository,
@@ -30,7 +29,6 @@ export type HonoEnv = {
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
 		CalendarRepository: ICalendarRepository;
-		SocialLinkRepository: ISocialLinkRepository;
 		CertificationRepository: ICertificationRepository;
 		InviteRepository: IInviteRepository;
 		LocationRepository: ILocationRepository;
