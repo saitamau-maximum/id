@@ -12,14 +12,20 @@ export default function Login() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
-	const { isInvited } = useInvitation();
+	const { invitationCode } = useInvitation();
 
 	const shouldProceed = !isLoading && isAuthorized && isMember;
 
+	const loginUrl = new URL(`${env("SERVER_HOST")}/auth/login/github`);
+
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
-	const continueToURL = encodeURIComponent(
-		searchParams.get("continue_to") ?? `${window.location.origin}/verify`,
-	);
+	const continueToURL =
+		searchParams.get("continue_to") ?? `${window.location.origin}/verify`;
+	loginUrl.searchParams.set("continue_to", continueToURL);
+
+	// もし招待コードがあれば使う
+	if (invitationCode)
+		loginUrl.searchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
 		if (shouldProceed) {
@@ -91,16 +97,14 @@ export default function Login() {
 				Maximum IDPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
-				{isInvited && (
+				{invitationCode && (
 					<p>
 						招待を受け入れるには以下のボタンから GitHub
 						アカウントでログインしてください。
 					</p>
 				)}
 			</p>
-			<a
-				href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
-			>
+			<a href={loginUrl.toString()}>
 				<LoginButtonLike />
 			</a>
 		</div>
