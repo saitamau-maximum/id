@@ -41,10 +41,28 @@ export const TEAM_ROLE_IDS = {
 	INFRA: 208,
 } as const;
 
+export const LEADER_ROLE_IDS ={
+    /** リーダー：競技プログラミング */
+	LEADER_CP: 302,
+    /** リーダー：Web */
+	LEADER_WEB: 303,
+    /** リーダー：AI */
+	LEADER_AI: 304,
+    /** リーダー：CTF */
+	LEADER_CTF: 305,
+    /** リーダー：モバイルアプリ */
+	LEADER_MOBILE: 306,
+    /** リーダー：ゲーム開発 */
+	LEADER_GAME: 307,
+    /** リーダー：インフラ */
+	LEADER_INFRA: 308,
+} as const;
+
 export const ROLE_IDS = {
 	...JOB_ROLE_IDS,
 	...STATUS_ROLE_IDS,
 	...TEAM_ROLE_IDS,
+	...LEADER_ROLE_IDS,
 } as const;
 
 // もしROLE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
@@ -126,5 +144,40 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		id: ROLE_IDS.DEV,
 		name: "開発",
 		color: "#0000FF",
+	},
+	[ROLE_IDS.LEADER_CP]: {
+		id: ROLE_IDS.LEADER_CP,
+		name: "班長：競プロ",
+		color: "#C8AA00",
+	},
+	[ROLE_IDS.LEADER_WEB]: {
+		id: ROLE_IDS.LEADER_WEB,
+		name: "班長：Web",
+		color: "#FF1493",
+	},
+	[ROLE_IDS.LEADER_AI]: {
+		id: ROLE_IDS.LEADER_AI,
+		name: "班長：広義AI",
+		color: "#00BFFF",
+	},
+	[ROLE_IDS.LEADER_CTF]: {
+		id: ROLE_IDS.LEADER_CTF,
+		name: "班長：CTF",
+		color: "#800080",
+	},
+	[ROLE_IDS.LEADER_MOBILE]: {
+		id: ROLE_IDS.LEADER_MOBILE,
+		name: "班長：モバイルアプリ",
+		color: "#1F0084",
+	},
+	[ROLE_IDS.LEADER_GAME]: {
+		id: ROLE_IDS.LEADER_GAME,
+		name: "班長：ゲーム開発",
+		color: "#FF69B4",
+	},
+	[ROLE_IDS.LEADER_INFRA]: {
+		id: ROLE_IDS.LEADER_INFRA,
+		name: "班長：インフラ",
+		color: "#008000",
 	},
 };
