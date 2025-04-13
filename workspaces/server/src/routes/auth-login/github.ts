@@ -148,20 +148,6 @@ const route = app
 							await c.var.InviteRepository.getInviteById(invitationId);
 						if (!invitation) return c.text(INVITATION_ERROR_MESSAGE, 400);
 
-						// 利用可能回数の検証
-						if (
-							invitation.remainingUse !== null &&
-							invitation.remainingUse <= 0
-						)
-							return c.text(INVITATION_ERROR_MESSAGE, 400);
-
-						// 有効期限の検証
-						if (
-							invitation.expiresAt !== null &&
-							invitation.expiresAt < new Date()
-						)
-							return c.text(INVITATION_ERROR_MESSAGE, 400);
-
 						// 招待コードが有効な場合は消費する
 						await c.var.InviteRepository.reduceInviteUsage(invitationId);
 					} catch {

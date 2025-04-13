@@ -54,6 +54,16 @@ export class CloudflareInviteRepository implements IInviteRepository {
 		if (!res) {
 			throw new Error(`Invite with ID ${id} not found`);
 		}
+
+		// 利用可能回数の検証
+		if (res.remainingUse !== null && res.remainingUse <= 0) {
+			throw new Error(`Invite with ID ${id} is no longer available`);
+		}
+		// 有効期限の検証
+		if (res.expiresAt !== null && res.expiresAt < new Date()) {
+			throw new Error(`Invite with ID ${id} has expired`);
+		}
+
 		return res;
 	}
 
