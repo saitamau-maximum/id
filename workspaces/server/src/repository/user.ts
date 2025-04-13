@@ -28,6 +28,7 @@ export type User = {
 	// 現状は authMiddleware を介しているため招待コードを載せる実装にしてもよいが、
 	// 将来的に public API から招待コードが外部に漏洩するリスクを考慮し "仮登録か？" 状態だけ返すようにする
 	isProvisional: boolean;
+	lastPaymentConfirmedAt: Date | null;
 	roles: Role[];
 } & Partial<Profile>;
 
@@ -78,8 +79,10 @@ export interface IUserRepository {
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	addUserRole: (userId: string, roleId: number) => Promise<void>;
 	fetchRolesByUserId: (userId: string) => Promise<number[]>;
 	fetchProvisionalUsers: () => Promise<User[]>;
 	approveProvisionalUser: (userId: string) => Promise<void>;
+	confirmPayment: (userId: string) => Promise<void>;
 	rejectProvisionalUser: (userId: string) => Promise<void>;
 }

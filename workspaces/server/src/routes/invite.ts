@@ -4,12 +4,8 @@ import { cors } from "hono/cors";
 import type { CookieOptions } from "hono/utils/cookie";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
-import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
-import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
-} from "../middleware/auth";
+import { adminOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
@@ -53,12 +49,7 @@ const publicRoute = app
 	});
 
 const protectedRoute = app
-	.use(authMiddleware)
-	.use(
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
-	)
+	.use(adminOnlyMiddleware)
 	.get("/", async (c) => {
 		const { InviteRepository } = c.var;
 		try {

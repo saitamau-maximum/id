@@ -2,8 +2,9 @@ import { vValidator } from "@hono/valibot-validator";
 import { sign, verify } from "hono/jwt";
 import { type EventAttributes, createEvents } from "ics";
 import * as v from "valibot";
+import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
-import { authMiddleware } from "../../middleware/auth";
+import { memberOnlyMiddleware } from "../../middleware/auth";
 import { calendarEventRoute } from "./events";
 import { calendarLocationRoute } from "./location";
 
@@ -17,7 +18,7 @@ const route = app
 	// 活動場所等が筒抜けになると怖いので、基本的には認証が必要とする
 	.route("/events", calendarEventRoute)
 	.route("/locations", calendarLocationRoute)
-	.post("/generate-url", authMiddleware, async (c) => {
+	.post("/generate-url", memberOnlyMiddleware, async (c) => {
 		const { userId } = c.get("jwtPayload");
 		// 毎回同じトークンを生成するのはあまり良くないので、ランダムな文字列を付与する
 		const randomString = Math.random().toString(36).slice(2);
@@ -27,8 +28,21 @@ const route = app
 	})
 	.get("/calendar.ics", vValidator("query", iCalParamSchema), async (c) => {
 		const { token } = c.req.valid("query");
+		const { UserRepository } = c.var;
 		try {
-			await verify(token, c.env.SECRET);
+			const payload = await verify(token, c.env.SECRET);
+			if (!payload) {
+				return c.text("Unauthorized", 401);
+			}
+			const { userId } = payload;
+			// ユーザーがメンバーであることを確認する
+			const user = await UserRepository.fetchUserProfileById(userId as string);
+			if (!user) {
+				return c.text("Unauthorized", 401);
+			}
+			if (!user.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
+				return c.text("Forbidden", 403);
+			}
 		} catch (e) {
 			return c.text("Unauthorized", 401);
 		}

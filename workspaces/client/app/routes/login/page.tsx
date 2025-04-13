@@ -8,13 +8,13 @@ import { env } from "~/utils/env";
 import { LoginButtonLike } from "./internal/components/login-button";
 
 export default function Login() {
-	const { isLoading, isAuthorized } = useAuth();
+	const { isLoading, isAuthorized, isMember } = useAuth();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
 	const { isInvited } = useInvitation();
 
-	const shouldProceed = !isLoading && isAuthorized;
+	const shouldProceed = !isLoading && isAuthorized && isMember;
 
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
 	const continueToURL = encodeURIComponent(

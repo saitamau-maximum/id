@@ -3,17 +3,31 @@ import { Outlet, useNavigate } from "react-router";
 import { css, cx } from "styled-system/css";
 import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
+import { useToast } from "~/hooks/use-toast";
 import { Sidebar } from "./internal/components/sidebar";
 
 export default function Dashboard() {
 	const navigate = useNavigate();
-	const { isLoading, isAuthorized, isInitialized, isProvisional } = useAuth();
+	const { isLoading, isAuthorized, isInitialized, isProvisional, isMember } =
+		useAuth();
+	const { pushToast } = useToast();
 
 	useEffect(() => {
 		if (isLoading) return;
 
 		// 認証されていない場合はログイン画面へ
 		if (!isAuthorized) {
+			navigate("/login");
+			return;
+		}
+
+		// メンバーでない場合もログイン画面へ
+		if (!isMember) {
+			pushToast({
+				title: "このアカウントはメンバーではありません",
+				description: "参加するには招待を受ける必要があります",
+				type: "error",
+			});
 			navigate("/login");
 			return;
 		}
@@ -29,12 +43,25 @@ export default function Dashboard() {
 			navigate("/payment-info");
 			return;
 		}
-	}, [isLoading, isAuthorized, isInitialized, isProvisional, navigate]);
+	}, [
+		isLoading,
+		isAuthorized,
+		isInitialized,
+		isProvisional,
+		isMember,
+		navigate,
+		pushToast,
+	]);
 
 	// リダイレクトされるべき場合は何も表示しない
-	if (isLoading || !isAuthorized || !isInitialized || isProvisional) {
+	if (
+		isLoading ||
+		!isAuthorized ||
+		!isMember ||
+		!isInitialized ||
+		isProvisional
+	)
 		return null;
-	}
 
 	return (
 		<div className={css({ display: "flex", height: "100%" })}>

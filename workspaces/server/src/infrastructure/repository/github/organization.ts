@@ -16,4 +16,11 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 			.then((res) => (res.status as number) === 204)
 			.catch(() => false);
 	}
+
+	async inviteToOrganization(githubId: number): Promise<void> {
+		await this.octokit.request("POST /orgs/{org}/invitations", {
+			org: "saitamau-maximum",
+			invitee_id: githubId,
+		});
+	}
 }

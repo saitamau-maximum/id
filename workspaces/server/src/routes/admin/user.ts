@@ -1,11 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
-import { ROLE_BY_ID, ROLE_IDS } from "../../constants/role";
+import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
+import { ROLE_BY_ID } from "../../constants/role";
 import { factory } from "../../factory";
-import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
-} from "../../middleware/auth";
+import { adminOnlyMiddleware } from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -14,12 +12,7 @@ const UpdateRoleRequestSchema = v.object({
 });
 
 const route = app
-	.use(authMiddleware)
-	.use(
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
-	)
+	.use(adminOnlyMiddleware)
 	.get("/list", async (c) => {
 		const { UserRepository } = c.var;
 		try {
@@ -61,9 +54,30 @@ const route = app
 	})
 	.post("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");
-		const { UserRepository } = c.var;
+		const { UserRepository, OrganizationRepository, OAuthInternalRepository } =
+			c.var;
 		try {
+			// GitHub OAuth で認証している前提
+			const oauthConnections =
+				await OAuthInternalRepository.fetchOAuthConnectionsByUserId(userId);
+			const githubConn = oauthConnections.find(
+				(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+			);
+			if (!githubConn || !githubConn.userId) {
+				return c.text("User not found", 404);
+			}
+
+			// 念のため int としてパースして検証
+			const githubUserId = Number.parseInt(githubConn.userId, 10);
+			if (githubUserId.toString() !== githubConn.userId) {
+				return c.text("Invalid GitHub user ID", 500);
+			}
+			// GitHub Organization に追加
+			await OrganizationRepository.inviteToOrganization(githubUserId);
+
+			// すべてが終わったら DB を書き換えて承認済みとする
 			await UserRepository.approveProvisionalUser(userId);
+
 			return c.text("ok", 200);
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);
@@ -74,6 +88,16 @@ const route = app
 		const { UserRepository } = c.var;
 		try {
 			await UserRepository.rejectProvisionalUser(userId);
+			return c.text("ok", 200);
+		} catch (e) {
+			return c.json({ error: "Internal Server Error" }, 500);
+		}
+	})
+	.post("/:userId/confirm-payment", async (c) => {
+		const userId = c.req.param("userId");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.confirmPayment(userId);
 			return c.text("ok", 200);
 		} catch (e) {
 			return c.json({ error: "Internal Server Error" }, 500);

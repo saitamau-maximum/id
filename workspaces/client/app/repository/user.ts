@@ -6,9 +6,9 @@ export interface UserRegisterParams {
 	realName: string;
 	realNameKana: string;
 	displayId: string;
-	academicEmail: string;
+	academicEmail?: string;
 	email: string;
-	studentId: string;
+	studentId?: string;
 	grade: string;
 }
 
@@ -17,9 +17,9 @@ export interface ProfileUpdateParams {
 	realName: string;
 	realNameKana: string;
 	displayId: string;
-	academicEmail: string;
+	academicEmail?: string;
 	email: string;
-	studentId: string;
+	studentId?: string;
 	grade: string;
 	bio: string;
 }
@@ -42,6 +42,7 @@ export interface IUserRepository {
 	getAllProvisionalUsers$$key: () => unknown[];
 	approveInvitation: (userId: string) => Promise<void>;
 	rejectInvitation: (userId: string) => Promise<void>;
+	confirmPayment: (userId: string) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -124,6 +125,9 @@ export class UserRepositoryImpl implements IUserRepository {
 			initializedAt: user.initializedAt
 				? new Date(user.initializedAt)
 				: undefined,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
+				? new Date(user.lastPaymentConfirmedAt)
+				: undefined,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 		}));
 	}
@@ -168,6 +172,9 @@ export class UserRepositoryImpl implements IUserRepository {
 			initializedAt: user.initializedAt
 				? new Date(user.initializedAt)
 				: undefined,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
+				? new Date(user.lastPaymentConfirmedAt)
+				: undefined,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 		}));
 	}
@@ -195,6 +202,17 @@ export class UserRepositoryImpl implements IUserRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to reject invitation");
+		}
+	}
+
+	async confirmPayment(userId: string) {
+		const res = await client.admin.users[":userId"]["confirm-payment"].$post({
+			param: {
+				userId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to confirm payment");
 		}
 	}
 }
