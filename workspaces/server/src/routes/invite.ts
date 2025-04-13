@@ -15,7 +15,12 @@ const createInviteSchema = v.object({
 const publicRoute = app.get("/:id", async (c) => {
 	const id = c.req.param("id");
 	const { InviteRepository } = c.var;
-	return c.json({ isValid: await validateInvitation(InviteRepository, id) });
+	try {
+		await validateInvitation(InviteRepository, id);
+		return c.text("OK", 200);
+	} catch (e) {
+		return c.text((e as Error).message, 400);
+	}
 });
 
 const protectedRoute = app

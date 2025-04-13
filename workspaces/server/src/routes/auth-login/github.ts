@@ -155,15 +155,11 @@ const route = app
 				if (typeof invitationId === "string") {
 					// 招待コードの署名検証に成功しているので、コードを検証する
 					try {
-						if (
-							!(await validateInvitation(c.var.InviteRepository, invitationId))
-						)
-							return c.text(INVITATION_ERROR_MESSAGE, 400);
-
-						// 招待コードが有効な場合は消費する
+						// 招待コードが有効かチェックし、有効な場合は消費する
+						await validateInvitation(c.var.InviteRepository, invitationId);
 						await c.var.InviteRepository.reduceInviteUsage(invitationId);
-					} catch {
-						return c.text(INVITATION_ERROR_MESSAGE, 400);
+					} catch (e) {
+						return c.text((e as Error).message, 400);
 					}
 					// 招待コードが有効な場合、仮登録処理を行う
 					foundUserId = await c.var.UserRepository.createTemporaryUser(

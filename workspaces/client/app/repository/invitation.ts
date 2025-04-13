@@ -66,8 +66,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 				id: params.invitationId,
 			},
 		});
-		const data = await res.json();
-		return data.isValid;
+		return res.ok;
 	}
 
 	fetchInvitation$$key(invitationId: string): unknown[] {
