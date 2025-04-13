@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router";
 import { css, cx } from "styled-system/css";
 import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
+import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { Sidebar } from "./internal/components/sidebar";
 
@@ -11,6 +12,7 @@ export default function Dashboard() {
 	const { isLoading, isAuthorized, isInitialized, isProvisional, isMember } =
 		useAuth();
 	const { pushToast } = useToast();
+	const { setInvitationCode } = useInvitation();
 
 	useEffect(() => {
 		if (isLoading) return;
@@ -22,6 +24,7 @@ export default function Dashboard() {
 		}
 
 		// メンバーでない場合もログイン画面へ
+		// TODO: ここ無限リダイレクトにならないか？
 		if (!isMember) {
 			pushToast({
 				title: "このアカウントはメンバーではありません",
@@ -31,6 +34,9 @@ export default function Dashboard() {
 			navigate("/login");
 			return;
 		}
+
+		// どうせログインしたら invitation code は使わないのでリセット
+		setInvitationCode("");
 
 		// 初期登録がまだの場合は初期登録画面へ
 		if (!isInitialized) {
@@ -51,6 +57,7 @@ export default function Dashboard() {
 		isMember,
 		navigate,
 		pushToast,
+		setInvitationCode,
 	]);
 
 	// リダイレクトされるべき場合は何も表示しない
