@@ -8,6 +8,7 @@ import { DashboardHeader } from "../internal/components/dashboard-title";
 import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
 import type { User } from "~/types/user";
 import { USER_ALLOWED_ROLES } from "./users/layout";
+import { INVITES_ALLOWED_ROLES } from "./invites/layout";
 
 const NAVIGATION = [
 	{
@@ -25,6 +26,10 @@ const NAVIGATION = [
 	...(FLAG.ENABLE_INVITE
 		? [
 				{
+					shouldDisplay: (user: User) =>
+						user.roles.some((r) =>
+							(INVITES_ALLOWED_ROLES as number[]).includes(r.id),
+						),
 					label: "Invites",
 					to: "/admin/invites",
 					isActive: (location: string) => location.startsWith("/admin/invites"),

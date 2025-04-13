@@ -28,8 +28,14 @@ export default [
 						]),
 					]),
 					...(FLAG.ENABLE_INVITE
-						? [route("invites", "routes/dashboard/admin/invites/page.tsx")]
-						: []),
+						? [
+								...prefix("invites", [
+									layout("routes/dashboard/admin/invites/layout.tsx", [
+										index("routes/dashboard/admin/invites/page.tsx"),
+									]),
+								]),
+							]
+							: []),
 					...(FLAG.ENABLE_CERTIFICATION
 						? [
 								route(
