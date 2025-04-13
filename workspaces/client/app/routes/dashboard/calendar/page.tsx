@@ -6,7 +6,6 @@ import { EventList } from "~/components/feature/calendar/event-list";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
 import { useDeviceType } from "~/hooks/use-device-type";
-import { DashboardHeader } from "../internal/components/dashboard-title";
 import { ICalDisplay } from "./components/ical-display";
 import { useCalendar } from "./hooks/use-calendar";
 
@@ -58,10 +57,7 @@ export default function CalendarHome() {
 
 	return (
 		<div>
-			<DashboardHeader
-				title="Maximum Calendar"
-				subtitle="サークルの講習会やイベントなどの予定を確認できます"
-			/>
+
 			<div
 				className={css({
 					display: "flex",
