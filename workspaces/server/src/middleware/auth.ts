@@ -68,6 +68,9 @@ export const adminOnlyMiddleware = every(
 export const adminAndLeaderOnlyMiddleware = every(
 	authMiddleware,
 	roleAuthorizationMiddleware({
-		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ...(Object.values(LEADER_ROLE_IDS) as number[])],
+		ALLOWED_ROLES: [
+			ROLE_IDS.ADMIN,
+			...(Object.values(LEADER_ROLE_IDS) as number[]),
+		],
 	}),
 );

@@ -1,11 +1,9 @@
-
-import { useState, useEffect } from "react";
+import { LEADER_ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
 import { DashboardHeader } from "../internal/components/dashboard-title";
-import { LEADER_ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
-
 
 const NAVIGATION = [
 	{
@@ -31,7 +29,11 @@ export default function AdminLayout() {
 			return;
 		}
 		// リーダーロールがない場合、/calendarにリダイレクト
-		if (!user?.roles.some((role) => (Object.values(LEADER_ROLE_IDS) as number[]).includes(role.id))) {
+		if (
+			!user?.roles.some((role) =>
+				(Object.values(LEADER_ROLE_IDS) as number[]).includes(role.id),
+			)
+		) {
 			setIsTabVisible(false);
 			navigate("/calendar"); // 条件を満たさない場合、/calendarにリダイレクト
 		} else {

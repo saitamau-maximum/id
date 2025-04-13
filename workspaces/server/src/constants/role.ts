@@ -41,20 +41,20 @@ export const TEAM_ROLE_IDS = {
 	INFRA: 208,
 } as const;
 
-export const LEADER_ROLE_IDS ={
-    /** リーダー：競技プログラミング */
+export const LEADER_ROLE_IDS = {
+	/** リーダー：競技プログラミング */
 	LEADER_CP: 302,
-    /** リーダー：Web */
+	/** リーダー：Web */
 	LEADER_WEB: 303,
-    /** リーダー：AI */
+	/** リーダー：AI */
 	LEADER_AI: 304,
-    /** リーダー：CTF */
+	/** リーダー：CTF */
 	LEADER_CTF: 305,
-    /** リーダー：モバイルアプリ */
+	/** リーダー：モバイルアプリ */
 	LEADER_MOBILE: 306,
-    /** リーダー：ゲーム開発 */
+	/** リーダー：ゲーム開発 */
 	LEADER_GAME: 307,
-    /** リーダー：インフラ */
+	/** リーダー：インフラ */
 	LEADER_INFRA: 308,
 } as const;
 

@@ -57,7 +57,6 @@ export default function CalendarHome() {
 
 	return (
 		<div>
-
 			<div
 				className={css({
 					display: "flex",
