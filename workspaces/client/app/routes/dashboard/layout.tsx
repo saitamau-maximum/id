@@ -23,17 +23,6 @@ export default function Dashboard() {
 			return;
 		}
 
-		// メンバーでない場合もログイン画面へ
-		if (!isMember) {
-			pushToast({
-				title: "このアカウントはメンバーではありません",
-				description: "参加するには招待を受ける必要があります",
-				type: "error",
-			});
-			navigate("/login");
-			return;
-		}
-
 		// どうせログインしたら invitation code は使わないのでリセット
 		setInvitationCode("");
 
@@ -46,6 +35,17 @@ export default function Dashboard() {
 		// 仮登録ユーザーの場合は入金情報画面へ
 		if (isProvisional) {
 			navigate("/payment-info");
+			return;
+		}
+
+		// メンバーでない場合もログイン画面へ
+		if (!isMember) {
+			pushToast({
+				title: "このアカウントはメンバーではありません",
+				description: "参加するには招待を受ける必要があります",
+				type: "error",
+			});
+			navigate("/login");
 			return;
 		}
 	}, [
