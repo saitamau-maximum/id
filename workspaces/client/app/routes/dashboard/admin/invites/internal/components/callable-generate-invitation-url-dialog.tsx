@@ -90,7 +90,12 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 						label="使用可能回数"
 						type="number"
 						error={errors.remainingUse?.message}
-						{...register("remainingUse")}
+						{...register("remainingUse", {
+							setValueAs: (value) => {
+								if (value === "") return null;
+								return value;
+							},
+						})}
 					/>
 
 					<Form.Field.WithLabel label="有効期限">
@@ -99,7 +104,12 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 								<Form.Input
 									id={id}
 									type="datetime-local"
-									{...register("expiresAt")}
+									{...register("expiresAt", {
+										setValueAs: (value) => {
+											if (value === "") return null;
+											return value;
+										},
+									})}
 								/>
 								<ErrorDisplay error={errors.expiresAt?.message} />
 							</>
