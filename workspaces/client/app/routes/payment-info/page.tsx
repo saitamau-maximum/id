@@ -194,7 +194,7 @@ export default function PaymentInfo() {
 						color: "gray.500",
 					})}
 				>
-					ページを閉じても、再度アクセス(Githubでログイン)すればまた表示されますので、ご安心ください。
+					ページを閉じても、再度アクセス(GitHubでログイン)すればまた表示されますので、ご安心ください。
 					<br />
 					その他、不明点があれば、気軽に
 					<a href="https://x.com/Maximum03400346">
