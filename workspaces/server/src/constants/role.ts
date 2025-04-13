@@ -87,7 +87,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.CALENDAR_EDITOR]: {
 		id: ROLE_IDS.CALENDAR_EDITOR,
 		name: "カレンダー編集者",
-		color: "#FF1493",
+		color: "#FEF2C0",
 	},
 	[ROLE_IDS.ALUMNI]: {
 		id: ROLE_IDS.ALUMNI,
