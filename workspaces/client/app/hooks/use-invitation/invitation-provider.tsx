@@ -6,13 +6,13 @@ interface Props {
 }
 
 export const InvitationProvider = ({ children }: Props) => {
-	const [isInvited, setIsInvited] = useState(false);
+	const [invitationCode, setInvitationCode] = useState("");
 
 	return (
 		<InvitationContext.Provider
 			value={{
-				isInvited,
-				setIsInvited,
+				invitationCode,
+				setInvitationCode,
 			}}
 		>
 			{children}
