@@ -12,7 +12,7 @@ export default function Login() {
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
-	const { isInvited } = useInvitation();
+	const { invitationCode } = useInvitation();
 
 	const shouldProceed = !isLoading && isAuthorized && isMember;
 
@@ -91,7 +91,7 @@ export default function Login() {
 				Maximum IDPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
-				{isInvited && (
+				{invitationCode && (
 					<p>
 						招待を受け入れるには以下のボタンから GitHub
 						アカウントでログインしてください。

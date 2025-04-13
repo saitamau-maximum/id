@@ -1,13 +1,13 @@
 import { createContext } from "react";
 
 interface InvitationContextProps {
-	isInvited: boolean;
-	setIsInvited: (isInvited: boolean) => void;
+	invitationCode: string;
+	setInvitationCode: (invitationCode: string) => void;
 }
 
 export const InvitationContext = createContext<InvitationContextProps>({
-	isInvited: false,
-	setIsInvited: () => {
+	invitationCode: "",
+	setInvitationCode: () => {
 		throw new Error("InvitationContext is not implemented");
 	},
 });

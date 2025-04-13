@@ -13,28 +13,35 @@ export default function Invitation() {
 	const { pushToast } = useToast();
 	const { invitationRepository } = useRepository();
 	const { isLoading, isAuthorized } = useAuth();
-	const { setIsInvited } = useInvitation();
+	const { setInvitationCode } = useInvitation();
 
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
-			const isSucceeded = await invitationRepository.fetchInvitation({
-				invitationId: id,
-			});
-			if (!isSucceeded) {
-				throw new Error("Failed to fetch invitation");
+			try {
+				const isSucceeded = await invitationRepository.fetchInvitation({
+					invitationId: id,
+				});
+				if (isSucceeded) {
+					setInvitationCode(id);
+				} else {
+					pushToast({
+						type: "error",
+						title: "招待コードは無効です",
+						description:
+							"正しい招待コードであるかチェックしてください。もし招待コードが正しい場合は、Admin に連絡してください。",
+					});
+				}
+			} catch {
+				pushToast({
+					type: "error",
+					title: "招待コードの取得に失敗しました",
+					description:
+						"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
+				});
+			} finally {
+				navigate("/login");
 			}
 		},
-		onSuccess: () => {
-			setIsInvited(true);
-			navigate("/login");
-		},
-		onError: () =>
-			pushToast({
-				type: "error",
-				title: "招待コードの取得に失敗しました",
-				description:
-					"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
-			}),
 	});
 
 	useEffect(() => {
