@@ -235,19 +235,22 @@ export const ProfileCard: React.FC<Props> = ({
 									alignItems: "center",
 									gap: 2,
 									textDecoration: "none",
-									fontSize: "lg",
 								})}
 							>
 								<SocialIcon service={link.service} />
 								<span
 									className={css({
+										color: "gray.600",
 										fontSize: "sm",
 										mdDown: {
 											fontSize: "sm",
 										},
+										_hover: {
+											color: "gray.800",
+										}
 									})}
 								>
-									{link.handle}
+								{link.handle}
 								</span>
 							</a>
 						))}

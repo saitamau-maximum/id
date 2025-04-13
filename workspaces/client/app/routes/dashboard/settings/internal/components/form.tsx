@@ -24,6 +24,8 @@ import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
 import { IconButton } from "~/components/ui/icon-button";
+import { SocialIcon } from "~/components/ui/social-icon";
+import { detectSocialService } from "~/utils/parse-social-link";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -94,8 +96,7 @@ export const ProfileUpdateForm = () => {
 			studentId: user?.studentId,
 			grade: user?.grade,
 			bio: user?.bio,
-			socialLinks: 
-				user?.socialLinks?.map((link) => ({ value: link })) ?? [],
+			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
 	});
 
@@ -283,24 +284,36 @@ export const ProfileUpdateForm = () => {
 			</Form.FieldSet>
 			<Form.FieldSet>
 				<legend>
-					<Form.LabelText>ソーシャルリンク</Form.LabelText>
+					<Form.LabelText>ソーシャルリンク (最大5つ)</Form.LabelText>
 				</legend>
-				<div>
+				<div
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: 2,
+						marginTop: 2,
+					})}
+				>
 					{socialLinks.map((field, index) => (
 						<div
 							key={field.id}
 							className={css({
-								display: "grid",
-								gridTemplateColumns: "1fr auto",
+								display: "flex",
 								gap: 4,
 								placeItems: "center",
 							})}
 						>
+							<SocialIcon
+								service={detectSocialService(
+									watch(`socialLinks.${index}.value` || ""),
+								)}
+								size={24}
+							/>
 							<Form.Input
 								placeholder="https://example.com"
 								{...register(`socialLinks.${index}.value`)}
 							/>
-							<IconButton 
+							<IconButton
 								label="Remove social link"
 								onClick={() => removeSocialLink(index)}
 							>
@@ -308,10 +321,7 @@ export const ProfileUpdateForm = () => {
 							</IconButton>
 						</div>
 					))}
-					<button
-						type="button"
-						onClick={() => appendSocialLink({ value: ""})}
-					>
+					<button type="button" onClick={() => appendSocialLink({ value: "" })}>
 						<ButtonLike variant="text" size="sm">
 							<Plus size={16} />
 							Add
