@@ -46,6 +46,8 @@ const roleAuthorizationMiddleware = (
 			return next();
 		}
 
+		c.set("roleIds", roleIds);
+
 		return c.text("Forbidden", 403);
 	});
 };

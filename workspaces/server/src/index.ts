@@ -31,6 +31,8 @@ const app = factory.createApp();
 export const route = app
 	.use(logger())
 	.use(async (c, next) => {
+		c.set("roleIds", []);
+
 		c.set(
 			"SessionRepository",
 			new CloudflareSessionRepository(c.env.IDP_SESSION),
