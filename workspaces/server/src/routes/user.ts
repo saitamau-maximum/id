@@ -39,8 +39,10 @@ const ProfileSchema = v.object({
 		v.regex(/^[a-z0-9_]{3,16}$/),
 	),
 	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
-	academicEmail: v.pipe(v.string(), v.nonEmpty(), v.email()),
-	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
+	academicEmail: v.optional(v.pipe(v.string(), v.nonEmpty(), v.email())),
+	studentId: v.optional(
+		v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
+	),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
 });
@@ -92,6 +94,13 @@ const route = app
 				grade,
 			} = c.req.valid("json");
 
+			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+			if (grade !== "卒業生" && grade !== "ゲスト") {
+				if (!academicEmail || !studentId) {
+					return c.text("academicEmail and studentId are required", 400);
+				}
+			}
+
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);
 			const normalizedRealNameKana = normalizeRealName(realNameKana);
@@ -129,6 +138,13 @@ const route = app
 				grade,
 				bio,
 			} = c.req.valid("json");
+
+			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+			if (grade !== "卒業生" && grade !== "ゲスト") {
+				if (!academicEmail || !studentId) {
+					return c.text("academicEmail and studentId are required", 400);
+				}
+			}
 
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);
