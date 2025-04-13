@@ -41,10 +41,13 @@ export default function Onboarding() {
 					className={css({
 						width: "100%",
 						height: "100%",
-						maxWidth: 500,
+						maxWidth: 640,
 						margin: "auto",
 						padding: 8,
 						gap: 8,
+						mdDown: {
+							padding: 4,
+						},
 					})}
 				>
 					{isProvisional && <Progress steps={registrationSteps} />}
