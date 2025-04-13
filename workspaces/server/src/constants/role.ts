@@ -5,6 +5,8 @@ export const JOB_ROLE_IDS = {
 	ACCOUNTANT: 2,
 	/** 広報 */
 	PR: 3,
+	/** カレンダー編集者 */
+	CALENDAR_EDITOR: 4,
 } as const;
 
 export const STATUS_ROLE_IDS = {
@@ -81,6 +83,11 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		id: ROLE_IDS.PR,
 		name: "広報",
 		color: "#5B00D3",
+	},
+	[ROLE_IDS.CALENDAR_EDITOR]: {
+		id: ROLE_IDS.CALENDAR_EDITOR,
+		name: "カレンダー編集者",
+		color: "#FF1493",
 	},
 	[ROLE_IDS.ALUMNI]: {
 		id: ROLE_IDS.ALUMNI,
