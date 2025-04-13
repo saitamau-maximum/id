@@ -64,3 +64,17 @@ export const adminOnlyMiddleware = every(
 		ALLOWED_ROLES: [ROLE_IDS.ADMIN],
 	}),
 );
+
+export const calendarEditableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.CALENDAR_EDITOR],
+	}),
+);
+
+export const invitesMutableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],
+	}),
+);
