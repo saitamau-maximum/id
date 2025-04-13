@@ -321,8 +321,16 @@ export const ProfileUpdateForm = () => {
 							</IconButton>
 						</div>
 					))}
-					<button type="button" onClick={() => appendSocialLink({ value: "" })}>
-						<ButtonLike variant="text" size="sm">
+					<button
+						type="button"
+						onClick={() => appendSocialLink({ value: "" })}
+						disabled={socialLinks.length >= 5}
+					>
+						<ButtonLike
+							variant="text"
+							size="sm"
+							disabled={socialLinks.length >= 5}
+						>
 							<Plus size={16} />
 							Add
 						</ButtonLike>
