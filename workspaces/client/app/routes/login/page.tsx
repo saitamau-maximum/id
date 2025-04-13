@@ -16,10 +16,17 @@ export default function Login() {
 
 	const shouldProceed = !isLoading && isAuthorized && isMember;
 
+	const loginUrl = new URL(`${env("SERVER_HOST")}/auth/login/github`);
+
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
 	const continueToURL = encodeURIComponent(
 		searchParams.get("continue_to") ?? `${window.location.origin}/verify`,
 	);
+	loginUrl.searchParams.set("continue_to", continueToURL);
+
+	// もし招待コードがあれば使う
+	if (invitationCode)
+		loginUrl.searchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
 		if (shouldProceed) {
@@ -98,9 +105,7 @@ export default function Login() {
 					</p>
 				)}
 			</p>
-			<a
-				href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
-			>
+			<a href={loginUrl.toString()}>
 				<LoginButtonLike />
 			</a>
 		</div>

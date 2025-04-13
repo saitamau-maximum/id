@@ -60,14 +60,24 @@ const callbackRequestQuerySchema = v.object({
 });
 
 const loginRequestQuerySchema = v.object({
-	continue_to: v.optional(v.string()),
+	continue_to: v.string(),
+	invitation_id: v.optional(v.string()),
 });
 
 const route = app
 	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
-		const { continue_to } = c.req.valid("query");
+		const { continue_to, invitation_id } = c.req.valid("query");
 
 		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+		if (invitation_id) {
+			setSignedCookie(
+				c,
+				COOKIE_NAME.INVITATION_ID,
+				invitation_id,
+				c.env.SECRET,
+				getCookieOptions(new URL(c.req.url).protocol === "http:"),
+			);
+		}
 
 		const requestUrl = new URL(c.req.url);
 
