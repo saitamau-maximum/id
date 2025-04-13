@@ -36,6 +36,12 @@ export default function Invitation() {
 			navigate("/login");
 		},
 		onError: () => {
+			pushToast({
+				type: "error",
+				title: "招待コードの取得に失敗しました",
+				description:
+					"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
+			});
 			navigate("/login");
 		},
 	});
