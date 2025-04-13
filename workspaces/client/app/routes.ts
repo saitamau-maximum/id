@@ -46,7 +46,13 @@ export default [
 							]
 						: []),
 					...(FLAG.ENABLE_CALENDAR
-						? [route("events", "routes/dashboard/admin/events/page.tsx")]
+						? [
+							...prefix("events", [
+								layout("routes/dashboard/admin/events/layout.tsx", [
+									index("routes/dashboard/admin/events/page.tsx"),
+								]),
+							]),
+						]
 						: []),
 				]),
 			]),

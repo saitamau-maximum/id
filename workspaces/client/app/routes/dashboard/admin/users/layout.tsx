@@ -22,7 +22,7 @@ export default function UsersAdminLayout() {
 		}
 	}, [isLoading, isAuthorized, user, navigate]);
 
-	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.ADMIN)) {
+	if (isLoading || !user?.roles.some((role) => (USER_ALLOWED_ROLES as number[]).includes(role.id))) {
 		return null;
 	}
     return <Outlet />;
