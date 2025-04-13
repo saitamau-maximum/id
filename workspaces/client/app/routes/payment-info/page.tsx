@@ -138,7 +138,9 @@ export default function PaymentInfo() {
 				>
 					<Details summary="方法1: 対面での支払い">
 						<p>
-							対面の活動に参加し、会計担当にこの画面を見せて現金でお支払いください。
+							対面の活動に参加し、運営メンバーに{" "}
+							<Emphasize>この画面を見せて</Emphasize> 現金でお支払いください。
+							運営メンバーは、サークルの活動に参加しているメンバーであれば誰でも構いません。
 						</p>
 					</Details>
 					<Details summary="方法2: 銀行振込での支払い">
