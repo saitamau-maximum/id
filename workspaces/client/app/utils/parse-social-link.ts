@@ -5,7 +5,19 @@ import {
 	type SocialServiceId,
 } from "../constant";
 
+const isValidUrl = (url: string) => {
+	try {
+		new URL(url);
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
 export const detectSocialService = (url: string) => {
+	if (!isValidUrl(url)) {
+		return SOCIAL_SERVICES_IDS.OTHER;
+	}
 	const host = new URL(url).host;
 	const socialService = SOCIAL_SERVICES_HOST_NAMES.find(
 		(service) => service.host === host,
