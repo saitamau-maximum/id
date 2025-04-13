@@ -123,7 +123,8 @@ export default function PaymentInfo() {
 					サークル費のお支払い
 				</h1>
 				<p className={css({ marginTop: 2 })}>
-					サークル費は <Emphasize>{`${membershipPrice} 円`}</Emphasize>{" "}
+					サークル費は{" "}
+					<Emphasize>{membershipPrice.toLocaleString()} 円</Emphasize>{" "}
 					です。下記の方法でお支払いください。
 				</p>
 				<div
