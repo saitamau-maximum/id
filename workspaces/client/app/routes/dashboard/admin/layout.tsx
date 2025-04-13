@@ -9,6 +9,7 @@ import { useCertificationRequests } from "./internal/hooks/use-certification-req
 import type { User } from "~/types/user";
 import { USER_ALLOWED_ROLES } from "./users/layout";
 import { INVITES_ALLOWED_ROLES } from "./invites/layout";
+import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
 
 const NAVIGATION = [
 	{
@@ -37,6 +38,10 @@ const NAVIGATION = [
 			]
 		: []),
 	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) =>
+				(CERTIFICATIONS_ALLOWED_ROLES as number[]).includes(r.id),
+			),
 		label: "Certifications",
 		to: "/admin/certifications",
 		isActive: (location: string) =>
