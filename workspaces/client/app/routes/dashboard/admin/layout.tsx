@@ -1,6 +1,6 @@
 import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
 import { FLAG } from "~/utils/flag";
@@ -10,6 +10,7 @@ import type { User } from "~/types/user";
 import { USER_ALLOWED_ROLES } from "./users/layout";
 import { INVITES_ALLOWED_ROLES } from "./invites/layout";
 import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
+import { EVENTS_ALLOWED_ROLES } from "./events/layout";
 
 const NAVIGATION = [
 	{
@@ -50,6 +51,10 @@ const NAVIGATION = [
 	...(FLAG.ENABLE_CALENDAR
 		? [
 				{
+					shouldDisplay: (user: User) =>
+						user.roles.some((r) =>
+							(EVENTS_ALLOWED_ROLES as number[]).includes(r.id),
+						),
 					label: "Events",
 					to: "/admin/events",
 					isActive: (location: string) => location.startsWith("/admin/events"),
@@ -59,7 +64,6 @@ const NAVIGATION = [
 ];
 
 export default function AdminLayout() {
-	const navigate = useNavigate();
 
 	const { user, isLoading, isAuthorized } = useAuth();
 	const { data: requests } = useCertificationRequests();
