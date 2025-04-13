@@ -13,6 +13,7 @@ import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
+import { validateInvitation } from "../../service/invite";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
@@ -154,9 +155,10 @@ const route = app
 				if (typeof invitationId === "string") {
 					// 招待コードの署名検証に成功しているので、コードを検証する
 					try {
-						const invitation =
-							await c.var.InviteRepository.getInviteById(invitationId);
-						if (!invitation) return c.text(INVITATION_ERROR_MESSAGE, 400);
+						if (
+							!(await validateInvitation(c.var.InviteRepository, invitationId))
+						)
+							return c.text(INVITATION_ERROR_MESSAGE, 400);
 
 						// 招待コードが有効な場合は消費する
 						await c.var.InviteRepository.reduceInviteUsage(invitationId);

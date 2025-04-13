@@ -2,6 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
 import { adminOnlyMiddleware } from "../middleware/auth";
+import { validateInvitation } from "../service/invite";
 
 const app = factory.createApp();
 
@@ -14,15 +15,7 @@ const createInviteSchema = v.object({
 const publicRoute = app.get("/:id", async (c) => {
 	const id = c.req.param("id");
 	const { InviteRepository } = c.var;
-	try {
-		const invite = await InviteRepository.getInviteById(id);
-		if (!invite) {
-			return c.text("Not Found", 404);
-		}
-		return c.text("OK", 200);
-	} catch {
-		return c.text("Not Found", 404);
-	}
+	return c.json({ isValid: await validateInvitation(InviteRepository, id) });
 });
 
 const protectedRoute = app
