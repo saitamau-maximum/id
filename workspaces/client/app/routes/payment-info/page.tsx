@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
+import { MemberCard } from "~/components/feature/user/member-card";
+import { Details } from "~/components/ui/details";
 import { Progress } from "~/components/ui/progess";
 import { Table } from "~/components/ui/table";
 
@@ -48,6 +50,8 @@ export default function PaymentInfo() {
 	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
 	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
 
+	const membershipPrice = remainingMonth * 250;
+
 	const registrationSteps = [
 		{ label: "仮登録", isActive: true, isCompleted: true },
 		{ label: "入金", isActive: true, isCompleted: false },
@@ -67,66 +71,132 @@ export default function PaymentInfo() {
 				className={css({
 					width: "100%",
 					maxWidth: 1024,
-					minHeight: "100%",
 					margin: "auto",
 					padding: 8,
 					color: "gray.600",
-					display: "flex",
-					flexDirection: "column",
-					justifyContent: "center",
+					marginTop: 128,
+					mdDown: {
+						padding: 4,
+						marginTop: 0,
+					},
 				})}
 			>
-				<Progress steps={registrationSteps} />
+				<div
+					className={css({
+						marginTop: 4,
+						marginBottom: 4,
+					})}
+				>
+					<Progress steps={registrationSteps} />
+				</div>
+
+				<div
+					className={css({
+						marginTop: 8,
+						marginBottom: 8,
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "center",
+					})}
+				>
+					<MemberCard
+						id={user.id}
+						displayId={user.displayId || ""}
+						displayName={user.displayName || ""}
+						profileImageURL={user.profileImageURL}
+						grade={user.grade}
+						realName={user.realName || ""}
+						roles={user.roles}
+						initialized={!!user.initializedAt}
+						displayOnly
+					/>
+				</div>
+
 				<h1
 					className={css({
 						fontSize: "2xl",
 						fontWeight: "bold",
 						color: "gray.700",
-						marginTop: 8,
-						marginBottom: 4,
+						marginTop: 4,
 					})}
 				>
 					サークル費のお支払い
 				</h1>
-				<Table.Root>
-					<Table.Tr>
-						<Table.Th className={css({ width: "120px" })}>銀行名</Table.Th>
-						<Table.Td>青木信用金庫</Table.Td>
-					</Table.Tr>
-					<Table.Tr>
-						<Table.Th className={css({ width: "120px" })}>支店名</Table.Th>
-						<Table.Td>埼大通支店</Table.Td>
-					</Table.Tr>
-					<Table.Tr>
-						<Table.Th className={css({ width: "120px" })}>預金種目</Table.Th>
-						<Table.Td>普通</Table.Td>
-					</Table.Tr>
-					<Table.Tr>
-						<Table.Th className={css({ width: "120px" })}>口座番号</Table.Th>
-						<Table.Td>3456237</Table.Td>
-					</Table.Tr>
-				</Table.Root>
-				<p className={css({ marginTop: 4 })}>
-					口座名義人が <Emphasize>マキシマム</Emphasize> であることを確認し、{" "}
-					<Emphasize>{(remainingMonth * 250).toLocaleString()} 円</Emphasize>{" "}
-					をお振込みください。 振込手数料はご負担願います。
-				</p>
-				<p className={css({ marginTop: 4 })}>
-					Admin が <Emphasize>入金を確認でき次第、本登録完了</Emphasize>{" "}
-					とさせていただきます。
-					確認までに数日かかる場合がありますので、ご了承ください。
-				</p>
 				<p className={css({ marginTop: 2 })}>
-					なお、対面の活動に参加し、会計担当にお支払いいただくことも可能です。
+					サークル費は{" "}
+					<Emphasize>{membershipPrice.toLocaleString()} 円</Emphasize>{" "}
+					です。下記の方法でお支払いください。
 				</p>
+				<div
+					className={css({
+						marginTop: 4,
+						marginBottom: 4,
+						display: "flex",
+						flexDirection: "column",
+						gap: 2,
+					})}
+				>
+					<Details summary="方法1: 対面での支払い">
+						<p>
+							対面の活動に参加し、会計担当に{" "}
+							<Emphasize>この画面を見せて</Emphasize> 現金でお支払いください。
+						</p>
+					</Details>
+					<Details summary="方法2: 銀行振込での支払い">
+						<p className={css({ marginTop: 2 })}>
+							口座名義人が <Emphasize>マキシマム</Emphasize>{" "}
+							であることを確認して以下の口座へお振込みください。
+							<br />
+							振込手数料はご負担願います。
+						</p>
+						<p className={css({ marginTop: 2, marginBottom: 4 })}>
+							<Emphasize>入金を確認でき次第、本登録完了</Emphasize>{" "}
+							とさせていただきます。
+						</p>
+						<Table.Root>
+							<Table.Tr>
+								<Table.Th className={css({ width: "120px" })}>銀行名</Table.Th>
+								<Table.Td>青木信用金庫</Table.Td>
+							</Table.Tr>
+							<Table.Tr>
+								<Table.Th className={css({ width: "120px" })}>支店名</Table.Th>
+								<Table.Td>埼大通支店</Table.Td>
+							</Table.Tr>
+							<Table.Tr>
+								<Table.Th className={css({ width: "120px" })}>
+									預金種目
+								</Table.Th>
+								<Table.Td>普通</Table.Td>
+							</Table.Tr>
+							<Table.Tr>
+								<Table.Th className={css({ width: "120px" })}>
+									口座番号
+								</Table.Th>
+								<Table.Td>3456237</Table.Td>
+							</Table.Tr>
+						</Table.Root>
+						<p
+							className={css({
+								fontSize: "sm",
+								marginTop: 4,
+								color: "gray.500",
+							})}
+						>
+							※入金は確認までに数日かかる場合がありますので、ご了承ください。
+						</p>
+					</Details>
+				</div>
 				<p
 					className={css({
 						fontSize: "sm",
 						marginTop: 4,
+						color: "gray.500",
 					})}
 				>
-					ページを閉じても、再度アクセスすればまた表示されます。
-					ご安心ください。
+					ページを閉じても、再度アクセス(GitHubでログイン)すればまた表示されますので、ご安心ください。
+					<br />
+					その他、不明点があれば、気軽に新歓用 Discord
+					サーバーやメンバーへお尋ねください。
 				</p>
 			</div>
 		</div>
