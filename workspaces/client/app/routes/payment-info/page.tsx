@@ -51,14 +51,14 @@ export default function PaymentInfo() {
 	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
 	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
 
+	const membershipPrice = remainingMonth * 250;
+
 	const registrationSteps = [
 		{ label: "仮登録", isActive: true, isCompleted: true },
 		{ label: "入金", isActive: true, isCompleted: false },
 		{ label: "承認", isActive: false, isCompleted: false },
 		{ label: "完了", isActive: false, isCompleted: false },
 	];
-
-	const membershipPrice = (remainingMonth * 250).toLocaleString();
 
 	return (
 		<div
