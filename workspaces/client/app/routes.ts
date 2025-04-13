@@ -35,24 +35,24 @@ export default [
 									]),
 								]),
 							]
-							: []),
+						: []),
 					...(FLAG.ENABLE_CERTIFICATION
 						? [
 								...prefix("certifications", [
 									layout("routes/dashboard/admin/certifications/layout.tsx", [
-											index("routes/dashboard/admin/certifications/page.tsx"),
-										]),
+										index("routes/dashboard/admin/certifications/page.tsx"),
 									]),
+								]),
 							]
 						: []),
 					...(FLAG.ENABLE_CALENDAR
 						? [
-							...prefix("events", [
-								layout("routes/dashboard/admin/events/layout.tsx", [
-									index("routes/dashboard/admin/events/page.tsx"),
+								...prefix("events", [
+									layout("routes/dashboard/admin/events/layout.tsx", [
+										index("routes/dashboard/admin/events/page.tsx"),
+									]),
 								]),
-							]),
-						]
+							]
 						: []),
 				]),
 			]),

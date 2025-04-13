@@ -3,14 +3,14 @@ import { useEffect } from "react";
 import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
+import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
-import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
-import type { User } from "~/types/user";
-import { USER_ALLOWED_ROLES } from "./users/layout";
-import { INVITES_ALLOWED_ROLES } from "./invites/layout";
 import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
 import { EVENTS_ALLOWED_ROLES } from "./events/layout";
+import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
+import { INVITES_ALLOWED_ROLES } from "./invites/layout";
+import { USER_ALLOWED_ROLES } from "./users/layout";
 
 const NAVIGATION = [
 	{
@@ -64,7 +64,6 @@ const NAVIGATION = [
 ];
 
 export default function AdminLayout() {
-
 	const { user, isLoading, isAuthorized } = useAuth();
 	const { data: requests } = useCertificationRequests();
 
@@ -77,24 +76,25 @@ export default function AdminLayout() {
 	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
 		return null;
 	}
-
 	return (
 		<div>
 			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
 			<Tab.List>
-				{NAVIGATION.map((nav) => (
-					(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
-					<Tab.Item
-						key={nav.to}
-						to={nav.to}
-						isActive={nav.isActive}
-						notification={
-							nav.label === "Certifications" ? requests.length : undefined
-						}
-					>
-						{nav.label}
-					</Tab.Item>
-				)))}
+				{NAVIGATION.map(
+					(nav) =>
+						(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
+							<Tab.Item
+								key={nav.to}
+								to={nav.to}
+								isActive={nav.isActive}
+								notification={
+									nav.label === "Certifications" ? requests.length : undefined
+								}
+							>
+								{nav.label}
+							</Tab.Item>
+						),
+				)}
 			</Tab.List>
 			<Outlet />
 		</div>
