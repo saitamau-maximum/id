@@ -17,10 +17,6 @@ export default function Dashboard() {
 
 		// 認証されていない場合はログイン画面へ
 		if (!isAuthorized) {
-			pushToast({
-				title: "ログインが必要です",
-				type: "error",
-			});
 			navigate("/login");
 			return;
 		}
