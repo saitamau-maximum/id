@@ -1,1 +1,1 @@
-export * as socialLink from "../constants/oauth";
+export * as socialService from "../constants/oauth";
