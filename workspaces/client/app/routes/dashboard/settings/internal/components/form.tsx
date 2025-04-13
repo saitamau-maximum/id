@@ -295,6 +295,11 @@ export const ProfileUpdateForm = () => {
 					})}
 				>
 					{socialLinks.map((field, index) => (
+						<>
+						<ErrorDisplay
+							key={`error-${field.id}`}
+							error={errors.socialLinks?.[index]?.value?.message}
+						/>
 						<div
 							key={field.id}
 							className={css({
@@ -320,6 +325,7 @@ export const ProfileUpdateForm = () => {
 								<X size={16} />
 							</IconButton>
 						</div>
+						</>
 					))}
 					<button
 						type="button"

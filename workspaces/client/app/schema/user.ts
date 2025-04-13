@@ -1,6 +1,8 @@
 import * as v from "valibot";
 import { RESERVED_WORDS } from "~/constant";
 import { MaxLines } from "~/utils/valibot";
+import { SOCIAL_SERVICES_IDS, SOCIAL_SERVICES_URL_PREFIXES } from "~/constant";
+import { detectSocialService } from "~/utils/parse-social-link";
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
@@ -78,13 +80,25 @@ export const UserSchemas = {
 			`自己紹介は${BIO_MAX_LINES}行以下で入力してください`,
 		),
 	),
-	SocialLinks: v.array(
+	SocialLinks: v.pipe(
+		v.array(
 			v.object({
 				value: v.pipe(
 					v.string(),
 					v.nonEmpty("ソーシャルリンクを入力してください"),
 					v.url("URL が正しくありません"),
-				)
-		}),
-	)
+					v.custom((input) => {
+						// SOCIAL_SERVICES_IDSがOTHERでなく、SOCIAL_SERVICES_URL_PREFIXESに含まれていないものは弾く
+						const service = detectSocialService(input);
+						if (service === SOCIAL_SERVICES_IDS.OTHER) return true;
+						const prefix = SOCIAL_SERVICES_URL_PREFIXES[service];
+						if (prefix === undefined) return false;
+						if (input.startsWith(prefix)) return true;
+						return false;
+					}, "URL の形式が正しくありません。"),
+				),
+			}),
+		),
+		v.maxLength(5),
+	),
 };
