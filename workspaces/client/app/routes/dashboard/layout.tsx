@@ -24,7 +24,6 @@ export default function Dashboard() {
 		}
 
 		// メンバーでない場合もログイン画面へ
-		// TODO: ここ無限リダイレクトにならないか？
 		if (!isMember) {
 			pushToast({
 				title: "このアカウントはメンバーではありません",
