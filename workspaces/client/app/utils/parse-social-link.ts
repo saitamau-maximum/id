@@ -12,7 +12,6 @@ export const detectSocialService = (url: string) => {
 	)?.id;
 
 	if (socialService) {
-		console.log("socialService", socialService);
 		return socialService;
 	}
 	// SOCIAL_SERVICES_HOST_NAMESにない場合はOTHERを返す
