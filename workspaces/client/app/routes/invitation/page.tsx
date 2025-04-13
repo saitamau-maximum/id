@@ -17,30 +17,26 @@ export default function Invitation() {
 
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
-			try {
-				const isSucceeded = await invitationRepository.fetchInvitation({
-					invitationId: id,
-				});
-				if (isSucceeded) {
-					setInvitationCode(id);
-				} else {
-					pushToast({
-						type: "error",
-						title: "招待コードは無効です",
-						description:
-							"正しい招待コードであるかチェックしてください。もし招待コードが正しい場合は、Admin に連絡してください。",
-					});
-				}
-			} catch {
+			const isSucceeded = await invitationRepository.fetchInvitation({
+				invitationId: id,
+			});
+			return isSucceeded;
+		},
+		onSuccess: (isSucceeded, id) => {
+			if (isSucceeded) {
+				setInvitationCode(id);
+			} else {
 				pushToast({
 					type: "error",
-					title: "招待コードの取得に失敗しました",
+					title: "招待コードは無効です",
 					description:
-						"時間をおいて再度お試しください。もし直らなければ Admin に連絡してください。",
+						"正しい招待コードであるかチェックしてください。もし招待コードが正しい場合は、Admin に連絡してください。",
 				});
-			} finally {
-				navigate("/login");
 			}
+			navigate("/login");
+		},
+		onError: () => {
+			navigate("/login");
 		},
 	});
 
