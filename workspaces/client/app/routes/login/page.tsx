@@ -19,9 +19,8 @@ export default function Login() {
 	const loginUrl = new URL(`${env("SERVER_HOST")}/auth/login/github`);
 
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
-	const continueToURL = encodeURIComponent(
-		searchParams.get("continue_to") ?? `${window.location.origin}/verify`,
-	);
+	const continueToURL =
+		searchParams.get("continue_to") ?? `${window.location.origin}/verify`;
 	loginUrl.searchParams.set("continue_to", continueToURL);
 
 	// もし招待コードがあれば使う
