@@ -6,9 +6,9 @@ export interface UserRegisterParams {
 	realName: string;
 	realNameKana: string;
 	displayId: string;
-	academicEmail: string;
+	academicEmail?: string;
 	email: string;
-	studentId: string;
+	studentId?: string;
 	grade: string;
 }
 
@@ -17,9 +17,9 @@ export interface ProfileUpdateParams {
 	realName: string;
 	realNameKana: string;
 	displayId: string;
-	academicEmail: string;
+	academicEmail?: string;
 	email: string;
-	studentId: string;
+	studentId?: string;
 	grade: string;
 	bio: string;
 }

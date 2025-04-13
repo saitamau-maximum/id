@@ -11,7 +11,7 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { Switch } from "~/components/ui/switch";
-import { GRADE } from "~/constant";
+import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
@@ -30,8 +30,8 @@ const UpdateFormSchema = v.object({
 	realNameKana: UserSchemas.RealNameKana,
 	displayId: UserSchemas.DisplayId,
 	email: UserSchemas.Email,
-	academicEmail: UserSchemas.AcademicEmail,
-	studentId: UserSchemas.StudentId,
+	academicEmail: v.optional(UserSchemas.AcademicEmail),
+	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
 	bio: UserSchemas.Bio,
 });
@@ -79,6 +79,7 @@ export const ProfileUpdateForm = () => {
 		register,
 		handleSubmit,
 		watch,
+		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UpdateFormSchema),
@@ -95,12 +96,34 @@ export const ProfileUpdateForm = () => {
 		},
 	});
 
+	const onSubmit = useCallback(
+		(data: FormInputValues) => {
+			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
+			if (!isOutsideMember && !data.academicEmail) {
+				setError("academicEmail", {
+					message: "学籍番号と大学のメールアドレスは必須です",
+				});
+				return;
+			}
+			if (!isOutsideMember && !data.studentId) {
+				setError("studentId", {
+					message: "学籍番号と大学のメールアドレスは必須です",
+				});
+				return;
+			}
+			mutate(data);
+		},
+		[mutate, setError],
+	);
+
 	const bio = watch("bio");
 	const bioLength = bio?.length || 0;
 
+	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+
 	return (
 		<form
-			onSubmit={handleSubmit((d) => mutate(d))}
+			onSubmit={handleSubmit(onSubmit)}
 			className={css({
 				width: "100%",
 				display: "flex",
@@ -109,72 +132,36 @@ export const ProfileUpdateForm = () => {
 				alignItems: "center",
 			})}
 		>
-			<Form.Field.TextInput
-				label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"
-				error={errors.displayId?.message}
-				placeholder="maximum_taro"
-				required
-				{...register("displayId")}
-			/>
-
-			<Form.Field.TextInput
-				label="ユーザー名"
-				error={errors.displayName?.message}
-				placeholder="Maximum"
-				required
-				{...register("displayName")}
-			/>
-
-			<Form.Field.TextInput
-				label="本名 (学生証に記載のもの)"
-				error={errors.realName?.message}
-				placeholder="山田 太郎"
-				required
-				{...register("realName")}
-			/>
-
-			<Form.Field.TextInput
-				label="本名 (カナ)"
-				error={errors.realNameKana?.message}
-				placeholder="ヤマダ タロウ"
-				required
-				{...register("realNameKana")}
-			/>
-
-			<Form.Field.TextInput
-				label="大学のメールアドレス"
-				error={errors.academicEmail?.message}
-				placeholder="student@ms.saitama-u.ac.jp"
-				required
-				{...register("academicEmail")}
-			/>
-
-			<Form.Field.TextInput
-				label="大学以外で連絡の取れるメールアドレス"
-				error={errors.email?.message}
-				placeholder="member@maximum.vc"
-				required
-				{...register("email")}
-			/>
-
-			<Form.Field.TextInput
-				label="学籍番号"
-				error={errors.studentId?.message}
-				placeholder="00XX000"
-				required
-				{...register("studentId")}
-			/>
-
 			<Form.FieldSet>
-				<legend>
-					<Form.LabelText>現在の学年</Form.LabelText>
-				</legend>
+				<h2
+					className={css({
+						display: "block",
+						fontSize: "md",
+						fontWeight: "bold",
+						color: "gray.600",
+					})}
+				>
+					はじめに、現在の学年を選択してください
+					<span className={css({ color: "rose.500", marginLeft: 1 })}>*</span>
+				</h2>
+				<p
+					className={css({
+						fontSize: "sm",
+						color: "gray.500",
+						marginBottom: 2,
+					})}
+				>
+					埼玉大学に在籍していない方で、埼玉大学を卒業した方は「卒業生」を、それ以外の方は「ゲスト」を選択してください。
+				</p>
 				<div
 					className={css({
 						display: "grid",
 						gap: "token(spacing.2) token(spacing.4)",
 						gridTemplateColumns: "auto 1fr",
 						alignItems: "center",
+						mdDown: {
+							gridTemplateColumns: "1fr !important",
+						},
 					})}
 				>
 					{GRADE.map((g) => (
@@ -196,6 +183,71 @@ export const ProfileUpdateForm = () => {
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
+
+			<Form.Field.TextInput
+				label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"
+				error={errors.displayId?.message}
+				placeholder="maximum_taro"
+				required
+				{...register("displayId")}
+			/>
+
+			<Form.Field.TextInput
+				label="ユーザー名"
+				error={errors.displayName?.message}
+				placeholder="Maximum"
+				required
+				{...register("displayName")}
+			/>
+
+			<Form.Field.TextInput
+				label={`本名 ${isOutsideMember ? "" : "(学生証に記載のもの)"}`}
+				error={errors.realName?.message}
+				placeholder="山田 太郎"
+				required
+				{...register("realName")}
+			/>
+
+			<Form.Field.TextInput
+				label="本名 (カナ)"
+				error={errors.realNameKana?.message}
+				placeholder="ヤマダ タロウ"
+				required
+				{...register("realNameKana")}
+			/>
+
+			{!isOutsideMember && (
+				<Form.Field.TextInput
+					label="学籍番号"
+					error={errors.studentId?.message}
+					placeholder="00XX000"
+					required
+					{...register("studentId", {
+						setValueAs: (value) => (!value ? undefined : value),
+					})}
+				/>
+			)}
+
+			{!isOutsideMember && (
+				<Form.Field.TextInput
+					label="大学のメールアドレス"
+					error={errors.academicEmail?.message}
+					placeholder="student@ms.saitama-u.ac.jp"
+					required
+					type="email"
+					{...register("academicEmail", {
+						setValueAs: (value) => (!value ? undefined : value),
+					})}
+				/>
+			)}
+
+			<Form.Field.TextInput
+				label={`${isOutsideMember ? "" : "大学以外で"}連絡の取れるメールアドレス`}
+				error={errors.email?.message}
+				placeholder="member@maximum.vc"
+				required
+				{...register("email")}
+			/>
 
 			<Form.FieldSet>
 				<legend>
