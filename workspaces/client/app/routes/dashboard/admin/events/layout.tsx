@@ -1,35 +1,18 @@
 import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
-import { useAuth } from "~/hooks/use-auth";
+import { Outlet } from "react-router";
+import { useRoleBlock } from "../internal/hooks/use-role-block";
 
 export const EVENTS_ALLOWED_ROLES = [ROLE_IDS.ADMIN, ROLE_IDS.CALENDAR_EDITOR];
 
-export default function UsersAdminLayout() {
-	const navigate = useNavigate();
+export default function EventsAdminLayout() {
+	const shouldProceed = useRoleBlock({
+		allowedRoles: EVENTS_ALLOWED_ROLES,
+		redirectPath: "/admin",
+	});
 
-	const { user, isLoading, isAuthorized } = useAuth();
-
-	useEffect(() => {
-		if (isLoading || !isAuthorized) {
-			return;
-		}
-		if (
-			!user?.roles.some((role) =>
-				(EVENTS_ALLOWED_ROLES as number[]).includes(role.id),
-			)
-		) {
-			navigate("/admin");
-		}
-	}, [isLoading, isAuthorized, user, navigate]);
-
-	if (
-		isLoading ||
-		!user?.roles.some((role) =>
-			(EVENTS_ALLOWED_ROLES as number[]).includes(role.id),
-		)
-	) {
+	if (!shouldProceed) {
 		return null;
 	}
+
 	return <Outlet />;
 }
