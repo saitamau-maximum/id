@@ -11,7 +11,7 @@ import type { CookieOptions } from "hono/utils/cookie";
 import { Octokit } from "octokit";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
-import { SOCIAL_SERVICES_IDS } from "../../constants/social";
+import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
@@ -137,14 +137,14 @@ const route = app
 				// ユーザーが存在するか確認
 				const id = await c.var.UserRepository.fetchUserIdByProviderInfo(
 					String(user.id),
-					SOCIAL_SERVICES_IDS.GITHUB,
+					OAUTH_PROVIDER_IDS.GITHUB,
 				);
 				foundUserId = id;
 			} catch (e) {
 				// もしユーザーが見つからなかったら新規作成
 				foundUserId = await c.var.UserRepository.createUser(
 					String(user.id),
-					SOCIAL_SERVICES_IDS.GITHUB,
+					OAUTH_PROVIDER_IDS.GITHUB,
 					{
 						email: user.email ?? undefined,
 						displayName: user.login,
