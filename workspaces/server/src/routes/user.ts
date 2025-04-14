@@ -43,12 +43,7 @@ const ProfileSchema = v.object({
 	studentId: v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
-	socialLinks: v.array(
-		v.pipe(
-			v.string(),
-			v.url()
-		)
-	)
+	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
 });
 
 const registerSchema = v.object({
@@ -135,7 +130,7 @@ const route = app
 				studentId,
 				grade,
 				bio,
-				socialLinks,	
+				socialLinks,
 			} = c.req.valid("json");
 
 			const normalizedDisplayName = normalizeRealName(displayName);
