@@ -142,7 +142,7 @@ export const Sidebar = () => {
 
 	const handleRecieveDiscordInvitation = useCallback(async () => {
 		const url = await miscRepository.getDiscordInvitationURL();
-		window.open(url, "_blank", "noopener,noreferrer");
+		window.open(url);
 	}, [miscRepository]);
 
 	if (!user) {
