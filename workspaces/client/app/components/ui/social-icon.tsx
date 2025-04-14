@@ -1,8 +1,3 @@
-import { FaGithub, FaInstagram, FaKaggle } from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
-import { GiLaurelsTrophy } from "react-icons/gi";
-import { RiGlobalLine } from "react-icons/ri";
-import { SiCodeforces, SiQiita, SiZenn } from "react-icons/si";
 import { SOCIAL_SERVICES_IDS, type SocialServiceId } from "../../constant";
 
 interface SocialIconProps {
@@ -13,22 +8,36 @@ interface SocialIconProps {
 export const SocialIcon = ({ service, size = 18 }: SocialIconProps) => {
 	switch (service) {
 		case SOCIAL_SERVICES_IDS.GITHUB:
-			return <FaGithub size={size} />;
+			return <img src="/github.svg" alt="GitHub" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.ATCODER:
-			return <GiLaurelsTrophy size={size} />;
+			return <img src="/atcoder.svg" alt="AtCoder" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.X:
-			return <FaXTwitter size={size} />;
+			return <img src="/x.svg" alt="X" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.CODEFORCES:
-			return <SiCodeforces size={size} />;
+			return (
+				<img
+					src="/codeforces.svg"
+					alt="Codeforces"
+					width={size}
+					height={size}
+				/>
+			);
 		case SOCIAL_SERVICES_IDS.INSTAGRAM:
-			return <FaInstagram size={size} />;
+			return (
+				<img
+					src="/instagram.svg"
+					alt="Instagram"
+					width={size}
+					height={size}
+				/>
+			);
 		case SOCIAL_SERVICES_IDS.KAGGLE:
-			return <FaKaggle size={size} />;
+			return <img src="/kaggle.svg" alt="Kaggle" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.ZENN:
-			return <SiZenn size={size} />;
+			return <img src="/zenn.svg" alt="Zenn" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.QIITA:
-			return <SiQiita size={size} />;
+			return <img src="/qiita.svg" alt="Qiita" width={size} height={size} />;
 		default:
-			return <RiGlobalLine size={size} />;
+			return <img src="/globe.svg" alt="Other" width={size} height={size} />;
 	}
-};
+}
