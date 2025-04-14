@@ -116,7 +116,7 @@ export const socialLinks = sqliteTable(
 		url: text("url").notNull().primaryKey(),
 	},
 	(table) => ({
-		userIdx: index("user_idx").on(table.userId),
+		userIdx: index("social_links_user_idx").on(table.userId),
 	}),
 );
 
