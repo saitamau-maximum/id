@@ -3,7 +3,7 @@ import * as v from "valibot";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { ROLE_BY_ID } from "../../constants/role";
 import { factory } from "../../factory";
-import { invitesMutableMiddleware } from "../../middleware/auth";
+import { adminOnlyMiddleware, invitesMutableMiddleware } from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -24,6 +24,7 @@ const route = app
 	})
 	.put(
 		"/:userId/role",
+		adminOnlyMiddleware,
 		vValidator("json", UpdateRoleRequestSchema),
 		async (c) => {
 			const userId = c.req.param("userId");
