@@ -39,6 +39,21 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		}));
 	}
 
+	async getEventById(eventId: ICalendarEvent["id"]): Promise<ICalendarEvent> {
+		const res = await this.client.query.calendarEvents.findFirst({
+			where: eq(schema.calendarEvents.id, eventId),
+		});
+		if (!res) {
+			throw new Error("Event not found");
+		}
+		return {
+			...res,
+			locationId: res.locationId ?? undefined,
+			startAt: new Date(res.startAt),
+			endAt: new Date(res.endAt),
+		};
+	}
+
 	async createEvent(event: CreateEventPayload): Promise<void> {
 		const newEvent = {
 			...event,

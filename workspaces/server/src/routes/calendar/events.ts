@@ -1,9 +1,10 @@
 import { vValidator } from "@hono/valibot-validator";
 import { validator } from "hono/validator";
 import * as v from "valibot";
+import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
-	adminOnlyMiddleware,
+	calendarMutableMiddleware,
 	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
@@ -38,7 +39,7 @@ const route = app
 	})
 	.post(
 		"/",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -69,7 +70,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -92,6 +93,15 @@ const route = app
 				locationId,
 			};
 			try {
+				// もしAdminじゃないなら、自分のイベントだけ更新できる
+				const roleIds = c.get("roleIds");
+				if (!roleIds.includes(ROLE_IDS.ADMIN)) {
+					const event = await CalendarRepository.getEventById(id);
+					if (event.userId !== userId) {
+						return c.json({ error: "Forbidden" }, 403);
+					}
+				}
+				// イベントを更新
 				await CalendarRepository.updateEvent(eventPayload);
 				return c.json({ message: "event updated" });
 			} catch (e) {
@@ -99,10 +109,20 @@ const route = app
 			}
 		},
 	)
-	.delete("/:id", adminOnlyMiddleware, async (c) => {
+	.delete("/:id", calendarMutableMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const id = c.req.param("id");
+		const { userId } = c.get("jwtPayload");
 		try {
+			// もしAdminじゃないなら、自分のイベントだけ削除できる
+			const roleIds = c.get("roleIds");
+			if (!roleIds.includes(ROLE_IDS.ADMIN)) {
+				const event = await CalendarRepository.getEventById(id);
+				if (event.userId !== userId) {
+					return c.json({ error: "Forbidden" }, 403);
+				}
+			}
+			// イベントを削除
 			await CalendarRepository.deleteEvent(id);
 			return c.json({ message: "event deleted" });
 		} catch (e) {

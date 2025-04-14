@@ -22,20 +22,37 @@ export default [
 			...prefix("admin", [
 				layout("routes/dashboard/admin/layout.tsx", [
 					index("routes/dashboard/admin/home/page.tsx"),
-					route("users", "routes/dashboard/admin/users/page.tsx"),
+					...prefix("users", [
+						layout("routes/dashboard/admin/users/layout.tsx", [
+							index("routes/dashboard/admin/users/page.tsx"),
+						]),
+					]),
 					...(FLAG.ENABLE_INVITE
-						? [route("invites", "routes/dashboard/admin/invites/page.tsx")]
+						? [
+								...prefix("invites", [
+									layout("routes/dashboard/admin/invites/layout.tsx", [
+										index("routes/dashboard/admin/invites/page.tsx"),
+									]),
+								]),
+							]
 						: []),
 					...(FLAG.ENABLE_CERTIFICATION
 						? [
-								route(
-									"certifications",
-									"routes/dashboard/admin/certifications/page.tsx",
-								),
+								...prefix("certifications", [
+									layout("routes/dashboard/admin/certifications/layout.tsx", [
+										index("routes/dashboard/admin/certifications/page.tsx"),
+									]),
+								]),
 							]
 						: []),
 					...(FLAG.ENABLE_CALENDAR
-						? [route("events", "routes/dashboard/admin/events/page.tsx")]
+						? [
+								...prefix("events", [
+									layout("routes/dashboard/admin/events/layout.tsx", [
+										index("routes/dashboard/admin/events/page.tsx"),
+									]),
+								]),
+							]
 						: []),
 				]),
 			]),

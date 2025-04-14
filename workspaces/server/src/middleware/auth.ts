@@ -46,6 +46,8 @@ const roleAuthorizationMiddleware = (
 			return next();
 		}
 
+		c.set("roleIds", roleIds);
+
 		return c.text("Forbidden", 403);
 	});
 };
@@ -62,5 +64,19 @@ export const adminOnlyMiddleware = every(
 	authMiddleware,
 	roleAuthorizationMiddleware({
 		ALLOWED_ROLES: [ROLE_IDS.ADMIN],
+	}),
+);
+
+export const calendarMutableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.CALENDAR_EDITOR],
+	}),
+);
+
+export const invitesMutableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],
 	}),
 );

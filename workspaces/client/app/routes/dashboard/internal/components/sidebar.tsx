@@ -1,4 +1,3 @@
-import { role } from "@idp/server/shared/role";
 import { useCallback, useState } from "react";
 import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -30,8 +29,6 @@ const NAVIGATION: Navigation[] = [
 		isActive: (location: string) => location.startsWith("/members"),
 	},
 	{
-		shouldDisplay: (user: User) =>
-			user.roles.some((r) => r.id === role.ROLE_IDS.ADMIN),
 		label: "Admin",
 		to: "/admin",
 		isActive: (location: string) => location.startsWith("/admin"),
@@ -219,70 +216,67 @@ export const Sidebar = () => {
 							gap: 4,
 						})}
 					>
-						{NAVIGATION.map(
-							(nav) =>
-								(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
-									<li
-										key={nav.to}
+						{NAVIGATION.map((nav) => (
+							<li
+								key={nav.to}
+								className={css({
+									display: "flex",
+									alignItems: "center",
+									gap: 2,
+								})}
+							>
+								<Dot isActive={nav.isActive(location.pathname)} />
+								{nav.comingSoon ? (
+									<span
 										className={css({
-											display: "flex",
-											alignItems: "center",
-											gap: 2,
+											display: "block",
+											padding: "token(spacing.2) token(spacing.4)",
+											width: "100%",
+											borderRadius: 8,
+											color: "gray.500",
+											fontSize: "sm",
+											fontWeight: "600",
+											cursor: "not-allowed",
 										})}
 									>
-										<Dot isActive={nav.isActive(location.pathname)} />
-										{nav.comingSoon ? (
-											<span
-												className={css({
-													display: "block",
-													padding: "token(spacing.2) token(spacing.4)",
-													width: "100%",
-													borderRadius: 8,
-													color: "gray.500",
-													fontSize: "sm",
-													fontWeight: "600",
-													cursor: "not-allowed",
-												})}
-											>
-												<span
-													className={css({
-														fontSize: "lg",
-														fontWeight: "normal",
-													})}
-												>
-													{nav.label}
-												</span>
-												<br />
-												Coming Soon ...
-											</span>
-										) : (
-											<Link
-												onClick={() => setIsMenuOpen(false)}
-												to={nav.to}
-												className={css({
-													display: "block",
-													padding: "token(spacing.2) token(spacing.4)",
-													width: "100%",
-													borderRadius: 8,
-													color: nav.isActive(location.pathname)
-														? "gray.800"
-														: "gray.500",
-													textDecoration: "none",
-													fontSize: "2xl",
-													fontWeight: "600",
-													transition: "colors",
-													_hover: {
-														color: "green.600",
-													},
-												})}
-											>
-												{nav.label}
-											</Link>
-										)}
-										<Dot />
-									</li>
-								),
-						)}
+										<span
+											className={css({
+												fontSize: "lg",
+												fontWeight: "normal",
+											})}
+										>
+											{nav.label}
+										</span>
+										<br />
+										Coming Soon ...
+									</span>
+								) : (
+									<Link
+										onClick={() => setIsMenuOpen(false)}
+										to={nav.to}
+										className={css({
+											display: "block",
+											padding: "token(spacing.2) token(spacing.4)",
+											width: "100%",
+											borderRadius: 8,
+											color: nav.isActive(location.pathname)
+												? "gray.800"
+												: "gray.500",
+											textDecoration: "none",
+											fontSize: "2xl",
+											fontWeight: "600",
+											transition: "colors",
+											_hover: {
+												color: "green.600",
+											},
+										})}
+									>
+										{nav.label}
+									</Link>
+								)}
+								<Dot />
+							</li>
+						))}
 					</ul>
 				</nav>
 
