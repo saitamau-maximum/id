@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import { RESERVED_WORDS } from "~/constant";
 import { MaxLines } from "~/utils/valibot";
-import { SOCIAL_SERVICES_IDS, SOCIAL_SERVICES_URL_PREFIXES } from "~/constant";
+import { SOCIAL_SERVICES_IDS, SOCIAL_SERVICES } from "~/constant";
 import { detectSocialService } from "~/utils/parse-social-link";
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
@@ -91,7 +91,9 @@ export const UserSchemas = {
 						// SOCIAL_SERVICES_IDSがOTHERでなく、SOCIAL_SERVICES_URL_PREFIXESに含まれていないものは弾く
 						const service = detectSocialService(input);
 						if (service === SOCIAL_SERVICES_IDS.OTHER) return true;
-						const prefix = SOCIAL_SERVICES_URL_PREFIXES[service];
+						const prefix = SOCIAL_SERVICES.find(
+							(s) => s.id === service,
+						)?.prefix;
 						if (prefix === undefined) return false;
 						if (input.startsWith(prefix)) return true;
 						return false;

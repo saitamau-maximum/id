@@ -34,25 +34,14 @@ export const SOCIAL_SERVICES_IDS = {
 
 export type SocialServiceId = (typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
 
-export const SOCIAL_SERVICES_HOST_NAMES = [
-	{id: SOCIAL_SERVICES_IDS.GITHUB, host: "github.com"},
-	{id: SOCIAL_SERVICES_IDS.ATCODER, host: "atcoder.jp"},
-	{id: SOCIAL_SERVICES_IDS.X, host: "x.com"},
-	{id: SOCIAL_SERVICES_IDS.CODEFORCES, host: "codeforces.com"},
-	{id: SOCIAL_SERVICES_IDS.INSTAGRAM, host: "www.instagram.com"},
-	{id: SOCIAL_SERVICES_IDS.KAGGLE, host: "www.kaggle.com"},
-	{id: SOCIAL_SERVICES_IDS.ZENN, host: "zenn.dev"},
-	{id: SOCIAL_SERVICES_IDS.QIITA, host: "qiita.com"},
-	{id: SOCIAL_SERVICES_IDS.OTHER, host: "other"},
+export const SOCIAL_SERVICES = [
+	{id: SOCIAL_SERVICES_IDS.GITHUB, host: "github.com", prefix: "https://github.com/" },
+	{id: SOCIAL_SERVICES_IDS.ATCODER, host: "atcoder.jp", prefix: "https://atcoder.jp/users/" },
+	{id: SOCIAL_SERVICES_IDS.X, host: "x.com", prefix: "https://x.com/" },
+	{id: SOCIAL_SERVICES_IDS.CODEFORCES, host: "codeforces.com", prefix: "https://codeforces.com/profile/" },
+	{id: SOCIAL_SERVICES_IDS.INSTAGRAM, host: "instagram.com", prefix: "https://www.instagram.com/" },
+	{id: SOCIAL_SERVICES_IDS.KAGGLE, host: "kaggle.com", prefix: "https://www.kaggle.com/" },
+	{id: SOCIAL_SERVICES_IDS.ZENN, host: "zenn.dev", prefix: "https://zenn.dev/" },
+	{id: SOCIAL_SERVICES_IDS.QIITA, host: "qiita.com", prefix: "https://qiita.com/" },
+	{id: SOCIAL_SERVICES_IDS.OTHER, host: "other", prefix: "" },
 ];
-
-export const SOCIAL_SERVICES_URL_PREFIXES = {
-	[SOCIAL_SERVICES_IDS.GITHUB]: "https://github.com/",
-	[SOCIAL_SERVICES_IDS.ATCODER]: "https://atcoder.jp/users/",
-	[SOCIAL_SERVICES_IDS.X]: "https://x.com/",
-	[SOCIAL_SERVICES_IDS.CODEFORCES]: "https://codeforces.com/profile/",
-	[SOCIAL_SERVICES_IDS.INSTAGRAM]: "https://www.instagram.com/",
-	[SOCIAL_SERVICES_IDS.KAGGLE]: "https://www.kaggle.com/",
-	[SOCIAL_SERVICES_IDS.ZENN]: "https://zenn.dev/",
-	[SOCIAL_SERVICES_IDS.QIITA]: "https://qiita.com/",
-}
