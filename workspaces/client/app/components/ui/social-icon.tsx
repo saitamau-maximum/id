@@ -10,7 +10,9 @@ export const SocialIcon = ({ service, size = 18 }: SocialIconProps) => {
 		case SOCIAL_SERVICES_IDS.GITHUB:
 			return <img src="/github.svg" alt="GitHub" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.ATCODER:
-			return <img src="/atcoder.svg" alt="AtCoder" width={size} height={size} />;
+			return (
+				<img src="/atcoder.svg" alt="AtCoder" width={size} height={size} />
+			);
 		case SOCIAL_SERVICES_IDS.X:
 			return <img src="/x.svg" alt="X" width={size} height={size} />;
 		case SOCIAL_SERVICES_IDS.CODEFORCES:
@@ -24,12 +26,7 @@ export const SocialIcon = ({ service, size = 18 }: SocialIconProps) => {
 			);
 		case SOCIAL_SERVICES_IDS.INSTAGRAM:
 			return (
-				<img
-					src="/instagram.svg"
-					alt="Instagram"
-					width={size}
-					height={size}
-				/>
+				<img src="/instagram.svg" alt="Instagram" width={size} height={size} />
 			);
 		case SOCIAL_SERVICES_IDS.KAGGLE:
 			return <img src="/kaggle.svg" alt="Kaggle" width={size} height={size} />;
@@ -40,4 +37,4 @@ export const SocialIcon = ({ service, size = 18 }: SocialIconProps) => {
 		default:
 			return <img src="/globe.svg" alt="Other" width={size} height={size} />;
 	}
-}
+};
