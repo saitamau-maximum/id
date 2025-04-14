@@ -42,12 +42,14 @@ export const editUserRole = async (
 		(roleId) => !roleIds.includes(roleId),
 	);
 
-	await client.insert(schema.userRoles).values(
-		newRoleIds.map((roleId) => ({
-			userId: user.userId,
-			roleId,
-		})),
-	);
+	if (newRoleIds.length > 0) {
+		await client.insert(schema.userRoles).values(
+			newRoleIds.map((roleId) => ({
+				userId: user.userId,
+				roleId,
+			})),
+		);
+	}
 
 	await client
 		.delete(schema.userRoles)
