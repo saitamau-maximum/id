@@ -12,11 +12,11 @@
     "lib": [
       "ESNext"
     ],
-    "types": [
-      "@cloudflare/workers-types/2023-07-01"
-    ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx"
   },
-  "include": ["src/**/*.ts", "worker-configuration.d.ts"],
+  "include": [
+    "src/**/*.ts",
+    "worker-configuration.d.ts"
+  ],
 }

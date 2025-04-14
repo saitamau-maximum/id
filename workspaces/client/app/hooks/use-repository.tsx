@@ -6,6 +6,7 @@ import type { ICertificationRepository } from "~/repository/certification";
 import type { IInvitationRepository } from "~/repository/invitation";
 import type { ILocationRepository } from "~/repository/location";
 import type { IMemberRepository } from "~/repository/member";
+import type { IMiscRepository } from "~/repository/misc";
 import type { IOAuthAppsRepository } from "~/repository/oauth-apps";
 import type { IUserRepository } from "~/repository/user";
 
@@ -18,6 +19,7 @@ export interface RepositoryContextProps {
 	certificationRepository: ICertificationRepository;
 	locationRepository: ILocationRepository;
 	invitationRepository: IInvitationRepository;
+	miscRepository: IMiscRepository;
 }
 
 export const RepositoryContext =

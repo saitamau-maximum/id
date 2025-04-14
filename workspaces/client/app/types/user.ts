@@ -6,7 +6,9 @@ import type { Role } from "./role";
  */
 export type User = {
 	id: string;
-	initialized: boolean;
+	initializedAt?: Date;
+	lastPaymentConfirmedAt?: Date;
+	isProvisional: boolean;
 	roles: Role[];
 	displayName?: string;
 	realName?: string;
@@ -40,7 +42,7 @@ export type UserBasicInfo = Pick<
 export type Member = Pick<
 	User,
 	| "id"
-	| "initialized"
+	| "initializedAt"
 	| "roles"
 	| "displayName"
 	| "realName"

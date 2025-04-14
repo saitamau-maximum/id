@@ -33,7 +33,8 @@ const UpdateFormSchema = v.object({
 	description: LocationSchemas.Description,
 });
 
-type UpdateFormValues = v.InferOutput<typeof UpdateFormSchema>;
+type UpdateFormInputValues = v.InferInput<typeof UpdateFormSchema>;
+type UpdateFormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 
 export const EditLocationDialog = createCallable<Props, Payload>(
 	({ call, locationId }) => {
@@ -45,7 +46,7 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 			setValue,
 			watch,
 			formState: { errors },
-		} = useForm<UpdateFormValues>({
+		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
 			resolver: valibotResolver(UpdateFormSchema),
 			defaultValues: {
 				name: location?.name,
@@ -60,7 +61,7 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 			}
 		}, [location, setValue]);
 
-		const onSubmit = async (values: UpdateFormValues) => {
+		const onSubmit = async (values: UpdateFormOutputValues) => {
 			if (!location) return;
 			const updatedLocation: Location = {
 				...location,

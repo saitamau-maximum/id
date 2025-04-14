@@ -77,13 +77,22 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 			key={event.id}
 			className={css({
 				position: "relative",
-				paddingLeft: 8,
+				paddingLeft: {
+					base: 6,
+					md: 8,
+				},
 				paddingBottom: 4,
 				_before: {
 					content: '""',
 					position: "absolute",
-					left: 4,
-					top: 4,
+					left: {
+						base: 3,
+						md: 4,
+					},
+					top: {
+						base: 3,
+						md: 4,
+					},
 					transform: "translateX(-50%)",
 					width: "2px",
 					height: "100%",
@@ -97,8 +106,14 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 				_after: {
 					content: '""',
 					position: "absolute",
-					left: 4,
-					top: 4,
+					left: {
+						base: 3,
+						md: 4,
+					},
+					top: {
+						base: 3,
+						md: 4,
+					},
 					transform: "translate(-50%, -50%)",
 					width: isActiveEvent(event) ? "12px" : "8px",
 					height: isActiveEvent(event) ? "12px" : "8px",
@@ -110,8 +125,11 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 		>
 			<span
 				className={css({
-					color: "gray.700",
-					fontSize: "xl",
+					color: "gray.600",
+					fontSize: {
+						base: "lg",
+						md: "xl",
+					},
 					fontWeight: 500,
 				})}
 			>

@@ -1,13 +1,20 @@
 {
-  "name": "@idp/root",
-  "scripts": {
-    "dev": "pnpm -r --parallel dev",
-    "build": "pnpm -C workspaces/server run build && pnpm -C workspaces/client run build",
-    "fix": "pnpm -r --parallel fix",
-    "check": "pnpm -r --parallel check"
-  },
-  "packageManager": "pnpm@9.5.0+sha512.140036830124618d624a2187b50d04289d5a087f326c9edfc0ccd733d76c4f52c3a313d4fc148794a2a9d81553016004e6742e8cf850670268a7387fc220c903",
-  "devDependencies": {
-    "@biomejs/biome": "1.9.4"
-  }
+	"name": "@idp/root",
+	"scripts": {
+		"dev": "pnpm -r --parallel dev",
+		"build": "pnpm -C workspaces/server run build && pnpm -C workspaces/client run build",
+		"fix": "pnpm -r --parallel fix",
+		"check": "pnpm -r --parallel check",
+		"seed": "pnpm -C workspaces/server run seed",
+		"apply:migrations:local": "pnpm -C workspaces/server run apply:migrations:local",
+		"apply:migrations:preview": "pnpm -C workspaces/server run apply:migrations:preview",
+		"apply:migrations:prod": "pnpm -C workspaces/server run apply:migrations:prod",
+		"generate:migrations": "pnpm -C workspaces/server run generate:migrations",
+		"deploy:preview": "pnpm -C workspaces/server run deploy:preview",
+		"deploy:prod": "pnpm -C workspaces/server run deploy:prod"
+	},
+	"packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4"
+	}
 }

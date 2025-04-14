@@ -73,7 +73,7 @@ export default function Profile() {
 					displayId={memberProfile?.displayId}
 					profileImageURL={memberProfile?.profileImageURL}
 					grade={memberProfile?.grade}
-					initialized={memberProfile?.initialized || false}
+					initialized={!!memberProfile?.initializedAt}
 					roles={memberProfile?.roles || []}
 					bio={memberProfile?.bio}
 				/>
@@ -100,19 +100,16 @@ export default function Profile() {
 					</p>
 					<h3
 						className={css({
-							fontSize: "lg",
+							fontSize: "md",
 							fontWeight: "bold",
 							color: "gray.600",
 							marginBottom: 2,
+							display: "flex",
+							alignItems: "center",
+							gap: 2,
 						})}
 					>
-						<CheckCircle
-							size={20}
-							className={css({
-								display: "inline-block",
-								marginRight: 2,
-							})}
-						/>
+						<CheckCircle size={16} />
 						資格・試験
 					</h3>
 					<CertificationCard

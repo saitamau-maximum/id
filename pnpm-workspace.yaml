@@ -1,2 +1,9 @@
 packages:
-  - 'workspaces/*'
+  - workspaces/*
+
+onlyBuiltDependencies:
+  - '@biomejs/biome'
+  - better-sqlite3
+  - esbuild
+  - sharp
+  - workerd

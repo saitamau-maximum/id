@@ -1,11 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
-import { ROLE_IDS } from "../constants/role";
 import { factory } from "../factory";
-import {
-	authMiddleware,
-	roleAuthorizationMiddleware,
-} from "../middleware/auth";
+import { adminOnlyMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
@@ -37,7 +33,7 @@ const route = app
 	})
 	.post(
 		"/request",
-		authMiddleware,
+		memberOnlyMiddleware,
 		vValidator("json", CertificationRequestSchema),
 		async (c) => {
 			const payload = c.get("jwtPayload");
@@ -53,21 +49,15 @@ const route = app
 			return c.text("ok", 200);
 		},
 	)
-	.get(
-		"/request",
-		authMiddleware,
-		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
-		async (c) => {
-			const { CertificationRepository } = c.var;
-			const requests =
-				await CertificationRepository.getAllCertificationRequests();
-			return c.json(requests);
-		},
-	)
+	.get("/request", adminOnlyMiddleware, async (c) => {
+		const { CertificationRepository } = c.var;
+		const requests =
+			await CertificationRepository.getAllCertificationRequests();
+		return c.json(requests);
+	})
 	.put(
 		"/review",
-		authMiddleware,
-		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
+		adminOnlyMiddleware,
 		vValidator("json", CertificationReviewSchema),
 		async (c) => {
 			const { CertificationRepository } = c.var;
@@ -88,8 +78,7 @@ const route = app
 	)
 	.post(
 		"/create",
-		authMiddleware,
-		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
+		adminOnlyMiddleware,
 		vValidator("json", CertificationCreateSchema),
 		async (c) => {
 			const { CertificationRepository } = c.var;
@@ -103,8 +92,7 @@ const route = app
 	)
 	.put(
 		"/:certificationId",
-		authMiddleware,
-		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
+		adminOnlyMiddleware,
 		vValidator("json", CertificationUpdateSchema),
 		async (c) => {
 			const { CertificationRepository } = c.var;
@@ -117,18 +105,13 @@ const route = app
 			return c.text("ok", 200);
 		},
 	)
-	.delete(
-		"/:certificationId",
-		authMiddleware,
-		roleAuthorizationMiddleware({ ALLOWED_ROLES: [ROLE_IDS.ADMIN] }),
-		async (c) => {
-			const { CertificationRepository } = c.var;
-			const certificationId = c.req.param("certificationId");
-			await CertificationRepository.deleteCertification(certificationId);
-			return c.text("ok", 200);
-		},
-	)
-	.delete("/:certificationId/my", authMiddleware, async (c) => {
+	.delete("/:certificationId", adminOnlyMiddleware, async (c) => {
+		const { CertificationRepository } = c.var;
+		const certificationId = c.req.param("certificationId");
+		await CertificationRepository.deleteCertification(certificationId);
+		return c.text("ok", 200);
+	})
+	.delete("/:certificationId/my", memberOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
 		const { userId } = c.get("jwtPayload");
 		const certificationId = c.req.param("certificationId");

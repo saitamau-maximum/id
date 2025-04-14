@@ -1,4 +1,4 @@
-import { type InferInsertModel, eq } from "drizzle-orm";
+import { type InferInsertModel, eq, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
@@ -18,39 +18,65 @@ export class CloudflareUserRepository implements IUserRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createUser(
+	private async createUserInternal(
 		providerUserId: string,
 		providerId: number,
-		payload: Partial<Profile> = {},
+		payload: Partial<Profile>,
+		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
-		// d1にはtransactionがないのでbatchで両方成功を期待する
-		const [_, res] = await this.client.batch([
+		const { displayName, email, profileImageURL } = payload;
+		const batchOps = [
 			this.client.insert(schema.users).values({
 				id: userId,
+				...(invitationId && { invitationId }),
 			}),
 			this.client.insert(schema.oauthConnections).values({
 				userId,
 				providerId,
 				providerUserId,
-				email: payload.email,
-				name: payload.displayName,
-				profileImageUrl: payload.profileImageURL,
+				email,
+				name: displayName,
+				profileImageUrl: profileImageURL,
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
 				userId,
-				displayName: payload.displayName,
-				profileImageURL: payload.profileImageURL,
+				displayName,
+				profileImageURL,
 			}),
-		]);
+		] as const;
+
+		const [_, res] = await this.client.batch(batchOps);
 
 		if (res.success) {
 			return userId;
 		}
 
 		throw new Error("Failed to create user");
+	}
+
+	async createUser(
+		providerUserId: string,
+		providerId: number,
+		payload: Partial<Profile> = {},
+	): Promise<string> {
+		return this.createUserInternal(providerUserId, providerId, payload);
+	}
+
+	async createTemporaryUser(
+		providerUserId: string,
+		providerId: number,
+		invitationId: string,
+		payload: Partial<Profile> = {},
+	): Promise<string> {
+		return this.createUserInternal(
+			providerUserId,
+			providerId,
+			payload,
+			invitationId,
+		);
 	}
 
 	async fetchUserIdByProviderInfo(
@@ -93,7 +119,9 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -214,15 +242,24 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMembers(): Promise<Member[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
 				profile: true,
 				roles: true,
 			},
 		});
 
-		return users.map((user) => ({
+		// メンバーのみを取得
+		// TODO: SQLでフィルタする
+		const members = users.filter((user) =>
+			user.roles.some((role) => role.roleId === ROLE_IDS.MEMBER),
+		);
+
+		return members.map((user) => ({
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -259,7 +296,9 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.user.id,
-			initialized: !!user.user.initializedAt,
+			initializedAt: user.user.initializedAt,
+			isProvisional: !!user.user.invitationId,
+			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
 			realNameKana: user.realNameKana ?? undefined,
@@ -286,17 +325,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		return roles.map((role) => role.roleId);
 	}
 
-	async fetchAllUsers(): Promise<User[]> {
+	async fetchApprovedUsers(): Promise<User[]> {
 		const users = await this.client.query.users.findMany({
+			where: isNull(schema.users.invitationId),
 			with: {
-				roles: true,
 				profile: true,
+				roles: true,
 			},
 		});
 
 		return users.map((user) => ({
 			id: user.id,
-			initialized: !!user.initializedAt,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -330,6 +372,94 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		if (!res2.success) {
 			throw new Error("Failed to update user role");
+		}
+	}
+
+	async addUserRole(userId: string, roleId: number): Promise<void> {
+		const res = await this.client
+			.insert(schema.userRoles)
+			.values({
+				userId,
+				roleId,
+			})
+			.onConflictDoNothing();
+
+		if (!res.success) {
+			throw new Error("Failed to add user role");
+		}
+	}
+
+	async fetchProvisionalUsers(): Promise<User[]> {
+		const users = await this.client.query.users.findMany({
+			where: isNotNull(schema.users.invitationId),
+			with: {
+				profile: true,
+				roles: true,
+				invitation: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
+			displayName: user.profile.displayName ?? undefined,
+			realName: user.profile.realName ?? undefined,
+			realNameKana: user.profile.realNameKana ?? undefined,
+			displayId: user.profile.displayId ?? undefined,
+			profileImageURL: user.profile.profileImageURL ?? undefined,
+			academicEmail: user.profile.academicEmail ?? undefined,
+			email: user.profile.email ?? undefined,
+			studentId: user.profile.studentId ?? undefined,
+			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			bio: user.profile.bio ?? undefined,
+			updatedAt: user.profile.updatedAt ?? undefined,
+			invitationTitle: user.invitation?.title ?? undefined,
+			invitationId: user.invitation?.id ?? undefined,
+		}));
+	}
+
+	async approveProvisionalUser(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				invitationId: null,
+				lastPaymentConfirmedAt: new Date(),
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to approve user");
+		}
+
+		// 仮実装でMEMBERロールを付与
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
+	}
+
+	async confirmPayment(userId: string): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({
+				lastPaymentConfirmedAt: new Date(),
+			})
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to confirm payment");
+		}
+
+		await this.addUserRole(userId, ROLE_IDS.MEMBER);
+	}
+
+	async rejectProvisionalUser(userId: string): Promise<void> {
+		const res = await this.client
+			.delete(schema.users)
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to reject user");
 		}
 	}
 }

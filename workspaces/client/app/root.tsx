@@ -15,6 +15,7 @@ import { RoleSelector } from "./components/feature/user/role-selector";
 import { UserSelector } from "./components/feature/user/user-selector";
 import { ConfirmDialog } from "./components/logic/callable/comfirm";
 import { InformationDialog } from "./components/logic/callable/information";
+import { InvitationProvider } from "./hooks/use-invitation/invitation-provider";
 import { RepositoryProvider } from "./hooks/use-repository";
 import { ToastProvider } from "./hooks/use-toast/toast-provider";
 import { initializeEnv } from "./utils/env";
@@ -90,11 +91,13 @@ export default function App() {
 		<RepositoryProvider>
 			<QueryClientProvider client={queryClient}>
 				<ToastProvider>
-					<Outlet />
-					<UserSelector.Root />
-					<RoleSelector.Root />
-					<ConfirmDialog.Root />
-					<InformationDialog.Root />
+					<InvitationProvider>
+						<Outlet />
+						<UserSelector.Root />
+						<RoleSelector.Root />
+						<ConfirmDialog.Root />
+						<InformationDialog.Root />
+					</InvitationProvider>
 				</ToastProvider>
 			</QueryClientProvider>
 		</RepositoryProvider>

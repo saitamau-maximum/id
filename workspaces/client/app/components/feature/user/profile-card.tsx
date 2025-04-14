@@ -6,9 +6,9 @@ import { RoleBadge } from "./role-badge";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { parseSocialLink } from "~/utils/parse-social-link";
 
-type Props = Omit<Member, "certifications"> & {
-	shrinkRoles?: boolean;
+type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
+	initialized: boolean;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -21,11 +21,8 @@ export const ProfileCard: React.FC<Props> = ({
 	roles,
 	bio,
 	socialLinks,
-	shrinkRoles = false,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
-	const trancatedRoles = shrinkRoles ? roles.slice(0, 3) : roles;
-	const rolesLeft = roles.length - trancatedRoles.length;
 
 	const socialLinksDetail = socialLinks?.map((link: string) => {
 		const {	service, handle } = parseSocialLink(link);
@@ -113,33 +110,6 @@ export const ProfileCard: React.FC<Props> = ({
 							>
 								{grade}
 							</span>
-						)}
-						{shrinkRoles && roles.length > 0 && (
-							<div
-								className={css({
-									display: "flex",
-									gap: 2,
-									alignItems: "center",
-									flexWrap: "wrap",
-								})}
-							>
-								{trancatedRoles.map((role) => (
-									<RoleBadge key={role.name} role={role} />
-								))}
-								{rolesLeft > 0 && (
-									<span
-										className={css({
-											color: "gray.500",
-											fontSize: "md",
-											mdDown: {
-												fontSize: "sm",
-											},
-										})}
-									>
-										+{rolesLeft}
-									</span>
-								)}
-							</div>
 						)}
 						{!initialized && (
 							<div
@@ -257,7 +227,7 @@ export const ProfileCard: React.FC<Props> = ({
 					</div>
 				)}
 				<div>
-					{!shrinkRoles && roles.length > 0 && (
+					{roles.length > 0 && (
 						<div
 							className={css({
 								display: "flex",

@@ -1,25 +1,31 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
-import { AnchorLike } from "~/components/ui/anchor-like";
 import { useAuth } from "~/hooks/use-auth";
+import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { env } from "~/utils/env";
-import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
 
 export default function Login() {
-	const { isLoading, isAuthorized } = useAuth();
+	const { isLoading, isAuthorized, isMember } = useAuth();
 	const navigate = useNavigate();
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
+	const { invitationCode } = useInvitation();
 
-	const shouldProceed = !isLoading && isAuthorized;
+	const shouldProceed = !isLoading && isAuthorized && isMember;
+
+	const loginUrl = new URL(`${env("SERVER_HOST")}/auth/login/github`);
 
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
-	const continueToURL = encodeURIComponent(
-		searchParams.get("continue_to") ?? `${window.location.origin}/verify`,
-	);
+	const continueToURL =
+		searchParams.get("continue_to") ?? `${window.location.origin}/verify`;
+	loginUrl.searchParams.set("continue_to", continueToURL);
+
+	// もし招待コードがあれば使う
+	if (invitationCode)
+		loginUrl.searchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
 		if (shouldProceed) {
@@ -91,25 +97,16 @@ export default function Login() {
 				Maximum IDPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
-				<br />
-				<a
-					href="https://github.com/saitamau-maximum"
-					className={css({ color: "blue.500" })}
-				>
-					<AnchorLike>Github Organization</AnchorLike>
-				</a>
-				に所属している方であれば <br />
-				どなたでもログイン可能です。
+				{invitationCode && (
+					<p>
+						招待を受け入れるには以下のボタンから GitHub
+						アカウントでログインしてください。
+					</p>
+				)}
 			</p>
-			{FLAG.ENABLE_LOGIN ? (
-				<a
-					href={`${env("SERVER_HOST")}/auth/login/github?continue_to=${continueToURL}`}
-				>
-					<LoginButtonLike />
-				</a>
-			) : (
-				<LoginButtonLike disabled />
-			)}
+			<a href={loginUrl.toString()}>
+				<LoginButtonLike />
+			</a>
 		</div>
 	);
 }

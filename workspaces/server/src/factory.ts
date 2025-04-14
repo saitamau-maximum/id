@@ -38,6 +38,7 @@ export type HonoEnv = {
 		oauthClientInfo?: Awaited<
 			ReturnType<IOAuthExternalRepository["getClientById"]>
 		>;
+		roleIds: number[];
 	} & JwtVariables<{ userId: string }>;
 };
 

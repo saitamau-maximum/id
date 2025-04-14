@@ -1,16 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
+import { ROLE_IDS } from "~/types/role";
+import { getFiscalYearStartDate } from "~/utils/date";
 import { useRepository } from "./use-repository";
-
-// 今年度の最初の日付を取得する
-const getFiscalYearStartDate = () => {
-	const date = new Date();
-	const year = date.getFullYear();
-	const month = date.getMonth() + 1;
-	if (month >= 4) {
-		return new Date(year, 3, 1);
-	}
-	return new Date(year - 1, 3, 1);
-};
 
 export function useAuth() {
 	const { authRepository } = useRepository();
@@ -22,8 +13,10 @@ export function useAuth() {
 	return {
 		isLoading,
 		user: data,
-		isInitialized: !!data?.initialized,
+		isInitialized: !!data?.initializedAt,
 		isAuthorized: !error,
+		isProvisional: !!data?.isProvisional,
+		isMember: data?.roles.some((role) => role.id === ROLE_IDS.MEMBER) || false,
 		// 今年度の最初の日付以降に更新されたか
 		hasFiscalYearUpdated:
 			data?.updatedAt && data.updatedAt >= getFiscalYearStartDate(),

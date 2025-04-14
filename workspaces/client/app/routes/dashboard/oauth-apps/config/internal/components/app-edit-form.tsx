@@ -25,7 +25,8 @@ const UpdateFormSchema = v.object({
 	icon: OAuthSchemas.Icon,
 });
 
-type FormValues = v.InferOutput<typeof UpdateFormSchema>;
+type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
+type FormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 
 const iconStyle = css({
 	padding: 1,
@@ -73,7 +74,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 		handleSubmit,
 		setValue,
 		formState: { errors },
-	} = useForm<FormValues>({
+	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UpdateFormSchema),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる

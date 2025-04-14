@@ -4,8 +4,10 @@ export const GRADE = [
 	{ label: "学部 (Bachelor)", identifier: ["B1", "B2", "B3", "B4"] },
 	{ label: "修士 (Master)", identifier: ["M1", "M2"] },
 	{ label: "博士 (Doctor)", identifier: ["D1", "D2", "D3"] },
-	{ label: "その他", identifier: ["卒業生"] },
+	{ label: "その他", identifier: ["卒業生", "ゲスト"] },
 ];
+
+export const OUTSIDE_GRADE = ["卒業生", "ゲスト"];
 
 export const RESERVED_WORDS = [
 	"maximum",

@@ -13,11 +13,13 @@ import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
+import { validateInvitation } from "../../service/invite";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
 
 const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
 interface GitHubOAuthTokenResponse {
 	access_token: string;
@@ -59,14 +61,24 @@ const callbackRequestQuerySchema = v.object({
 });
 
 const loginRequestQuerySchema = v.object({
-	continue_to: v.optional(v.string()),
+	continue_to: v.string(),
+	invitation_id: v.optional(v.string()),
 });
 
 const route = app
 	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
-		const { continue_to } = c.req.valid("query");
+		const { continue_to, invitation_id } = c.req.valid("query");
 
 		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+		if (invitation_id) {
+			setSignedCookie(
+				c,
+				COOKIE_NAME.INVITATION_ID,
+				invitation_id,
+				c.env.SECRET,
+				getCookieOptions(new URL(c.req.url).protocol === "http:"),
+			);
+		}
 
 		const requestUrl = new URL(c.req.url);
 
@@ -123,34 +135,64 @@ const route = app
 			const userOctokit = new Octokit({ auth: access_token });
 			const { data: user } = await userOctokit.request("GET /user");
 
-			const isMember = await c.var.OrganizationRepository.checkIsMember(
-				user.login,
+			const invitationId = await getSignedCookie(
+				c,
+				c.env.SECRET,
+				COOKIE_NAME.INVITATION_ID,
 			);
+			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
 
-			if (!isMember) {
-				// いったん Maximum Member じゃない場合はログインさせないようにする
-				return c.text("not a member", 403);
-			}
-
-			let foundUserId = null;
+			const githubUserIdStr = String(user.id);
+			let foundUserId: string | null;
 			try {
-				// ユーザーが存在するか確認
-				const id = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					String(user.id),
+				// ユーザーの存在確認
+				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
+					githubUserIdStr,
 					OAUTH_PROVIDER_IDS.GITHUB,
 				);
-				foundUserId = id;
-			} catch (e) {
-				// もしユーザーが見つからなかったら新規作成
-				foundUserId = await c.var.UserRepository.createUser(
-					String(user.id),
-					OAUTH_PROVIDER_IDS.GITHUB,
-					{
-						email: user.email ?? undefined,
-						displayName: user.login,
-						profileImageURL: user.avatar_url,
-					},
-				);
+			} catch {
+				// ユーザーが存在しなかった場合
+				if (typeof invitationId === "string") {
+					// 招待コードの署名検証に成功しているので、コードを検証する
+					try {
+						// 招待コードが有効かチェックし、有効な場合は消費する
+						await validateInvitation(c.var.InviteRepository, invitationId);
+						await c.var.InviteRepository.reduceInviteUsage(invitationId);
+					} catch (e) {
+						return c.text((e as Error).message, 400);
+					}
+					// 招待コードが有効な場合、仮登録処理を行う
+					foundUserId = await c.var.UserRepository.createTemporaryUser(
+						githubUserIdStr,
+						OAUTH_PROVIDER_IDS.GITHUB,
+						invitationId,
+						{
+							email: user.email ?? undefined,
+							displayName: user.login,
+							profileImageURL: user.avatar_url,
+						},
+					);
+				} else if (invitationId === undefined) {
+					// 招待コードが提供されなかった場合、GitHub Organization メンバーかどうかを確認する処理
+					const isMember = await c.var.OrganizationRepository.checkIsMember(
+						user.login,
+					);
+					if (!isMember)
+						return c.text("invitation code required for non-members", 403);
+					// Organization のメンバーであれば、本登録処理を行う
+					foundUserId = await c.var.UserRepository.createUser(
+						githubUserIdStr,
+						OAUTH_PROVIDER_IDS.GITHUB,
+						{
+							email: user.email ?? undefined,
+							displayName: user.login,
+							profileImageURL: user.avatar_url,
+						},
+					);
+				} else {
+					// invitationId が不正な場合の処理
+					return c.text(INVITATION_ERROR_MESSAGE, 400);
+				}
 			}
 
 			const now = Math.floor(Date.now() / 1000);

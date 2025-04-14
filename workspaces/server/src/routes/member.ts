@@ -1,12 +1,11 @@
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
-import { authMiddleware } from "../middleware/auth";
+import { memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
 const route = app
-	.use(authMiddleware)
-	.get("/list", async (c) => {
+	.get("/list", memberOnlyMiddleware, async (c) => {
 		const { UserRepository } = c.var;
 		try {
 			const members = await UserRepository.fetchMembers();
@@ -15,7 +14,7 @@ const route = app
 			return c.json({ error: "member not found" }, 404);
 		}
 	})
-	.get("/profile/:userDisplayId", async (c) => {
+	.get("/profile/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
 		const { UserRepository } = c.var;
 		try {
@@ -25,7 +24,7 @@ const route = app
 			return c.json({ error: "member not found" }, 404);
 		}
 	})
-	.get("/contribution/:userDisplayId", async (c) => {
+	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
 		const {
 			ContributionRepository,

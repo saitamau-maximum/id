@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "8ddc2191-32d9-447f-9c16-66a5e51816c7",
+  "id": "37be7446-f9b6-4347-8e01-afdc3214a02f",
   "prevId": "bb5a241a-e219-474e-86f7-1a57e1f0d504",
   "tables": {
     "calendar_events": {
@@ -302,59 +302,6 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
-    "social_links": {
-      "name": "social_links",
-      "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "provider_id": {
-          "name": "provider_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "social_links_user_id_users_id_fk": {
-          "name": "social_links_user_id_users_id_fk",
-          "tableFrom": "social_links",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "social_links_user_id_provider_id_pk": {
-          "columns": [
-            "user_id",
-            "provider_id"
-          ],
-          "name": "social_links_user_id_provider_id_pk"
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
     "user_certifications": {
       "name": "user_certifications",
       "columns": {
@@ -630,10 +577,31 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "invitation_id": {
+          "name": "invitation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "users_invitation_id_invites_id_fk": {
+          "name": "users_invitation_id_invites_id_fk",
+          "tableFrom": "users",
+          "tableTo": "invites",
+          "columnsFrom": [
+            "invitation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}

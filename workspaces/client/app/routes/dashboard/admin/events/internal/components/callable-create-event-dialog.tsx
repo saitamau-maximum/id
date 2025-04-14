@@ -29,7 +29,8 @@ const CreateFormSchema = v.object({
 	locationId: EventSchemas.LocationId,
 });
 
-type CreateFormValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
+type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 	const { locations } = useLocations();
@@ -38,15 +39,23 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 		handleSubmit,
 		register,
 		watch,
+		setError,
 		formState: { errors },
-	} = useForm<CreateFormValues>({
+	} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
 		resolver: valibotResolver(CreateFormSchema),
 		defaultValues: {
 			locationId: null,
 		},
 	});
 
-	const onSubmit = async (values: CreateFormValues) => {
+	const onSubmit = async (values: CreateFormOutputValues) => {
+		if (values.startAt >= values.endAt) {
+			setError("root", {
+				message: "終了日時は開始日時よりも後にしてください",
+			});
+			return;
+		}
+
 		call.end({
 			type: "success",
 			payload: {
@@ -134,6 +143,8 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 					</Form.RadioGroup>
 					<ErrorDisplay error={errors.locationId?.message} />
 				</Form.FieldSet>
+
+				<ErrorDisplay error={errors.root?.message} />
 
 				<div
 					className={css({

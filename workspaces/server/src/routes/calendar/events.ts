@@ -1,8 +1,12 @@
 import { vValidator } from "@hono/valibot-validator";
+import { validator } from "hono/validator";
 import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
-import { roleAuthorizationMiddleware } from "../../middleware/auth";
+import {
+	calendarMutableMiddleware,
+	memberOnlyMiddleware,
+} from "../../middleware/auth";
 
 const app = factory.createApp();
 
@@ -24,7 +28,7 @@ const updateEventSchema = v.object({
 });
 
 const route = app
-	.get("/", async (c) => {
+	.get("/", memberOnlyMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		try {
 			const events = await CalendarRepository.getAllEvents();
@@ -35,10 +39,14 @@ const route = app
 	})
 	.post(
 		"/",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
+		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
+		validator("json", (value, c) => {
+			if (new Date(value.startAt) >= new Date(value.endAt)) {
+				return c.json({ error: "startAt must be before endAt" }, 400);
+			}
+			return value;
+		}),
 		async (c) => {
 			const { CalendarRepository } = c.var;
 			const { userId } = c.get("jwtPayload");
@@ -62,10 +70,14 @@ const route = app
 	)
 	.put(
 		"/:id",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
+		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
+		validator("json", (value, c) => {
+			if (new Date(value.startAt) >= new Date(value.endAt)) {
+				return c.json({ error: "startAt must be before endAt" }, 400);
+			}
+			return value;
+		}),
 		async (c) => {
 			const { CalendarRepository } = c.var;
 			const { userId, title, description, startAt, endAt, locationId } =
@@ -81,6 +93,15 @@ const route = app
 				locationId,
 			};
 			try {
+				// もしAdminじゃないなら、自分のイベントだけ更新できる
+				const roleIds = c.get("roleIds");
+				if (!roleIds.includes(ROLE_IDS.ADMIN)) {
+					const event = await CalendarRepository.getEventById(id);
+					if (event.userId !== userId) {
+						return c.json({ error: "Forbidden" }, 403);
+					}
+				}
+				// イベントを更新
 				await CalendarRepository.updateEvent(eventPayload);
 				return c.json({ message: "event updated" });
 			} catch (e) {
@@ -88,21 +109,25 @@ const route = app
 			}
 		},
 	)
-	.delete(
-		"/:id",
-		roleAuthorizationMiddleware({
-			ALLOWED_ROLES: [ROLE_IDS.ADMIN],
-		}),
-		async (c) => {
-			const { CalendarRepository } = c.var;
-			const id = c.req.param("id");
-			try {
-				await CalendarRepository.deleteEvent(id);
-				return c.json({ message: "event deleted" });
-			} catch (e) {
-				return c.json({ error: "event not deleted" }, 500);
+	.delete("/:id", calendarMutableMiddleware, async (c) => {
+		const { CalendarRepository } = c.var;
+		const id = c.req.param("id");
+		const { userId } = c.get("jwtPayload");
+		try {
+			// もしAdminじゃないなら、自分のイベントだけ削除できる
+			const roleIds = c.get("roleIds");
+			if (!roleIds.includes(ROLE_IDS.ADMIN)) {
+				const event = await CalendarRepository.getEventById(id);
+				if (event.userId !== userId) {
+					return c.json({ error: "Forbidden" }, 403);
+				}
 			}
-		},
-	);
+			// イベントを削除
+			await CalendarRepository.deleteEvent(id);
+			return c.json({ message: "event deleted" });
+		} catch (e) {
+			return c.json({ error: "event not deleted" }, 500);
+		}
+	});
 
 export { route as calendarEventRoute };

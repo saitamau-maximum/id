@@ -1,11 +1,14 @@
-import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
-import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
+import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
+import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
+import { EVENTS_ALLOWED_ROLES } from "./events/layout";
 import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
+import { INVITES_ALLOWED_ROLES } from "./invites/layout";
+import { USER_ALLOWED_ROLES } from "./users/layout";
 
 const NAVIGATION = [
 	{
@@ -14,11 +17,30 @@ const NAVIGATION = [
 		isActive: (location: string) => location === "/admin",
 	},
 	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) => (USER_ALLOWED_ROLES as number[]).includes(r.id)),
 		label: "Users",
 		to: "/admin/users",
 		isActive: (location: string) => location.startsWith("/admin/users"),
 	},
+	...(FLAG.ENABLE_INVITE
+		? [
+				{
+					shouldDisplay: (user: User) =>
+						user.roles.some((r) =>
+							(INVITES_ALLOWED_ROLES as number[]).includes(r.id),
+						),
+					label: "Invites",
+					to: "/admin/invites",
+					isActive: (location: string) => location.startsWith("/admin/invites"),
+				},
+			]
+		: []),
 	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) =>
+				(CERTIFICATIONS_ALLOWED_ROLES as number[]).includes(r.id),
+			),
 		label: "Certifications",
 		to: "/admin/certifications",
 		isActive: (location: string) =>
@@ -27,6 +49,10 @@ const NAVIGATION = [
 	...(FLAG.ENABLE_CALENDAR
 		? [
 				{
+					shouldDisplay: (user: User) =>
+						user.roles.some((r) =>
+							(EVENTS_ALLOWED_ROLES as number[]).includes(r.id),
+						),
 					label: "Events",
 					to: "/admin/events",
 					isActive: (location: string) => location.startsWith("/admin/events"),
@@ -36,21 +62,10 @@ const NAVIGATION = [
 ];
 
 export default function AdminLayout() {
-	const navigate = useNavigate();
-
-	const { user, isLoading, isAuthorized } = useAuth();
+	const { user } = useAuth();
 	const { data: requests } = useCertificationRequests();
 
-	useEffect(() => {
-		if (isLoading || !isAuthorized) {
-			return;
-		}
-		if (!user?.roles.some((role) => role.id === ROLE_IDS.ADMIN)) {
-			navigate("/");
-		}
-	}, [isLoading, isAuthorized, user, navigate]);
-
-	if (isLoading || !user?.roles.some((role) => role.id === ROLE_IDS.ADMIN)) {
+	if (!user) {
 		return null;
 	}
 
@@ -58,18 +73,21 @@ export default function AdminLayout() {
 		<div>
 			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
 			<Tab.List>
-				{NAVIGATION.map((nav) => (
-					<Tab.Item
-						key={nav.to}
-						to={nav.to}
-						isActive={nav.isActive}
-						notification={
-							nav.label === "Certifications" ? requests.length : undefined
-						}
-					>
-						{nav.label}
-					</Tab.Item>
-				))}
+				{NAVIGATION.map(
+					(nav) =>
+						(!nav.shouldDisplay || nav.shouldDisplay(user)) && (
+							<Tab.Item
+								key={nav.to}
+								to={nav.to}
+								isActive={nav.isActive}
+								notification={
+									nav.label === "Certifications" ? requests.length : undefined
+								}
+							>
+								{nav.label}
+							</Tab.Item>
+						),
+				)}
 			</Tab.List>
 			<Outlet />
 		</div>

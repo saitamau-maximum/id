@@ -1,5 +1,4 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import {} from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
@@ -12,12 +11,17 @@ const CreateFormSchema = v.object({
 	description: v.string(),
 });
 
-type FormValues = v.InferOutput<typeof CreateFormSchema>;
+type FormInputValues = v.InferInput<typeof CreateFormSchema>;
+type FormOutputValues = v.InferOutput<typeof CreateFormSchema>;
 
 export const CertificationCreator = () => {
 	const { mutate, isPending } = useCreateCertification();
 
-	const { register, handleSubmit, reset } = useForm<FormValues>({
+	const { register, handleSubmit, reset } = useForm<
+		FormInputValues,
+		unknown,
+		FormOutputValues
+	>({
 		resolver: valibotResolver(CreateFormSchema),
 	});
 

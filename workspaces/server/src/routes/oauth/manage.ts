@@ -22,7 +22,9 @@ const generateHash = async (secret: string) => {
 
 const verifyOAuthClientMiddleware = factory.createMiddleware(
 	async (c, next) => {
-		const { clientId } = c.req.param();
+		const clientId = c.req.param("clientId");
+		if (!clientId) return c.text("Not found", 404);
+
 		const { userId } = c.get("jwtPayload");
 
 		const client = await c.var.OAuthExternalRepository.getClientById(clientId);
