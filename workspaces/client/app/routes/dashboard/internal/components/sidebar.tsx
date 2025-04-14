@@ -132,6 +132,7 @@ export const Sidebar = () => {
 	const { user, refetch } = useAuth();
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [discordInvitationUrl, setDiscordInvitationUrl] = useState("");
 	const navigate = useNavigate();
 	const { miscRepository } = useRepository();
 
@@ -140,9 +141,8 @@ export const Sidebar = () => {
 		refetch();
 	}, [refetch]);
 
-	const handleRecieveDiscordInvitation = useCallback(async () => {
-		const url = await miscRepository.getDiscordInvitationURL();
-		window.open(url);
+	useEffect(async () => {
+		setDiscordInivitationUrl(await miscRepository.getDiscordInvitationURL());
 	}, [miscRepository]);
 
 	if (!user) {
@@ -365,7 +365,7 @@ export const Sidebar = () => {
 								/>
 								OAuth Apps
 							</Menu.Item>
-							<Menu.Item onAction={handleRecieveDiscordInvitation}>
+							<Menu.Item onAction={navigate(discordInvitationUrl)}>
 								<img
 									src="/discord.svg"
 									alt="Discord"
