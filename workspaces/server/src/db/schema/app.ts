@@ -100,11 +100,11 @@ export const socialLinks = sqliteTable(
 		userId: text("user_id")
 			.references(() => users.id)
 			.notNull(),
-		url: text("url").notNull(),
+		url: text("url").notNull().primaryKey(),
 	},
 	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.url] }),
-	})
+		userIdx: index("user_idx").on(table.userId),
+	}),
 );
 
 export const socialLinksRelations = relations(socialLinks, ({ one }) => ({
