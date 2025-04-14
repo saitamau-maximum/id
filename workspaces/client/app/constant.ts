@@ -56,12 +56,12 @@ export const SOCIAL_SERVICES = [
 	},
 	{
 		id: SOCIAL_SERVICES_IDS.INSTAGRAM,
-		host: "instagram.com",
+		host: "www.instagram.com",
 		prefix: "https://www.instagram.com/",
 	},
 	{
 		id: SOCIAL_SERVICES_IDS.KAGGLE,
-		host: "kaggle.com",
+		host: "www.kaggle.com",
 		prefix: "https://www.kaggle.com/",
 	},
 	{
