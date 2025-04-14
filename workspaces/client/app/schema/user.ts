@@ -89,6 +89,7 @@ export const UserSchemas = {
 					v.url("URL が正しくありません"),
 					v.custom((input) => {
 						// SOCIAL_SERVICES_IDSがOTHERでなく、SOCIAL_SERVICES_URL_PREFIXESに含まれていないものは弾く
+						if (typeof input !== "string") return false;
 						const service = detectSocialService(input);
 						if (service === SOCIAL_SERVICES_IDS.OTHER) return true;
 						const prefix = SOCIAL_SERVICES.find(
