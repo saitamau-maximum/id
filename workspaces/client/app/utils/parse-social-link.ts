@@ -1,6 +1,6 @@
 import {
-	SOCIAL_SERVICES_IDS,
 	SOCIAL_SERVICES,
+	SOCIAL_SERVICES_IDS,
 	type SocialServiceId,
 } from "../constant";
 

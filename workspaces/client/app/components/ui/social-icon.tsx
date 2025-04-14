@@ -1,8 +1,8 @@
 import { FaGithub, FaInstagram, FaKaggle } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { RiGlobalLine } from "react-icons/ri";
-import { SiCodeforces, SiZenn, SiQiita } from "react-icons/si";
 import { GiLaurelsTrophy } from "react-icons/gi";
+import { RiGlobalLine } from "react-icons/ri";
+import { SiCodeforces, SiQiita, SiZenn } from "react-icons/si";
 import { SOCIAL_SERVICES_IDS, type SocialServiceId } from "../../constant";
 
 interface SocialIconProps {

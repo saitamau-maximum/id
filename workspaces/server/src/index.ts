@@ -49,7 +49,7 @@ export const route = app
 		);
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
 		// c.set("SocialLinkRepository", new CloudflareSocialLinkRepository(c.env.DB));
-		
+
 		c.set(
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),

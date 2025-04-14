@@ -34,16 +34,45 @@ export const SOCIAL_SERVICES_IDS = {
 	OTHER: 999, // あとから増えてもいいように遠い値にする
 } as const;
 
-export type SocialServiceId = (typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
+export type SocialServiceId =
+	(typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
 
 export const SOCIAL_SERVICES = [
-	{id: SOCIAL_SERVICES_IDS.GITHUB, host: "github.com", prefix: "https://github.com/" },
-	{id: SOCIAL_SERVICES_IDS.ATCODER, host: "atcoder.jp", prefix: "https://atcoder.jp/users/" },
-	{id: SOCIAL_SERVICES_IDS.X, host: "x.com", prefix: "https://x.com/" },
-	{id: SOCIAL_SERVICES_IDS.CODEFORCES, host: "codeforces.com", prefix: "https://codeforces.com/profile/" },
-	{id: SOCIAL_SERVICES_IDS.INSTAGRAM, host: "instagram.com", prefix: "https://www.instagram.com/" },
-	{id: SOCIAL_SERVICES_IDS.KAGGLE, host: "kaggle.com", prefix: "https://www.kaggle.com/" },
-	{id: SOCIAL_SERVICES_IDS.ZENN, host: "zenn.dev", prefix: "https://zenn.dev/" },
-	{id: SOCIAL_SERVICES_IDS.QIITA, host: "qiita.com", prefix: "https://qiita.com/" },
-	{id: SOCIAL_SERVICES_IDS.OTHER, host: "other", prefix: "" },
+	{
+		id: SOCIAL_SERVICES_IDS.GITHUB,
+		host: "github.com",
+		prefix: "https://github.com/",
+	},
+	{
+		id: SOCIAL_SERVICES_IDS.ATCODER,
+		host: "atcoder.jp",
+		prefix: "https://atcoder.jp/users/",
+	},
+	{ id: SOCIAL_SERVICES_IDS.X, host: "x.com", prefix: "https://x.com/" },
+	{
+		id: SOCIAL_SERVICES_IDS.CODEFORCES,
+		host: "codeforces.com",
+		prefix: "https://codeforces.com/profile/",
+	},
+	{
+		id: SOCIAL_SERVICES_IDS.INSTAGRAM,
+		host: "instagram.com",
+		prefix: "https://www.instagram.com/",
+	},
+	{
+		id: SOCIAL_SERVICES_IDS.KAGGLE,
+		host: "kaggle.com",
+		prefix: "https://www.kaggle.com/",
+	},
+	{
+		id: SOCIAL_SERVICES_IDS.ZENN,
+		host: "zenn.dev",
+		prefix: "https://zenn.dev/",
+	},
+	{
+		id: SOCIAL_SERVICES_IDS.QIITA,
+		host: "qiita.com",
+		prefix: "https://qiita.com/",
+	},
+	{ id: SOCIAL_SERVICES_IDS.OTHER, host: "other", prefix: "" },
 ];

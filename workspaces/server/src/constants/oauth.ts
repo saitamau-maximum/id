@@ -3,4 +3,4 @@ export const OAUTH_SCOPE_REGEX =
 
 export const OAUTH_PROVIDER_IDS = {
 	GITHUB: 1,
-}
+};

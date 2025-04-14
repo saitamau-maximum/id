@@ -1,10 +1,10 @@
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
+import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
-import { RoleBadge } from "./role-badge";
-import { SocialIcon } from "~/components/ui/social-icon";
 import { parseSocialLink } from "~/utils/parse-social-link";
+import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
@@ -25,7 +25,7 @@ export const ProfileCard: React.FC<Props> = ({
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
 	const socialLinksDetail = socialLinks?.map((link: string) => {
-		const {	service, handle } = parseSocialLink(link);
+		const { service, handle } = parseSocialLink(link);
 		return {
 			service,
 			handle,
@@ -217,10 +217,10 @@ export const ProfileCard: React.FC<Props> = ({
 										},
 										_hover: {
 											color: "gray.800",
-										}
+										},
 									})}
 								>
-								{link.handle}
+									{link.handle}
 								</span>
 							</a>
 						))}

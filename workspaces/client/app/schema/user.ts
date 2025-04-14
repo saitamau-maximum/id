@@ -1,8 +1,8 @@
 import * as v from "valibot";
 import { RESERVED_WORDS } from "~/constant";
-import { MaxLines } from "~/utils/valibot";
-import { SOCIAL_SERVICES_IDS, SOCIAL_SERVICES } from "~/constant";
+import { SOCIAL_SERVICES, SOCIAL_SERVICES_IDS } from "~/constant";
 import { detectSocialService } from "~/utils/parse-social-link";
+import { MaxLines } from "~/utils/valibot";
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;

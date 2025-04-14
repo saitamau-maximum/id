@@ -10,11 +10,14 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { IconButton } from "~/components/ui/icon-button";
+import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
 import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
+import { detectSocialService } from "~/utils/parse-social-link";
 import {
 	useCertifications,
 	useDeleteUserCertification,
@@ -23,9 +26,6 @@ import { useSendCertificationRequest } from "../hooks/use-send-certification-req
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
-import { IconButton } from "~/components/ui/icon-button";
-import { SocialIcon } from "~/components/ui/social-icon";
-import { detectSocialService } from "~/utils/parse-social-link";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -346,35 +346,35 @@ export const ProfileUpdateForm = () => {
 				>
 					{socialLinks.map((field, index) => (
 						<>
-						<ErrorDisplay
-							key={`error-${field.id}`}
-							error={errors.socialLinks?.[index]?.value?.message}
-						/>
-						<div
-							key={field.id}
-							className={css({
-								display: "flex",
-								gap: 4,
-								placeItems: "center",
-							})}
-						>
-							<SocialIcon
-								service={detectSocialService(
-									watch(`socialLinks.${index}.value` || ""),
-								)}
-								size={24}
+							<ErrorDisplay
+								key={`error-${field.id}`}
+								error={errors.socialLinks?.[index]?.value?.message}
 							/>
-							<Form.Input
-								placeholder="https://example.com"
-								{...register(`socialLinks.${index}.value`)}
-							/>
-							<IconButton
-								label="Remove social link"
-								onClick={() => removeSocialLink(index)}
+							<div
+								key={field.id}
+								className={css({
+									display: "flex",
+									gap: 4,
+									placeItems: "center",
+								})}
 							>
-								<X size={16} />
-							</IconButton>
-						</div>
+								<SocialIcon
+									service={detectSocialService(
+										watch(`socialLinks.${index}.value` || ""),
+									)}
+									size={24}
+								/>
+								<Form.Input
+									placeholder="https://example.com"
+									{...register(`socialLinks.${index}.value`)}
+								/>
+								<IconButton
+									label="Remove social link"
+									onClick={() => removeSocialLink(index)}
+								>
+									<X size={16} />
+								</IconButton>
+							</div>
 						</>
 					))}
 					<button
