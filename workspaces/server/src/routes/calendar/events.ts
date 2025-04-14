@@ -98,7 +98,7 @@ const route = app
 				if (!roleIds.includes(ROLE_IDS.ADMIN)) {
 					const event = await CalendarRepository.getEventById(id);
 					if (event.userId !== userId) {
-						return c.json({ error: "not authorized" }, 403);
+						return c.json({ error: "Forbidden" }, 403);
 					}
 				}
 				// イベントを更新
@@ -119,7 +119,7 @@ const route = app
 			if (!roleIds.includes(ROLE_IDS.ADMIN)) {
 				const event = await CalendarRepository.getEventById(id);
 				if (event.userId !== userId) {
-					return c.json({ error: "not authorized" }, 403);
+					return c.json({ error: "Forbidden" }, 403);
 				}
 			}
 			// イベントを削除
