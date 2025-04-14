@@ -30,7 +30,7 @@ export const ProfileCard: React.FC<Props> = ({
 	const socialLinksDetail = socialLinks?.map((link: string) => {
 		const {	service, handle } = parseSocialLink(link);
 		return {
-			service: service,
+			service,
 			handle,
 			url: link,
 		};
