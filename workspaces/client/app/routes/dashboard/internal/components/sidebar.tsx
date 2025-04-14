@@ -367,7 +367,7 @@ export const Sidebar = () => {
 							</Menu.Item>
 							<Menu.Item
 								onAction={() => {
-									navigate(discordInvitationUrl);
+									window.open(discordInvitationUrl);
 								}}
 							>
 								<img
