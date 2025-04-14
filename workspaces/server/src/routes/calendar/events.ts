@@ -4,7 +4,7 @@ import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
-	calendarEditableMiddleware,
+	calendarMutableMiddleware,
 	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
@@ -39,7 +39,7 @@ const route = app
 	})
 	.post(
 		"/",
-		calendarEditableMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -70,7 +70,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		calendarEditableMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
 		validator("json", (value, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
@@ -109,7 +109,7 @@ const route = app
 			}
 		},
 	)
-	.delete("/:id", calendarEditableMiddleware, async (c) => {
+	.delete("/:id", calendarMutableMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const id = c.req.param("id");
 		const { userId } = c.get("jwtPayload");

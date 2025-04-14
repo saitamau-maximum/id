@@ -67,7 +67,7 @@ export const adminOnlyMiddleware = every(
 	}),
 );
 
-export const calendarEditableMiddleware = every(
+export const calendarMutableMiddleware = every(
 	authMiddleware,
 	roleAuthorizationMiddleware({
 		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.CALENDAR_EDITOR],
