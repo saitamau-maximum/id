@@ -345,13 +345,11 @@ export const ProfileUpdateForm = () => {
 					})}
 				>
 					{socialLinks.map((field, index) => (
-						<>
+						<li className={css({ listStyle: "none" })} key={field.id}>
 							<ErrorDisplay
-								key={`error-${field.id}`}
 								error={errors.socialLinks?.[index]?.value?.message}
 							/>
 							<div
-								key={field.id}
 								className={css({
 									display: "flex",
 									gap: 4,
@@ -375,7 +373,7 @@ export const ProfileUpdateForm = () => {
 									<X size={16} />
 								</IconButton>
 							</div>
-						</>
+						</li>
 					))}
 					<button
 						type="button"
