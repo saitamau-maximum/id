@@ -336,7 +336,7 @@ export const ProfileUpdateForm = () => {
 				<legend>
 					<Form.LabelText>ソーシャルリンク (最大5つ)</Form.LabelText>
 				</legend>
-				<div
+				<ul
 					className={css({
 						display: "flex",
 						flexDirection: "column",
@@ -389,7 +389,7 @@ export const ProfileUpdateForm = () => {
 							Add
 						</ButtonLike>
 					</button>
-				</div>
+				</ul>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>

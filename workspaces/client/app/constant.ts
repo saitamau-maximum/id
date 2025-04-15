@@ -74,5 +74,44 @@ export const SOCIAL_SERVICES = [
 		host: "qiita.com",
 		prefix: "https://qiita.com/",
 	},
-	{ id: SOCIAL_SERVICES_IDS.OTHER, host: "other", prefix: "" },
+	{ id: SOCIAL_SERVICES_IDS.OTHER, host: "other" },
 ];
+
+export const ICON = {
+	[SOCIAL_SERVICES_IDS.GITHUB]: {
+		src: "/github.svg",
+		alt: "GitHub",
+	},
+	[SOCIAL_SERVICES_IDS.ATCODER]: {
+		src: "/atcoder.svg",
+		alt: "AtCoder",
+	},
+	[SOCIAL_SERVICES_IDS.X]: {
+		src: "/x.svg",
+		alt: "X",
+	},
+	[SOCIAL_SERVICES_IDS.CODEFORCES]: {
+		src: "/codeforces.svg",
+		alt: "Codeforces",
+	},
+	[SOCIAL_SERVICES_IDS.INSTAGRAM]: {
+		src: "/instagram.svg",
+		alt: "Instagram",
+	},
+	[SOCIAL_SERVICES_IDS.KAGGLE]: {
+		src: "/kaggle.svg",
+		alt: "Kaggle",
+	},
+	[SOCIAL_SERVICES_IDS.ZENN]: {
+		src: "/zenn.svg",
+		alt: "Zenn",
+	},
+	[SOCIAL_SERVICES_IDS.QIITA]: {
+		src: "/qiita.svg",
+		alt: "Qiita",
+	},
+	[SOCIAL_SERVICES_IDS.OTHER]: {
+		src: "/globe.svg",
+		alt: "Other",
+	},
+};
