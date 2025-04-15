@@ -12,16 +12,10 @@ export const JOB_ROLE_IDS = {
 export const STATUS_ROLE_IDS = {
 	/**
 	 * メンバー (会費を払ってる人という区分)
-	 * - 卒業生でも会費を払っている人は含む
+	 * - 卒業生や外部生でも会費を払っている人は含む
 	 * - 会費を払わなかった(==辞めた)人はこのロールを外すことでコンテンツアクセスを制限する
 	 */
 	MEMBER: 101,
-	/**
-	 * 卒業生 (Bachelor, Master, PhD のいずれかのタイミングで弊学を卒業した人)
-	 * - 卒業生でも会費を払うことでコンテンツアクセスを許可したい
-	 * - 現役との区別のためのロール
-	 */
-	ALUMNI: 102,
 } as const;
 
 export const TEAM_ROLE_IDS = {
@@ -87,12 +81,7 @@ export const ROLE_BY_ID: Record<number, Role> = {
 	[ROLE_IDS.CALENDAR_EDITOR]: {
 		id: ROLE_IDS.CALENDAR_EDITOR,
 		name: "カレンダー編集者",
-		color: "#0e8a16",
-	},
-	[ROLE_IDS.ALUMNI]: {
-		id: ROLE_IDS.ALUMNI,
-		name: "卒業生",
-		color: "#FF0000",
+		color: "#0E8A16",
 	},
 	[ROLE_IDS.CP]: {
 		id: ROLE_IDS.CP,

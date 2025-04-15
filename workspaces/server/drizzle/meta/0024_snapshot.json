@@ -1,8 +1,8 @@
 {
+  "id": "59c59e67-a042-4e61-acea-6d0f02fa1589",
+  "prevId": "53c7948c-f7e1-4618-bccb-b7d67fe19512",
   "version": "6",
   "dialect": "sqlite",
-  "id": "3d3e8294-f1b0-4282-8b58-bbf444bf0d06",
-  "prevId": "53c7948c-f7e1-4618-bccb-b7d67fe19512",
   "tables": {
     "calendar_events": {
       "name": "calendar_events",
@@ -84,28 +84,28 @@
         "calendar_events_user_id_users_id_fk": {
           "name": "calendar_events_user_id_users_id_fk",
           "tableFrom": "calendar_events",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "calendar_events_location_id_locations_id_fk": {
           "name": "calendar_events_location_id_locations_id_fk",
           "tableFrom": "calendar_events",
-          "tableTo": "locations",
           "columnsFrom": [
             "location_id"
           ],
+          "tableTo": "locations",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "set null"
         }
       },
       "compositePrimaryKeys": {},
@@ -175,15 +175,15 @@
         "invite_roles_invite_id_invites_id_fk": {
           "name": "invite_roles_invite_id_invites_id_fk",
           "tableFrom": "invite_roles",
-          "tableTo": "invites",
           "columnsFrom": [
             "invite_id"
           ],
+          "tableTo": "invites",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -249,15 +249,15 @@
         "invites_issued_by_users_id_fk": {
           "name": "invites_issued_by_users_id_fk",
           "tableFrom": "invites",
-          "tableTo": "users",
           "columnsFrom": [
             "issued_by"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -298,52 +298,6 @@
       },
       "indexes": {},
       "foreignKeys": {},
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "social_links": {
-      "name": "social_links",
-      "columns": {
-        "user_id": {
-          "name": "user_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "url": {
-          "name": "url",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        }
-      },
-      "indexes": {
-        "social_links_user_idx": {
-          "name": "social_links_user_idx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "social_links_user_id_users_id_fk": {
-          "name": "social_links_user_id_users_id_fk",
-          "tableFrom": "social_links",
-          "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -395,28 +349,28 @@
         "user_certifications_user_id_users_id_fk": {
           "name": "user_certifications_user_id_users_id_fk",
           "tableFrom": "user_certifications",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "user_certifications_certification_id_certifications_id_fk": {
           "name": "user_certifications_certification_id_certifications_id_fk",
           "tableFrom": "user_certifications",
-          "tableTo": "certifications",
           "columnsFrom": [
             "certification_id"
           ],
+          "tableTo": "certifications",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -546,15 +500,15 @@
         "user_profiles_user_id_users_id_fk": {
           "name": "user_profiles_user_id_users_id_fk",
           "tableFrom": "user_profiles",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -584,15 +538,15 @@
         "user_roles_user_id_users_id_fk": {
           "name": "user_roles_user_id_users_id_fk",
           "tableFrom": "user_roles",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -644,15 +598,15 @@
         "users_invitation_id_invites_id_fk": {
           "name": "users_invitation_id_invites_id_fk",
           "tableFrom": "users",
-          "tableTo": "invites",
           "columnsFrom": [
             "invitation_id"
           ],
+          "tableTo": "invites",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -682,15 +636,15 @@
         "oauth_client_callbacks_client_id_oauth_clients_id_fk": {
           "name": "oauth_client_callbacks_client_id_oauth_clients_id_fk",
           "tableFrom": "oauth_client_callbacks",
-          "tableTo": "oauth_clients",
           "columnsFrom": [
             "client_id"
           ],
+          "tableTo": "oauth_clients",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -728,28 +682,28 @@
         "oauth_client_managers_client_id_oauth_clients_id_fk": {
           "name": "oauth_client_managers_client_id_oauth_clients_id_fk",
           "tableFrom": "oauth_client_managers",
-          "tableTo": "oauth_clients",
           "columnsFrom": [
             "client_id"
           ],
+          "tableTo": "oauth_clients",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "oauth_client_managers_user_id_users_id_fk": {
           "name": "oauth_client_managers_user_id_users_id_fk",
           "tableFrom": "oauth_client_managers",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -787,15 +741,15 @@
         "oauth_client_scopes_client_id_oauth_clients_id_fk": {
           "name": "oauth_client_scopes_client_id_oauth_clients_id_fk",
           "tableFrom": "oauth_client_scopes",
-          "tableTo": "oauth_clients",
           "columnsFrom": [
             "client_id"
           ],
+          "tableTo": "oauth_clients",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -854,28 +808,28 @@
         "oauth_client_secrets_client_id_oauth_clients_id_fk": {
           "name": "oauth_client_secrets_client_id_oauth_clients_id_fk",
           "tableFrom": "oauth_client_secrets",
-          "tableTo": "oauth_clients",
           "columnsFrom": [
             "client_id"
           ],
+          "tableTo": "oauth_clients",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "oauth_client_secrets_issued_by_users_id_fk": {
           "name": "oauth_client_secrets_issued_by_users_id_fk",
           "tableFrom": "oauth_client_secrets",
-          "tableTo": "users",
           "columnsFrom": [
             "issued_by"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -934,15 +888,15 @@
         "oauth_clients_owner_id_users_id_fk": {
           "name": "oauth_clients_owner_id_users_id_fk",
           "tableFrom": "oauth_clients",
-          "tableTo": "users",
           "columnsFrom": [
             "owner_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -972,15 +926,15 @@
         "oauth_token_scopes_token_id_oauth_tokens_id_fk": {
           "name": "oauth_token_scopes_token_id_oauth_tokens_id_fk",
           "tableFrom": "oauth_token_scopes",
-          "tableTo": "oauth_tokens",
           "columnsFrom": [
             "token_id"
           ],
+          "tableTo": "oauth_tokens",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1082,28 +1036,28 @@
         "oauth_tokens_client_id_oauth_clients_id_fk": {
           "name": "oauth_tokens_client_id_oauth_clients_id_fk",
           "tableFrom": "oauth_tokens",
-          "tableTo": "oauth_clients",
           "columnsFrom": [
             "client_id"
           ],
+          "tableTo": "oauth_clients",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         },
         "oauth_tokens_user_id_users_id_fk": {
           "name": "oauth_tokens_user_id_users_id_fk",
           "tableFrom": "oauth_tokens",
-          "tableTo": "users",
           "columnsFrom": [
             "user_id"
           ],
+          "tableTo": "users",
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1174,9 +1128,9 @@
   "views": {},
   "enums": {},
   "_meta": {
+    "columns": {},
     "schemas": {},
-    "tables": {},
-    "columns": {}
+    "tables": {}
   },
   "internal": {
     "indexes": {}

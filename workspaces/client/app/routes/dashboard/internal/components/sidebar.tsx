@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
@@ -132,6 +132,7 @@ export const Sidebar = () => {
 	const { user, refetch } = useAuth();
 	const location = useLocation();
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
+	const [discordInvitationUrl, setDiscordInvitationUrl] = useState("");
 	const navigate = useNavigate();
 	const { miscRepository } = useRepository();
 
@@ -140,9 +141,8 @@ export const Sidebar = () => {
 		refetch();
 	}, [refetch]);
 
-	const handleRecieveDiscordInvitation = useCallback(async () => {
-		const url = await miscRepository.getDiscordInvitationURL();
-		window.open(url, "_blank", "noopener,noreferrer");
+	useEffect(() => {
+		miscRepository.getDiscordInvitationURL().then(setDiscordInvitationUrl);
 	}, [miscRepository]);
 
 	if (!user) {
@@ -365,7 +365,11 @@ export const Sidebar = () => {
 								/>
 								OAuth Apps
 							</Menu.Item>
-							<Menu.Item onAction={handleRecieveDiscordInvitation}>
+							<Menu.Item
+								onAction={() => {
+									window.open(discordInvitationUrl);
+								}}
+							>
 								<img
 									src="/discord.svg"
 									alt="Discord"
