@@ -3,7 +3,7 @@ import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
-import { parseSocialLink } from "~/utils/parse-social-link";
+import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt"> & {

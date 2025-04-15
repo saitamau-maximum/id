@@ -17,7 +17,7 @@ import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
-import { detectSocialService } from "~/utils/parse-social-link";
+import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
 	useDeleteUserCertification,
