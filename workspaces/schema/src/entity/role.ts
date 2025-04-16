@@ -55,7 +55,7 @@ if (new Set(ROLE_IDS_VALUES).size !== ROLE_IDS_VALUES.length) {
  * Roleの情報
  */
 export const Role = v.object({
-	id: v.number(),
+	id: v.union(ROLE_IDS_VALUES.map((roleId) => v.literal(roleId))),
 	name: v.string(),
 	color: v.pipe(
 		v.string(),
