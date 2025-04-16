@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { validator } from "hono/validator";
 import * as v from "valibot";
-import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import {
 	calendarMutableMiddleware,
