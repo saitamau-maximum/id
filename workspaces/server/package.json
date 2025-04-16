@@ -13,7 +13,7 @@
 		"deploy:prod": "wrangler deploy --env production",
 		"seed": "NODE_NO_WARNINGS=1 tsx ./src/db/seed/main.ts",
 		"fix": "biome check --write ./src",
-		"check": "biome check ./src"
+		"check": "biome check ./src && tsc"
 	},
 	"exports": {
 		"./shared/*": {
