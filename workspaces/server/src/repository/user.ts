@@ -7,7 +7,7 @@ export type RegisterUserPayload = Partial<UserProfile>;
 export type UpdateUserPayload = Partial<UserProfile>;
 
 export type FetchApprovedUsersRes = Omit<User, "certifications">[];
-export type FetchMembersRes = Omit<Member, "certifications">[];
+export type FetchMembersRes = Omit<Member, "certifications" | "bio">[];
 export type FetchProvisionalUsersRes = Omit<User, "certifications">[];
 
 export interface IUserRepository {

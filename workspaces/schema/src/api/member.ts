@@ -2,7 +2,7 @@ import * as v from "valibot";
 import { Member } from "../entity/member";
 
 export const GetMembersResponse = v.array(
-	v.omit(Member, ["certifications"] as const),
+	v.omit(Member, ["certifications", "bio"] as const),
 );
 export type GetMembersResponse = v.InferOutput<typeof GetMembersResponse>;
 

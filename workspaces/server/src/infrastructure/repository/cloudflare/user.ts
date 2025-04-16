@@ -252,7 +252,16 @@ export class CloudflareUserRepository implements IUserRepository {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
-				profile: true,
+				profile: {
+					columns: {
+						displayName: true,
+						realName: true,
+						realNameKana: true,
+						displayId: true,
+						profileImageURL: true,
+						grade: true,
+					},
+				},
 				roles: true,
 			},
 		});
@@ -271,7 +280,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
