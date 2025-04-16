@@ -20,6 +20,9 @@ importers:
       '@idp/flag':
         specifier: workspace:*
         version: link:../flag
+      '@idp/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@idp/server':
         specifier: workspace:*
         version: link:../server
@@ -117,11 +120,20 @@ importers:
 
   workspaces/flag: {}
 
+  workspaces/schema:
+    dependencies:
+      valibot:
+        specifier: ^1.0.0
+        version: 1.0.0(typescript@5.8.3)
+
   workspaces/server:
     dependencies:
       '@hono/valibot-validator':
         specifier: ^0.5.2
         version: 0.5.2(hono@4.7.5)(valibot@1.0.0(typescript@5.8.3))
+      '@idp/schema':
+        specifier: workspace:*
+        version: link:../schema
       '@octokit/auth-app':
         specifier: ^7.2.0
         version: 7.2.0
