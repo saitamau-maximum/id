@@ -1,37 +1,11 @@
-import type { Role } from "@idp/schema/entity/role";
-import type { UserCertification } from "./certification";
+import { User } from "@idp/schema/entity/user";
+import * as v from "valibot";
 
-/**
- * Userは公開情報と非公開情報を持つ。
- */
-export type User = {
-	id: string;
-	initializedAt?: Date;
-	lastPaymentConfirmedAt?: Date;
-	isProvisional: boolean;
-	roles: Role[];
-	displayName?: string;
-	realName?: string;
-	realNameKana?: string;
-	displayId?: string;
-	profileImageURL?: string;
-	academicEmail?: string;
-	email?: string;
-	studentId?: string;
-	grade?: string;
-	bio?: string;
-	socialLinks?: string[];
-	updatedAt?: Date;
-};
+export const UserBasicInfo = v.pick(User, [
+	"id",
+	"displayId",
+	"displayName",
+	"profileImageURL",
+]);
 
-export type UserWithCertifications = User & {
-	certifications: UserCertification[];
-};
-
-/**
- * あくまでもユーザー表示するだけのための軽めの情報
- */
-export type UserBasicInfo = Pick<
-	User,
-	"id" | "displayId" | "displayName" | "profileImageURL"
->;
+export type UserBasicInfo = v.InferOutput<typeof UserBasicInfo>;
