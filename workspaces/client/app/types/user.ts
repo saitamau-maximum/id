@@ -35,24 +35,3 @@ export type UserBasicInfo = Pick<
 	User,
 	"id" | "displayId" | "displayName" | "profileImageURL"
 >;
-
-/**
- * MemberはUserと一部同じフィールドを持つが、MemberはUserのうち公開情報のみを持つ。
- */
-export type Member = Pick<
-	User,
-	| "id"
-	| "roles"
-	| "displayName"
-	| "realName"
-	| "realNameKana"
-	| "displayId"
-	| "profileImageURL"
-	| "grade"
-	| "bio"
-	| "socialLinks"
->;
-
-export type MemberWithCertifications = Member & {
-	certifications: UserCertification[];
-};

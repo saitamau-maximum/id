@@ -1,7 +1,7 @@
+import type { Member } from "@idp/schema/entity/member";
 import { Role } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
 import * as v from "valibot";
-import type { Member } from "~/types/user";
 
 export interface Filter {
 	keyword: string;
@@ -15,7 +15,9 @@ const katakanaToHiragana = (str: string) => {
 	);
 };
 
-export function useMembersFilter(members: Member[]) {
+export function useMembersFilter(
+	members: Omit<Member, "certifications" | "bio">[],
+) {
 	const [filter, setFilter] = useState<Filter>({
 		keyword: "",
 		selectedGrades: [],
