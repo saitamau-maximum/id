@@ -48,6 +48,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	oauthConnections: many(oauthConnections),
 	roles: many(userRoles),
 	certifications: many(userCertifications),
+	socialLinks: many(socialLinks),
 }));
 
 export const userProfiles = sqliteTable(
@@ -102,6 +103,26 @@ export const userRoles = sqliteTable(
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
 	user: one(users, {
 		fields: [userRoles.userId],
+		references: [users.id],
+	}),
+}));
+
+export const socialLinks = sqliteTable(
+	"social_links",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull(),
+		url: text("url").notNull().primaryKey(),
+	},
+	(table) => ({
+		userIdx: index("social_links_user_idx").on(table.userId),
+	}),
+);
+
+export const socialLinksRelations = relations(socialLinks, ({ one }) => ({
+	user: one(users, {
+		fields: [socialLinks.userId],
 		references: [users.id],
 	}),
 }));

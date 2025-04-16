@@ -45,6 +45,7 @@ const ProfileSchema = v.object({
 	),
 	grade: v.pipe(v.string(), v.nonEmpty()),
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
+	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
 });
 
 const registerSchema = v.object({
@@ -68,6 +69,7 @@ const updateSchema = v.object({
 	studentId: ProfileSchema.entries.studentId,
 	grade: ProfileSchema.entries.grade,
 	bio: ProfileSchema.entries.bio,
+	socialLinks: ProfileSchema.entries.socialLinks,
 });
 
 const updateProfileImageSchema = v.object({
@@ -137,6 +139,7 @@ const route = app
 				studentId,
 				grade,
 				bio,
+				socialLinks,
 			} = c.req.valid("json");
 
 			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
@@ -160,6 +163,7 @@ const route = app
 				studentId,
 				grade,
 				bio,
+				socialLinks,
 			});
 
 			return c.text("ok", 200);

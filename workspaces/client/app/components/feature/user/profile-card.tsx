@@ -1,10 +1,13 @@
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
+import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
+import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
+	socialLinks?: string[];
 	initialized: boolean;
 };
 
@@ -17,8 +20,18 @@ export const ProfileCard: React.FC<Props> = ({
 	initialized,
 	roles,
 	bio,
+	socialLinks,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
+
+	const socialLinksDetail = socialLinks?.map((link: string) => {
+		const { service, handle } = parseSocialLink(link);
+		return {
+			service,
+			handle,
+			url: link,
+		};
+	});
 
 	return (
 		<div
@@ -170,34 +183,80 @@ export const ProfileCard: React.FC<Props> = ({
 					)}
 				</div>
 			</div>
-			{roles.length > 0 && (
-				<div
-					className={css({
-						display: "flex",
-						gap: 2,
-						alignItems: "center",
-						flexWrap: "wrap",
-					})}
-				>
-					{roles.map((role) => (
-						<RoleBadge key={role.name} role={role} />
-					))}
+			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>
+				{(socialLinksDetail ?? []).length > 0 && (
+					<div
+						className={css({
+							display: "flex",
+							flexDirection: "column",
+							gap: "4px",
+							alignItems: "flex-start",
+							minWidth: "120px",
+						})}
+					>
+						{socialLinksDetail?.map((link) => (
+							<a
+								key={link.url}
+								href={link.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								className={css({
+									display: "flex",
+									alignItems: "center",
+									gap: 2,
+									textDecoration: "none",
+								})}
+							>
+								<SocialIcon service={link.service} />
+								<span
+									className={css({
+										color: "gray.600",
+										fontSize: "sm",
+										mdDown: {
+											fontSize: "sm",
+										},
+										_hover: {
+											color: "gray.800",
+										},
+									})}
+								>
+									{link.handle}
+								</span>
+							</a>
+						))}
+					</div>
+				)}
+				<div>
+					{roles.length > 0 && (
+						<div
+							className={css({
+								display: "flex",
+								gap: 2,
+								alignItems: "center",
+								flexWrap: "wrap",
+							})}
+						>
+							{roles.map((role) => (
+								<RoleBadge key={role.name} role={role} />
+							))}
+						</div>
+					)}
+					{bio && (
+						<Document
+							inlineOnly
+							className={css({
+								color: "gray.500",
+								fontSize: "md",
+								mdDown: {
+									fontSize: "sm",
+								},
+							})}
+						>
+							{bioPreviewContent}
+						</Document>
+					)}
 				</div>
-			)}
-			{bio && (
-				<Document
-					inlineOnly
-					className={css({
-						color: "gray.500",
-						fontSize: "md",
-						mdDown: {
-							fontSize: "sm",
-						},
-					})}
-				>
-					{bioPreviewContent}
-				</Document>
-			)}
+			</div>
 		</div>
 	);
 };

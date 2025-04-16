@@ -20,6 +20,7 @@ export type User = {
 	studentId?: string;
 	grade?: string;
 	bio?: string;
+	socialLinks?: string[];
 	updatedAt?: Date;
 };
 
@@ -50,6 +51,7 @@ export type Member = Pick<
 	| "profileImageURL"
 	| "grade"
 	| "bio"
+	| "socialLinks"
 >;
 
 export type MemberWithCertifications = Member & {

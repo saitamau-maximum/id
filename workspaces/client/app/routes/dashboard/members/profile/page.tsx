@@ -76,6 +76,7 @@ export default function Profile() {
 					initialized={!!memberProfile?.initializedAt}
 					roles={memberProfile?.roles || []}
 					bio={memberProfile?.bio}
+					socialLinks={memberProfile?.socialLinks}
 				/>
 			</div>
 			{FLAG.ENABLE_CERTIFICATION && (

@@ -1,7 +1,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { Fragment, useCallback, useMemo, useState } from "react";
-import { Plus } from "react-feather";
-import { useForm } from "react-hook-form";
+import { Plus, X } from "react-feather";
+import { useFieldArray, useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
@@ -10,11 +10,14 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { IconButton } from "~/components/ui/icon-button";
+import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
 import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
+import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
 	useDeleteUserCertification,
@@ -34,6 +37,7 @@ const UpdateFormSchema = v.object({
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
 	bio: UserSchemas.Bio,
+	socialLinks: UserSchemas.SocialLinks,
 });
 
 type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
@@ -79,6 +83,7 @@ export const ProfileUpdateForm = () => {
 		register,
 		handleSubmit,
 		watch,
+		control,
 		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
@@ -93,9 +98,18 @@ export const ProfileUpdateForm = () => {
 			studentId: user?.studentId,
 			grade: user?.grade,
 			bio: user?.bio,
+			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
 	});
 
+	const {
+		fields: socialLinks,
+		append: appendSocialLink,
+		remove: removeSocialLink,
+	} = useFieldArray({
+		control,
+		name: "socialLinks",
+	});
 	const onSubmit = useCallback(
 		(data: FormInputValues) => {
 			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
@@ -111,7 +125,12 @@ export const ProfileUpdateForm = () => {
 				});
 				return;
 			}
-			mutate(data);
+			const socialLinks = data.socialLinks.map((link) => link.value);
+			const payload = {
+				...data,
+				socialLinks,
+			};
+			mutate(payload);
 		},
 		[mutate, setError],
 	);
@@ -312,6 +331,65 @@ export const ProfileUpdateForm = () => {
 				>
 					{bioLength} / {BIO_MAX_LENGTH}
 				</p>
+			</Form.FieldSet>
+			<Form.FieldSet>
+				<legend>
+					<Form.LabelText>ソーシャルリンク (最大5つ)</Form.LabelText>
+				</legend>
+				<ul
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: 2,
+						marginTop: 2,
+					})}
+				>
+					{socialLinks.map((field, index) => (
+						<li className={css({ listStyle: "none" })} key={field.id}>
+							<ErrorDisplay
+								error={errors.socialLinks?.[index]?.value?.message}
+							/>
+							<div
+								className={css({
+									display: "flex",
+									gap: 4,
+									placeItems: "center",
+								})}
+							>
+								<SocialIcon
+									service={detectSocialService(
+										watch(`socialLinks.${index}.value` || ""),
+									)}
+									size={24}
+								/>
+								<Form.Input
+									placeholder="https://example.com"
+									{...register(`socialLinks.${index}.value`)}
+								/>
+								<IconButton
+									label="Remove social link"
+									onClick={() => removeSocialLink(index)}
+								>
+									<X size={16} />
+								</IconButton>
+							</div>
+						</li>
+					))}
+					<button
+						type="button"
+						onClick={() => appendSocialLink({ value: "" })}
+						disabled={socialLinks.length >= 5}
+					>
+						<ButtonLike
+							variant="text"
+							size="sm"
+							disabled={socialLinks.length >= 5}
+						>
+							<Plus size={16} />
+							Add
+						</ButtonLike>
+					</button>
+				</ul>
 			</Form.FieldSet>
 
 			<button type="submit" disabled={isPending}>

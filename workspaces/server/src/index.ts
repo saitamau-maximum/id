@@ -48,6 +48,7 @@ export const route = app
 			new CloudflareOAuthInternalRepository(c.env.DB),
 		);
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
+
 		c.set(
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),

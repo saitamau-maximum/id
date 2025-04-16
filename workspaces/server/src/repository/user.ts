@@ -19,6 +19,7 @@ export type Profile = {
 	studentId: string;
 	grade: string;
 	bio: string;
+	socialLinks: string[];
 	updatedAt: Date;
 };
 
@@ -47,6 +48,7 @@ export type Member = User &
 			| "profileImageURL"
 			| "grade"
 			| "bio"
+			| "socialLinks"
 		>
 	>;
 

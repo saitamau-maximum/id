@@ -176,6 +176,13 @@
       "when": 1744648193816,
       "tag": "0024_remove_alumni_role",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "6",
+      "when": 1744729341456,
+      "tag": "0025_nosy_runaways",
+      "breakpoints": true
     }
   ]
 }

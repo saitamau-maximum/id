@@ -109,6 +109,7 @@ export class CloudflareUserRepository implements IUserRepository {
 						certification: true,
 					},
 				},
+				socialLinks: true,
 			},
 		});
 
@@ -131,6 +132,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
 			bio: user.profile.bio ?? undefined,
+			socialLinks: user.socialLinks.map((link) => link.url),
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 			certifications: user.certifications.map((cert) => ({
 				id: cert.certification.id,
@@ -217,12 +219,25 @@ export class CloudflareUserRepository implements IUserRepository {
 			updatedAt: new Date(),
 		};
 
-		const res = await this.client
-			.update(schema.userProfiles)
-			.set(value)
-			.where(eq(schema.userProfiles.userId, userId));
+		try {
+			await this.client
+				.update(schema.userProfiles)
+				.set(value)
+				.where(eq(schema.userProfiles.userId, userId));
 
-		if (!res.success) {
+			if (payload.socialLinks) {
+				await this.client
+					.delete(schema.socialLinks)
+					.where(eq(schema.socialLinks.userId, userId));
+
+				await this.client.insert(schema.socialLinks).values(
+					payload.socialLinks.map((link) => ({
+						userId,
+						url: link,
+					})),
+				);
+			}
+		} catch (err) {
 			throw new Error("Failed to update user");
 		}
 	}
@@ -272,6 +287,7 @@ export class CloudflareUserRepository implements IUserRepository {
 								certification: true,
 							},
 						},
+						socialLinks: true,
 					},
 				},
 			},
@@ -294,6 +310,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.grade ?? undefined,
 			bio: user.bio ?? undefined,
 			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			socialLinks: user.user.socialLinks.map((link) => link.url),
 			certifications: user.user.certifications.map((cert) => ({
 				id: cert.certification.id,
 				title: cert.certification.title,
