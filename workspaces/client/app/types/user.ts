@@ -51,6 +51,7 @@ export type Member = Pick<
 	| "profileImageURL"
 	| "grade"
 	| "bio"
+	| "socialLinks"
 >;
 
 export type MemberWithCertifications = Member & {

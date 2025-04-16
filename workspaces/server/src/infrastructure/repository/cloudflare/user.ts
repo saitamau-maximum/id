@@ -287,6 +287,7 @@ export class CloudflareUserRepository implements IUserRepository {
 								certification: true,
 							},
 						},
+						socialLinks: true,
 					},
 				},
 			},
@@ -309,6 +310,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			grade: user.grade ?? undefined,
 			bio: user.bio ?? undefined,
 			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			socialLinks: user.user.socialLinks.map((link) => link.url),
 			certifications: user.user.certifications.map((cert) => ({
 				id: cert.certification.id,
 				title: cert.certification.title,

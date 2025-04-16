@@ -48,6 +48,7 @@ export type Member = User &
 			| "profileImageURL"
 			| "grade"
 			| "bio"
+			| "socialLinks"
 		>
 	>;
 
