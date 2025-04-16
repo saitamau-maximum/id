@@ -265,9 +265,6 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return members.map((user) => ({
 			id: user.id,
-			initializedAt: user.initializedAt,
-			isProvisional: !!user.invitationId,
-			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
