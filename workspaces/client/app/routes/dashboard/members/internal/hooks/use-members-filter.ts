@@ -1,5 +1,6 @@
+import { Role } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
-import type { Role } from "~/types/role";
+import * as v from "valibot";
 import type { Member } from "~/types/user";
 
 export interface Filter {
@@ -85,7 +86,7 @@ export function useMembersFilter(members: Member[]) {
 
 	const handleRoleSelectChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = Number(event.target.value);
+			const value = v.parse(Role.entries.id, Number(event.target.value));
 			setFilter((prev) => {
 				if (prev.selectedRoleIds.includes(value)) {
 					return {

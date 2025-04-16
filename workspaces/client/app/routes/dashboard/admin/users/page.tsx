@@ -1,6 +1,6 @@
+import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
-import { ROLE_BY_ID, ROLE_IDS } from "~/types/role";
 import {
 	MemberUsersTable,
 	NonMemberUsersTable,

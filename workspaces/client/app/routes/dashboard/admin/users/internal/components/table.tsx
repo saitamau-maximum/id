@@ -1,3 +1,4 @@
+import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
 import { useCallback } from "react";
 import { Edit } from "react-feather";
 import { css } from "styled-system/css";
@@ -8,7 +9,6 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
 import { getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";

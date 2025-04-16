@@ -1,14 +1,12 @@
+import type { Member } from "@idp/schema/entity/member";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { Member } from "~/types/user";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications" | "initializedAt"> & {
-	socialLinks?: string[];
-};
+type Props = Omit<Member, "certifications">;
 
 export const ProfileCard: React.FC<Props> = ({
 	displayName,

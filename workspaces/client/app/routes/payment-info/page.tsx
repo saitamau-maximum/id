@@ -107,7 +107,6 @@ export default function PaymentInfo() {
 						grade={user.grade}
 						realName={user.realName || ""}
 						roles={user.roles}
-						initialized={!!user.initializedAt}
 						displayOnly
 					/>
 				</div>

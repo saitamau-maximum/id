@@ -1,6 +1,8 @@
+import { Role } from "@idp/schema/entity/role";
 import { ROLE_BY_ID } from "node_modules/@idp/server/dist/constants/role";
 import { useId } from "react";
 import { css } from "styled-system/css";
+import * as v from "valibot";
 import { Form } from "~/components/ui/form";
 import { GRADE } from "~/constant";
 import type { Filter } from "../hooks/use-members-filter";
@@ -106,7 +108,9 @@ export const FilterForm = ({
 								key={id}
 								value={id}
 								label={role.name}
-								checked={filter.selectedRoleIds.includes(Number(id))}
+								checked={filter.selectedRoleIds.includes(
+									v.parse(Role.entries.id, Number(id)),
+								)}
 								onChange={handleRoleSelectChange}
 							/>
 						))}
