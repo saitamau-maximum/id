@@ -8,7 +8,10 @@ export type UpdateUserPayload = Partial<UserProfile>;
 
 export type FetchApprovedUsersRes = Omit<User, "certifications">[];
 export type FetchMembersRes = Omit<Member, "certifications" | "bio">[];
-export type FetchProvisionalUsersRes = Omit<User, "certifications">[];
+export type FetchProvisionalUsersRes = (Omit<User, "certifications"> & {
+	invitationId?: string;
+	invitationTitle?: string;
+})[];
 
 export interface IUserRepository {
 	createUser: (
