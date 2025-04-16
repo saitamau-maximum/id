@@ -1,5 +1,5 @@
+import type { User } from "@idp/schema/entity/user";
 import type { Scope, ScopeId } from "../constants/scope";
-import type { User } from "./user";
 
 export type Client = {
 	id: string;
