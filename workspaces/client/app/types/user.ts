@@ -42,7 +42,6 @@ export type UserBasicInfo = Pick<
 export type Member = Pick<
 	User,
 	| "id"
-	| "initializedAt"
 	| "roles"
 	| "displayName"
 	| "realName"

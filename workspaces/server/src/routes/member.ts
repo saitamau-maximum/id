@@ -1,3 +1,8 @@
+import type {
+	GetMembersContributionByUserDisplayIDResponse,
+	GetMembersProfileByUserDisplayIDResponse,
+	GetMembersResponse,
+} from "@idp/schema/api/member";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { memberOnlyMiddleware } from "../middleware/auth";
@@ -9,7 +14,7 @@ const route = app
 		const { UserRepository } = c.var;
 		try {
 			const members = await UserRepository.fetchMembers();
-			return c.json(members);
+			return c.json<GetMembersResponse>(members);
 		} catch (e) {
 			return c.json({ error: "member not found" }, 404);
 		}
@@ -19,7 +24,7 @@ const route = app
 		const { UserRepository } = c.var;
 		try {
 			const member = await UserRepository.fetchMemberByDisplayId(userDisplayId);
-			return c.json(member);
+			return c.json<GetMembersProfileByUserDisplayIDResponse>(member);
 		} catch (e) {
 			return c.json({ error: "member not found" }, 404);
 		}
@@ -63,7 +68,17 @@ const route = app
 			ContributionCacheRepository.set(githubConn.name, contributions),
 		);
 
-		return c.json(contributions, 200);
+		return c.json<GetMembersContributionByUserDisplayIDResponse>(
+			{
+				weeks: contributions.weeks.map((week) =>
+					week.map((day) => ({
+						...day,
+						date: day.date.toISOString(),
+					})),
+				),
+			},
+			200,
+		);
 	});
 
 export { route as memberRoute };
