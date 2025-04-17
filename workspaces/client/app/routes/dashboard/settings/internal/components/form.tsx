@@ -1,4 +1,9 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import {
+	BIO_MAX_LENGTH,
+	BIO_MAX_LINES,
+	UserProfile,
+} from "@idp/schema/entity/user";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -15,7 +20,6 @@ import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
 import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
 import { detectSocialService } from "~/utils/social-link";
 import {
@@ -28,16 +32,21 @@ import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
 
 const UpdateFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
-	bio: UserSchemas.Bio,
-	socialLinks: UserSchemas.SocialLinks,
+	displayName: UserProfile.entries.displayName,
+	realName: UserProfile.entries.realName,
+	realNameKana: UserProfile.entries.realNameKana,
+	displayId: UserProfile.entries.displayId,
+	email: UserProfile.entries.email,
+	academicEmail: v.optional(UserProfile.entries.academicEmail),
+	studentId: v.optional(UserProfile.entries.studentId),
+	grade: UserProfile.entries.grade,
+	bio: UserProfile.entries.bio,
+	// RHFでは配列の要素をオブジェクトにしないとuseFieldArrayが使えない
+	socialLinks: v.array(
+		v.object({
+			value: UserProfile.entries.socialLinks.item,
+		}),
+	),
 });
 
 type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
@@ -125,12 +134,10 @@ export const ProfileUpdateForm = () => {
 				});
 				return;
 			}
-			const socialLinks = data.socialLinks.map((link) => link.value);
-			const payload = {
+			mutate({
 				...data,
-				socialLinks,
-			};
-			mutate(payload);
+				socialLinks: data.socialLinks.map((link) => link.value),
+			});
 		},
 		[mutate, setError],
 	);

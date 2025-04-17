@@ -1,4 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { UserProfile } from "@idp/schema/entity/user";
 import { Fragment, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -8,18 +9,17 @@ import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
 
 const RegisterFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
+	displayName: UserProfile.entries.displayName,
+	realName: UserProfile.entries.realName,
+	realNameKana: UserProfile.entries.realNameKana,
+	displayId: UserProfile.entries.displayId,
+	email: UserProfile.entries.email,
+	academicEmail: v.optional(UserProfile.entries.academicEmail),
+	studentId: v.optional(UserProfile.entries.studentId),
+	grade: UserProfile.entries.grade,
 });
 
 type FormInputValues = v.InferInput<typeof RegisterFormSchema>;

@@ -1,9 +1,9 @@
+import type { UserRegisterParams } from "@idp/schema/api/user";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { UserRegisterParams } from "~/repository/user";
 
 export const useRegister = () => {
 	const queryClient = useQueryClient();
