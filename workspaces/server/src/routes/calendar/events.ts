@@ -48,7 +48,7 @@ const route = app
 			return value;
 		}),
 		async (c) => {
-			const { CalendarRepository } = c.var;
+			const { CalendarRepository, CalenderNotifier } = c.var;
 			const { userId } = c.get("jwtPayload");
 			const { title, description, startAt, endAt, locationId } =
 				c.req.valid("json");
@@ -60,12 +60,15 @@ const route = app
 				endAt: new Date(endAt),
 				locationId,
 			};
-			try {
-				await CalendarRepository.createEvent(eventPayload);
-				return c.json({ message: "event created" });
-			} catch (e) {
-				return c.json({ error: "event not created" }, 404);
-			}
+
+			await CalendarRepository.createEvent(eventPayload);
+			await CalenderNotifier.notifyEvent({
+				...eventPayload,
+				id: crypto.randomUUID(),
+				locationId: locationId ?? undefined,
+			});
+
+			return c.json({ message: "event created" });
 		},
 	)
 	.put(
