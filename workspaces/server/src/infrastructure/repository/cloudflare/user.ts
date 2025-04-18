@@ -230,12 +230,14 @@ export class CloudflareUserRepository implements IUserRepository {
 					.delete(schema.socialLinks)
 					.where(eq(schema.socialLinks.userId, userId));
 
-				await this.client.insert(schema.socialLinks).values(
-					payload.socialLinks.map((link) => ({
-						userId,
-						url: link,
-					})),
-				);
+				if (payload.socialLinks.length > 0) {
+					await this.client.insert(schema.socialLinks).values(
+						payload.socialLinks.map((link) => ({
+							userId,
+							url: link,
+						})),
+					);
+				}
 			}
 		} catch (err) {
 			throw new Error("Failed to update user");
