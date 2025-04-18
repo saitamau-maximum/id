@@ -59,7 +59,6 @@ export default function Home() {
 						displayId={user.displayId}
 						profileImageURL={user.profileImageURL}
 						grade={user.grade}
-						initialized={!!user.initializedAt}
 						roles={user.roles}
 						bio={user.bio}
 						socialLinks={user.socialLinks}

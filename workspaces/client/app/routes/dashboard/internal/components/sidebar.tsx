@@ -1,3 +1,4 @@
+import type { User } from "@idp/schema/entity/user";
 import { useCallback, useEffect, useState } from "react";
 import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
@@ -6,7 +7,6 @@ import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 
 type Navigation = {

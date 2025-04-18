@@ -1,3 +1,5 @@
+import * as v from "valibot";
+
 export const JOB_ROLE_IDS = {
 	/** 管理者 */
 	ADMIN: 1,
@@ -49,11 +51,19 @@ if (new Set(ROLE_IDS_VALUES).size !== ROLE_IDS_VALUES.length) {
 	throw new Error("Role IDは重複してはいけません");
 }
 
-export type Role = {
-	id: number;
-	name: string;
-	color: string; // must be HEX 6-digit color code
-};
+/**
+ * Roleの情報
+ */
+export const Role = v.object({
+	id: v.union(ROLE_IDS_VALUES.map((roleId) => v.literal(roleId))),
+	name: v.string(),
+	color: v.pipe(
+		v.string(),
+		v.regex(/^#([0-9A-Fa-f]{6})$/, "must be HEX 6-digit color code"),
+	),
+});
+
+export type Role = v.InferOutput<typeof Role>;
 
 export type RoleId = (typeof ROLE_IDS)[keyof typeof ROLE_IDS];
 

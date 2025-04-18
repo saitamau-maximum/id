@@ -1,7 +1,7 @@
+import type { User } from "@idp/schema/entity/user";
 import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
-import type { User } from "~/types/user";
 import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";

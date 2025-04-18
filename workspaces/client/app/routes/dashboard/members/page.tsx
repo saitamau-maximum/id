@@ -38,17 +38,16 @@ export default function Members() {
 					gap: 4,
 				})}
 			>
-				{filteredMembers.map((user) => (
+				{filteredMembers.map((member) => (
 					<MemberCard
-						key={user.id}
-						id={user.id}
-						displayName={user.displayName}
-						realName={user.realName}
-						displayId={user.displayId}
-						profileImageURL={user.profileImageURL}
-						grade={user.grade}
-						initialized={!!user.initializedAt}
-						roles={user.roles}
+						key={member.id}
+						id={member.id}
+						displayName={member.displayName}
+						realName={member.realName}
+						displayId={member.displayId}
+						profileImageURL={member.profileImageURL}
+						grade={member.grade}
+						roles={member.roles}
 					/>
 				))}
 			</div>

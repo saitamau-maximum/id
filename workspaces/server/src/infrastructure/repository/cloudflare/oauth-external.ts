@@ -1,6 +1,6 @@
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { ROLE_BY_ID } from "../../../constants/role";
 import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";

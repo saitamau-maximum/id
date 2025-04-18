@@ -1,7 +1,7 @@
+import type { Role } from "@idp/schema/entity/role";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
-import type { Role } from "~/types/role";
 
 type UpdateRolePayload = {
 	roleIds: Role["id"][];

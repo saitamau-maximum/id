@@ -1,10 +1,10 @@
+import { ROLE_BY_ID, type RoleId } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
 import { createCallable } from "react-call";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
-import { ROLE_BY_ID, type RoleId } from "~/types/role";
 import { RoleBadge } from "./role-badge";
 
 interface Props {

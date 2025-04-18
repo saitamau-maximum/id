@@ -1,7 +1,7 @@
+import type { UserProfileUpdateParams } from "@idp/schema/api/user";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { ProfileUpdateParams } from "~/repository/user";
 
 export const useUpdateProfile = () => {
 	const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export const useUpdateProfile = () => {
 	const { pushToast } = useToast();
 
 	return useMutation({
-		mutationFn: (payload: ProfileUpdateParams) =>
+		mutationFn: (payload: UserProfileUpdateParams) =>
 			userRepository.update(payload),
 		onSuccess: () => {
 			pushToast({

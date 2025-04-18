@@ -73,7 +73,6 @@ export default function Profile() {
 					displayId={memberProfile?.displayId}
 					profileImageURL={memberProfile?.profileImageURL}
 					grade={memberProfile?.grade}
-					initialized={!!memberProfile?.initializedAt}
 					roles={memberProfile?.roles || []}
 					bio={memberProfile?.bio}
 					socialLinks={memberProfile?.socialLinks}

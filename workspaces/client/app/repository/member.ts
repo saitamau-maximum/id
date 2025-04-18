@@ -1,20 +1,21 @@
-import type { Member, MemberWithCertifications } from "~/types/user";
+import type {
+	GetMembersContributionByUserDisplayIDResponse,
+	GetMembersProfileByUserDisplayIDResponse,
+	GetMembersResponse,
+} from "@idp/schema/api/member";
 import { client } from "~/utils/hono";
 
 export interface IMemberRepository {
-	getMembers: () => Promise<Member[]>;
+	getMembers: () => Promise<GetMembersResponse>;
 	getMembers$$key(): unknown[];
-	getContributionsByUserDisplayID: (userDisplayId: string) => Promise<{
-		weeks: {
-			date: string;
-			rate: number;
-		}[][];
-	}>;
+	getContributionsByUserDisplayID: (
+		userDisplayId: string,
+	) => Promise<GetMembersContributionByUserDisplayIDResponse>;
 	getContributionsByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 	getProfileByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 	getProfileByUserDisplayID: (
 		userDisplayId: string,
-	) => Promise<MemberWithCertifications>;
+	) => Promise<GetMembersProfileByUserDisplayIDResponse>;
 }
 
 export class MemberRepositoryImpl implements IMemberRepository {
@@ -24,12 +25,7 @@ export class MemberRepositoryImpl implements IMemberRepository {
 			throw new Error("Failed to fetch members");
 		}
 		const data = await res.json();
-		return data.map((member) => ({
-			...member,
-			initializedAt: member.initializedAt
-				? new Date(member.initializedAt)
-				: undefined,
-		}));
+		return data;
 	}
 
 	getMembers$$key() {
@@ -69,12 +65,7 @@ export class MemberRepositoryImpl implements IMemberRepository {
 		}
 
 		const data = await res.json();
-		return {
-			...data,
-			initializedAt: data.initializedAt
-				? new Date(data.initializedAt)
-				: undefined,
-		};
+		return data;
 	}
 
 	getProfileByUserDisplayID$$key(userDisplayId: string) {

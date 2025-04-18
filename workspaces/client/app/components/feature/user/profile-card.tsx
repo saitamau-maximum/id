@@ -1,15 +1,12 @@
+import type { Member } from "@idp/schema/entity/member";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { Member } from "~/types/user";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications" | "initializedAt"> & {
-	socialLinks?: string[];
-	initialized: boolean;
-};
+type Props = Omit<Member, "certifications">;
 
 export const ProfileCard: React.FC<Props> = ({
 	displayName,
@@ -17,7 +14,6 @@ export const ProfileCard: React.FC<Props> = ({
 	displayId,
 	profileImageURL,
 	grade,
-	initialized,
 	roles,
 	bio,
 	socialLinks,
@@ -110,22 +106,6 @@ export const ProfileCard: React.FC<Props> = ({
 							>
 								{grade}
 							</span>
-						)}
-						{!initialized && (
-							<div
-								className={css({
-									backgroundColor: "blue.100",
-									borderWidth: 2,
-									borderStyle: "solid",
-									borderColor: "blue.300",
-									color: "blue.500",
-									padding: "token(spacing.1) token(spacing.4)",
-									borderRadius: 8,
-									fontSize: "sm",
-								})}
-							>
-								初期登録中
-							</div>
 						)}
 					</div>
 					<div

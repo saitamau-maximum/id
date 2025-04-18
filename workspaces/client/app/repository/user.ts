@@ -1,45 +1,26 @@
-import type { User } from "~/types/user";
+import type {
+	UserGetContributionsResponse,
+	UserProfileUpdateParams,
+	UserRegisterParams,
+} from "@idp/schema/api/user";
+import type { User } from "@idp/schema/entity/user";
 import { client } from "~/utils/hono";
-
-export interface UserRegisterParams {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail?: string;
-	email: string;
-	studentId?: string;
-	grade: string;
-}
-
-export interface ProfileUpdateParams {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail?: string;
-	email: string;
-	studentId?: string;
-	grade: string;
-	bio: string;
-	socialLinks: string[];
-}
 
 export interface IUserRepository {
 	register: (params: UserRegisterParams) => Promise<void>;
-	update: (params: ProfileUpdateParams) => Promise<void>;
-	getContributions: () => Promise<{
-		weeks: {
-			date: string;
-			rate: number;
-		}[][];
-	}>;
+	update: (params: UserProfileUpdateParams) => Promise<void>;
+	getContributions: () => Promise<UserGetContributionsResponse>;
 	getContributions$$key: () => unknown[];
-	getAllUsers: () => Promise<User[]>;
+	getAllUsers: () => Promise<Omit<User, "certifications">[]>;
 	getAllUsers$$key: () => unknown[];
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
 	updateUserProfileImage: (file: File) => Promise<void>;
-	getAllProvisionalUsers: () => Promise<User[]>;
+	getAllProvisionalUsers: () => Promise<
+		(Omit<User, "certifications"> & {
+			invitationId?: string;
+			invitationTitle?: string;
+		})[]
+	>;
 	getAllProvisionalUsers$$key: () => unknown[];
 	approveInvitation: (userId: string) => Promise<void>;
 	rejectInvitation: (userId: string) => Promise<void>;
@@ -85,7 +66,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		grade,
 		bio,
 		socialLinks,
-	}: ProfileUpdateParams) {
+	}: UserProfileUpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
 				displayName,
@@ -125,12 +106,10 @@ export class UserRepositoryImpl implements IUserRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
-			initializedAt: user.initializedAt
-				? new Date(user.initializedAt)
-				: undefined,
+			initializedAt: user.initializedAt ? new Date(user.initializedAt) : null,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
 				? new Date(user.lastPaymentConfirmedAt)
-				: undefined,
+				: null,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 		}));
 	}
@@ -172,12 +151,10 @@ export class UserRepositoryImpl implements IUserRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
-			initializedAt: user.initializedAt
-				? new Date(user.initializedAt)
-				: undefined,
+			initializedAt: user.initializedAt ? new Date(user.initializedAt) : null,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
 				? new Date(user.lastPaymentConfirmedAt)
-				: undefined,
+				: null,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 		}));
 	}

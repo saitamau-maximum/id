@@ -1,3 +1,5 @@
+import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
+import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
 import { Edit } from "react-feather";
 import { css } from "styled-system/css";
@@ -8,8 +10,6 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import { ROLE_IDS, type RoleId } from "~/types/role";
-import type { User } from "~/types/user";
 import { getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";
 import { useConfirmPayment } from "../hooks/use-confirm-payment";
@@ -79,7 +79,7 @@ const ROLE_SLICE_LIMIT = 3;
 const UserTableRow = ({
 	user,
 }: {
-	user: User;
+	user: Omit<User, "certifications">;
 }) => {
 	const { mutate: updateRole } = useUpdateRole(user.id);
 	const { mutate: confirmPayment } = useConfirmPayment(user.id);

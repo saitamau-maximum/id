@@ -1,14 +1,17 @@
+import type { Member } from "@idp/schema/entity/member";
+import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
+import type { User, UserProfile } from "@idp/schema/entity/user";
 import { type InferInsertModel, eq, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
+	CreateUserPayload,
+	FetchApprovedUsersRes,
+	FetchMembersRes,
+	FetchProvisionalUsersRes,
 	IUserRepository,
-	Member,
-	MemberWithCertifications,
-	Profile,
-	User,
-	UserWithCertifications,
+	RegisterUserPayload,
+	UpdateUserPayload,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -21,7 +24,7 @@ export class CloudflareUserRepository implements IUserRepository {
 	private async createUserInternal(
 		providerUserId: string,
 		providerId: number,
-		payload: Partial<Profile>,
+		payload: Partial<UserProfile>,
 		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
@@ -60,7 +63,7 @@ export class CloudflareUserRepository implements IUserRepository {
 	async createUser(
 		providerUserId: string,
 		providerId: number,
-		payload: Partial<Profile> = {},
+		payload: CreateUserPayload = {},
 	): Promise<string> {
 		return this.createUserInternal(providerUserId, providerId, payload);
 	}
@@ -69,7 +72,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		providerUserId: string,
 		providerId: number,
 		invitationId: string,
-		payload: Partial<Profile> = {},
+		payload: CreateUserPayload = {},
 	): Promise<string> {
 		return this.createUserInternal(
 			providerUserId,
@@ -98,7 +101,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return res.userId;
 	}
 
-	async fetchUserProfileById(userId: string): Promise<UserWithCertifications> {
+	async fetchUserProfileById(userId: string): Promise<User> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -145,7 +148,10 @@ export class CloudflareUserRepository implements IUserRepository {
 		};
 	}
 
-	async registerUser(userId: string, payload: Partial<Profile>): Promise<void> {
+	async registerUser(
+		userId: string,
+		payload: RegisterUserPayload,
+	): Promise<void> {
 		// userが登録済みかどうか確認
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
@@ -201,7 +207,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async updateUser(userId: string, payload: Partial<Profile>): Promise<void> {
+	async updateUser(userId: string, payload: UpdateUserPayload): Promise<void> {
 		const value: Omit<
 			InferInsertModel<typeof schema.userProfiles>,
 			"id" | "userId"
@@ -244,11 +250,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchMembers(): Promise<Member[]> {
+	async fetchMembers(): Promise<FetchMembersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
-				profile: true,
+				profile: {
+					columns: {
+						displayName: true,
+						realName: true,
+						realNameKana: true,
+						displayId: true,
+						profileImageURL: true,
+						grade: true,
+					},
+				},
 				roles: true,
 			},
 		});
@@ -261,23 +276,17 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return members.map((user) => ({
 			id: user.id,
-			initializedAt: user.initializedAt,
-			isProvisional: !!user.invitationId,
-			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			bio: user.profile.bio ?? undefined,
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 		}));
 	}
 
-	async fetchMemberByDisplayId(
-		displayId: string,
-	): Promise<MemberWithCertifications> {
+	async fetchMemberByDisplayId(displayId: string): Promise<Member> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -301,9 +310,6 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.user.id,
-			initializedAt: user.user.initializedAt,
-			isProvisional: !!user.user.invitationId,
-			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
 			realNameKana: user.realNameKana ?? undefined,
@@ -331,7 +337,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return roles.map((role) => role.roleId);
 	}
 
-	async fetchApprovedUsers(): Promise<User[]> {
+	async fetchApprovedUsers(): Promise<FetchApprovedUsersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
@@ -395,7 +401,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchProvisionalUsers(): Promise<User[]> {
+	async fetchProvisionalUsers(): Promise<FetchProvisionalUsersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
 			with: {
