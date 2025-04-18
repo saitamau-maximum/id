@@ -15,6 +15,7 @@ declare namespace Cloudflare {
 		GITHUB_OAUTH_SECRET: string;
 		GITHUB_OAUTH_ID: string;
 		DISCORD_INVITATION_URL: string;
+        DISCORD_WEBHOOK_URL: string;
 		STORAGE: R2Bucket;
 		DB: D1Database;
 	}
