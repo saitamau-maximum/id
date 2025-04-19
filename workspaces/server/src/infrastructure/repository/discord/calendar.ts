@@ -40,7 +40,7 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 				},
 				{
 					name: "場所",
-					value: embedInfo.location ? embedInfo.location.name : "未定",
+					value: `${embedInfo.location?.name || "未定"}\n\n[カレンダーを見る](${this.CALENDAR_URL})`,
 				},
 			],
 		};
