@@ -9,7 +9,7 @@ import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
-import type { CalendarEvent } from "~/types/event";
+import type { CalendarEvent, CalendarEventWithNotify } from "~/types/event";
 import { toHTMLDateTimePickerFormat } from "~/utils/date";
 import { DescriptionFormField } from "./detail-form-field";
 
@@ -20,7 +20,7 @@ interface Props {
 type Payload =
 	| {
 			type: "success";
-			payload: CalendarEvent;
+			payload: CalendarEventWithNotify;
 	  }
 	| {
 			type: "dismiss";
@@ -65,7 +65,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 				});
 				return;
 			}
-			const updatedEvent: CalendarEvent = {
+			const updatedEvent: CalendarEventWithNotify = {
 				...event,
 				...values,
 				startAt: values.startAt,
