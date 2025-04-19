@@ -83,7 +83,7 @@ export const route = app
 
 		c.set(
 			"CalendarNotifier",
-			new DiscordCalendarNotifier(c.env.DISCORD_WEBHOOK_URL),
+			new DiscordCalendarNotifier(c.env.CALENDAR_NOTIFY_WEBHOOK_URL),
 		);
 		await next();
 	})
