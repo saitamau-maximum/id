@@ -154,7 +154,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 
 					<Form.FieldSet>
 						<Form.Select
-							label="Discordに通知する"
+							label="更新をDiscordに通知する"
 							{...register("notifyDiscord")}
 							defaultChecked={false}
 						/>
