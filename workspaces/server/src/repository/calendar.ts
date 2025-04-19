@@ -28,5 +28,5 @@ export interface ICalendarRepository {
 }
 
 export interface ICalendarNotifier {
-	notifyEvent: (event: ICalendarEvent) => Promise<void>;
+	notifyEvent: (event: Omit<ICalendarEventWithLocation, "id">) => Promise<void>;
 }

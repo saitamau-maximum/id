@@ -5,6 +5,7 @@ import type {
 
 export class DiscordCalendarNotifier implements ICalendarNotifier {
 	private webhookUrl: string;
+	private readonly CALENDAR_URL = "https://id.maximum.vc/calendar/";
 
 	constructor(webhookUrl: string) {
 		this.webhookUrl = webhookUrl;
@@ -14,7 +15,6 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 		const days = ["日", "月", "火", "水", "木", "金", "土"];
 		const mm = (d.getMonth() + 1).toString().padStart(2, "0");
 		const dd = d.getDate().toString().padStart(2, "0");
-		const hh = d.getHours().toString().padStart(2, "0");
 		const day = days[d.getDay()];
 		return `${mm}/${dd} (${day})`;
 	}
@@ -25,7 +25,9 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 		return `${hh}:${mm}`;
 	}
 
-	async notifyEvent(event: ICalendarEventWithLocation): Promise<void> {
+	async notifyEvent(
+		event: Omit<ICalendarEventWithLocation, "id">,
+	): Promise<void> {
 		const payload = {
 			content: "**新しい予定が追加されました！**",
 			embeds: [
@@ -33,7 +35,7 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 					title: `${event.title}`,
 					description: `${
 						event.description
-					}\n\n🔗 [詳細はこちら](https://id.maximum.vc/calendar/)`,
+					}\n\n🔗 [詳細はこちら](${this.CALENDAR_URL})`,
 					color: 0x2ecc71,
 					fields: [
 						{
@@ -51,8 +53,8 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 							}`,
 						},
 						{
-							name: "活動場所",
-							value: "図書館セミナー室",
+							name: "場所",
+							value: event.location ? `${event.location.name}` : "未定",
 						},
 					],
 				},
