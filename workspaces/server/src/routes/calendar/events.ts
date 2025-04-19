@@ -71,7 +71,7 @@ const route = app
 					const location = locationId
 						? await LocationRepository.getLocationById(locationId)
 						: undefined;
-					await CalendarNotifier.notifyEvent({
+					await CalendarNotifier.notifyAddEvent({
 						...eventPayload,
 						location,
 					});
@@ -131,7 +131,7 @@ const route = app
 					const location = locationId
 						? await LocationRepository.getLocationById(locationId)
 						: undefined;
-					await CalendarNotifier.notifyEvent({
+					await CalendarNotifier.notifyUpdateEvent({
 						...eventPayload,
 						location,
 					});

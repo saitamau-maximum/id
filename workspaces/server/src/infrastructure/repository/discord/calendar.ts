@@ -1,5 +1,5 @@
 import type {
-	ICalendarEventWithLocation,
+	ICalendarEventNotify,
 	ICalendarNotifier,
 } from "../../../repository/calendar";
 
@@ -11,56 +11,50 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 		this.webhookUrl = webhookUrl;
 	}
 
-	private formatDate(d: Date): string {
+	private formatDateTime(start: Date, end: Date): string {
 		const days = ["日", "月", "火", "水", "木", "金", "土"];
-		const mm = (d.getMonth() + 1).toString().padStart(2, "0");
-		const dd = d.getDate().toString().padStart(2, "0");
-		const day = days[d.getDay()];
-		return `${mm}/${dd} (${day})`;
+		const date = (d: Date) =>
+			`${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")} (${days[d.getDay()]})`;
+		const time = (d: Date) =>
+			`${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+
+		const startDate = date(start);
+		const endDate = date(end);
+		const startTime = time(start);
+		const endTime = time(end);
+
+		return startDate === endDate
+			? `${startDate} ${startTime} - ${endTime}`
+			: `${startDate} ${startTime} - ${endDate} ${endTime}`;
 	}
 
-	private formatTime(d: Date): string {
-		const hh = d.getHours().toString().padStart(2, "0");
-		const mm = d.getMinutes().toString().padStart(2, "0");
-		return `${hh}:${mm}`;
-	}
-
-	async notifyEvent(
-		event: Omit<ICalendarEventWithLocation, "id">,
-	): Promise<void> {
-		const payload = {
-			content: "**新しい予定が追加されました！**",
-			embeds: [
+	private embedBuilder(embedInfo: ICalendarEventNotify & { color: number }) {
+		return {
+			title: embedInfo.title,
+			description: embedInfo.description,
+			color: embedInfo.color,
+			fields: [
 				{
-					title: `${event.title}`,
-					description: `${
-						event.description
-					}\n\n🔗 [詳細はこちら](${this.CALENDAR_URL})`,
-					color: 0x2ecc71,
-					fields: [
-						{
-							name: "日時",
-							value: `${
-								this.formatDate(event.startAt) === this.formatDate(event.endAt)
-									? `${this.formatDate(event.startAt)} ${this.formatTime(event.startAt)} - ${this.formatTime(
-											event.endAt,
-										)}`
-									: `${this.formatDate(event.startAt)} ${this.formatTime(
-											event.startAt,
-										)} - ${this.formatDate(event.endAt)} ${this.formatTime(
-											event.endAt,
-										)}`
-							}`,
-						},
-						{
-							name: "場所",
-							value: event.location ? `${event.location.name}` : "未定",
-						},
-					],
+					name: "日時",
+					value: this.formatDateTime(embedInfo.startAt, embedInfo.endAt),
+				},
+				{
+					name: "場所",
+					value: embedInfo.location ? embedInfo.location.name : "未定",
 				},
 			],
 		};
+	}
 
+	private async sendNotification(payload: {
+		content: string;
+		embeds: {
+			title: string;
+			description: string;
+			color: number;
+			fields: { name: string; value: string }[];
+		}[];
+	}): Promise<void> {
 		try {
 			await fetch(this.webhookUrl, {
 				method: "POST",
@@ -69,6 +63,40 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 				},
 				body: JSON.stringify(payload),
 			});
+		} catch (error) {
+			throw new Error("Failed to send notification");
+		}
+	}
+
+	async notifyAddEvent(event: ICalendarEventNotify): Promise<void> {
+		const payload = {
+			content: "**予定が追加されました！**",
+			embeds: [
+				this.embedBuilder({
+					...event,
+					color: 0x2ecc71,
+				}),
+			],
+		};
+		try {
+			await this.sendNotification(payload);
+		} catch (error) {
+			throw new Error("Failed to send notification");
+		}
+	}
+
+	async notifyUpdateEvent(event: ICalendarEventNotify): Promise<void> {
+		const payload = {
+			content: "**予定が更新されました！**",
+			embeds: [
+				this.embedBuilder({
+					...event,
+					color: 0x3498db,
+				}),
+			],
+		};
+		try {
+			await this.sendNotification(payload);
 		} catch (error) {
 			throw new Error("Failed to send notification");
 		}
