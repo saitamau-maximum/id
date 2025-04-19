@@ -32,7 +32,7 @@ export type HonoEnv = {
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
 		CalendarRepository: ICalendarRepository;
-		CalenderNotifier: ICalendarNotifier;
+		CalendarNotifier: ICalendarNotifier;
 		CertificationRepository: ICertificationRepository;
 		InviteRepository: IInviteRepository;
 		LocationRepository: ILocationRepository;

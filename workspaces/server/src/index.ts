@@ -82,7 +82,7 @@ export const route = app
 		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
 
 		c.set(
-			"CalenderNotifier",
+			"CalendarNotifier",
 			new DiscordCalendarNotifier(c.env.DISCORD_WEBHOOK_URL),
 		);
 		await next();

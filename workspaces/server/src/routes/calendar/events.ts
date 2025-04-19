@@ -50,7 +50,7 @@ const route = app
 			return value;
 		}),
 		async (c) => {
-			const { CalendarRepository, CalenderNotifier, LocationRepository } =
+			const { CalendarRepository, CalendarNotifier, LocationRepository } =
 				c.var;
 			const { userId } = c.get("jwtPayload");
 			const { title, description, startAt, endAt, locationId, notifyDiscord } =
@@ -71,7 +71,7 @@ const route = app
 					const location = locationId
 						? await LocationRepository.getLocationById(locationId)
 						: undefined;
-					await CalenderNotifier.notifyEvent({
+					await CalendarNotifier.notifyEvent({
 						...eventPayload,
 						location,
 					});
@@ -94,7 +94,7 @@ const route = app
 			return value;
 		}),
 		async (c) => {
-			const { CalendarRepository, CalenderNotifier, LocationRepository } =
+			const { CalendarRepository, CalendarNotifier, LocationRepository } =
 				c.var;
 			const {
 				userId,
@@ -131,7 +131,7 @@ const route = app
 					const location = locationId
 						? await LocationRepository.getLocationById(locationId)
 						: undefined;
-					await CalenderNotifier.notifyEvent({
+					await CalendarNotifier.notifyEvent({
 						...eventPayload,
 						location,
 					});
