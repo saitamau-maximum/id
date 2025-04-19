@@ -32,6 +32,7 @@ const UpdateFormSchema = v.object({
 	startAt: EventSchemas.StartAt,
 	endAt: EventSchemas.EndAt,
 	locationId: EventSchemas.LocationId,
+	notifyDiscord: v.boolean(),
 });
 
 type UpdateFormInputValues = v.InferInput<typeof UpdateFormSchema>;
@@ -149,6 +150,14 @@ export const EditEventDialog = createCallable<Props, Payload>(
 							))}
 						</Form.RadioGroup>
 						<ErrorDisplay error={errors.locationId?.message} />
+					</Form.FieldSet>
+
+					<Form.FieldSet>
+						<Form.Select
+							label="Discordに通知する"
+							{...register("notifyDiscord")}
+							defaultChecked={false}
+						/>
 					</Form.FieldSet>
 
 					<ErrorDisplay error={errors.root?.message} />

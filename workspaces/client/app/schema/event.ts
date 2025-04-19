@@ -30,4 +30,5 @@ export const EventSchemas = {
 		v.date(),
 	),
 	LocationId: v.nullable(v.string()),
+	notifyDiscord: v.boolean(),
 };

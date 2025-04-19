@@ -9,3 +9,7 @@ export interface CalendarEvent {
 	endAt: Date;
 	locationId?: Location["id"];
 }
+
+export interface CalendarEventWithNotify extends CalendarEvent {
+	notifyDiscord: boolean;
+}
