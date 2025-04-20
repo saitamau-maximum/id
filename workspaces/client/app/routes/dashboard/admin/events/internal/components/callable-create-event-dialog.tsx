@@ -27,7 +27,7 @@ const CreateFormSchema = v.object({
 	startAt: EventSchemas.StartAt,
 	endAt: EventSchemas.EndAt,
 	locationId: EventSchemas.LocationId,
-	notifyDiscord: v.boolean(),
+	notifyDiscord: EventSchemas.NotifyDiscord,
 });
 
 type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
