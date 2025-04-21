@@ -1,7 +1,10 @@
 import { createFactory } from "hono/factory";
 import type { JwtVariables } from "hono/jwt";
 import type { IContributionCacheRepository } from "./repository/cache";
-import type { ICalendarRepository } from "./repository/calendar";
+import type {
+	ICalendarNotifier,
+	ICalendarRepository,
+} from "./repository/calendar";
 import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
 import type { IInviteRepository } from "./repository/invite";
@@ -29,6 +32,7 @@ export type HonoEnv = {
 		OrganizationRepository: IOrganizationRepository;
 		UserStorageRepository: IUserStorageRepository;
 		CalendarRepository: ICalendarRepository;
+		CalendarNotifier: ICalendarNotifier;
 		CertificationRepository: ICertificationRepository;
 		InviteRepository: IInviteRepository;
 		LocationRepository: ILocationRepository;

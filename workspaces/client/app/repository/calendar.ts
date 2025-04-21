@@ -1,11 +1,13 @@
-import type { CalendarEvent } from "~/types/event";
+import type { CalendarEvent, CalendarEventWithNotify } from "~/types/event";
 import { client } from "~/utils/hono";
 
 export interface ICalendarRepository {
 	getAllEvents: () => Promise<CalendarEvent[]>;
 	getAllEvents$$key: () => unknown[];
-	createEvent: (event: Omit<CalendarEvent, "id" | "userId">) => Promise<void>;
-	updateEvent: (event: CalendarEvent) => Promise<void>;
+	createEvent: (
+		event: Omit<CalendarEventWithNotify, "id" | "userId">,
+	) => Promise<void>;
+	updateEvent: (event: CalendarEventWithNotify) => Promise<void>;
 	deleteEvent: (id: CalendarEvent["id"]) => Promise<void>;
 	generateURL: () => Promise<string>;
 }
@@ -27,7 +29,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		return ["calendar-events"];
 	}
 
-	async createEvent(event: Omit<CalendarEvent, "id" | "userId">) {
+	async createEvent(event: Omit<CalendarEventWithNotify, "id" | "userId">) {
 		const res = await client.calendar.events.$post({
 			json: {
 				...event,
@@ -40,7 +42,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		}
 	}
 
-	async updateEvent(event: CalendarEvent) {
+	async updateEvent(event: CalendarEventWithNotify) {
 		const res = await client.calendar.events[":id"].$put({
 			param: {
 				id: event.id,

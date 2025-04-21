@@ -9,13 +9,13 @@ import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
-import type { CalendarEvent } from "~/types/event";
+import type { CalendarEventWithNotify } from "~/types/event";
 import { DescriptionFormField } from "./detail-form-field";
 
 type Payload =
 	| {
 			type: "success";
-			payload: Omit<CalendarEvent, "id" | "userId">;
+			payload: Omit<CalendarEventWithNotify, "id" | "userId">;
 	  }
 	| {
 			type: "dismiss";
@@ -27,6 +27,7 @@ const CreateFormSchema = v.object({
 	startAt: EventSchemas.StartAt,
 	endAt: EventSchemas.EndAt,
 	locationId: EventSchemas.LocationId,
+	notifyDiscord: EventSchemas.NotifyDiscord,
 });
 
 type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
@@ -142,6 +143,15 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 						))}
 					</Form.RadioGroup>
 					<ErrorDisplay error={errors.locationId?.message} />
+				</Form.FieldSet>
+
+				<Form.FieldSet>
+					<Form.Select
+						label="Discordに通知する"
+						{...register("notifyDiscord")}
+						defaultChecked={false}
+					/>
+					<ErrorDisplay error={errors.notifyDiscord?.message} />
 				</Form.FieldSet>
 
 				<ErrorDisplay error={errors.root?.message} />

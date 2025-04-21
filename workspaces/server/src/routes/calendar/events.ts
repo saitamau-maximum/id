@@ -16,6 +16,7 @@ const createEventSchema = v.object({
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	locationId: v.optional(v.string()),
+	notifyDiscord: v.boolean(),
 });
 
 const updateEventSchema = v.object({
@@ -25,6 +26,7 @@ const updateEventSchema = v.object({
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	locationId: v.optional(v.string()),
+	notifyDiscord: v.boolean(),
 });
 
 const route = app
@@ -48,9 +50,10 @@ const route = app
 			return value;
 		}),
 		async (c) => {
-			const { CalendarRepository } = c.var;
+			const { CalendarRepository, CalendarNotifier, LocationRepository } =
+				c.var;
 			const { userId } = c.get("jwtPayload");
-			const { title, description, startAt, endAt, locationId } =
+			const { title, description, startAt, endAt, locationId, notifyDiscord } =
 				c.req.valid("json");
 			const eventPayload = {
 				userId,
@@ -60,11 +63,23 @@ const route = app
 				endAt: new Date(endAt),
 				locationId,
 			};
+
 			try {
 				await CalendarRepository.createEvent(eventPayload);
+
+				if (notifyDiscord) {
+					const location = locationId
+						? await LocationRepository.getLocationById(locationId)
+						: undefined;
+					await CalendarNotifier.notifyAddEvent({
+						...eventPayload,
+						location,
+					});
+				}
+
 				return c.json({ message: "event created" });
 			} catch (e) {
-				return c.json({ error: "event not created" }, 404);
+				return c.json({ error: "failed to create event" }, 500);
 			}
 		},
 	)
@@ -79,9 +94,17 @@ const route = app
 			return value;
 		}),
 		async (c) => {
-			const { CalendarRepository } = c.var;
-			const { userId, title, description, startAt, endAt, locationId } =
-				c.req.valid("json");
+			const { CalendarRepository, CalendarNotifier, LocationRepository } =
+				c.var;
+			const {
+				userId,
+				title,
+				description,
+				startAt,
+				endAt,
+				locationId,
+				notifyDiscord,
+			} = c.req.valid("json");
 			const id = c.req.param("id");
 			const eventPayload = {
 				id,
@@ -103,6 +126,16 @@ const route = app
 				}
 				// イベントを更新
 				await CalendarRepository.updateEvent(eventPayload);
+
+				if (notifyDiscord) {
+					const location = locationId
+						? await LocationRepository.getLocationById(locationId)
+						: undefined;
+					await CalendarNotifier.notifyUpdateEvent({
+						...eventPayload,
+						location,
+					});
+				}
 				return c.json({ message: "event updated" });
 			} catch (e) {
 				return c.json({ error: "failed to update event" }, 500);
