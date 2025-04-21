@@ -12,7 +12,11 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 	}
 
 	private formatDateTime(startAt: Date, endAt: Date): string {
-		if (startAt.getDate() === endAt.getDate()) {
+		if (
+			startAt.getFullYear() === endAt.getFullYear() &&
+			startAt.getMonth() === endAt.getMonth() &&
+			startAt.getDate() === endAt.getDate()
+		) {
 			const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
 				hour: "2-digit",
 				minute: "2-digit",
