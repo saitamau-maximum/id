@@ -369,6 +369,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			throw new Error("Failed to update user role");
 		}
 
+		if (roleIds.length === 0) {
+			return;
+		}
+
 		const values = roleIds.map((roleId) => ({
 			userId,
 			roleId,
