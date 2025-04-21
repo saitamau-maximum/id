@@ -11,21 +11,38 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 		this.webhookUrl = webhookUrl;
 	}
 
-	private formatDateTime(start: Date, end: Date): string {
-		const days = ["日", "月", "火", "水", "木", "金", "土"];
-		const date = (d: Date) =>
-			`${(d.getMonth() + 1).toString().padStart(2, "0")}/${d.getDate().toString().padStart(2, "0")} (${days[d.getDay()]})`;
-		const time = (d: Date) =>
-			`${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
-
-		const startDate = date(start);
-		const endDate = date(end);
-		const startTime = time(start);
-		const endTime = time(end);
-
-		return startDate === endDate
-			? `${startDate} ${startTime} - ${endTime}`
-			: `${startDate} ${startTime} - ${endDate} ${endTime}`;
+	private formatDateTime(startAt: Date, endAt: Date): string {
+		if (startAt.getDate() === endAt.getDate()) {
+			const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			const date = startAt.toLocaleDateString("ja-JP", {
+				month: "2-digit",
+				day: "2-digit",
+				weekday: "short",
+			});
+			return `${date} ${startTimestamp} - ${endTimestamp}`;
+		}
+		return `${startAt.toLocaleDateString("ja-JP", {
+			month: "2-digit",
+			day: "2-digit",
+			weekday: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+			timeZone: "Asia/Tokyo",
+		})} - ${endAt.toLocaleDateString("ja-JP", {
+			month: "2-digit",
+			day: "2-digit",
+			weekday: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+			timeZone: "Asia/Tokyo",
+		})}`;
 	}
 
 	private embedBuilder(embedInfo: ICalendarEventNotify & { color: number }) {
