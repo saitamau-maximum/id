@@ -1,20 +1,19 @@
-import { ArrowUpRight, CheckCircle } from "react-feather";
-import { useNavigate } from "react-router";
+import { CheckCircle } from "react-feather";
 import { css } from "styled-system/css";
 import { CertificationCard } from "~/components/feature/user/certification-card";
 import { ContributionCard } from "~/components/feature/user/contribution/card";
 import { ProfileCard } from "~/components/feature/user/profile-card";
-import { MessageBox } from "~/components/ui/message-box";
 import { useAuth } from "~/hooks/use-auth";
 import { useDeviceType } from "~/hooks/use-device-type";
 import { DiscordInvitationMessageBox } from "./internal/components/discord-invitation-message-box";
+import { PaymentMessageBox } from "./internal/components/payment-message-box";
+import { ProfileUpdateMessageBox } from "./internal/components/profile-update-message-box";
 import { useContribution } from "./internal/hooks/use-contribution";
 
 export default function Home() {
-	const { user, hasFiscalYearUpdated } = useAuth();
+	const { user, hasFiscalYearUpdated, isFiscalYearPaid } = useAuth();
 	const { data, isLoading } = useContribution();
 	const { deviceType } = useDeviceType();
-	const navigate = useNavigate();
 
 	if (!user) {
 		return null;
@@ -25,20 +24,9 @@ export default function Home() {
 
 	return (
 		<>
-			{!hasFiscalYearUpdated && (
-				<MessageBox
-					variant="info"
-					right={<ArrowUpRight size={24} />}
-					onClick={() => navigate("/settings")}
-				>
-					新年度になりました、学年と学籍番号を更新してください。
-					<br />
-					<span className={css({ fontSize: "xs" })}>
-						※変更がない方でもプロフィール画面から更新ボタンを押すことでこのメッセージは消えます。
-					</span>
-				</MessageBox>
-			)}
+			{!hasFiscalYearUpdated && <ProfileUpdateMessageBox />}
 			{!userJoinedDiscord && <DiscordInvitationMessageBox />}
+			{!isFiscalYearPaid && <PaymentMessageBox />}
 			<div
 				className={css({
 					width: "100%",

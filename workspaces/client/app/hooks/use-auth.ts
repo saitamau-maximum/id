@@ -21,5 +21,9 @@ export function useAuth() {
 		hasFiscalYearUpdated:
 			data?.updatedAt && data.updatedAt >= getFiscalYearStartDate(),
 		refetch,
+		// 今年度の会費を払ったことを確認したか
+		isFiscalYearPaid:
+			data?.lastPaymentConfirmedAt &&
+			data?.lastPaymentConfirmedAt >= getFiscalYearStartDate(),
 	};
 }

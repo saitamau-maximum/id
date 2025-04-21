@@ -1,16 +1,12 @@
-import { useEffect, useState } from "react";
 import { ArrowUpRight } from "react-feather";
 import { css } from "styled-system/css";
 import { MessageBox } from "~/components/ui/message-box";
-import { useRepository } from "~/hooks/use-repository";
+import { useToast } from "~/hooks/use-toast";
+import { useDiscordInvitationURL } from "../hooks/use-discord-invitation-url";
 
 export const DiscordInvitationMessageBox = () => {
-	const { miscRepository } = useRepository();
-	const [discordInvitationUrl, setDiscordInvitationUrl] = useState("");
-
-	useEffect(() => {
-		miscRepository.getDiscordInvitationURL().then(setDiscordInvitationUrl);
-	}, [miscRepository]);
+	const { data: discordInvitationUrl } = useDiscordInvitationURL();
+	const { pushToast } = useToast();
 
 	return (
 		<MessageBox
@@ -18,7 +14,11 @@ export const DiscordInvitationMessageBox = () => {
 			right={<ArrowUpRight size={24} />}
 			onClick={() => {
 				if (!discordInvitationUrl) {
-					alert("Discord の招待 URL が取得できませんでした。");
+					pushToast({
+						type: "error",
+						title: "Discord の招待 URL が取得できませんでした。",
+						description: "画面を再読み込みしてみてください。",
+					});
 					return;
 				}
 				window.open(discordInvitationUrl);

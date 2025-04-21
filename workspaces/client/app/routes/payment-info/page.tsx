@@ -21,13 +21,11 @@ const Emphasize = ({ children }: { children: React.ReactNode }) => (
 );
 
 export default function PaymentInfo() {
-	const { isLoading, isInitialized, isAuthorized, isProvisional, user } =
-		useAuth();
+	const { isLoading, isInitialized, isAuthorized, user } = useAuth();
 	const navigate = useNavigate();
 
 	// そのうち本登録ユーザーでも表示できるようにする？
-	const shouldProceed =
-		!isLoading && isAuthorized && isInitialized && isProvisional;
+	const shouldProceed = !isLoading && isAuthorized && isInitialized;
 
 	useEffect(() => {
 		if (!shouldProceed) navigate("/");

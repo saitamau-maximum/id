@@ -2,6 +2,7 @@ import { client } from "~/utils/hono";
 
 export interface IMiscRepository {
 	getDiscordInvitationURL: () => Promise<string>;
+	getDiscordInvitationURL$$key: () => unknown[];
 }
 
 export class MiscRepositoryImpl implements IMiscRepository {
@@ -12,5 +13,9 @@ export class MiscRepositoryImpl implements IMiscRepository {
 		}
 		const data = await res.json();
 		return data.url;
+	}
+
+	getDiscordInvitationURL$$key(): unknown[] {
+		return ["discord-invitation-url"];
 	}
 }
