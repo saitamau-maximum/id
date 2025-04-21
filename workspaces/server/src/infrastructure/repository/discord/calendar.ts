@@ -12,37 +12,37 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 	}
 
 	private formatDateTime(startAt: Date, endAt: Date): string {
-			if (startAt.getDate() === endAt.getDate()) {
-				const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
-					hour: "2-digit",
-					minute: "2-digit",
-				});
-				const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
-					hour: "2-digit",
-					minute: "2-digit",
-				});
-				const date = startAt.toLocaleDateString("ja-JP", {
-					month: "2-digit",
-					day: "2-digit",
-					weekday: "short",
-				});
-				return `${date} ${startTimestamp} - ${endTimestamp}`;
-			}
-			return `${startAt.toLocaleDateString("ja-JP", {
+		if (startAt.getDate() === endAt.getDate()) {
+			const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
+				hour: "2-digit",
+				minute: "2-digit",
+			});
+			const date = startAt.toLocaleDateString("ja-JP", {
 				month: "2-digit",
 				day: "2-digit",
 				weekday: "short",
-				hour: "2-digit",
-				minute: "2-digit",
-				timeZone: "Asia/Tokyo",
-			})} - ${endAt.toLocaleDateString("ja-JP", {
-				month: "2-digit",
-				day: "2-digit",
-				weekday: "short",
-				hour: "2-digit",
-				minute: "2-digit",
-				timeZone: "Asia/Tokyo",
-			})}`;
+			});
+			return `${date} ${startTimestamp} - ${endTimestamp}`;
+		}
+		return `${startAt.toLocaleDateString("ja-JP", {
+			month: "2-digit",
+			day: "2-digit",
+			weekday: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+			timeZone: "Asia/Tokyo",
+		})} - ${endAt.toLocaleDateString("ja-JP", {
+			month: "2-digit",
+			day: "2-digit",
+			weekday: "short",
+			hour: "2-digit",
+			minute: "2-digit",
+			timeZone: "Asia/Tokyo",
+		})}`;
 	}
 
 	private embedBuilder(embedInfo: ICalendarEventNotify & { color: number }) {
