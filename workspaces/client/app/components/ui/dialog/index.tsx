@@ -65,6 +65,8 @@ const StyledRAModal = (props: ModalProps) => (
 		className={css({
 			maxWidth: "min(calc(100vw - 32px), 800px)", // dialog 分の padding があるので 32px
 			width: "100%",
+			maxHeight: "calc(100dvh - 32px)",
+			overflowY: "auto",
 			boxShadow: "0 8px 20px rgba(0 0 0 / 0.1)",
 			borderRadius: 6,
 			background: "white",
