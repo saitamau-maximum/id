@@ -16,44 +16,12 @@ import { Table } from "~/components/ui/table";
 import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
-import { getFiscalYear } from "~/utils/date";
+import { formatDuration, getFiscalYear } from "~/utils/date";
 import { useCreateEvent } from "../hooks/use-create-event";
 import { useDeleteEvent } from "../hooks/use-delete-event";
 import { useUpdateEvent } from "../hooks/use-update-event";
 import { CreateEventDialog } from "./callable-create-event-dialog";
 import { EditEventDialog } from "./callable-edit-event-dialog";
-
-const formatDuration = (startAt: Date, endAt: Date) => {
-	if (startAt.getDate() === endAt.getDate()) {
-		const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-		const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
-			hour: "2-digit",
-			minute: "2-digit",
-		});
-		const date = startAt.toLocaleDateString("ja-JP", {
-			month: "2-digit",
-			day: "2-digit",
-			weekday: "short",
-		});
-		return `${date} ${startTimestamp} - ${endTimestamp}`;
-	}
-	return `${startAt.toLocaleDateString("ja-JP", {
-		month: "2-digit",
-		day: "2-digit",
-		weekday: "short",
-		hour: "2-digit",
-		minute: "2-digit",
-	})} - ${endAt.toLocaleDateString("ja-JP", {
-		month: "2-digit",
-		day: "2-digit",
-		weekday: "short",
-		hour: "2-digit",
-		minute: "2-digit",
-	})}`;
-};
 
 export const EventsEditor = () => {
 	const { data: events } = useCalendar();
