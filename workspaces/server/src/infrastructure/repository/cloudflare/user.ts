@@ -350,7 +350,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			throw new Error("Failed to update user role");
 		}
 
-		if (!roleIds || roleIds.length === 0) {
+		if (roleIds.length === 0) {
 			return;
 		}
 
