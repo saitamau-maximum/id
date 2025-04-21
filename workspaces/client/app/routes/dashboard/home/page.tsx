@@ -7,7 +7,6 @@ import { ProfileCard } from "~/components/feature/user/profile-card";
 import { MessageBox } from "~/components/ui/message-box";
 import { useAuth } from "~/hooks/use-auth";
 import { useDeviceType } from "~/hooks/use-device-type";
-import { FLAG } from "~/utils/flag";
 import { DiscordInvitationMessageBox } from "./internal/components/discord-invitation-message-box";
 import { useContribution } from "./internal/hooks/use-contribution";
 
@@ -70,43 +69,41 @@ export default function Home() {
 						socialLinks={user.socialLinks}
 					/>
 				</div>
-				{FLAG.ENABLE_CERTIFICATION && (
-					<div className={css({ width: "100%", maxWidth: "480px" })}>
-						<h2
-							className={css({
-								fontSize: "2xl",
-								fontWeight: "bold",
-								color: "gray.600",
-							})}
-						>
-							Achievements
-						</h2>
-						<p
-							className={css({
-								color: "gray.500",
-								fontSize: "sm",
-								marginBottom: 4,
-							})}
-						>
-							経歴・資格情報など
-						</p>
-						<h3
-							className={css({
-								fontSize: "md",
-								fontWeight: "bold",
-								color: "gray.600",
-								marginBottom: 2,
-								display: "flex",
-								alignItems: "center",
-								gap: 2,
-							})}
-						>
-							<CheckCircle size={16} />
-							資格・試験
-						</h3>
-						<CertificationCard certifications={user.certifications} />
-					</div>
-				)}
+				<div className={css({ width: "100%", maxWidth: "480px" })}>
+					<h2
+						className={css({
+							fontSize: "2xl",
+							fontWeight: "bold",
+							color: "gray.600",
+						})}
+					>
+						Achievements
+					</h2>
+					<p
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+							marginBottom: 4,
+						})}
+					>
+						経歴・資格情報など
+					</p>
+					<h3
+						className={css({
+							fontSize: "md",
+							fontWeight: "bold",
+							color: "gray.600",
+							marginBottom: 2,
+							display: "flex",
+							alignItems: "center",
+							gap: 2,
+						})}
+					>
+						<CheckCircle size={16} />
+						資格・試験
+					</h3>
+					<CertificationCard certifications={user.certifications} />
+				</div>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>
 					<h2
 						className={css({
