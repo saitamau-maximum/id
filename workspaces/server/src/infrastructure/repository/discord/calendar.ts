@@ -16,15 +16,18 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 			const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
 				hour: "2-digit",
 				minute: "2-digit",
+				timeZone: "Asia/Tokyo",
 			});
 			const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
 				hour: "2-digit",
 				minute: "2-digit",
+				timeZone: "Asia/Tokyo",
 			});
 			const date = startAt.toLocaleDateString("ja-JP", {
 				month: "2-digit",
 				day: "2-digit",
 				weekday: "short",
+				timeZone: "Asia/Tokyo",
 			});
 			return `${date} ${startTimestamp} - ${endTimestamp}`;
 		}
