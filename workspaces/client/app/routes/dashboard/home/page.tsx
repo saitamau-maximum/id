@@ -8,6 +8,7 @@ import { MessageBox } from "~/components/ui/message-box";
 import { useAuth } from "~/hooks/use-auth";
 import { useDeviceType } from "~/hooks/use-device-type";
 import { FLAG } from "~/utils/flag";
+import { DiscordInvitationMessageBox } from "./internal/components/discord-invitation-message-box";
 import { useContribution } from "./internal/hooks/use-contribution";
 
 export default function Home() {
@@ -19,6 +20,9 @@ export default function Home() {
 	if (!user) {
 		return null;
 	}
+
+	// 仮実装として、いったん全員に Discord 招待メッセージを表示するようにする
+	const userJoinedDiscord = false;
 
 	return (
 		<>
@@ -35,6 +39,7 @@ export default function Home() {
 					</span>
 				</MessageBox>
 			)}
+			{!userJoinedDiscord && <DiscordInvitationMessageBox />}
 			<div
 				className={css({
 					width: "100%",
