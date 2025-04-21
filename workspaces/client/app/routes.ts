@@ -36,15 +36,11 @@ export default [
 								]),
 							]
 						: []),
-					...(FLAG.ENABLE_CERTIFICATION
-						? [
-								...prefix("certifications", [
-									layout("routes/dashboard/admin/certifications/layout.tsx", [
-										index("routes/dashboard/admin/certifications/page.tsx"),
-									]),
-								]),
-							]
-						: []),
+					...prefix("certifications", [
+						layout("routes/dashboard/admin/certifications/layout.tsx", [
+							index("routes/dashboard/admin/certifications/page.tsx"),
+						]),
+					]),
 					...(FLAG.ENABLE_CALENDAR
 						? [
 								...prefix("events", [
