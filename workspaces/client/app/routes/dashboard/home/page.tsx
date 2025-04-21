@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { ArrowUpRight, CheckCircle } from "react-feather";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
@@ -7,6 +8,7 @@ import { ProfileCard } from "~/components/feature/user/profile-card";
 import { MessageBox } from "~/components/ui/message-box";
 import { useAuth } from "~/hooks/use-auth";
 import { useDeviceType } from "~/hooks/use-device-type";
+import { useRepository } from "~/hooks/use-repository";
 import { FLAG } from "~/utils/flag";
 import { useContribution } from "./internal/hooks/use-contribution";
 
@@ -15,10 +17,20 @@ export default function Home() {
 	const { data, isLoading } = useContribution();
 	const { deviceType } = useDeviceType();
 	const navigate = useNavigate();
+	const { miscRepository } = useRepository();
+
+	const [discordInvitationUrl, setDiscordInvitationUrl] = useState("");
+
+	useEffect(() => {
+		miscRepository.getDiscordInvitationURL().then(setDiscordInvitationUrl);
+	}, [miscRepository]);
 
 	if (!user) {
 		return null;
 	}
+
+	// 仮実装として、いったん全員に Discord 招待メッセージを表示するようにする
+	const userJoinedDiscord = false;
 
 	return (
 		<>
@@ -32,6 +44,32 @@ export default function Home() {
 					<br />
 					<span className={css({ fontSize: "xs" })}>
 						※変更がない方でもプロフィール画面から更新ボタンを押すことでこのメッセージは消えます。
+					</span>
+				</MessageBox>
+			)}
+			{!userJoinedDiscord && discordInvitationUrl && (
+				<MessageBox
+					variant="info"
+					right={<ArrowUpRight size={24} />}
+					onClick={() => {
+						window.open(discordInvitationUrl);
+					}}
+				>
+					<img
+						src="/discord.svg"
+						alt="Discord"
+						width={16}
+						height={16}
+						className={css({
+							display: "inline-block",
+							marginRight: 2,
+						})}
+					/>
+					Maximum の Discord に参加しよう！
+					<br />
+					<span className={css({ fontSize: "xs" })}>
+						※ すでに参加している人にも表示されています。
+						そのうち参加者には非表示になる予定です。
 					</span>
 				</MessageBox>
 			)}
