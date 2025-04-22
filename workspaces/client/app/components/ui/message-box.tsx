@@ -32,22 +32,22 @@ const messageBoxStyle = cva({
 	variants: {
 		variant: {
 			info: {
-				backgroundColor: "blue.100",
+				backgroundColor: "blue.50",
 				borderColor: "blue.300",
 				color: "blue.500",
 			},
 			warning: {
-				backgroundColor: "yellow.100",
-				borderColor: "yellow.300",
-				color: "yellow.500",
+				backgroundColor: "amber.50",
+				borderColor: "amber.300",
+				color: "amber.500",
 			},
 			error: {
-				backgroundColor: "rose.100",
+				backgroundColor: "rose.50",
 				borderColor: "rose.300",
 				color: "rose.500",
 			},
 			success: {
-				backgroundColor: "green.100",
+				backgroundColor: "green.50",
 				borderColor: "green.300",
 				color: "green.500",
 			},
@@ -64,7 +64,7 @@ const messageBoxStyle = cva({
 			clickable: true,
 			css: {
 				"&:hover": {
-					backgroundColor: "blue.200",
+					backgroundColor: "blue.100",
 					borderColor: "blue.400",
 				},
 				"&:active": {
@@ -82,15 +82,15 @@ const messageBoxStyle = cva({
 			clickable: true,
 			css: {
 				"&:hover": {
-					backgroundColor: "yellow.200",
-					borderColor: "yellow.400",
+					backgroundColor: "amber.100",
+					borderColor: "amber.400",
 				},
 				"&:active": {
-					backgroundColor: "yellow.300",
-					borderColor: "yellow.500",
+					backgroundColor: "amber.300",
+					borderColor: "amber.500",
 				},
 				"&:focus": {
-					outline: "2px solid yellow.500",
+					outline: "2px solid amber.500",
 					outlineOffset: "2px",
 				},
 			},
@@ -100,7 +100,7 @@ const messageBoxStyle = cva({
 			clickable: true,
 			css: {
 				"&:hover": {
-					backgroundColor: "rose.200",
+					backgroundColor: "rose.100",
 					borderColor: "rose.400",
 				},
 				"&:active": {
@@ -118,7 +118,7 @@ const messageBoxStyle = cva({
 			clickable: true,
 			css: {
 				"&:hover": {
-					backgroundColor: "green.200",
+					backgroundColor: "green.100",
 					borderColor: "green.400",
 				},
 				"&:active": {
