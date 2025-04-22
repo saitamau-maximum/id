@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { PaymentInfoDisplay } from "~/components/feature/payment/info-display";
 import { MemberCard } from "~/components/feature/user/member-card";
@@ -7,30 +5,16 @@ import { Progress } from "~/components/ui/progess";
 
 import { useAuth } from "~/hooks/use-auth";
 
-const REGISTRATION_STEPS = [
-	{ label: "仮登録", isActive: true, isCompleted: true },
+const PAYMENT_UPDATE_STEPS = [
 	{ label: "入金", isActive: true, isCompleted: false },
 	{ label: "承認", isActive: false, isCompleted: false },
 	{ label: "完了", isActive: false, isCompleted: false },
 ];
 
 export default function PaymentInfo() {
-	const { isLoading, isInitialized, isAuthorized, isProvisional, user } =
-		useAuth();
-	const navigate = useNavigate();
+	const { user } = useAuth();
 
-	// そのうち本登録ユーザーでも表示できるようにする？
-	const shouldProceed =
-		!isLoading && isAuthorized && isInitialized && isProvisional;
-
-	useEffect(() => {
-		if (!shouldProceed) navigate("/");
-	}, [shouldProceed, navigate]);
-
-	if (!shouldProceed || !user) return null;
-
-	// isInitialized が true の時点で initializedAt は必ず存在するはず
-	if (!user.initializedAt) throw new Error("initializedAt is null");
+	if (!user || !user.initializedAt) throw new Error("initializedAt is null");
 
 	return (
 		<div
@@ -60,7 +44,7 @@ export default function PaymentInfo() {
 						marginBottom: 4,
 					})}
 				>
-					<Progress steps={REGISTRATION_STEPS} />
+					<Progress steps={PAYMENT_UPDATE_STEPS} />
 				</div>
 
 				<div
@@ -86,19 +70,6 @@ export default function PaymentInfo() {
 				</div>
 
 				<PaymentInfoDisplay />
-
-				<p
-					className={css({
-						fontSize: "sm",
-						marginTop: 4,
-						color: "gray.500",
-					})}
-				>
-					ページを閉じても、再度アクセス(GitHubでログイン)すればまた表示されますので、ご安心ください。
-					<br />
-					その他、不明点があれば、気軽に新歓用 Discord
-					サーバーやメンバーへお尋ねください。
-				</p>
 			</div>
 		</div>
 	);

@@ -52,6 +52,7 @@ export default [
 						: []),
 				]),
 			]),
+			route("update-payment-info", "routes/dashboard/payment-info/page.tsx"),
 			...prefix("oauth-apps", [
 				layout("routes/dashboard/oauth-apps/layout.tsx", [
 					index("routes/dashboard/oauth-apps/home/page.tsx"),

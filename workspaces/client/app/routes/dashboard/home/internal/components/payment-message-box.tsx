@@ -10,7 +10,7 @@ export const PaymentMessageBox = () => {
 		<MessageBox
 			variant="warning"
 			right={<ArrowUpRight size={24} />}
-			onClick={() => navigate("/payment-info")}
+			onClick={() => navigate("/update-payment-info")}
 		>
 			今年度の会費をまだお支払いされていません。
 			<br />
