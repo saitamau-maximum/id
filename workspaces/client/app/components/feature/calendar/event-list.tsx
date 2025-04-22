@@ -7,6 +7,7 @@ import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
+import { formatDuration } from "~/utils/date";
 import { LocationDisplay } from "./location-display";
 
 interface Props {
@@ -26,38 +27,6 @@ export const EventList = ({ events }: Props) => {
 
 const EventRow = ({ event }: { event: CalendarEvent }) => {
 	const { locationMap } = useLocations();
-	const formatTerm = (startAt: Date, endAt: Date) => {
-		if (startAt.getDate() === endAt.getDate()) {
-			const startTimestamp = startAt.toLocaleTimeString("ja-JP", {
-				hour: "2-digit",
-				minute: "2-digit",
-			});
-			const endTimestamp = endAt.toLocaleTimeString("ja-JP", {
-				hour: "2-digit",
-				minute: "2-digit",
-			});
-			const date = startAt.toLocaleDateString("ja-JP", {
-				month: "2-digit",
-				day: "2-digit",
-				weekday: "short",
-			});
-			return `${date} ${startTimestamp} - ${endTimestamp}`;
-		}
-		return `${startAt.toLocaleDateString("ja-JP", {
-			month: "2-digit",
-			day: "2-digit",
-			weekday: "short",
-			hour: "2-digit",
-			minute: "2-digit",
-		})} - ${endAt.toLocaleDateString("ja-JP", {
-			month: "2-digit",
-			day: "2-digit",
-			weekday: "short",
-			hour: "2-digit",
-			minute: "2-digit",
-		})}`;
-	};
-
 	const isActiveEvent = useCallback((event: CalendarEvent) => {
 		const now = new Date();
 		return event.startAt <= now && now <= event.endAt;
@@ -175,7 +144,7 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 									width: "100%",
 								})}
 							>
-								{formatTerm(event.startAt, event.endAt)}
+								{formatDuration(event.startAt, event.endAt)}
 							</td>
 						</tr>
 						{event.locationId && (
