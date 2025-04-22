@@ -16,8 +16,8 @@ export const DiscordInvitationMessageBox = () => {
 				if (!discordInvitationUrl) {
 					pushToast({
 						type: "error",
-						title: "Discord の招待 URL が取得できませんでした。",
-						description: "画面を再読み込みしてみてください。",
+						title: "Discord の招待 URL が取得できませんでした",
+						description: "画面を再読み込みしてもう一度お試しください",
 					});
 					return;
 				}

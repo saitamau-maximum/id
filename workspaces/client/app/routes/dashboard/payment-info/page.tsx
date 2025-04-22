@@ -11,10 +11,10 @@ const PAYMENT_UPDATE_STEPS = [
 	{ label: "完了", isActive: false, isCompleted: false },
 ];
 
-export default function PaymentInfo() {
+export default function UpdatePaymentInfo() {
 	const { user } = useAuth();
 
-	if (!user || !user.initializedAt) throw new Error("initializedAt is null");
+	if (!user || !user.initializedAt) return null;
 
 	return (
 		<div
