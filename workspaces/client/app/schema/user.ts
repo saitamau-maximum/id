@@ -61,7 +61,7 @@ export const UserSchemas = {
 		v.check((value) => {
 			const domain = value.split("@")[1];
 			return domain === ACADEMIC_EMAIL_DOMAIN;
-		}),
+		}, "大学のメールアドレスを入力してください"),
 	),
 	StudentId: v.pipe(
 		v.string(),
