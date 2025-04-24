@@ -12,3 +12,5 @@ export const RESERVED_WORDS = [
 	"merin",
 	"idp",
 ];
+
+export const ACADEMIC_EMAIL_DOMAIN = "ms.saitama-u.ac.jp";
