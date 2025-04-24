@@ -52,6 +52,10 @@ export const UserSchemas = {
 		v.nonEmpty("メールアドレスを入力してください"),
 		v.email("メールアドレスの形式が正しくありません"),
 		v.maxLength(255, "メールアドレスは255文字以下で入力してください"),
+		v.check((value) => {
+			const domain = value.split("@")[1];
+			return domain !== ACADEMIC_EMAIL_DOMAIN;
+		}, "大学以外ののメールアドレスを入力してください"),
 	),
 	AcademicEmail: v.pipe(
 		v.string(),

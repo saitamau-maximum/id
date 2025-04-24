@@ -39,7 +39,15 @@ const ProfileSchema = v.object({
 		v.check((value) => !RESERVED_WORDS.includes(value)),
 		v.regex(/^[a-z0-9_]{3,16}$/),
 	),
-	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
+	email: v.pipe(
+		v.string(),
+		v.nonEmpty(),
+		v.email(),
+		v.check((value) => {
+			const domain = value.split("@")[1];
+			return domain !== ACADEMIC_EMAIL_DOMAIN;
+		}),
+	),
 	academicEmail: v.optional(
 		v.pipe(
 			v.string(),
