@@ -3,6 +3,7 @@ import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { ACADEMIC_EMAIL_DOMAIN } from "../constants/validation";
 import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware, memberOnlyMiddleware } from "../middleware/auth";
@@ -38,8 +39,26 @@ const ProfileSchema = v.object({
 		v.check((value) => !RESERVED_WORDS.includes(value)),
 		v.regex(/^[a-z0-9_]{3,16}$/),
 	),
-	email: v.pipe(v.string(), v.nonEmpty(), v.email()),
-	academicEmail: v.optional(v.pipe(v.string(), v.nonEmpty(), v.email())),
+	email: v.pipe(
+		v.string(),
+		v.nonEmpty(),
+		v.email(),
+		v.check((value) => {
+			const domain = value.split("@")[1];
+			return domain !== ACADEMIC_EMAIL_DOMAIN;
+		}),
+	),
+	academicEmail: v.optional(
+		v.pipe(
+			v.string(),
+			v.nonEmpty(),
+			v.email(),
+			v.check((value) => {
+				const domain = value.split("@")[1];
+				return domain === ACADEMIC_EMAIL_DOMAIN;
+			}),
+		),
+	),
 	studentId: v.optional(
 		v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	),

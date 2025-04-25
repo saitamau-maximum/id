@@ -7,6 +7,8 @@ export const GRADE = [
 	{ label: "その他", identifier: ["卒業生", "ゲスト"] },
 ];
 
+export const ACADEMIC_EMAIL_DOMAIN = "ms.saitama-u.ac.jp";
+
 export const OUTSIDE_GRADE = ["卒業生", "ゲスト"];
 
 export const RESERVED_WORDS = [

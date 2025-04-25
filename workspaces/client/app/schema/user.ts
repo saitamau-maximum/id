@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { RESERVED_WORDS } from "~/constant";
+import { ACADEMIC_EMAIL_DOMAIN, RESERVED_WORDS } from "~/constant";
 import { MaxLines } from "~/utils/valibot";
 
 // 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
@@ -52,12 +52,20 @@ export const UserSchemas = {
 		v.nonEmpty("メールアドレスを入力してください"),
 		v.email("メールアドレスの形式が正しくありません"),
 		v.maxLength(255, "メールアドレスは255文字以下で入力してください"),
+		v.check((value) => {
+			const domain = value.split("@")[1];
+			return domain !== ACADEMIC_EMAIL_DOMAIN;
+		}, "大学以外のメールアドレスを入力してください"),
 	),
 	AcademicEmail: v.pipe(
 		v.string(),
 		v.nonEmpty("大学のメールアドレスを入力してください"),
 		v.email("大学のメールアドレスの形式が正しくありません"),
 		v.maxLength(255, "大学のメールアドレスは255文字以下で入力してください"),
+		v.check((value) => {
+			const domain = value.split("@")[1];
+			return domain === ACADEMIC_EMAIL_DOMAIN;
+		}, "大学のメールアドレスを入力してください"),
 	),
 	StudentId: v.pipe(
 		v.string(),
