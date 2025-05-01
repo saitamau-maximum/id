@@ -57,11 +57,14 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 - `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
 - `GITHUB_APP_INSTALLID`: GitHub App の Install ID。 GitHub の REST API を使って取得できます。 詳しくは [公式ドキュメント](https://docs.github.com/ja/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) を参照してください。
 
-> [!NOTE]
+> [!TIP]
 > `.dev.vars` に同じ変数名のものがあると、 `.dev.vars` の値が優先されます。
 > そのため、ローカル開発時にこちらの値を変更したい場合には、 `.dev.vars` に設定してください。
 
 ### 開発サーバーの立ち上げ
+
+> [!NOTE]
+> これらのコマンドはプロジェクトのルートディレクトリで実行してください。
 
 初期セットアップ時には、マイグレーションを行う必要があります。
 
