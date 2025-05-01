@@ -28,7 +28,7 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 
 `workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーし、変更します。
 
-各変数の説明を以下に記載します。
+必須となる環境変数は以下の通りです。
 
 - `SECRET`: JWT の署名や Cookie の暗号化に使用する鍵
   - 適当な文字列を設定してください。
@@ -42,8 +42,43 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
   - Application name, Homepage URL は適当に設定してよいです。 Authorization callback URL には `http://localhost:8787/auth/login/github/callback` を設定してください。
   - 作成できたら、 Client Secret を生成してコピーしてください。
 - `GITHUB_OAUTH_ID`: ↑ の OAuth App を作成した際に表示される Client ID を設定してください。
-- `PRIVKEY_FOR_OAUTH`: OAuth で使用する秘密鍵
+
+ここから下の環境変数たちは必要に応じて設定してください。
+
+<details>
+<summary>IdP OAuth の開発</summary>
+
+- `PRIVKEY_FOR_OAUTH`: IdP OAuth 内で使用する秘密鍵
   - <https://api.id.maximum.vc/oauth/util/keygen> へアクセスして生成してください。
+
+</details>
+
+<details>
+<summary>Discord 関連の開発</summary>
+
+- `DISCORD_OAUTH_ID`: Discord OAuth の Client ID
+- `DISCORD_OAUTH_SECRET`: Discord OAuth の Client Secret
+
+Discord Developer Portal (<https://discord.com/developers/applications>) から新しくアプリケーションを作成してください。
+その後設定画面の OAuth2 タブから Client ID と Client Secret を取得してください。
+Redirect URL として、 `http://localhost:8787/auth/login/discord/callback` を設定してください。
+Bot を作成する場合、自身の管理するサーバーに Bot を追加してください。
+
+</details>
+
+<details>
+<summary>通知系</summary>
+
+- `CALENDAR_NOTIFY_WEBHOOK_URL`: Calendar の追加・更新時に通知を受け取る Webhook URL
+
+</details>
+
+<details>
+<summary>その他</summary>
+
+- `DISCORD_INVITATION_URL`: Discord の招待 URL
+
+</details>
 
 ### 環境変数の設定 (基本的に触る必要なし)
 
