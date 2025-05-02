@@ -5,3 +5,8 @@ export const OAUTH_PROVIDER_IDS = {
 	GITHUB: 1,
 	DISCORD: 2,
 };
+
+export const OAUTH_PROVIDER_NAMES = {
+	[OAUTH_PROVIDER_IDS.GITHUB]: "GitHub",
+	[OAUTH_PROVIDER_IDS.DISCORD]: "Discord",
+};
