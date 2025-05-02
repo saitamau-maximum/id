@@ -1,5 +1,11 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
+	OAuth2Routes,
+	OAuth2Scopes,
+	type RESTGetAPICurrentUserResult,
+	type RESTPostOAuth2AccessTokenResult,
+} from "discord-api-types/v10";
+import {
 	deleteCookie,
 	getCookie,
 	getSignedCookie,
@@ -8,44 +14,71 @@ import {
 } from "hono/cookie";
 import { sign } from "hono/jwt";
 import type { CookieOptions } from "hono/utils/cookie";
-import { Octokit } from "octokit";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
-import { validateInvitation } from "../../service/invite";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
 
 const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
-const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
-interface GitHubOAuthTokenResponse {
-	access_token: string;
-	scope: string;
-	token_type: string;
+interface FetchAccessTokenParams {
+	code: string;
+	redirectUri: string;
+	clientId: string;
+	clientSecret: string;
 }
 
-const fetchAccessToken = (
-	code: string,
-	clientId: string,
-	clientSecret: string,
-) =>
-	fetch("https://github.com/login/oauth/access_token", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Accept: "application/json",
-		},
-		body: JSON.stringify({
-			client_id: clientId,
-			client_secret: clientSecret,
-			code,
-		}),
-	})
-		.then((res) => res.json<GitHubOAuthTokenResponse>())
-		.catch(() => ({ access_token: null }));
+const fetchAccessToken = async ({
+	code,
+	redirectUri,
+	clientId,
+	clientSecret,
+}: FetchAccessTokenParams): Promise<
+	RESTPostOAuth2AccessTokenResult | { access_token: null }
+> => {
+	const body = new URLSearchParams();
+	body.set("grant_type", "authorization_code");
+	body.set("code", code);
+	body.set("redirect_uri", redirectUri);
+	body.set("client_id", clientId);
+	body.set("client_secret", clientSecret);
+
+	try {
+		const res = await fetch(OAuth2Routes.tokenURL, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: "application/json",
+			},
+			body,
+		});
+		return await res.json<RESTPostOAuth2AccessTokenResult>();
+	} catch {
+		return {
+			access_token: null,
+		};
+	}
+};
+
+// ここでしか使わないので特にリポジトリ抽象化しない
+const fetchUser = async (accessToken: string) => {
+	const endpoint = "https://discord.com/api/v10/users/@me";
+	try {
+		const res = await fetch(endpoint, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+		return await res.json<RESTGetAPICurrentUserResult>();
+	} catch {
+		return {
+			id: null,
+		};
+	}
+};
 
 const getCookieOptions = (isLocal: boolean): CookieOptions => ({
 	path: "/",
@@ -69,16 +102,13 @@ const route = app
 	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
 		const { continue_to, invitation_id } = c.req.valid("query");
 
-		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+		// invitation_id がセットされている場合は GitHub でしかログインできないようにする
 		if (invitation_id) {
-			setSignedCookie(
-				c,
-				COOKIE_NAME.INVITATION_ID,
-				invitation_id,
-				c.env.SECRET,
-				getCookieOptions(new URL(c.req.url).protocol === "http:"),
-			);
+			// TODO
+			return c.text("Discord login is not available", 400);
 		}
+
+		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
 
 		const requestUrl = new URL(c.req.url);
 
@@ -91,17 +121,19 @@ const route = app
 			getCookieOptions(requestUrl.protocol === "http:"),
 		);
 
-		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-		const oauthUrl = new URL("https://github.com/login/oauth/authorize");
+		// ref: https://discord.com/developers/docs/topics/oauth2
+		const oauthUrl = new URL(OAuth2Routes.authorizationURL);
 		const oauthParams = new URLSearchParams();
-		oauthParams.set("client_id", c.env.GITHUB_OAUTH_ID);
+		oauthParams.set("client_id", c.env.DISCORD_OAUTH_ID);
 		oauthParams.set(
 			"redirect_uri",
-			`${requestUrl.origin}/auth/login/github/callback`,
+			`${requestUrl.origin}/auth/login/discord/callback`,
 		);
-		oauthParams.set("scope", "read:user");
+		oauthParams.set("scope", [OAuth2Scopes.Identify].join(" "));
 		oauthParams.set("state", state);
-		oauthParams.set("allow_signup", "false");
+		oauthParams.set("response_type", "code");
+		// 個人認証のため USER_INSTALL にする (SERVER_INSTALL はしない)
+		oauthParams.set("integration_type", "1");
 		return c.redirect(`${oauthUrl.toString()}?${oauthParams.toString()}`, 302);
 	})
 	.get(
@@ -121,78 +153,34 @@ const route = app
 				return c.text("state mismatch", 400);
 			}
 
-			const { access_token } = await fetchAccessToken(
+			const { access_token } = await fetchAccessToken({
 				code,
-				c.env.GITHUB_OAUTH_ID,
-				c.env.GITHUB_OAUTH_SECRET,
-			);
+				redirectUri: `${new URL(c.req.url).origin}/auth/login/discord/callback`,
+				clientId: c.env.DISCORD_OAUTH_ID,
+				clientSecret: c.env.DISCORD_OAUTH_SECRET,
+			});
 
 			if (!access_token) {
 				return c.text("invalid code", 400);
 			}
 
-			// ここでしか使わないので user 側は特にリポジトリ抽象化しない
-			const userOctokit = new Octokit({ auth: access_token });
-			const { data: user } = await userOctokit.request("GET /user");
+			const discordUser = await fetchUser(access_token);
 
-			const invitationId = await getSignedCookie(
-				c,
-				c.env.SECRET,
-				COOKIE_NAME.INVITATION_ID,
-			);
-			deleteCookie(c, COOKIE_NAME.INVITATION_ID);
+			if (!discordUser.id) {
+				return c.text("invalid user", 400);
+			}
 
-			const githubUserIdStr = String(user.id);
 			let foundUserId: string | null;
 			try {
 				// ユーザーの存在確認
 				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					githubUserIdStr,
-					OAUTH_PROVIDER_IDS.GITHUB,
+					discordUser.id,
+					OAUTH_PROVIDER_IDS.DISCORD,
 				);
 			} catch {
 				// ユーザーが存在しなかった場合
-				if (typeof invitationId === "string") {
-					// 招待コードの署名検証に成功しているので、コードを検証する
-					try {
-						// 招待コードが有効かチェックし、有効な場合は消費する
-						await validateInvitation(c.var.InviteRepository, invitationId);
-						await c.var.InviteRepository.reduceInviteUsage(invitationId);
-					} catch (e) {
-						return c.text((e as Error).message, 400);
-					}
-					// 招待コードが有効な場合、仮登録処理を行う
-					foundUserId = await c.var.UserRepository.createTemporaryUser(
-						githubUserIdStr,
-						OAUTH_PROVIDER_IDS.GITHUB,
-						invitationId,
-						{
-							email: user.email ?? undefined,
-							displayName: user.login,
-							profileImageURL: user.avatar_url,
-						},
-					);
-				} else if (invitationId === undefined) {
-					// 招待コードが提供されなかった場合、GitHub Organization メンバーかどうかを確認する処理
-					const isMember = await c.var.OrganizationRepository.checkIsMember(
-						user.login,
-					);
-					if (!isMember)
-						return c.text("invitation code required for non-members", 403);
-					// Organization のメンバーであれば、本登録処理を行う
-					foundUserId = await c.var.UserRepository.createUser(
-						githubUserIdStr,
-						OAUTH_PROVIDER_IDS.GITHUB,
-						{
-							email: user.email ?? undefined,
-							displayName: user.login,
-							profileImageURL: user.avatar_url,
-						},
-					);
-				} else {
-					// invitationId が不正な場合の処理
-					return c.text(INVITATION_ERROR_MESSAGE, 400);
-				}
+				// TODO: ログインページにリダイレクト
+				return c.text("User not found", 400);
 			}
 
 			const now = Math.floor(Date.now() / 1000);
