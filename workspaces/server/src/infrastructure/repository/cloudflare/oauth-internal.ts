@@ -74,4 +74,18 @@ export class CloudflareOAuthInternalRepository
 				),
 			);
 	}
+
+	async deleteOAuthConnection(
+		userId: string,
+		providerId: number,
+	): Promise<void> {
+		await this.client
+			.delete(schema.oauthConnections)
+			.where(
+				and(
+					eq(schema.oauthConnections.userId, userId),
+					eq(schema.oauthConnections.providerId, providerId),
+				),
+			);
+	}
 }

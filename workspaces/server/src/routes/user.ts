@@ -270,6 +270,33 @@ const route = app
 			}
 		},
 	)
+	.delete("/oauth-connection/:providerId", memberOnlyMiddleware, async (c) => {
+		const { userId } = c.get("jwtPayload");
+		const { OAuthInternalRepository } = c.var;
+		const providerIdStr = c.req.param("providerId");
+
+		if (
+			!Object.values(OAUTH_PROVIDER_IDS).map(String).includes(providerIdStr)
+		) {
+			return c.text("Invalid providerId", 400);
+		}
+
+		const providerId = Number.parseInt(providerIdStr, 10);
+		// Assert
+		if (
+			Number.isNaN(providerId) ||
+			!Object.values(OAUTH_PROVIDER_IDS).includes(providerId)
+		) {
+			return c.text("Invalid providerId", 400);
+		}
+
+		try {
+			await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
+			return c.text("ok", 200);
+		} catch {
+			return c.text("Failed to delete OAuth connection", 500);
+		}
+	})
 	.get("/profile-image/:userId", async (c) => {
 		// TODO 画像のキャッシュを考慮する
 		const { UserStorageRepository } = c.var;

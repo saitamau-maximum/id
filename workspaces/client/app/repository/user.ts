@@ -44,6 +44,7 @@ export interface IUserRepository {
 	approveInvitation: (userId: string) => Promise<void>;
 	rejectInvitation: (userId: string) => Promise<void>;
 	confirmPayment: (userId: string) => Promise<void>;
+	deleteOAuthConnection: (providerId: number) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -216,6 +217,17 @@ export class UserRepositoryImpl implements IUserRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to confirm payment");
+		}
+	}
+
+	async deleteOAuthConnection(providerId: number) {
+		const res = await client.user["oauth-connection"][":providerId"].$delete({
+			param: {
+				providerId: providerId.toString(),
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to delete OAuth connection");
 		}
 	}
 }
