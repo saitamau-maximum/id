@@ -1,4 +1,5 @@
 import type { Role } from "../constants/role";
+import type { OAuthConnection } from "./oauth-internal";
 
 export type Certification = {
 	id: string;
@@ -33,10 +34,6 @@ export type User = {
 	roles: Role[];
 } & Partial<Profile>;
 
-export type UserWithCertifications = User & {
-	certifications: Certification[];
-};
-
 export type Member = User &
 	Partial<
 		Pick<
@@ -52,8 +49,12 @@ export type Member = User &
 		>
 	>;
 
-export type MemberWithCertifications = Member & {
+export type WithCertifications<T> = T & {
 	certifications: Certification[];
+};
+
+export type WithOAuthConnections<T> = T & {
+	oauthConnections: Omit<OAuthConnection, "userId" | "email">[];
 };
 
 export interface IUserRepository {
@@ -72,12 +73,14 @@ export interface IUserRepository {
 		providerUserId: string,
 		providerId: number,
 	) => Promise<string>;
-	fetchUserProfileById: (userId: string) => Promise<UserWithCertifications>;
+	fetchUserProfileById: (
+		userId: string,
+	) => Promise<WithOAuthConnections<WithCertifications<User>>>;
 	fetchApprovedUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
 	fetchMemberByDisplayId: (
 		displayId: string,
-	) => Promise<MemberWithCertifications>;
+	) => Promise<WithOAuthConnections<WithCertifications<Member>>>;
 	registerUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUser: (userId: string, payload: Partial<Profile>) => Promise<void>;
 	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;

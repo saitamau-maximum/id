@@ -5,10 +5,10 @@ import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
 	Member,
-	MemberWithCertifications,
 	Profile,
 	User,
-	UserWithCertifications,
+	WithCertifications,
+	WithOAuthConnections,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -98,7 +98,9 @@ export class CloudflareUserRepository implements IUserRepository {
 		return res.userId;
 	}
 
-	async fetchUserProfileById(userId: string): Promise<UserWithCertifications> {
+	async fetchUserProfileById(
+		userId: string,
+	): Promise<WithOAuthConnections<WithCertifications<User>>> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -107,6 +109,16 @@ export class CloudflareUserRepository implements IUserRepository {
 				certifications: {
 					with: {
 						certification: true,
+					},
+				},
+				oauthConnections: {
+					columns: {
+						userId: false,
+						providerId: true,
+						providerUserId: true,
+						email: false,
+						name: true,
+						profileImageUrl: true,
 					},
 				},
 				socialLinks: true,
@@ -140,6 +152,12 @@ export class CloudflareUserRepository implements IUserRepository {
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
 				isApproved: cert.isApproved,
+			})),
+			oauthConnections: user.oauthConnections.map((conn) => ({
+				providerId: conn.providerId,
+				providerUserId: conn.providerUserId,
+				name: conn.name,
+				profileImageUrl: conn.profileImageUrl,
 			})),
 			updatedAt: user.profile.updatedAt ?? undefined,
 		};
@@ -277,7 +295,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMemberByDisplayId(
 		displayId: string,
-	): Promise<MemberWithCertifications> {
+	): Promise<WithOAuthConnections<WithCertifications<Member>>> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -287,6 +305,16 @@ export class CloudflareUserRepository implements IUserRepository {
 						certifications: {
 							with: {
 								certification: true,
+							},
+						},
+						oauthConnections: {
+							columns: {
+								userId: false,
+								providerId: true,
+								providerUserId: true,
+								email: false,
+								name: true,
+								profileImageUrl: true,
 							},
 						},
 						socialLinks: true,
@@ -319,6 +347,12 @@ export class CloudflareUserRepository implements IUserRepository {
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
 				isApproved: cert.isApproved,
+			})),
+			oauthConnections: user.user.oauthConnections.map((conn) => ({
+				providerId: conn.providerId,
+				providerUserId: conn.providerUserId,
+				name: conn.name,
+				profileImageUrl: conn.profileImageUrl,
 			})),
 		};
 	}
