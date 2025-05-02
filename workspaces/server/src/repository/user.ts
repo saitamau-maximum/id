@@ -58,20 +58,10 @@ export type WithOAuthConnections<T> = T & {
 };
 
 export interface IUserRepository {
-	createUser: (
-		providerUserId: string,
-		providerId: number,
-		payload: Partial<Profile>,
-	) => Promise<string>;
+	createUser: (payload: Partial<Profile>) => Promise<string>;
 	createTemporaryUser: (
-		providerUserId: string,
-		providerId: number,
 		invitationId: string,
 		payload: Partial<Profile>,
-	) => Promise<string>;
-	fetchUserIdByProviderInfo: (
-		providerUserId: string,
-		providerId: number,
 	) => Promise<string>;
 	fetchUserProfileById: (
 		userId: string,

@@ -19,26 +19,16 @@ export class CloudflareUserRepository implements IUserRepository {
 	}
 
 	private async createUserInternal(
-		providerUserId: string,
-		providerId: number,
 		payload: Partial<Profile>,
 		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
-		const { displayName, email, profileImageURL } = payload;
+		const { displayName, profileImageURL } = payload;
 		const batchOps = [
 			this.client.insert(schema.users).values({
 				id: userId,
 				...(invitationId && { invitationId }),
-			}),
-			this.client.insert(schema.oauthConnections).values({
-				userId,
-				providerId,
-				providerUserId,
-				email,
-				name: displayName,
-				profileImageUrl: profileImageURL,
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
@@ -57,45 +47,15 @@ export class CloudflareUserRepository implements IUserRepository {
 		throw new Error("Failed to create user");
 	}
 
-	async createUser(
-		providerUserId: string,
-		providerId: number,
-		payload: Partial<Profile> = {},
-	): Promise<string> {
-		return this.createUserInternal(providerUserId, providerId, payload);
+	async createUser(payload: Partial<Profile> = {}): Promise<string> {
+		return this.createUserInternal(payload);
 	}
 
 	async createTemporaryUser(
-		providerUserId: string,
-		providerId: number,
 		invitationId: string,
 		payload: Partial<Profile> = {},
 	): Promise<string> {
-		return this.createUserInternal(
-			providerUserId,
-			providerId,
-			payload,
-			invitationId,
-		);
-	}
-
-	async fetchUserIdByProviderInfo(
-		providerUserId: string,
-		providerId: number,
-	): Promise<string> {
-		const res = await this.client.query.oauthConnections.findFirst({
-			where: (oauthConn, { eq, and }) =>
-				and(
-					eq(oauthConn.providerId, providerId),
-					eq(oauthConn.providerUserId, providerUserId),
-				),
-		});
-
-		if (!res) {
-			throw new Error("User not found");
-		}
-
-		return res.userId;
+		return this.createUserInternal(payload, invitationId);
 	}
 
 	async fetchUserProfileById(
