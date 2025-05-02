@@ -1,4 +1,8 @@
-import type { Member, MemberWithCertifications } from "~/types/user";
+import type {
+	Member,
+	WithCertifications,
+	WithOAuthConnections,
+} from "~/types/user";
 import { client } from "~/utils/hono";
 
 export interface IMemberRepository {
@@ -14,7 +18,7 @@ export interface IMemberRepository {
 	getProfileByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 	getProfileByUserDisplayID: (
 		userDisplayId: string,
-	) => Promise<MemberWithCertifications>;
+	) => Promise<WithOAuthConnections<WithCertifications<Member>>>;
 }
 
 export class MemberRepositoryImpl implements IMemberRepository {
