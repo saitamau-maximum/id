@@ -12,12 +12,12 @@ import {
 	setCookie,
 	setSignedCookie,
 } from "hono/cookie";
-import { sign } from "hono/jwt";
+import { sign, verify } from "hono/jwt";
 import type { CookieOptions } from "hono/utils/cookie";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
-import { factory } from "../../factory";
+import { type HonoEnv, factory } from "../../factory";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
@@ -170,38 +170,8 @@ const route = app
 				return c.text("invalid user", 400);
 			}
 
-			let foundUserId: string | null;
-			try {
-				// ユーザーの存在確認
-				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					discordUser.id,
-					OAUTH_PROVIDER_IDS.DISCORD,
-				);
-			} catch {
-				// ユーザーが存在しなかった場合
-				// TODO: ログインページにリダイレクト
-				return c.text("User not found", 400);
-			}
-
-			const now = Math.floor(Date.now() / 1000);
-			const jwt = await sign(
-				{
-					userId: foundUserId,
-					iat: now,
-					exp: now + JWT_EXPIRATION,
-				},
-				c.env.SECRET,
-			);
-
+			// 先に Redirect URL の validate (共通なので)
 			const requestUrl = new URL(c.req.url);
-			await setSignedCookie(
-				c,
-				COOKIE_NAME.LOGIN_STATE,
-				jwt,
-				c.env.SECRET,
-				getCookieOptions(requestUrl.protocol === "http:"),
-			);
-
 			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
 			deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
 			if (continueTo === undefined) {
@@ -222,13 +192,80 @@ const route = app
 				return c.text("Bad Request", 400);
 			}
 
-			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
+			try {
+				// ユーザーの存在確認
+				const foundUserId =
+					await c.var.OAuthInternalRepository.fetchUserIdByProviderInfo(
+						discordUser.id,
+						OAUTH_PROVIDER_IDS.DISCORD,
+					);
 
-			await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
+				// JWT 構築 & セット
+				const now = Math.floor(Date.now() / 1000);
+				const jwt = await sign(
+					{
+						userId: foundUserId,
+						iat: now,
+						exp: now + JWT_EXPIRATION,
+					},
+					c.env.SECRET,
+				);
 
-			continueToUrl.searchParams.set("ott", ott);
+				await setSignedCookie(
+					c,
+					COOKIE_NAME.LOGIN_STATE,
+					jwt,
+					c.env.SECRET,
+					getCookieOptions(requestUrl.protocol === "http:"),
+				);
 
-			return c.redirect(continueToUrl.toString(), 302);
+				const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
+				await c.var.SessionRepository.storeOneTimeToken(
+					ott,
+					jwt,
+					JWT_EXPIRATION,
+				);
+				continueToUrl.searchParams.set("ott", ott);
+
+				return c.redirect(continueToUrl.toString(), 302);
+			} catch {
+				// ユーザーが存在しなかった場合、ログイン状態をチェック
+				let loggedInUserId: string | null = null;
+
+				const jwt = await getSignedCookie(
+					c,
+					c.env.SECRET,
+					COOKIE_NAME.LOGIN_STATE,
+				);
+				if (jwt) {
+					const payload = await verify(jwt, c.env.SECRET);
+					if (payload) {
+						loggedInUserId = (payload as HonoEnv["Variables"]["jwtPayload"])
+							.userId;
+					}
+				}
+
+				// 未ログイン時はログインページに差し戻し
+				if (!loggedInUserId) {
+					// TODO: 「まず紐づけてください」とともにログインページにリダイレクト
+					return c.text("User not found", 400);
+				}
+
+				// Settings からの連携リクエストとみなして OAuth Connection を作成
+				await c.var.OAuthInternalRepository.createOAuthConnection({
+					userId: loggedInUserId,
+					providerId: OAUTH_PROVIDER_IDS.DISCORD,
+					providerUserId: discordUser.id,
+					name: discordUser.username,
+					// avatar は image hash が入る
+					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting
+					profileImageUrl: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`,
+					// 取得したい場合には email scope をつける
+					email: discordUser.email ?? null,
+				});
+
+				return c.redirect(continueToUrl.toString(), 302);
+			}
 		},
 	);
 
