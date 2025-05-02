@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -60,5 +60,18 @@ export class CloudflareOAuthInternalRepository
 
 	async createOAuthConnection(data: OAuthConnection): Promise<void> {
 		await this.client.insert(schema.oauthConnections).values(data);
+	}
+
+	async updateOAuthConnection(data: OAuthConnection): Promise<void> {
+		await this.client
+			.update(schema.oauthConnections)
+			.set(data)
+			.where(
+				and(
+					eq(schema.oauthConnections.userId, data.userId),
+					eq(schema.oauthConnections.providerUserId, data.providerUserId),
+					eq(schema.oauthConnections.providerId, data.providerId),
+				),
+			);
 	}
 }

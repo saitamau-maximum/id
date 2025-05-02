@@ -86,7 +86,13 @@ export const OAuthConnRow = ({
 						<AnchorLike>連携する</AnchorLike>
 					</a>
 				)}
-				{/* TODO: 連携解除 */}
+				{providerId !== OAUTH_PROVIDER_IDS.GITHUB && conn && (
+					<a
+						href={`${env("SERVER_HOST")}/auth/login/${OAUTH_PROVIDER_NAMES[providerId].toLowerCase()}?${loginSearchParams.toString()}`}
+					>
+						<AnchorLike>再連携する</AnchorLike>
+					</a>
+				)}
 			</Table.Td>
 		</Table.Tr>
 	);

@@ -18,6 +18,7 @@ import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { type HonoEnv, factory } from "../../factory";
+import type { OAuthConnection } from "../../repository/oauth-internal";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 
 const app = factory.createApp();
@@ -192,67 +193,32 @@ const route = app
 				return c.text("Bad Request", 400);
 			}
 
-			try {
-				// ユーザーの存在確認
-				const foundUserId =
+			// ログイン状態をチェック
+			let loggedInUserId: string | null = null;
+			const cookieJwt = await getSignedCookie(
+				c,
+				c.env.SECRET,
+				COOKIE_NAME.LOGIN_STATE,
+			);
+			if (cookieJwt) {
+				const payload = await verify(cookieJwt, c.env.SECRET);
+				if (payload) {
+					loggedInUserId = (payload as HonoEnv["Variables"]["jwtPayload"])
+						.userId;
+				}
+			}
+
+			// もしログインしている場合には、 Settings からの OAuth Conn 作成/更新リクエストとみなす
+			if (loggedInUserId) {
+				const doesExistConn =
 					await c.var.OAuthInternalRepository.fetchUserIdByProviderInfo(
 						discordUser.id,
 						OAUTH_PROVIDER_IDS.DISCORD,
-					);
+					)
+						.then(() => true)
+						.catch(() => false);
 
-				// JWT 構築 & セット
-				const now = Math.floor(Date.now() / 1000);
-				const jwt = await sign(
-					{
-						userId: foundUserId,
-						iat: now,
-						exp: now + JWT_EXPIRATION,
-					},
-					c.env.SECRET,
-				);
-
-				await setSignedCookie(
-					c,
-					COOKIE_NAME.LOGIN_STATE,
-					jwt,
-					c.env.SECRET,
-					getCookieOptions(requestUrl.protocol === "http:"),
-				);
-
-				const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
-				await c.var.SessionRepository.storeOneTimeToken(
-					ott,
-					jwt,
-					JWT_EXPIRATION,
-				);
-				continueToUrl.searchParams.set("ott", ott);
-
-				return c.redirect(continueToUrl.toString(), 302);
-			} catch {
-				// ユーザーが存在しなかった場合、ログイン状態をチェック
-				let loggedInUserId: string | null = null;
-
-				const jwt = await getSignedCookie(
-					c,
-					c.env.SECRET,
-					COOKIE_NAME.LOGIN_STATE,
-				);
-				if (jwt) {
-					const payload = await verify(jwt, c.env.SECRET);
-					if (payload) {
-						loggedInUserId = (payload as HonoEnv["Variables"]["jwtPayload"])
-							.userId;
-					}
-				}
-
-				// 未ログイン時はログインページに差し戻し
-				if (!loggedInUserId) {
-					// TODO: 「まず紐づけてください」とともにログインページにリダイレクト
-					return c.text("User not found", 400);
-				}
-
-				// Settings からの連携リクエストとみなして OAuth Connection を作成
-				await c.var.OAuthInternalRepository.createOAuthConnection({
+				const payload: OAuthConnection = {
 					userId: loggedInUserId,
 					providerId: OAUTH_PROVIDER_IDS.DISCORD,
 					providerUserId: discordUser.id,
@@ -262,10 +228,58 @@ const route = app
 					profileImageUrl: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`,
 					// 取得したい場合には email scope をつける
 					email: discordUser.email ?? null,
-				});
+				};
+
+				if (doesExistConn) {
+					// すでに存在する場合は更新
+					await c.var.OAuthInternalRepository.updateOAuthConnection(payload);
+				} else {
+					// 存在しない場合は新規作成
+					await c.var.OAuthInternalRepository.createOAuthConnection(payload);
+				}
 
 				return c.redirect(continueToUrl.toString(), 302);
 			}
+
+			// 未ログインの場合
+			let foundUserId: string | null = null;
+			try {
+				// ユーザーの存在確認
+				foundUserId =
+					await c.var.OAuthInternalRepository.fetchUserIdByProviderInfo(
+						discordUser.id,
+						OAUTH_PROVIDER_IDS.DISCORD,
+					);
+			} catch {
+				// 未ログイン時かつ未連携ならログインページに差し戻し
+				// TODO: 「まず紐づけてください」とともにログインページにリダイレクト
+				return c.text("User not found", 400);
+			}
+
+			// JWT 構築 & セット
+			const now = Math.floor(Date.now() / 1000);
+			const jwt = await sign(
+				{
+					userId: foundUserId,
+					iat: now,
+					exp: now + JWT_EXPIRATION,
+				},
+				c.env.SECRET,
+			);
+
+			await setSignedCookie(
+				c,
+				COOKIE_NAME.LOGIN_STATE,
+				jwt,
+				c.env.SECRET,
+				getCookieOptions(requestUrl.protocol === "http:"),
+			);
+
+			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
+			await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
+			continueToUrl.searchParams.set("ott", ott);
+
+			return c.redirect(continueToUrl.toString(), 302);
 		},
 	);
 
