@@ -3,7 +3,7 @@ import type {
 	OAuthClientCallback,
 	OAuthClientSecret,
 	OAuthScope,
-} from "~/types/oauth";
+} from "~/types/oauth-external";
 import type { UserBasicInfo } from "~/types/user";
 import { client } from "~/utils/hono";
 

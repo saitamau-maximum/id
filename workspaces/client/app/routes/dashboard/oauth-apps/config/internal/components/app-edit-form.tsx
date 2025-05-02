@@ -13,7 +13,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { OAuthSchemas } from "~/schema/oauth";
-import type { OAuthScope } from "~/types/oauth";
+import type { OAuthScope } from "~/types/oauth-external";
 import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
 
