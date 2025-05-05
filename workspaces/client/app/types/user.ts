@@ -1,4 +1,5 @@
 import type { UserCertification } from "./certification";
+import type { OAuthConnection } from "./oauth-internal";
 import type { Role } from "./role";
 
 /**
@@ -22,10 +23,6 @@ export type User = {
 	bio?: string;
 	socialLinks?: string[];
 	updatedAt?: Date;
-};
-
-export type UserWithCertifications = User & {
-	certifications: UserCertification[];
 };
 
 /**
@@ -54,6 +51,10 @@ export type Member = Pick<
 	| "socialLinks"
 >;
 
-export type MemberWithCertifications = Member & {
+export type WithCertifications<T> = T & {
 	certifications: UserCertification[];
+};
+
+export type WithOAuthConnections<T> = T & {
+	oauthConnections: OAuthConnection[];
 };

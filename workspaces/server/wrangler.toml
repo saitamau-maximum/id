@@ -42,6 +42,7 @@ ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
+DISCORD_OAUTH_ID = "1363752651518509116"
 ENV = "preview"
 CLIENT_ORIGIN = ""  # これは OAuth 周りで使うが、 Preview では OAuth は使わないので空にしておく　必要なら適宜設定する
 
@@ -77,6 +78,7 @@ ALLOW_ORIGIN = "https://id.maximum.vc"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Iv1.3fef0e17322d38ce"
+DISCORD_OAUTH_ID = "1363752651518509116"
 ENV = "production"
 CLIENT_ORIGIN = "https://id.maximum.vc"
 

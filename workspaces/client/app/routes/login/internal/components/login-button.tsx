@@ -1,11 +1,17 @@
-import { GitHub } from "react-feather";
+import type { FC, ReactNode } from "react";
 import { css } from "styled-system/css";
 
 interface LoginButtonProps {
 	disabled?: boolean;
+	children: ReactNode;
+	bgColor?: string;
 }
 
-export const LoginButtonLike = ({ disabled }: LoginButtonProps) => {
+export const LoginButtonLike: FC<LoginButtonProps> = ({
+	disabled,
+	children,
+	bgColor,
+}) => {
 	return (
 		<span
 			className={css({
@@ -22,14 +28,16 @@ export const LoginButtonLike = ({ disabled }: LoginButtonProps) => {
 				textDecoration: "none",
 				userSelect: "none",
 				color: "white",
-				backgroundColor: "gray.900",
 				_hover: {
-					backgroundColor: "gray.700",
+					opacity: 0.8,
 				},
 			})}
+			style={{
+				// 動的に指定しないとスタイルが効かない
+				backgroundColor: bgColor,
+			}}
 		>
-			<GitHub size={20} />
-			GitHubでログイン
+			{children}
 		</span>
 	);
 };

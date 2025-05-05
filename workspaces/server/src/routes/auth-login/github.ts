@@ -146,10 +146,11 @@ const route = app
 			let foundUserId: string | null;
 			try {
 				// ユーザーの存在確認
-				foundUserId = await c.var.UserRepository.fetchUserIdByProviderInfo(
-					githubUserIdStr,
-					OAUTH_PROVIDER_IDS.GITHUB,
-				);
+				foundUserId =
+					await c.var.OAuthInternalRepository.fetchUserIdByProviderInfo(
+						githubUserIdStr,
+						OAUTH_PROVIDER_IDS.GITHUB,
+					);
 			} catch {
 				// ユーザーが存在しなかった場合
 				if (typeof invitationId === "string") {
@@ -163,15 +164,20 @@ const route = app
 					}
 					// 招待コードが有効な場合、仮登録処理を行う
 					foundUserId = await c.var.UserRepository.createTemporaryUser(
-						githubUserIdStr,
-						OAUTH_PROVIDER_IDS.GITHUB,
 						invitationId,
 						{
-							email: user.email ?? undefined,
 							displayName: user.login,
 							profileImageURL: user.avatar_url,
 						},
 					);
+					await c.var.OAuthInternalRepository.createOAuthConnection({
+						userId: foundUserId,
+						providerId: OAUTH_PROVIDER_IDS.GITHUB,
+						providerUserId: githubUserIdStr,
+						name: user.login,
+						email: user.email ?? null,
+						profileImageUrl: user.avatar_url,
+					});
 				} else if (invitationId === undefined) {
 					// 招待コードが提供されなかった場合、GitHub Organization メンバーかどうかを確認する処理
 					const isMember = await c.var.OrganizationRepository.checkIsMember(
@@ -180,15 +186,18 @@ const route = app
 					if (!isMember)
 						return c.text("invitation code required for non-members", 403);
 					// Organization のメンバーであれば、本登録処理を行う
-					foundUserId = await c.var.UserRepository.createUser(
-						githubUserIdStr,
-						OAUTH_PROVIDER_IDS.GITHUB,
-						{
-							email: user.email ?? undefined,
-							displayName: user.login,
-							profileImageURL: user.avatar_url,
-						},
-					);
+					foundUserId = await c.var.UserRepository.createUser({
+						displayName: user.login,
+						profileImageURL: user.avatar_url,
+					});
+					await c.var.OAuthInternalRepository.createOAuthConnection({
+						userId: foundUserId,
+						providerId: OAUTH_PROVIDER_IDS.GITHUB,
+						providerUserId: githubUserIdStr,
+						name: user.login,
+						email: user.email ?? null,
+						profileImageUrl: user.avatar_url,
+					});
 				} else {
 					// invitationId が不正な場合の処理
 					return c.text(INVITATION_ERROR_MESSAGE, 400);

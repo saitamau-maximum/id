@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -15,6 +15,22 @@ export class CloudflareOAuthInternalRepository
 		this.client = drizzle(db, { schema });
 	}
 
+	async fetchUserIdByProviderInfo(
+		providerUserId: string,
+		providerId: number,
+	): Promise<string> {
+		const res = await this.client.query.oauthConnections.findFirst({
+			where: (oauthConn, { eq, and }) =>
+				and(
+					eq(oauthConn.providerId, providerId),
+					eq(oauthConn.providerUserId, providerUserId),
+				),
+		});
+
+		if (!res) throw new Error("User not found");
+		return res.userId;
+	}
+
 	async fetchOAuthConnectionsByUserId(
 		userId: string,
 	): Promise<OAuthConnection[]> {
@@ -25,13 +41,10 @@ export class CloudflareOAuthInternalRepository
 				oauthConnections: true,
 			},
 		});
-
-		if (!user) {
-			throw new Error("User not found");
-		}
-
+		if (!user) throw new Error("User not found");
 		return user.oauthConnections;
 	}
+
 	async fetchOAuthConnectionsByUserDisplayId(
 		displayId: string,
 	): Promise<OAuthConnection[]> {
@@ -41,11 +54,38 @@ export class CloudflareOAuthInternalRepository
 				oauthConnections: true,
 			},
 		});
-
-		if (!userProfile) {
-			throw new Error("User not found");
-		}
-
+		if (!userProfile) throw new Error("User not found");
 		return userProfile.oauthConnections;
+	}
+
+	async createOAuthConnection(data: OAuthConnection): Promise<void> {
+		await this.client.insert(schema.oauthConnections).values(data);
+	}
+
+	async updateOAuthConnection(data: OAuthConnection): Promise<void> {
+		await this.client
+			.update(schema.oauthConnections)
+			.set(data)
+			.where(
+				and(
+					eq(schema.oauthConnections.userId, data.userId),
+					eq(schema.oauthConnections.providerUserId, data.providerUserId),
+					eq(schema.oauthConnections.providerId, data.providerId),
+				),
+			);
+	}
+
+	async deleteOAuthConnection(
+		userId: string,
+		providerId: number,
+	): Promise<void> {
+		await this.client
+			.delete(schema.oauthConnections)
+			.where(
+				and(
+					eq(schema.oauthConnections.userId, userId),
+					eq(schema.oauthConnections.providerId, providerId),
+				),
+			);
 	}
 }

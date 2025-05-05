@@ -6,7 +6,7 @@ import { UserDisplay } from "~/components/feature/user/user-display";
 import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { IconButton } from "~/components/ui/icon-button";
 import { useMembers } from "~/routes/dashboard/members/internal/hooks/use-members";
-import type { OAuthClientSecret } from "~/types/oauth";
+import type { OAuthClientSecret } from "~/types/oauth-external";
 import { useDeleteSecret } from "../hooks/use-delete-secret";
 import { useGenerateSecret } from "../hooks/use-generate-secret";
 import { ConfigSectionSubHeader } from "./config-section-sub-header";

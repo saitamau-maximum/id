@@ -1,4 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -13,10 +14,12 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
+import { Table } from "~/components/ui/table";
 import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
+import { FLAG } from "~/utils/flag";
 import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
@@ -26,6 +29,7 @@ import { useSendCertificationRequest } from "../hooks/use-send-certification-req
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
+import { OAuthConnRow } from "./oauth-conn-row";
 
 const UpdateFormSchema = v.object({
 	displayName: UserSchemas.DisplayName,
@@ -139,6 +143,13 @@ export const ProfileUpdateForm = () => {
 	const bioLength = bio?.length || 0;
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+
+	const githubConn = user?.oauthConnections.find(
+		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+	);
+	const discordConn = user?.oauthConnections.find(
+		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+	);
 
 	return (
 		<form
@@ -332,6 +343,30 @@ export const ProfileUpdateForm = () => {
 					{bioLength} / {BIO_MAX_LENGTH}
 				</p>
 			</Form.FieldSet>
+
+			{FLAG.ENABLE_DISCORD_LOGIN && (
+				<Form.FieldSet>
+					<legend>
+						<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
+					</legend>
+
+					<Table.Root>
+						<Table.Tr>
+							<Table.Th>サービス</Table.Th>
+							<Table.Th>アカウント</Table.Th>
+							<Table.Th>連携</Table.Th>
+						</Table.Tr>
+						{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
+							<OAuthConnRow
+								key={providerId}
+								providerId={providerId}
+								conns={user?.oauthConnections ?? []}
+							/>
+						))}
+					</Table.Root>
+				</Form.FieldSet>
+			)}
+
 			<Form.FieldSet>
 				<legend>
 					<Form.LabelText>ソーシャルリンク (最大5つ)</Form.LabelText>

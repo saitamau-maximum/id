@@ -5,10 +5,10 @@ import * as schema from "../../../db/schema";
 import type {
 	IUserRepository,
 	Member,
-	MemberWithCertifications,
 	Profile,
 	User,
-	UserWithCertifications,
+	WithCertifications,
+	WithOAuthConnections,
 } from "./../../../repository/user";
 
 export class CloudflareUserRepository implements IUserRepository {
@@ -19,26 +19,16 @@ export class CloudflareUserRepository implements IUserRepository {
 	}
 
 	private async createUserInternal(
-		providerUserId: string,
-		providerId: number,
 		payload: Partial<Profile>,
 		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
-		const { displayName, email, profileImageURL } = payload;
+		const { displayName, profileImageURL } = payload;
 		const batchOps = [
 			this.client.insert(schema.users).values({
 				id: userId,
 				...(invitationId && { invitationId }),
-			}),
-			this.client.insert(schema.oauthConnections).values({
-				userId,
-				providerId,
-				providerUserId,
-				email,
-				name: displayName,
-				profileImageUrl: profileImageURL,
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
@@ -57,48 +47,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		throw new Error("Failed to create user");
 	}
 
-	async createUser(
-		providerUserId: string,
-		providerId: number,
-		payload: Partial<Profile> = {},
-	): Promise<string> {
-		return this.createUserInternal(providerUserId, providerId, payload);
+	async createUser(payload: Partial<Profile> = {}): Promise<string> {
+		return this.createUserInternal(payload);
 	}
 
 	async createTemporaryUser(
-		providerUserId: string,
-		providerId: number,
 		invitationId: string,
 		payload: Partial<Profile> = {},
 	): Promise<string> {
-		return this.createUserInternal(
-			providerUserId,
-			providerId,
-			payload,
-			invitationId,
-		);
+		return this.createUserInternal(payload, invitationId);
 	}
 
-	async fetchUserIdByProviderInfo(
-		providerUserId: string,
-		providerId: number,
-	): Promise<string> {
-		const res = await this.client.query.oauthConnections.findFirst({
-			where: (oauthConn, { eq, and }) =>
-				and(
-					eq(oauthConn.providerId, providerId),
-					eq(oauthConn.providerUserId, providerUserId),
-				),
-		});
-
-		if (!res) {
-			throw new Error("User not found");
-		}
-
-		return res.userId;
-	}
-
-	async fetchUserProfileById(userId: string): Promise<UserWithCertifications> {
+	async fetchUserProfileById(
+		userId: string,
+	): Promise<WithOAuthConnections<WithCertifications<User>>> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -107,6 +69,16 @@ export class CloudflareUserRepository implements IUserRepository {
 				certifications: {
 					with: {
 						certification: true,
+					},
+				},
+				oauthConnections: {
+					columns: {
+						userId: false,
+						providerId: true,
+						providerUserId: true,
+						email: false,
+						name: true,
+						profileImageUrl: true,
 					},
 				},
 				socialLinks: true,
@@ -140,6 +112,12 @@ export class CloudflareUserRepository implements IUserRepository {
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
 				isApproved: cert.isApproved,
+			})),
+			oauthConnections: user.oauthConnections.map((conn) => ({
+				providerId: conn.providerId,
+				providerUserId: conn.providerUserId,
+				name: conn.name,
+				profileImageUrl: conn.profileImageUrl,
 			})),
 			updatedAt: user.profile.updatedAt ?? undefined,
 		};
@@ -277,7 +255,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchMemberByDisplayId(
 		displayId: string,
-	): Promise<MemberWithCertifications> {
+	): Promise<WithOAuthConnections<WithCertifications<Member>>> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -287,6 +265,16 @@ export class CloudflareUserRepository implements IUserRepository {
 						certifications: {
 							with: {
 								certification: true,
+							},
+						},
+						oauthConnections: {
+							columns: {
+								userId: false,
+								providerId: true,
+								providerUserId: true,
+								email: false,
+								name: true,
+								profileImageUrl: true,
 							},
 						},
 						socialLinks: true,
@@ -319,6 +307,12 @@ export class CloudflareUserRepository implements IUserRepository {
 				description: cert.certification.description,
 				certifiedIn: cert.certifiedIn,
 				isApproved: cert.isApproved,
+			})),
+			oauthConnections: user.user.oauthConnections.map((conn) => ({
+				providerId: conn.providerId,
+				providerUserId: conn.providerUserId,
+				name: conn.name,
+				profileImageUrl: conn.profileImageUrl,
 			})),
 		};
 	}

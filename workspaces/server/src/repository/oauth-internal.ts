@@ -8,8 +8,15 @@ export type OAuthConnection = {
 };
 
 export type IOAuthInternalRepository = {
+	fetchUserIdByProviderInfo: (
+		providerUserId: string,
+		providerId: number,
+	) => Promise<string>;
 	fetchOAuthConnectionsByUserId: (userId: string) => Promise<OAuthConnection[]>;
 	fetchOAuthConnectionsByUserDisplayId: (
 		displayId: string,
 	) => Promise<OAuthConnection[]>;
+	createOAuthConnection: (data: OAuthConnection) => Promise<void>;
+	updateOAuthConnection: (data: OAuthConnection) => Promise<void>;
+	deleteOAuthConnection: (userId: string, providerId: number) => Promise<void>;
 };

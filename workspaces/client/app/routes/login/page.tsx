@@ -1,10 +1,12 @@
 import { useEffect } from "react";
+import { GitHub } from "react-feather";
 import { useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { env } from "~/utils/env";
+import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
 
 export default function Login() {
@@ -16,16 +18,15 @@ export default function Login() {
 
 	const shouldProceed = !isLoading && isAuthorized && isMember;
 
-	const loginUrl = new URL(`${env("SERVER_HOST")}/auth/login/github`);
+	const loginSearchParams = new URLSearchParams();
 
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
 	const continueToURL =
 		searchParams.get("continue_to") ?? `${window.location.origin}/verify`;
-	loginUrl.searchParams.set("continue_to", continueToURL);
+	loginSearchParams.set("continue_to", continueToURL);
 
 	// もし招待コードがあれば使う
-	if (invitationCode)
-		loginUrl.searchParams.set("invitation_id", invitationCode);
+	if (invitationCode) loginSearchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
 		if (shouldProceed) {
@@ -104,9 +105,43 @@ export default function Login() {
 					</p>
 				)}
 			</p>
-			<a href={loginUrl.toString()}>
-				<LoginButtonLike />
-			</a>
+			<div className={css({ display: "flex", gap: 4 })}>
+				<a
+					href={`${env("SERVER_HOST")}/auth/login/github?${loginSearchParams.toString()}`}
+				>
+					<LoginButtonLike bgColor="#181717">
+						<GitHub size={20} />
+						GitHub でログイン
+					</LoginButtonLike>
+				</a>
+				{
+					// invitationCode がある場合には GitHub ログインを強制
+					FLAG.ENABLE_DISCORD_LOGIN && !invitationCode && (
+						<a
+							href={`${env("SERVER_HOST")}/auth/login/discord?${loginSearchParams.toString()}`}
+						>
+							<LoginButtonLike bgColor="#5865F2">
+								<div
+									role="img"
+									aria-hidden="true"
+									// img[src=svg] だと色が変更できない？ので mask-image を使う
+									className={css({
+										width: "20px",
+										height: "20px",
+										display: "inline-block",
+										maskImage: "url(/discord.svg)",
+										maskSize: "contain",
+										maskRepeat: "no-repeat",
+										maskPosition: "center",
+										backgroundColor: "currentColor",
+									})}
+								/>
+								Discord でログイン
+							</LoginButtonLike>
+						</a>
+					)
+				}
+			</div>
 		</div>
 	);
 }
