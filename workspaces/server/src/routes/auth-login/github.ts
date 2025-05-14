@@ -21,18 +21,20 @@ const app = factory.createApp();
 const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
 const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
+interface GitHubOAuthTokenParams {
+	code: string;
+	redirectUri: string;
+	clientId: string;
+	clientSecret: string;
+}
+
 interface GitHubOAuthTokenResponse {
 	access_token: string;
 	scope: string;
 	token_type: string;
 }
 
-const fetchAccessToken = (params: {
-	code: string;
-	redirectUri: string;
-	clientId: string;
-	clientSecret: string;
-}) =>
+const fetchAccessToken = (params: GitHubOAuthTokenParams) =>
 	fetch("https://github.com/login/oauth/access_token", {
 		method: "POST",
 		headers: {
