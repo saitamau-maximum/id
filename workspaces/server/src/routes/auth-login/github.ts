@@ -21,17 +21,20 @@ const app = factory.createApp();
 const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
 const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
+interface GitHubOAuthTokenParams {
+	code: string;
+	redirectUri: string;
+	clientId: string;
+	clientSecret: string;
+}
+
 interface GitHubOAuthTokenResponse {
 	access_token: string;
 	scope: string;
 	token_type: string;
 }
 
-const fetchAccessToken = (
-	code: string,
-	clientId: string,
-	clientSecret: string,
-) =>
+const fetchAccessToken = (params: GitHubOAuthTokenParams) =>
 	fetch("https://github.com/login/oauth/access_token", {
 		method: "POST",
 		headers: {
@@ -39,9 +42,10 @@ const fetchAccessToken = (
 			Accept: "application/json",
 		},
 		body: JSON.stringify({
-			client_id: clientId,
-			client_secret: clientSecret,
-			code,
+			client_id: params.clientId,
+			client_secret: params.clientSecret,
+			redirect_uri: params.redirectUri,
+			code: params.code,
 		}),
 	})
 		.then((res) => res.json<GitHubOAuthTokenResponse>())
@@ -121,11 +125,14 @@ const route = app
 				return c.text("state mismatch", 400);
 			}
 
-			const { access_token } = await fetchAccessToken(
+			const requestUrl = new URL(c.req.url);
+
+			const { access_token } = await fetchAccessToken({
 				code,
-				c.env.GITHUB_OAUTH_ID,
-				c.env.GITHUB_OAUTH_SECRET,
-			);
+				clientId: c.env.GITHUB_OAUTH_ID,
+				clientSecret: c.env.GITHUB_OAUTH_SECRET,
+				redirectUri: `${requestUrl.origin}/auth/login/github/callback`,
+			});
 
 			if (!access_token) {
 				return c.text("invalid code", 400);
@@ -214,7 +221,6 @@ const route = app
 				c.env.SECRET,
 			);
 
-			const requestUrl = new URL(c.req.url);
 			await setSignedCookie(
 				c,
 				COOKIE_NAME.LOGIN_STATE,
