@@ -9,6 +9,7 @@ import { RoleBadge } from "./role-badge";
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
 	initialized: boolean;
+	lastLoginAt?: Date;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -21,6 +22,7 @@ export const ProfileCard: React.FC<Props> = ({
 	roles,
 	bio,
 	socialLinks,
+	lastLoginAt,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
@@ -167,6 +169,23 @@ export const ProfileCard: React.FC<Props> = ({
 								{realName}
 							</span>
 						)}
+						{/* 最終ログイン表示 */}
+						<span
+							className={css({
+								color: "gray.500",
+								fontSize: "sm",
+								marginLeft: 2,
+							})}
+						>
+							最終ログイン:{" "}
+							{lastLoginAt
+								? new Date(lastLoginAt).toLocaleDateString("ja-JP", {
+										year: "numeric",
+										month: "2-digit",
+										day: "2-digit",
+									})
+								: "-"}
+						</span>
 					</div>
 					{displayId && (
 						<p

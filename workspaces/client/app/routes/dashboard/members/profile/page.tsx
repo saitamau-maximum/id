@@ -76,6 +76,7 @@ export default function Profile() {
 					roles={memberProfile?.roles || []}
 					bio={memberProfile?.bio}
 					socialLinks={memberProfile?.socialLinks}
+					lastLoginAt={memberProfile?.lastLoginAt}
 				/>
 			</div>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
