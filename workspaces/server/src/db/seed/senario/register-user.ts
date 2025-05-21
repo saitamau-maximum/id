@@ -148,7 +148,12 @@ export const registerUserSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
 	// invitation が user1 を参照しているので先に INSERT
-	await client.insert(schema.users).values(DUMMY_INITIALIZED_USERS[0]);
+	await client.insert(schema.users).values({
+		id: DUMMY_INITIALIZED_USERS[0].id,
+		initializedAt: new Date(),
+		invitationId: DUMMY_INITIALIZED_USERS[0].invitationId,
+		lastLoginAt: new Date(),
+	});
 	await client.insert(schema.invites).values(DUMMY_INVITATION);
 
 	for (const user of DUMMY_INITIALIZED_USERS) {
@@ -159,6 +164,7 @@ export const registerUserSeed = async (
 					id: user.id,
 					initializedAt: new Date(),
 					invitationId: user.invitationId,
+					lastLoginAt: new Date(),
 				})
 				.onConflictDoNothing(), // user1 の重複 INSERT を無視する為の処理
 			client.insert(schema.userProfiles).values({
@@ -189,6 +195,7 @@ export const registerUserSeed = async (
 			client.insert(schema.users).values({
 				id: user.id,
 				invitationId: user.invitationId,
+				lastLoginAt: new Date(),
 			}),
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
