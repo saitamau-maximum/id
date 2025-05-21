@@ -279,6 +279,9 @@ const route = app
 			await c.var.SessionRepository.storeOneTimeToken(ott, jwt, JWT_EXPIRATION);
 			continueToUrl.searchParams.set("ott", ott);
 
+			// ユーザーの存在確認後、最終ログイン日時を更新
+			await c.var.UserRepository.updateLastLoginAt(foundUserId);
+
 			return c.redirect(continueToUrl.toString(), 302);
 		},
 	);

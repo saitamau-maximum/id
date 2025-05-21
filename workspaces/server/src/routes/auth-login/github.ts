@@ -211,6 +211,9 @@ const route = app
 				}
 			}
 
+			// ユーザーの存在確認後、最終ログイン日時を更新
+			await c.var.UserRepository.updateLastLoginAt(foundUserId);
+
 			const now = Math.floor(Date.now() / 1000);
 			const jwt = await sign(
 				{
