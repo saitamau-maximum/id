@@ -3,6 +3,7 @@ import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
+import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
@@ -190,16 +191,7 @@ export const ProfileCard: React.FC<Props> = ({
 							marginTop: 2,
 						})}
 					>
-						最終ログイン:{" "}
-						{lastLoginAt
-							? new Date(lastLoginAt).toLocaleDateString("ja-JP", {
-									year: "numeric",
-									month: "2-digit",
-									day: "2-digit",
-									hour: "2-digit",
-									minute: "2-digit",
-								})
-							: "-"}
+						最終ログイン: {lastLoginAt ? formatDateTime(lastLoginAt) : "-"}
 					</span>
 				</div>
 			</div>
