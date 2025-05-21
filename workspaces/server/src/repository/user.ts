@@ -31,7 +31,7 @@ export type User = {
 	// 将来的に public API から招待コードが外部に漏洩するリスクを考慮し "仮登録か？" 状態だけ返すようにする
 	isProvisional: boolean;
 	lastPaymentConfirmedAt: Date | null;
-	lastLoginAt: Date;
+	lastLoginAt?: Date | null;
 	roles: Role[];
 } & Partial<Profile>;
 

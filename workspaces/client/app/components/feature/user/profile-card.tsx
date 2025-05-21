@@ -177,11 +177,13 @@ export const ProfileCard: React.FC<Props> = ({
 							})}
 						>
 							最終ログイン:{" "}
-							{new Date(lastLoginAt).toLocaleDateString("ja-JP", {
-								year: "numeric",
-								month: "2-digit",
-								day: "2-digit",
-							})}
+							{lastLoginAt
+								? new Date(lastLoginAt).toLocaleDateString("ja-JP", {
+										year: "numeric",
+										month: "2-digit",
+										day: "2-digit",
+									})
+								: "-"}
 						</span>
 					</div>
 					{displayId && (

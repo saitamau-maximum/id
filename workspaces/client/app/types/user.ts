@@ -23,7 +23,7 @@ export type User = {
 	bio?: string;
 	socialLinks?: string[];
 	updatedAt?: Date;
-	lastLoginAt: Date;
+	lastLoginAt?: Date | undefined;
 };
 
 /**

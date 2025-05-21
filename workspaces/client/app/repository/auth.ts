@@ -26,7 +26,7 @@ export class AuthRepositoryImpl implements IAuthRepository {
 				? new Date(data.lastPaymentConfirmedAt)
 				: undefined,
 			updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
-			lastLoginAt: new Date(data.lastLoginAt),
+			lastLoginAt: data.lastLoginAt ? new Date(data.lastLoginAt) : undefined,
 		};
 	}
 	me$$key() {

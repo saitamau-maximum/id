@@ -28,12 +28,12 @@ export const MemberUsersTable = () => {
 					<Table.Th>表示名</Table.Th>
 					<Table.Th>Display ID</Table.Th>
 					<Table.Th>本名</Table.Th>
+					<Table.Th>最終ログイン</Table.Th>
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
 					<Table.Th>ロール</Table.Th>
 					<Table.Th>会費</Table.Th>
-					<Table.Th>最終ログイン</Table.Th>
 				</Table.Tr>
 			</thead>
 			<tbody>
@@ -58,12 +58,12 @@ export const NonMemberUsersTable = () => {
 					<Table.Th>表示名</Table.Th>
 					<Table.Th>Display ID</Table.Th>
 					<Table.Th>本名</Table.Th>
+					<Table.Th>最終ログイン</Table.Th>
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
 					<Table.Th>ロール</Table.Th>
 					<Table.Th>会費</Table.Th>
-					<Table.Th>最終ログイン</Table.Th>
 				</Table.Tr>
 			</thead>
 			<tbody>
@@ -185,6 +185,19 @@ const UserTableRow = ({
 						</span>
 					</div>
 				)}
+			</Table.Td>
+			<Table.Td>
+				<span className={css({ color: "gray.500", fontSize: "sm" })}>
+					{user.lastLoginAt
+						? new Date(user.lastLoginAt).toLocaleString("ja-JP", {
+								year: "numeric",
+								month: "2-digit",
+								day: "2-digit",
+								hour: "2-digit",
+								minute: "2-digit",
+							})
+						: "-"}
+				</span>
 			</Table.Td>
 			<Table.Td>
 				<div>
@@ -309,17 +322,6 @@ const UserTableRow = ({
 						</span>
 					)}
 				</div>
-			</Table.Td>
-			<Table.Td>
-				<span className={css({ color: "gray.500", fontSize: "sm" })}>
-					{new Date(user.lastLoginAt).toLocaleString("ja-JP", {
-						year: "numeric",
-						month: "2-digit",
-						day: "2-digit",
-						hour: "2-digit",
-						minute: "2-digit",
-					})}
-				</span>
 			</Table.Td>
 		</Table.Tr>
 	);

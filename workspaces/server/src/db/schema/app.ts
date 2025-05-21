@@ -31,7 +31,7 @@ export const users = sqliteTable("users", {
 		mode: "timestamp",
 	}),
 	/* 最終ログイン日時 */
-	lastLoginAt: integer("last_login_at", { mode: "timestamp" }).notNull(),
+	lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

@@ -33,7 +33,9 @@ export class MemberRepositoryImpl implements IMemberRepository {
 			initializedAt: member.initializedAt
 				? new Date(member.initializedAt)
 				: undefined,
-			lastLoginAt: new Date(member.lastLoginAt),
+			lastLoginAt: member.lastLoginAt
+				? new Date(member.lastLoginAt)
+				: undefined,
 		}));
 	}
 
@@ -79,7 +81,7 @@ export class MemberRepositoryImpl implements IMemberRepository {
 			initializedAt: data.initializedAt
 				? new Date(data.initializedAt)
 				: undefined,
-			lastLoginAt: new Date(data.lastLoginAt),
+			lastLoginAt: data.lastLoginAt ? new Date(data.lastLoginAt) : undefined,
 		};
 	}
 
