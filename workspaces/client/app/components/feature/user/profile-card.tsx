@@ -169,22 +169,6 @@ export const ProfileCard: React.FC<Props> = ({
 								{realName}
 							</span>
 						)}
-						<span
-							className={css({
-								color: "gray.500",
-								fontSize: "sm",
-								marginLeft: 2,
-							})}
-						>
-							最終ログイン:{" "}
-							{lastLoginAt
-								? new Date(lastLoginAt).toLocaleDateString("ja-JP", {
-										year: "numeric",
-										month: "2-digit",
-										day: "2-digit",
-									})
-								: "-"}
-						</span>
 					</div>
 					{displayId && (
 						<p
@@ -199,6 +183,24 @@ export const ProfileCard: React.FC<Props> = ({
 							@{displayId}
 						</p>
 					)}
+					<span
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+							marginTop: 2,
+						})}
+					>
+						最終ログイン:{" "}
+						{lastLoginAt
+							? new Date(lastLoginAt).toLocaleDateString("ja-JP", {
+									year: "numeric",
+									month: "2-digit",
+									day: "2-digit",
+									hour: "2-digit",
+									minute: "2-digit",
+								})
+							: "-"}
+					</span>
 				</div>
 			</div>
 			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>
