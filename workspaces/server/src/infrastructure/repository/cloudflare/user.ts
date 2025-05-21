@@ -28,6 +28,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		const batchOps = [
 			this.client.insert(schema.users).values({
 				id: userId,
+				lastLoginAt: new Date(),
 				...(invitationId && { invitationId }),
 			}),
 			this.client.insert(schema.userProfiles).values({
@@ -94,7 +95,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
-			lastLoginAt: user.lastLoginAt ?? null, // 追加
+			lastLoginAt: user.lastLoginAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -243,7 +244,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
-			lastLoginAt: user.lastLoginAt ?? null, // 追加
+			lastLoginAt: user.lastLoginAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -294,7 +295,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.user.initializedAt,
 			isProvisional: !!user.user.invitationId,
 			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
-			lastLoginAt: user.user.lastLoginAt ?? null, // 追加
+			lastLoginAt: user.user.lastLoginAt,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,
 			realNameKana: user.realNameKana ?? undefined,
@@ -342,7 +343,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
-			lastLoginAt: user.lastLoginAt ?? null, // 追加
+			lastLoginAt: user.lastLoginAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -412,7 +413,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
-			lastLoginAt: user.lastLoginAt ?? null, // 追加
+			lastLoginAt: user.lastLoginAt,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -473,7 +474,8 @@ export class CloudflareUserRepository implements IUserRepository {
 	}
 
 	async updateLastLoginAt(userId: string): Promise<void> {
-		await this.client.update(schema.users)
+		await this.client
+			.update(schema.users)
 			.set({ lastLoginAt: new Date() })
 			.where(eq(schema.users.id, userId));
 	}
