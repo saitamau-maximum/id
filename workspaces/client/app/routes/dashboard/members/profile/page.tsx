@@ -26,12 +26,12 @@ export default function Profile() {
 	const { data: memberContribution, isLoading: isMemberContributionLoading } =
 		useMemberContribution(userDisplayId);
 
-	// めんどくさいのでとりあえずMemberProfileが読み込まれるまでは表示しない
+	// MemberProfile が読み込まれるまでは表示しない
 	if (isMemberProfileLoading) {
 		return null;
 	}
 
-	if (isMemberProfileError) {
+	if (isMemberProfileError || !memberProfile) {
 		return (
 			<div
 				className={css({
@@ -66,17 +66,17 @@ export default function Profile() {
 		>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
 				<ProfileCard
-					id={memberProfile?.id || ""}
-					displayName={memberProfile?.displayName}
-					realName={memberProfile?.realName}
-					displayId={memberProfile?.displayId}
-					profileImageURL={memberProfile?.profileImageURL}
-					grade={memberProfile?.grade}
-					initialized={!!memberProfile?.initializedAt}
-					roles={memberProfile?.roles || []}
-					bio={memberProfile?.bio}
-					socialLinks={memberProfile?.socialLinks}
-					lastLoginAt={memberProfile?.lastLoginAt}
+					id={memberProfile.id}
+					displayName={memberProfile.displayName}
+					realName={memberProfile.realName}
+					displayId={memberProfile.displayId}
+					profileImageURL={memberProfile.profileImageURL}
+					grade={memberProfile.grade}
+					initialized={!!memberProfile.initializedAt}
+					roles={memberProfile.roles}
+					bio={memberProfile.bio}
+					socialLinks={memberProfile.socialLinks}
+					lastLoginAt={memberProfile.lastLoginAt}
 				/>
 			</div>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
