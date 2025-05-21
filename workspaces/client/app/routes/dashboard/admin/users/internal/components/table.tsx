@@ -10,7 +10,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
-import { getFiscalYearStartDate } from "~/utils/date";
+import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";
 import { useConfirmPayment } from "../hooks/use-confirm-payment";
 import { useUpdateRole } from "../hooks/use-update-role";
@@ -188,15 +188,7 @@ const UserTableRow = ({
 			</Table.Td>
 			<Table.Td>
 				<span className={css({ color: "gray.500", fontSize: "sm" })}>
-					{user.lastLoginAt
-						? new Date(user.lastLoginAt).toLocaleString("ja-JP", {
-								year: "numeric",
-								month: "2-digit",
-								day: "2-digit",
-								hour: "2-digit",
-								minute: "2-digit",
-							})
-						: "-"}
+					{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
 				</span>
 			</Table.Td>
 			<Table.Td>
