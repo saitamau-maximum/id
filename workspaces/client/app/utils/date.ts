@@ -117,3 +117,21 @@ export const formatDuration = (startAt: Date, endAt: Date): string => {
 
 	return `${startDateTime} - ${endDateTime}`;
 };
+
+/**
+ * 指定されたDateオブジェクトを日本語ローカル形式（YYYY/MM/DD HH:mm）でフォーマットして返す関数。
+ *
+ * @param date - フォーマット対象のDateオブジェクト。nullの場合は空文字列を返す。
+ * @returns フォーマット済みの日付文字列。dateがnullの場合は空文字列。
+ */
+export const formatDateTime = (date: Date | null) => {
+	if (!date) return "";
+	const options: Intl.DateTimeFormatOptions = {
+		year: "numeric",
+		month: "2-digit",
+		day: "2-digit",
+		hour: "2-digit",
+		minute: "2-digit",
+	};
+	return date.toLocaleDateString("ja-JP", options);
+};

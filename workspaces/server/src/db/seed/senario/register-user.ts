@@ -147,8 +147,15 @@ export const DUMMY_OAUTH_CONNECTIONS = [
 export const registerUserSeed = async (
 	client: DrizzleD1Database<typeof schema>,
 ) => {
+	const now = new Date();
+
 	// invitation が user1 を参照しているので先に INSERT
-	await client.insert(schema.users).values(DUMMY_INITIALIZED_USERS[0]);
+	await client.insert(schema.users).values({
+		id: DUMMY_INITIALIZED_USERS[0].id,
+		initializedAt: new Date(),
+		invitationId: DUMMY_INITIALIZED_USERS[0].invitationId,
+		lastLoginAt: now,
+	});
 	await client.insert(schema.invites).values(DUMMY_INVITATION);
 
 	for (const user of DUMMY_INITIALIZED_USERS) {
@@ -157,7 +164,7 @@ export const registerUserSeed = async (
 				.insert(schema.users)
 				.values({
 					id: user.id,
-					initializedAt: new Date(),
+					initializedAt: now,
 					invitationId: user.invitationId,
 				})
 				.onConflictDoNothing(), // user1 の重複 INSERT を無視する為の処理

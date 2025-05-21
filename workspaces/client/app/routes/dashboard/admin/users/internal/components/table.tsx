@@ -10,7 +10,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
-import { getFiscalYearStartDate } from "~/utils/date";
+import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";
 import { useConfirmPayment } from "../hooks/use-confirm-payment";
 import { useUpdateRole } from "../hooks/use-update-role";
@@ -28,6 +28,7 @@ export const MemberUsersTable = () => {
 					<Table.Th>表示名</Table.Th>
 					<Table.Th>Display ID</Table.Th>
 					<Table.Th>本名</Table.Th>
+					<Table.Th>最終ログイン</Table.Th>
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
@@ -57,6 +58,7 @@ export const NonMemberUsersTable = () => {
 					<Table.Th>表示名</Table.Th>
 					<Table.Th>Display ID</Table.Th>
 					<Table.Th>本名</Table.Th>
+					<Table.Th>最終ログイン</Table.Th>
 					<Table.Th>Email</Table.Th>
 					<Table.Th>学籍番号</Table.Th>
 					<Table.Th>学年</Table.Th>
@@ -183,6 +185,11 @@ const UserTableRow = ({
 						</span>
 					</div>
 				)}
+			</Table.Td>
+			<Table.Td>
+				<span className={css({ color: "gray.500", fontSize: "sm" })}>
+					{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
+				</span>
 			</Table.Td>
 			<Table.Td>
 				<div>

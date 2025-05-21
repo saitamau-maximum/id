@@ -55,6 +55,7 @@ export default function Home() {
 						roles={user.roles}
 						bio={user.bio}
 						socialLinks={user.socialLinks}
+						lastLoginAt={user.lastLoginAt}
 					/>
 				</div>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>

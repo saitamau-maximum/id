@@ -23,6 +23,7 @@ export type User = {
 	bio?: string;
 	socialLinks?: string[];
 	updatedAt?: Date;
+	lastLoginAt?: Date | undefined;
 };
 
 /**
@@ -49,6 +50,7 @@ export type Member = Pick<
 	| "grade"
 	| "bio"
 	| "socialLinks"
+	| "lastLoginAt"
 >;
 
 export type WithCertifications<T> = T & {

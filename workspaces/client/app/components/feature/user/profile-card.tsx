@@ -3,12 +3,14 @@ import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
+import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
 	initialized: boolean;
+	lastLoginAt?: Date | undefined;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -21,6 +23,7 @@ export const ProfileCard: React.FC<Props> = ({
 	roles,
 	bio,
 	socialLinks,
+	lastLoginAt,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
@@ -181,6 +184,15 @@ export const ProfileCard: React.FC<Props> = ({
 							@{displayId}
 						</p>
 					)}
+					<span
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+							marginTop: 2,
+						})}
+					>
+						最終ログイン: {lastLoginAt ? formatDateTime(lastLoginAt) : "-"}
+					</span>
 				</div>
 			</div>
 			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>

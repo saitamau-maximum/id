@@ -133,6 +133,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				? new Date(user.lastPaymentConfirmedAt)
 				: undefined,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
+			lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
 		}));
 	}
 
@@ -180,6 +181,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				? new Date(user.lastPaymentConfirmedAt)
 				: undefined,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
+			lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
 		}));
 	}
 

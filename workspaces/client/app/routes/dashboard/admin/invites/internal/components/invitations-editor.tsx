@@ -6,22 +6,11 @@ import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Table } from "~/components/ui/table";
 import type { Invitation } from "~/types/invitation";
+import { formatDateTime } from "~/utils/date";
 import { useGenerateInvitation } from "../hooks/use-generate-invitation";
 import { useInvitations } from "../hooks/use-invitations";
 import { GenerateInvitationURLDialog } from "./callable-generate-invitation-url-dialog";
 import { InvitationURLDisplay } from "./invitation-url-display";
-
-const formatLocalDate = (date: Date | null) => {
-	if (!date) return "";
-	const options: Intl.DateTimeFormatOptions = {
-		year: "numeric",
-		month: "2-digit",
-		day: "2-digit",
-		hour: "2-digit",
-		minute: "2-digit",
-	};
-	return date.toLocaleDateString("ja-JP", options);
-};
 
 export const InvitationsEditor = () => {
 	const { data: invitations } = useInvitations();
@@ -122,7 +111,7 @@ export const InvitationsEditor = () => {
 												alignItems: "center",
 											})}
 										>
-											{formatLocalDate(invitation.expiresAt)}
+											{formatDateTime(invitation.expiresAt)}
 											{invitation.expiresAt < new Date() && (
 												<span
 													className={css({
@@ -136,7 +125,7 @@ export const InvitationsEditor = () => {
 										</div>
 									)}
 								</Table.Td>
-								<Table.Td>{formatLocalDate(invitation.createdAt)}</Table.Td>
+								<Table.Td>{formatDateTime(invitation.createdAt)}</Table.Td>
 								<Table.Td>
 									<UserDisplay
 										iconURL={invitation.issuedBy.profileImageURL}
