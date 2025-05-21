@@ -10,7 +10,7 @@ import { RoleBadge } from "./role-badge";
 type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
 	initialized: boolean;
-	lastLoginAt: Date;
+	lastLoginAt?: Date | undefined;
 };
 
 export const ProfileCard: React.FC<Props> = ({
