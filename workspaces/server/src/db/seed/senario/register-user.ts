@@ -164,7 +164,6 @@ export const registerUserSeed = async (
 					id: user.id,
 					initializedAt: new Date(),
 					invitationId: user.invitationId,
-					lastLoginAt: new Date(),
 				})
 				.onConflictDoNothing(), // user1 の重複 INSERT を無視する為の処理
 			client.insert(schema.userProfiles).values({
@@ -195,7 +194,6 @@ export const registerUserSeed = async (
 			client.insert(schema.users).values({
 				id: user.id,
 				invitationId: user.invitationId,
-				lastLoginAt: new Date(),
 			}),
 			client.insert(schema.userProfiles).values({
 				id: user.profile.id,
