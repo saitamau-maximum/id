@@ -8,10 +8,10 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import { PING_INTERVAL } from "~/constants/ping";
 import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
 import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
+import { isNowLoggedIn } from "~/utils/last-login";
 import { useAllUsers } from "../hooks/use-all-user";
 import { useConfirmPayment } from "../hooks/use-confirm-payment";
 import { useUpdateRole } from "../hooks/use-update-role";
@@ -188,8 +188,7 @@ const UserTableRow = ({
 				)}
 			</Table.Td>
 			<Table.Td>
-				{user.lastLoginAt &&
-				Date.now() - new Date(user.lastLoginAt).getTime() < PING_INTERVAL ? (
+				{isNowLoggedIn(user.lastLoginAt) ? (
 					<span
 						className={css({
 							color: "green.600",

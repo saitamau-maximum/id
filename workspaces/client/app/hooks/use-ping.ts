@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { PING_INTERVAL } from "~/constants/ping";
+import { PING_INTERVAL } from "~/utils/last-login";
 import { useRepository } from "./use-repository";
 
 export function usePing(enabled: boolean) {
