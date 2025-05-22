@@ -191,7 +191,6 @@ export const ProfileCard: React.FC<Props> = ({
 						<span
 							className={css({
 								color: "green.600",
-								fontWeight: "bold",
 								fontSize: "sm",
 								marginTop: 2,
 							})}
