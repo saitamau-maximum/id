@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router";
 import { css, cx } from "styled-system/css";
 import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
+import { useAuthPing } from "~/hooks/use-auth-ping";
 import { useInvitation } from "~/hooks/use-invitation";
 import { useToast } from "~/hooks/use-toast";
 import { Sidebar } from "./internal/components/sidebar";
@@ -13,6 +14,9 @@ export default function Dashboard() {
 		useAuth();
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
+
+	// ping を使って最終ログイン日時を更新し続ける
+	useAuthPing(isAuthorized);
 
 	useEffect(() => {
 		if (isLoading) return;

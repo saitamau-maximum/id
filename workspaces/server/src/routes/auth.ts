@@ -33,6 +33,16 @@ const route = app
 		} catch (e) {
 			return c.json({ error: "user not found" }, 404);
 		}
+	})
+	.get("/ping", authMiddleware, async (c) => {
+		const payload = c.get("jwtPayload");
+		const { UserRepository } = c.var;
+		try {
+			await UserRepository.updateLastLoginAt(payload.userId);
+			return c.json({ ok: true });
+		} catch (e) {
+			return c.json({ ok: false }, 500);
+		}
 	});
 
 export { route as authRoute };

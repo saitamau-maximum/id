@@ -10,6 +10,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
+import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";
 import { useConfirmPayment } from "../hooks/use-confirm-payment";
@@ -187,9 +188,25 @@ const UserTableRow = ({
 				)}
 			</Table.Td>
 			<Table.Td>
-				<span className={css({ color: "gray.500", fontSize: "sm" })}>
-					{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
-				</span>
+				{isNowLoggedIn(user.lastLoginAt) ? (
+					<span
+						className={css({
+							color: "green.600",
+							fontSize: "sm",
+						})}
+					>
+						現在ログイン中
+					</span>
+				) : (
+					<span
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+						})}
+					>
+						{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
+					</span>
+				)}
 			</Table.Td>
 			<Table.Td>
 				<div>
