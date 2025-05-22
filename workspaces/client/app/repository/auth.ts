@@ -8,6 +8,8 @@ import { client } from "~/utils/hono";
 export interface IAuthRepository {
 	me: () => Promise<WithOAuthConnections<WithCertifications<User>>>;
 	me$$key(): unknown[];
+	ping(): Promise<void>;
+	ping$$key(): unknown[];
 }
 
 export class AuthRepositoryImpl implements IAuthRepository {
@@ -31,5 +33,15 @@ export class AuthRepositoryImpl implements IAuthRepository {
 	}
 	me$$key() {
 		return ["auth"];
+	}
+
+	async ping() {
+		const res = await client.auth.ping.$get();
+		if (!res.ok) {
+			throw new Error("Failed to ping");
+		}
+	}
+	ping$$key() {
+		return ["auth-ping"];
 	}
 }

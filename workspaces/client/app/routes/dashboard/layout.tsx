@@ -4,6 +4,7 @@ import { css, cx } from "styled-system/css";
 import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
+import { usePing } from "~/hooks/use-ping";
 import { useToast } from "~/hooks/use-toast";
 import { Sidebar } from "./internal/components/sidebar";
 
@@ -13,6 +14,9 @@ export default function Dashboard() {
 		useAuth();
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
+
+	// ping を使って最終ログイン日時を更新し続ける
+	usePing(isAuthorized);
 
 	useEffect(() => {
 		if (isLoading) return;
