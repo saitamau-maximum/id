@@ -8,6 +8,7 @@ import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
+import { PING_INTERVAL } from "~/constants/ping";
 import { ROLE_IDS, type RoleId } from "~/types/role";
 import type { User } from "~/types/user";
 import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
@@ -187,9 +188,26 @@ const UserTableRow = ({
 				)}
 			</Table.Td>
 			<Table.Td>
-				<span className={css({ color: "gray.500", fontSize: "sm" })}>
-					{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
-				</span>
+				{user.lastLoginAt &&
+				Date.now() - new Date(user.lastLoginAt).getTime() < PING_INTERVAL ? (
+					<span
+						className={css({
+							color: "green.600",
+							fontSize: "sm",
+						})}
+					>
+						現在ログイン中
+					</span>
+				) : (
+					<span
+						className={css({
+							color: "gray.500",
+							fontSize: "sm",
+						})}
+					>
+						{user.lastLoginAt ? formatDateTime(user.lastLoginAt) : "-"}
+					</span>
+				)}
 			</Table.Td>
 			<Table.Td>
 				<div>
