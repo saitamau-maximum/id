@@ -1,6 +1,7 @@
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
+import { PING_INTERVAL } from "~/constants/ping";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
 import { formatDateTime } from "~/utils/date";
@@ -184,15 +185,30 @@ export const ProfileCard: React.FC<Props> = ({
 							@{displayId}
 						</p>
 					)}
-					<span
-						className={css({
-							color: "gray.500",
-							fontSize: "sm",
-							marginTop: 2,
-						})}
-					>
-						最終ログイン: {lastLoginAt ? formatDateTime(lastLoginAt) : "-"}
-					</span>
+					{/* PING_INTERVAL (30s) 以内ならログイン中とみなす */}
+					{lastLoginAt &&
+					Date.now() - new Date(lastLoginAt).getTime() < PING_INTERVAL ? (
+						<span
+							className={css({
+								color: "green.600",
+								fontWeight: "bold",
+								fontSize: "sm",
+								marginTop: 2,
+							})}
+						>
+							現在ログイン中
+						</span>
+					) : (
+						<span
+							className={css({
+								color: "gray.500",
+								fontSize: "sm",
+								marginTop: 2,
+							})}
+						>
+							最終ログイン: {lastLoginAt ? formatDateTime(lastLoginAt) : "-"}
+						</span>
+					)}
 				</div>
 			</div>
 			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>

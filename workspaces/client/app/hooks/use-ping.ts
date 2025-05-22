@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { PING_INTERVAL } from "~/constants/ping";
 import { useRepository } from "./use-repository";
 
 export function usePing(enabled: boolean) {
@@ -6,7 +7,7 @@ export function usePing(enabled: boolean) {
 	return useQuery({
 		queryKey: authRepository.ping$$key(),
 		queryFn: () => authRepository.ping(),
-		refetchInterval: 30000,
+		refetchInterval: PING_INTERVAL,
 		refetchIntervalInBackground: true,
 		enabled,
 	});
