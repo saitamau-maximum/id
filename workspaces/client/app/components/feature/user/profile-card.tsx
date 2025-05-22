@@ -3,8 +3,8 @@ import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { Member } from "~/types/user";
+import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
-import { isNowLoggedIn } from "~/utils/last-login";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
@@ -185,7 +185,6 @@ export const ProfileCard: React.FC<Props> = ({
 							@{displayId}
 						</p>
 					)}
-					{/* PING_INTERVAL (30s) 以内ならログイン中とみなす */}
 					{isNowLoggedIn(lastLoginAt) ? (
 						<span
 							className={css({
