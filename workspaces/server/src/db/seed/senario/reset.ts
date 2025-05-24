@@ -35,5 +35,7 @@ export const reset = async (client: DrizzleD1Database<typeof schema>) => {
 	// app
 	await client.delete(schema.userProfiles);
 	await client.delete(schema.userRoles);
+	await client.delete(schema.socialLinks);
+	await client.delete(schema.locations);
 	await client.delete(schema.users);
 };
