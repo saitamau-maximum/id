@@ -60,3 +60,12 @@ export type WithCertifications<T> = T & {
 export type WithOAuthConnections<T> = T & {
 	oauthConnections: OAuthConnection[];
 };
+
+export type DashboardUser = {
+	id: string;
+	initializedAt?: Date;
+	lastLoginAt?: Date;
+	isProvisional: boolean;
+	grade?: string;
+	roles: Role[];
+};

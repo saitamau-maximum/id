@@ -3,6 +3,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
+	DashboardUser,
 	IUserRepository,
 	Member,
 	Profile,
@@ -222,6 +223,34 @@ export class CloudflareUserRepository implements IUserRepository {
 		} catch (err) {
 			throw new Error("Failed to update user");
 		}
+	}
+
+	async fetchAllUsers(): Promise<DashboardUser[]> {
+		const users = await this.client.query.users.findMany({
+			columns: {
+				id: true,
+				initializedAt: true,
+				invitationId: true,
+				lastLoginAt: true,
+			},
+			with: {
+				profile: {
+					columns: {
+						grade: true,
+					},
+				},
+				roles: true,
+			},
+		});
+
+		return users.map((user) => ({
+			id: user.id,
+			initializedAt: user.initializedAt,
+			isProvisional: !!user.invitationId,
+			lastLoginAt: user.lastLoginAt,
+			grade: user.profile.grade ?? undefined,
+			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+		}));
 	}
 
 	async fetchMembers(): Promise<Member[]> {
