@@ -35,6 +35,15 @@ export type User = {
 	roles: Role[];
 } & Partial<Profile>;
 
+export type DashboardUser = {
+	id: string;
+	initializedAt: Date | null;
+	lastLoginAt: Date | null;
+	isProvisional: boolean;
+	grade?: string;
+	roles: Role[];
+};
+
 export type Member = User &
 	Partial<
 		Pick<
@@ -67,6 +76,7 @@ export interface IUserRepository {
 	fetchUserProfileById: (
 		userId: string,
 	) => Promise<WithOAuthConnections<WithCertifications<User>>>;
+	fetchAllUsers: () => Promise<DashboardUser[]>;
 	fetchApprovedUsers: () => Promise<User[]>;
 	fetchMembers: () => Promise<Member[]>;
 	fetchMemberByDisplayId: (
