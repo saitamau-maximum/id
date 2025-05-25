@@ -27,7 +27,7 @@ const createMemberSegmentsByDate = (data: DashboardUser[], now: Date) => {
 	return segments;
 };
 
-const createProvisioningSegmentsByDate = (data: DashboardUser[], now: Date) => {
+const createProvisionalSegmentsByDate = (data: DashboardUser[], now: Date) => {
 	// 直近50日のユーザー登録数を日付ごとに集計する
 	const segments: { date: string; count: number }[] = [];
 	const dataSet = new Set<DashboardUser>(data);
@@ -51,7 +51,7 @@ export const UsersTransitionGraph = () => {
 	const { data: info } = useDashboardInfo();
 
 	const memberSegments = createMemberSegmentsByDate(info || [], new Date());
-	const provisioningSegments = createProvisioningSegmentsByDate(
+	const provisionalSegments = createProvisionalSegmentsByDate(
 		info || [],
 		new Date(),
 	);
@@ -68,7 +68,7 @@ export const UsersTransitionGraph = () => {
 				datasets: [
 					{
 						label: "仮登録ユーザー",
-						data: provisioningSegments.map((segment) => segment.count),
+						data: provisionalSegments.map((segment) => segment.count),
 						fill: false,
 					},
 					{
