@@ -1,8 +1,8 @@
 import { css } from "styled-system/css";
 import { Panel } from "./internal/components/panel";
 import { RoleCountsGraph } from "./internal/components/role-counts-graph";
+import { TodayLoggedInUsers } from "./internal/components/today-loggedin-users";
 import { UsersTransitionGraph } from "./internal/components/users-transition-graph";
-import { WeeklyLoggedinUsersGraph } from "./internal/components/weekly-loggedin-users-graph";
 
 export default function AdminHome() {
 	return (
@@ -31,9 +31,9 @@ export default function AdminHome() {
 			</Panel>
 			<Panel
 				title="ユーザーログイン数"
-				description="過去1週間のユーザーログイン数をグラフで表示します。"
+				description="今日ログインしたユーザーの数を表示します。"
 			>
-				<WeeklyLoggedinUsersGraph />
+				<TodayLoggedInUsers />
 			</Panel>
 		</div>
 	);

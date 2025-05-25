@@ -18,7 +18,7 @@ export const Panel = ({ title, description, children }: Props) => {
 		>
 			<div
 				className={css({
-					marginBottom: 4,
+					marginBottom: 2,
 				})}
 			>
 				<h2
