@@ -14,6 +14,7 @@ export const Panel = ({ title, description, children }: Props) => {
 				display: "flex",
 				flexDirection: "column",
 				gap: 4,
+				maxWidth: "100%",
 			})}
 		>
 			<div

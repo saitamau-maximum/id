@@ -19,7 +19,7 @@ export default function AdminHome() {
 		>
 			<Panel
 				title="IdPユーザー登録状況の推移"
-				description="ユーザー登録状況の推移をグラフで表示します。Provisioningは仮登録中の入金確認待ち、Memberは会費を支払っている会員です。"
+				description="直近50日のユーザー登録状況の推移をグラフで表示します。"
 			>
 				<UsersTransitionGraph />
 			</Panel>
