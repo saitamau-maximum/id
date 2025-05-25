@@ -67,12 +67,12 @@ export const UsersTransitionGraph = () => {
 				),
 				datasets: [
 					{
-						label: "Provisioning Users",
+						label: "仮登録ユーザー",
 						data: provisioningSegments.map((segment) => segment.count),
 						fill: false,
 					},
 					{
-						label: "Members",
+						label: "メンバー",
 						data: memberSegments.map((segment) => segment.count),
 						fill: false,
 					},

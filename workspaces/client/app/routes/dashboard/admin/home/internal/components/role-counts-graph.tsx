@@ -37,7 +37,7 @@ export const RoleCountsGraph = () => {
 							(role) => ROLE_BY_ID[role[0]]?.color || "#ccc",
 						),
 						backgroundColor: sortedRoleCounts.map(
-							(role) => `${ROLE_BY_ID[role[0]]?.color}66` || "#ccc66",
+							(role) => `${ROLE_BY_ID[role[0]]?.color}66` || "#ccc6",
 						),
 					},
 				],
