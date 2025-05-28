@@ -19,6 +19,7 @@ import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import {
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
+	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	TOAST_SEARCHPARAM,
 	ToastHashFn,
 } from "../../constants/toast";
@@ -109,24 +110,20 @@ const route = app
 		const { continue_to, invitation_id } = c.req.valid("query");
 
 		const requestUrl = new URL(c.req.url);
-		const continueToUrl = new URL(continue_to);
-
-		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
-		if (
-			(c.env.ENV as string) === "production" &&
-			continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
-			continueToUrl.origin !== requestUrl.origin
-		) {
-			return c.text("Bad Request", 400);
-		}
 
 		// invitation_id がセットされている場合は GitHub でしかログインできないようにする
 		if (invitation_id) {
-			continueToUrl.searchParams.set(
+			// invitation_id はそのままにしておく
+			const redirectUrl = new URL(
+				`/invitation/${invitation_id}`,
+				c.env.CLIENT_ORIGIN,
+			);
+			// GitHub でしかログインできないことを Toast で表示
+			redirectUrl.searchParams.set(
 				TOAST_SEARCHPARAM,
 				ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION),
 			);
-			return c.redirect(continueToUrl.toString(), 302);
+			return c.redirect(redirectUrl.toString(), 302);
 		}
 
 		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
@@ -270,11 +267,14 @@ const route = app
 					);
 			} catch {
 				// 未ログイン時かつ未連携ならログインページに差し戻し
-				continueToUrl.searchParams.set(
+				const redirectUrl = new URL("/login", c.env.CLIENT_ORIGIN);
+				// continue_to はそのままにしておく
+				redirectUrl.searchParams.set("continue_to", continueTo);
+				redirectUrl.searchParams.set(
 					TOAST_SEARCHPARAM,
-					ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION),
+					ToastHashFn(PLEASE_CONNECT_OAUTH_ACCOUNT),
 				);
-				return c.redirect(continueToUrl.toString(), 302);
+				return c.redirect(redirectUrl.toString(), 302);
 			}
 
 			// JWT 構築 & セット

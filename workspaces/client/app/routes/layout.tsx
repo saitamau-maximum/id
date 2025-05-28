@@ -5,7 +5,7 @@ import { css } from "styled-system/css";
 import { useToast } from "~/hooks/use-toast";
 
 export default function Root() {
-	// Server からのリダイレクト先は Dashboard かもしれないし Login かもしれないので、
+	// Server からのリダイレクト先は Dashboard かもしれないし Login かもしれないし invitation かもしれないので、
 	// ここで Server からの Toast リクエストを処理する
 	const [searchParams] = useSearchParams();
 	const { pushToast } = useToast();
