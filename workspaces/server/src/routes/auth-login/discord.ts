@@ -17,6 +17,11 @@ import type { CookieOptions } from "hono/utils/cookie";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
+import {
+	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
+	TOAST_SEARCHPARAM,
+	ToastHashFn,
+} from "../../constants/toast";
 import { type HonoEnv, factory } from "../../factory";
 import type { OAuthConnection } from "../../repository/oauth-internal";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
@@ -103,15 +108,28 @@ const route = app
 	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
 		const { continue_to, invitation_id } = c.req.valid("query");
 
+		const requestUrl = new URL(c.req.url);
+		const continueToUrl = new URL(continue_to);
+
+		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
+		if (
+			(c.env.ENV as string) === "production" &&
+			continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
+			continueToUrl.origin !== requestUrl.origin
+		) {
+			return c.text("Bad Request", 400);
+		}
+
 		// invitation_id がセットされている場合は GitHub でしかログインできないようにする
 		if (invitation_id) {
-			// TODO
-			return c.text("Discord login is not available", 400);
+			continueToUrl.searchParams.set(
+				TOAST_SEARCHPARAM,
+				ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION),
+			);
+			return c.redirect(continueToUrl.toString(), 302);
 		}
 
 		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
-
-		const requestUrl = new URL(c.req.url);
 
 		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
 		await setSignedCookie(
@@ -252,8 +270,11 @@ const route = app
 					);
 			} catch {
 				// 未ログイン時かつ未連携ならログインページに差し戻し
-				// TODO: 「まず紐づけてください」とともにログインページにリダイレクト
-				return c.text("User not found", 400);
+				continueToUrl.searchParams.set(
+					TOAST_SEARCHPARAM,
+					ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION),
+				);
+				return c.redirect(continueToUrl.toString(), 302);
 			}
 
 			// JWT 構築 & セット
