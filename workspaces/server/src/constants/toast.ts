@@ -40,9 +40,20 @@ export const PLEASE_CONNECT_OAUTH_ACCOUNT: ToastItem = {
 		"この機能を利用するには、まず設定画面からアカウントを紐づける必要があります。",
 } as const;
 
-export const TOAST_MESSAGES = {
-	[ToastHashFn(PLEASE_LOGIN_FOR_OAUTH)]: PLEASE_LOGIN_FOR_OAUTH,
-	[ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION)]:
-		ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
-	[ToastHashFn(PLEASE_CONNECT_OAUTH_ACCOUNT)]: PLEASE_CONNECT_OAUTH_ACCOUNT,
-};
+const TOAST_ITEMS = [
+	PLEASE_LOGIN_FOR_OAUTH,
+	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
+	PLEASE_CONNECT_OAUTH_ACCOUNT,
+];
+
+// ハッシュ衝突チェック
+const TOAST_HASHES = TOAST_ITEMS.map((item) => ToastHashFn(item));
+if (new Set(TOAST_HASHES).size !== TOAST_HASHES.length) {
+	throw new Error(
+		"ToastItem のハッシュが重複しています。定義を見直してください。",
+	);
+}
+
+export const TOAST_MESSAGES = Object.fromEntries(
+	TOAST_ITEMS.map((item) => [ToastHashFn(item), item]),
+) as Record<string, ToastItem>;
