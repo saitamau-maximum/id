@@ -1,7 +1,10 @@
 import { Outlet } from "react-router";
 import { css } from "styled-system/css";
+import { useSetup } from "~/hooks/use-setup";
 
 export default function Root() {
+	useSetup();
+
 	return (
 		<div
 			className={css({

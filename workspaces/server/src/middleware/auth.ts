@@ -3,6 +3,11 @@ import { getSignedCookie } from "hono/cookie";
 import { jwt, verify } from "hono/jwt";
 import { COOKIE_NAME } from "../constants/cookie";
 import { ROLE_IDS } from "../constants/role";
+import {
+	PLEASE_LOGIN_FOR_OAUTH,
+	TOAST_SEARCHPARAM,
+	ToastHashFn,
+} from "../constants/toast";
 import { factory } from "../factory";
 
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
@@ -23,9 +28,16 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 		}
 
 		const requestUrl = new URL(c.req.url);
-		return c.redirect(
-			`${c.env.CLIENT_ORIGIN}/login?continue_to=${encodeURIComponent(requestUrl.toString())}`,
+
+		const redirectTo = new URL("/login", c.env.CLIENT_ORIGIN);
+		redirectTo.searchParams.set("continue_to", requestUrl.toString());
+		// どうせ OAuth でしか使ってないのでこのメッセージ
+		redirectTo.searchParams.set(
+			TOAST_SEARCHPARAM,
+			ToastHashFn(PLEASE_LOGIN_FOR_OAUTH),
 		);
+
+		return c.redirect(redirectTo.toString(), 302);
 	},
 );
 
