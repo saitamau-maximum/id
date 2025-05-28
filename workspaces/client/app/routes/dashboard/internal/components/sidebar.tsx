@@ -6,6 +6,7 @@ import { Menu } from "~/components/ui/menu";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/types/user";
+import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
 
 type Navigation = {
@@ -136,6 +137,7 @@ export const Sidebar = () => {
 	const handleLogout = useCallback(() => {
 		localStorage.removeItem(JWT_STORAGE_KEY);
 		refetch();
+		window.location.href = `${env("SERVER_HOST")}/auth/logout`;
 	}, [refetch]);
 
 	if (!user) {
