@@ -1,5 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { deleteCookie } from "hono/cookie";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../constants/cookie";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 import { authLoginRoute } from "./auth-login";
@@ -12,6 +14,10 @@ const verifyRequestQuerySchema = v.object({
 
 const route = app
 	.route("/login", authLoginRoute)
+	.get("/logout", async (c) => {
+		deleteCookie(c, COOKIE_NAME.LOGIN_STATE);
+		return c.redirect(`${c.env.CLIENT_ORIGIN}/login`, 302);
+	})
 	.get("/verify", vValidator("query", verifyRequestQuerySchema), async (c) => {
 		const { SessionRepository } = c.var;
 		const { ott } = c.req.valid("query");
