@@ -1,7 +1,23 @@
-import { Outlet } from "react-router";
+import { TOAST_MESSAGES, TOAST_SEARCHPARAM } from "@idp/server/shared/toast";
+import { useEffect } from "react";
+import { Outlet, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
+import { useToast } from "~/hooks/use-toast";
 
 export default function Root() {
+	// Server からのリダイレクト先は Dashboard かもしれないし Login かもしれないので、
+	// ここで Server からの Toast リクエストを処理する
+	const [searchParams] = useSearchParams();
+	const { pushToast } = useToast();
+
+	useEffect(() => {
+		const toastId = searchParams.get(TOAST_SEARCHPARAM);
+		if (toastId) {
+			const msg = TOAST_MESSAGES[toastId];
+			if (msg) pushToast(msg);
+		}
+	}, [searchParams, pushToast]);
+
 	return (
 		<div
 			className={css({

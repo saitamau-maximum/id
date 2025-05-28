@@ -20,6 +20,12 @@ export const ToastHashFn = (item: ToastItem): string => {
 
 export const TOAST_SEARCHPARAM = "toast";
 
+export const PLEASE_LOGIN_FOR_OAUTH: ToastItem = {
+	type: "error",
+	title: "ログインしてください",
+	description: "OAuth アプリケーションを利用するためにはログインが必要です",
+} as const;
+
 export const ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION: ToastItem = {
 	type: "error",
 	title: "このログインは利用できません",
@@ -35,6 +41,7 @@ export const PLEASE_CONNECT_OAUTH_ACCOUNT: ToastItem = {
 } as const;
 
 export const TOAST_MESSAGES = {
+	[ToastHashFn(PLEASE_LOGIN_FOR_OAUTH)]: PLEASE_LOGIN_FOR_OAUTH,
 	[ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION)]:
 		ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	[ToastHashFn(PLEASE_CONNECT_OAUTH_ACCOUNT)]: PLEASE_CONNECT_OAUTH_ACCOUNT,
