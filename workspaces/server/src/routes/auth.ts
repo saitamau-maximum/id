@@ -15,6 +15,9 @@ const verifyRequestQuerySchema = v.object({
 const route = app
 	.route("/login", authLoginRoute)
 	.get("/logout", async (c) => {
+		c.header("Cache-Control", "no-store, no-cache");
+		c.header("Expires", "0");
+
 		deleteCookie(c, COOKIE_NAME.LOGIN_STATE);
 		return c.redirect(`${c.env.CLIENT_ORIGIN}/login`, 302);
 	})
