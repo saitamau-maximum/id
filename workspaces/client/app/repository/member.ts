@@ -1,3 +1,4 @@
+import type { DiscordInfo } from "~/types/discord-info";
 import type {
 	Member,
 	WithCertifications,
@@ -19,6 +20,10 @@ export interface IMemberRepository {
 	getProfileByUserDisplayID: (
 		userDisplayId: string,
 	) => Promise<WithOAuthConnections<WithCertifications<Member>>>;
+	getDiscordInfoByUserDisplayID: (
+		userDisplayId: string,
+	) => Promise<DiscordInfo>;
+	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 }
 
 export class MemberRepositoryImpl implements IMemberRepository {
@@ -88,6 +93,33 @@ export class MemberRepositoryImpl implements IMemberRepository {
 	getProfileByUserDisplayID$$key(userDisplayId: string) {
 		return [
 			"profile",
+			{
+				userDisplayId,
+			},
+		];
+	}
+
+	async getDiscordInfoByUserDisplayID(userDisplayId: string) {
+		const res = await client.member.discord[":userDisplayId"].$get({
+			param: {
+				userDisplayId,
+			},
+		});
+
+		// Discord OAuth 紐づけてない or Maximum サーバーに入ってない場合
+		if (res.status === 404) {
+			return undefined;
+		}
+
+		if (!res.ok) {
+			throw new Error("Failed to fetch Discord info");
+		}
+
+		return res.json();
+	}
+	getDiscordInfoByUserDisplayID$$key(userDisplayId: string) {
+		return [
+			"discord",
 			{
 				userDisplayId,
 			},
