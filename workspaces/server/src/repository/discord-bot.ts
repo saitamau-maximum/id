@@ -1,3 +1,5 @@
+import type { RESTGetAPIGuildMemberResult } from "discord-api-types/v10";
+
 export interface IDiscordBotRepository {
-	foo: string;
+	getGuildMember(memberId: string): Promise<RESTGetAPIGuildMemberResult>;
 }

@@ -1,5 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
+import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware } from "../middleware/auth";
 import { authLoginRoute } from "./auth-login";
@@ -42,6 +43,28 @@ const route = app
 			return c.json({ ok: true });
 		} catch (e) {
 			return c.json({ ok: false }, 500);
+		}
+	})
+	// Temporary route for Discord Bot Test
+	.get("/discord/guild-member", authMiddleware, async (c) => {
+		const { DiscordBotRepository, OAuthInternalRepository } = c.var;
+		const payload = c.get("jwtPayload");
+		try {
+			const conn = await OAuthInternalRepository.fetchOAuthConnectionsByUserId(
+				payload.userId,
+			);
+			const discordConn = conn.find(
+				(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+			);
+			if (!discordConn) {
+				return c.json({ error: "Discord connection not found" }, 404);
+			}
+			const member = await DiscordBotRepository.getGuildMember(
+				discordConn.providerUserId,
+			);
+			return c.json(member);
+		} catch (e) {
+			return c.json({ error: "failed to fetch guild member" }, 500);
 		}
 	});
 
