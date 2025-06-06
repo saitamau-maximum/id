@@ -37,9 +37,6 @@ export const SOCIAL_SERVICES_IDS = {
 	OTHER: 999, // あとから増えてもいいように遠い値にする
 } as const;
 
-export type SocialServiceId =
-	(typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
-
 export const SOCIAL_SERVICES_PREFIX = {
 	[SOCIAL_SERVICES_IDS.GITHUB]: "https://github.com/",
 	[SOCIAL_SERVICES_IDS.ATCODER]: "https://atcoder.jp/users/",
@@ -52,6 +49,11 @@ export const SOCIAL_SERVICES_PREFIX = {
 	[SOCIAL_SERVICES_IDS.OTHER]: "",
 	// Discord は OAuth で連携させるため、ここの定義は不要 (ここの値は Settings の SocialLinks で使われるので)
 };
+
+export type SocialServiceId =
+	(typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
+
+export type ManuallyAddableSocialService = keyof typeof SOCIAL_SERVICES_PREFIX;
 
 export const ICON = {
 	[SOCIAL_SERVICES_IDS.GITHUB]: {
