@@ -24,6 +24,36 @@ const route = app
 			return c.json({ error: "member not found" }, 404);
 		}
 	})
+	.get("/discord/:userDisplayId", memberOnlyMiddleware, async (c) => {
+		const userDisplayId = c.req.param("userDisplayId");
+		const { DiscordBotRepository, OAuthInternalRepository } = c.var;
+		try {
+			const conn =
+				await OAuthInternalRepository.fetchOAuthConnectionsByUserDisplayId(
+					userDisplayId,
+				);
+			const discordConn = conn.find(
+				(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+			);
+			if (!discordConn) {
+				return c.json({ error: "Discord connection not found" }, 404);
+			}
+			const member = await DiscordBotRepository.getGuildMember(
+				discordConn.providerUserId,
+			);
+			if (!member) {
+				return c.json({ error: "Discord member not found" }, 404);
+			}
+			// 載せたくない情報も含まれているので制限する
+			return c.json({
+				// global_name: Discord サーバー内での表示名 (may undefined)
+				// username: Discord 全体 (defined)
+				displayName: member.user.global_name || member.user.username,
+			});
+		} catch {
+			return c.json({ error: "Failed to fetch Discord member" }, 500);
+		}
+	})
 	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
 		const {

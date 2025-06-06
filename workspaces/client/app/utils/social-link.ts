@@ -1,10 +1,12 @@
 import {
+	type ManuallyAddableSocialService,
 	SOCIAL_SERVICES_IDS,
 	SOCIAL_SERVICES_PREFIX,
-	type SocialServiceId,
 } from "../constant";
 
-export const detectSocialService = (url: string) => {
+export const detectSocialService = (
+	url: string,
+): ManuallyAddableSocialService => {
 	if (!URL.canParse(url)) {
 		return SOCIAL_SERVICES_IDS.OTHER;
 	}
@@ -16,13 +18,16 @@ export const detectSocialService = (url: string) => {
 	)?.[0];
 
 	if (socialService) {
-		return Number.parseInt(socialService) as SocialServiceId;
+		return Number.parseInt(socialService) as ManuallyAddableSocialService;
 	}
 	// SOCIAL_SERVICES_HOST_NAMESにない場合はOTHERを返す
 	return SOCIAL_SERVICES_IDS.OTHER;
 };
 
-export const getHandle = (url: string, service: SocialServiceId) => {
+export const getHandle = (
+	url: string,
+	service: ManuallyAddableSocialService,
+) => {
 	const u = new URL(url);
 	if (service === SOCIAL_SERVICES_IDS.OTHER) {
 		return u.hostname;

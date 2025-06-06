@@ -1,7 +1,9 @@
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
+import { SOCIAL_SERVICES_IDS } from "~/constant";
 import { useMarkdown } from "~/hooks/use-markdown";
+import type { DiscordInfo } from "~/types/discord-info";
 import type { Member } from "~/types/user";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
@@ -12,6 +14,7 @@ type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	socialLinks?: string[];
 	initialized: boolean;
 	lastLoginAt?: Date | undefined;
+	discordInfo?: DiscordInfo;
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -25,6 +28,7 @@ export const ProfileCard: React.FC<Props> = ({
 	bio,
 	socialLinks,
 	lastLoginAt,
+	discordInfo,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
@@ -209,48 +213,69 @@ export const ProfileCard: React.FC<Props> = ({
 				</div>
 			</div>
 			<div className={css({ display: "flex", gap: 4, flexWrap: "wrap" })}>
-				{(socialLinksDetail ?? []).length > 0 && (
-					<div
-						className={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "4px",
-							alignItems: "flex-start",
-							minWidth: "120px",
-						})}
-					>
-						{socialLinksDetail?.map((link) => (
-							<a
-								key={link.url}
-								href={link.url}
-								target="_blank"
-								rel="noopener noreferrer"
+				<div
+					className={css({
+						display: "flex",
+						flexDirection: "column",
+						gap: "4px",
+						alignItems: "flex-start",
+						minWidth: "120px",
+					})}
+				>
+					{discordInfo?.displayName && (
+						<span
+							className={css({
+								display: "flex",
+								alignItems: "center",
+								gap: 2,
+								textDecoration: "none",
+							})}
+						>
+							<SocialIcon service={SOCIAL_SERVICES_IDS.DISCORD} />
+							<span
 								className={css({
-									display: "flex",
-									alignItems: "center",
-									gap: 2,
-									textDecoration: "none",
+									color: "gray.600",
+									fontSize: "sm",
+									mdDown: {
+										fontSize: "sm",
+									},
 								})}
 							>
-								<SocialIcon service={link.service} />
-								<span
-									className={css({
-										color: "gray.600",
+								{discordInfo.displayName}
+							</span>
+						</span>
+					)}
+					{(socialLinksDetail ?? []).map((link) => (
+						<a
+							key={link.url}
+							href={link.url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className={css({
+								display: "flex",
+								alignItems: "center",
+								gap: 2,
+								textDecoration: "none",
+							})}
+						>
+							<SocialIcon service={link.service} />
+							<span
+								className={css({
+									color: "gray.600",
+									fontSize: "sm",
+									mdDown: {
 										fontSize: "sm",
-										mdDown: {
-											fontSize: "sm",
-										},
-										_hover: {
-											color: "gray.800",
-										},
-									})}
-								>
-									{link.handle}
-								</span>
-							</a>
-						))}
-					</div>
-				)}
+									},
+									_hover: {
+										color: "gray.800",
+									},
+								})}
+							>
+								{link.handle}
+							</span>
+						</a>
+					))}
+				</div>
 				<div>
 					{roles.length > 0 && (
 						<div

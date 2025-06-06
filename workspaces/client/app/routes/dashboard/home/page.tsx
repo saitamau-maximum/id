@@ -9,11 +9,13 @@ import { DiscordInvitationMessageBox } from "./internal/components/discord-invit
 import { PaymentMessageBox } from "./internal/components/payment-message-box";
 import { ProfileUpdateMessageBox } from "./internal/components/profile-update-message-box";
 import { useContribution } from "./internal/hooks/use-contribution";
+import { useDiscordInfo } from "./internal/hooks/use-discord-info";
 
 export default function Home() {
 	const { user, hasFiscalYearUpdated, isFiscalYearPaid } = useAuth();
 	const { data, isLoading } = useContribution();
 	const { deviceType } = useDeviceType();
+	const { data: discordInfo } = useDiscordInfo(user?.displayId || "");
 
 	if (!user) {
 		return null;
@@ -56,6 +58,7 @@ export default function Home() {
 						bio={user.bio}
 						socialLinks={user.socialLinks}
 						lastLoginAt={user.lastLoginAt}
+						discordInfo={discordInfo}
 					/>
 				</div>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>
