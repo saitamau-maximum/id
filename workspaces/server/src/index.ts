@@ -32,44 +32,6 @@ const app = factory.createApp();
 export const route = app
 	.use(logger())
 	.use(async (c, next) => {
-		c.set("roleIds", []);
-
-		c.set(
-			"SessionRepository",
-			new CloudflareSessionRepository(c.env.IDP_SESSION),
-		);
-
-		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
-		c.set(
-			"OAuthExternalRepository",
-			new CloudflareOAuthExternalRepository(c.env.DB),
-		);
-		c.set(
-			"OAuthInternalRepository",
-			new CloudflareOAuthInternalRepository(c.env.DB),
-		);
-		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
-
-		c.set(
-			"CertificationRepository",
-			new CloudflareCertificationRepository(c.env.DB),
-		);
-		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
-		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
-
-		c.set(
-			"ContributionCacheRepository",
-			new CloudflareContributionCacheRepository(c.env.CACHE),
-		);
-		c.set(
-			"UserStorageRepository",
-			new CloudflareUserStorageRepository(c.env.STORAGE),
-		);
-		c.set(
-			"OAuthAppStorageRepository",
-			new CloudflareOAuthAppRepository(c.env.STORAGE),
-		);
-
 		const octokit = new Octokit({
 			authStrategy: createAppAuth,
 			auth: {
@@ -78,13 +40,59 @@ export const route = app
 				installationId: c.env.GITHUB_APP_INSTALLID,
 			},
 		});
-		c.set("ContributionRepository", new GithubContributionRepository(octokit));
-		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
 
+		// ----- IdP Core ----- //
+		// ユーザー・セッション
+		c.set(
+			"SessionRepository",
+			new CloudflareSessionRepository(c.env.IDP_SESSION),
+		);
+		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
+		// Storage
+		c.set(
+			"UserStorageRepository",
+			new CloudflareUserStorageRepository(c.env.STORAGE),
+		);
+		c.set(
+			"OAuthAppStorageRepository",
+			new CloudflareOAuthAppRepository(c.env.STORAGE),
+		);
+		// キャッシュ
+		c.set(
+			"ContributionCacheRepository",
+			new CloudflareContributionCacheRepository(c.env.CACHE),
+		);
+		// カレンダー
+		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
 		c.set(
 			"CalendarNotifier",
 			new DiscordCalendarNotifier(c.env.CALENDAR_NOTIFY_WEBHOOK_URL),
 		);
+		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
+		// 資格・試験
+		c.set(
+			"CertificationRepository",
+			new CloudflareCertificationRepository(c.env.DB),
+		);
+		// 招待
+		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
+		// ----- IdP OAuth & Connect ----- //
+		// 内外の OAuth 関連
+		c.set(
+			"OAuthInternalRepository",
+			new CloudflareOAuthInternalRepository(c.env.DB),
+		);
+		c.set(
+			"OAuthExternalRepository",
+			new CloudflareOAuthExternalRepository(c.env.DB),
+		);
+		// GitHub 関連
+		c.set("ContributionRepository", new GithubContributionRepository(octokit));
+		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
+
+		// ----- Dynamic Variables ----- //
+		c.set("roleIds", []);
+
 		await next();
 	})
 	.use((c, next) => {
