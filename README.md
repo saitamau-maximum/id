@@ -70,6 +70,7 @@ Bot を作成する場合、自身の管理するサーバーに Bot を追加�
 また、 Bot タブから TOKEN を生成してください。
 Bot の追加については、 OAuth2 タブの Scopes に `bot` にチェックを入れ、 Bot Permissions には少なくとも以下の権限を設定してください。
 
+- Manage Roles (メンバーのロール設定に必要)
 - Create Instant Invite (招待の作成に必要)
 - Send Messages (通知等の送信に必要)
 
