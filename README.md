@@ -59,6 +59,8 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 - `DISCORD_OAUTH_ID`: Discord OAuth の Client ID
 - `DISCORD_OAUTH_SECRET`: Discord OAuth の Client Secret
 - `DISCORD_BOT_TOKEN`: Discord Bot のトークン
+- `DISCORD_GUILD_ID`: Discord Bot を追加するサーバーの ID
+- `DISCORD_CALENDAR_CHANNEL_ID`: Calendar の通知を送信する Discord チャンネルの ID
 
 Discord Developer Portal (<https://discord.com/developers/applications>) から新しくアプリケーションを作成してください。
 その後設定画面の OAuth2 タブから Client ID と Client Secret を取得してください。
@@ -76,7 +78,10 @@ Bot の追加については、 OAuth2 タブの Scopes に `bot` にチェッ�
 
 サーバーに Bot を追加出来たら、Installation タブにおいて、 User Install のみにチェックを入れ、 Guild Install のチェックは外しておくとよいでしょう。
 また、 Bot タブから Private Bot としておくとよいと思います。
-なお、権限更新時に Bot の再インストールが必要になる (と思う) ので、再インストール時は Guild Install 再有効化する必要があることに注意してください。
+なお、権限更新時に Bot の再インストールが必要になる (と思う) ので、再インストール時は Guild Install を再有効化する必要があることに注意してください。
+
+Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL に表示されます。
+`https://discord.com/channels/<Guild ID>/<Channel ID>` です。
 
 </details>
 
