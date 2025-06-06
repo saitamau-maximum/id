@@ -14,6 +14,7 @@ import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/c
 import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
+import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
 import { DiscordCalendarNotifier } from "./infrastructure/repository/discord/calendar";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
@@ -89,6 +90,11 @@ export const route = app
 		// GitHub 関連
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
 		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
+		// Discord 関連
+		c.set(
+			"DiscordBotRepository",
+			new DiscordBotRepository(c.env.DISCORD_BOT_TOKEN),
+		);
 
 		// ----- Dynamic Variables ----- //
 		c.set("roleIds", []);

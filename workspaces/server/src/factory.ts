@@ -7,6 +7,7 @@ import type {
 } from "./repository/calendar";
 import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
+import type { IDiscordBotRepository } from "./repository/discord-bot";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -46,6 +47,8 @@ export type HonoEnv = {
 		// GitHub 関連
 		ContributionRepository: IContributionRepository;
 		OrganizationRepository: IOrganizationRepository;
+		// Discord 関連
+		DiscordBotRepository: IDiscordBotRepository;
 		// ----- Dynamic Variables ----- //
 		roleIds: number[];
 		tokenInfo?: Awaited<
