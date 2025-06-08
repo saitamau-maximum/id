@@ -4,6 +4,17 @@ import { memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
+type DiscordInfoResNotLinked = {
+	status: "not_linked";
+};
+type DiscordInfoResNotJoined = {
+	status: "not_joined";
+};
+type DiscordInfoResJoined = {
+	status: "joined";
+	displayName: string;
+};
+
 const route = app
 	.get("/list", memberOnlyMiddleware, async (c) => {
 		const { UserRepository } = c.var;
@@ -27,32 +38,30 @@ const route = app
 	.get("/discord/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
 		const { DiscordBotRepository, OAuthInternalRepository } = c.var;
-		try {
-			const conn =
-				await OAuthInternalRepository.fetchOAuthConnectionsByUserDisplayId(
-					userDisplayId,
-				);
-			const discordConn = conn.find(
-				(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+
+		const conn =
+			await OAuthInternalRepository.fetchOAuthConnectionsByUserDisplayId(
+				userDisplayId,
 			);
-			if (!discordConn) {
-				return c.json({ error: "Discord connection not found" }, 404);
-			}
-			const member = await DiscordBotRepository.getGuildMember(
-				discordConn.providerUserId,
-			);
-			if (!member) {
-				return c.json({ error: "Discord member not found" }, 404);
-			}
-			// 載せたくない情報も含まれているので制限する
-			return c.json({
-				// global_name: Discord サーバー内での表示名 (may undefined)
-				// username: Discord 全体 (defined)
-				displayName: member.user.global_name || member.user.username,
-			});
-		} catch {
-			return c.json({ error: "Failed to fetch Discord member" }, 500);
+		const discordConn = conn.find(
+			(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+		);
+		if (!discordConn) {
+			return c.json({ status: "not_linked" } as DiscordInfoResNotLinked);
 		}
+		const member = await DiscordBotRepository.getGuildMember(
+			discordConn.providerUserId,
+		);
+		if (!member) {
+			return c.json({ status: "not_joined" } as DiscordInfoResNotJoined);
+		}
+		// 載せたくない情報も含まれているので制限する
+		return c.json({
+			status: "joined",
+			// global_name: Discord サーバー内での表示名 (may be undefined)
+			// username: Discord 全体 (defined)
+			displayName: member.user.global_name || member.user.username,
+		} as DiscordInfoResJoined);
 	})
 	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");

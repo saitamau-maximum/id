@@ -222,7 +222,7 @@ export const ProfileCard: React.FC<Props> = ({
 						minWidth: "120px",
 					})}
 				>
-					{discordInfo?.displayName && (
+					{discordInfo?.status === "joined" && (
 						<span
 							className={css({
 								display: "flex",

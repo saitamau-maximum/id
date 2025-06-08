@@ -106,11 +106,6 @@ export class MemberRepositoryImpl implements IMemberRepository {
 			},
 		});
 
-		// Discord OAuth 紐づけてない or Maximum サーバーに入ってない場合
-		if (res.status === 404) {
-			return undefined;
-		}
-
 		if (!res.ok) {
 			throw new Error("Failed to fetch Discord info");
 		}
