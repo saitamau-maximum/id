@@ -5,6 +5,7 @@ import { CertificationCard } from "~/components/feature/user/certification-card"
 import { ContributionCard } from "~/components/feature/user/contribution/card";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useDeviceType } from "~/hooks/use-device-type";
+import { useDiscordInfo } from "./internal/hooks/use-discord-info";
 import { useMemberContribution } from "./internal/hooks/use-member-contribution";
 import { useMemberProfile } from "./internal/hooks/use-member-profie";
 
@@ -25,6 +26,7 @@ export default function Profile() {
 	} = useMemberProfile(userDisplayId);
 	const { data: memberContribution, isLoading: isMemberContributionLoading } =
 		useMemberContribution(userDisplayId);
+	const { data: discordInfo } = useDiscordInfo(userDisplayId);
 
 	// MemberProfile が読み込まれるまでは表示しない
 	if (isMemberProfileLoading) {
@@ -77,6 +79,7 @@ export default function Profile() {
 					bio={memberProfile.bio}
 					socialLinks={memberProfile.socialLinks}
 					lastLoginAt={memberProfile.lastLoginAt}
+					discordInfo={discordInfo}
 				/>
 			</div>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
