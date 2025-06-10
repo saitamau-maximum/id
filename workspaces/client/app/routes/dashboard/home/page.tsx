@@ -15,7 +15,7 @@ export default function Home() {
 	const { user, hasFiscalYearUpdated, isFiscalYearPaid } = useAuth();
 	const { data, isLoading } = useContribution();
 	const { deviceType } = useDeviceType();
-	const { data: discordInfo } = useDiscordInfo(user?.displayId || "");
+	const { data: discordInfo } = useDiscordInfo(user?.displayId);
 
 	if (!user) {
 		return null;
