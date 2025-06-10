@@ -47,21 +47,21 @@ const route = app
 			(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
 		);
 		if (!discordConn) {
-			return c.json({ status: "not_linked" } as DiscordInfoResNotLinked);
+			return c.json<DiscordInfoResNotLinked>({ status: "not_linked" });
 		}
 		const member = await DiscordBotRepository.getGuildMember(
 			discordConn.providerUserId,
 		);
 		if (!member) {
-			return c.json({ status: "not_joined" } as DiscordInfoResNotJoined);
+			return c.json<DiscordInfoResNotJoined>({ status: "not_joined" });
 		}
 		// 載せたくない情報も含まれているので制限する
-		return c.json({
+		return c.json<DiscordInfoResJoined>({
 			status: "joined",
 			// global_name: Discord サーバー内での表示名 (may be undefined)
 			// username: Discord 全体 (defined)
 			displayName: member.user.global_name || member.user.username,
-		} as DiscordInfoResJoined);
+		});
 	})
 	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
