@@ -7,6 +7,7 @@ import type {
 } from "./repository/calendar";
 import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
+import type { IDiscordBotRepository } from "./repository/discord-bot";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -22,27 +23,40 @@ import type { IUserRepository } from "./repository/user";
 export type HonoEnv = {
 	Bindings: Env;
 	Variables: {
+		// ----- IdP Core ----- //
+		// ユーザー・セッション
 		SessionRepository: ISessionRepository;
 		UserRepository: IUserRepository;
-		ContributionRepository: IContributionRepository;
-		ContributionCacheRepository: IContributionCacheRepository;
-		OAuthExternalRepository: IOAuthExternalRepository;
-		OAuthInternalRepository: IOAuthInternalRepository;
-		OAuthAppStorageRepository: IOAuthAppStorageRepository;
-		OrganizationRepository: IOrganizationRepository;
+		// Storage
 		UserStorageRepository: IUserStorageRepository;
+		OAuthAppStorageRepository: IOAuthAppStorageRepository;
+		// キャッシュ
+		ContributionCacheRepository: IContributionCacheRepository;
+		// カレンダー
 		CalendarRepository: ICalendarRepository;
 		CalendarNotifier: ICalendarNotifier;
-		CertificationRepository: ICertificationRepository;
-		InviteRepository: IInviteRepository;
 		LocationRepository: ILocationRepository;
+		// 資格・試験
+		CertificationRepository: ICertificationRepository;
+		// 招待
+		InviteRepository: IInviteRepository;
+		// ----- IdP OAuth & Connect ----- //
+		// 内外の OAuth 関連
+		OAuthInternalRepository: IOAuthInternalRepository;
+		OAuthExternalRepository: IOAuthExternalRepository;
+		// GitHub 関連
+		ContributionRepository: IContributionRepository;
+		OrganizationRepository: IOrganizationRepository;
+		// Discord 関連
+		DiscordBotRepository: IDiscordBotRepository;
+		// ----- Dynamic Variables ----- //
+		roleIds: number[];
 		tokenInfo?: Awaited<
 			ReturnType<IOAuthExternalRepository["getTokenByAccessToken"]>
 		>;
 		oauthClientInfo?: Awaited<
 			ReturnType<IOAuthExternalRepository["getClientById"]>
 		>;
-		roleIds: number[];
 	} & JwtVariables<{ userId: string }>;
 };
 

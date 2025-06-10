@@ -33,11 +33,9 @@ export const SOCIAL_SERVICES_IDS = {
 	KAGGLE: 6,
 	ZENN: 7,
 	QIITA: 8,
+	DISCORD: 9,
 	OTHER: 999, // あとから増えてもいいように遠い値にする
 } as const;
-
-export type SocialServiceId =
-	(typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
 
 export const SOCIAL_SERVICES_PREFIX = {
 	[SOCIAL_SERVICES_IDS.GITHUB]: "https://github.com/",
@@ -49,7 +47,13 @@ export const SOCIAL_SERVICES_PREFIX = {
 	[SOCIAL_SERVICES_IDS.ZENN]: "https://zenn.dev/",
 	[SOCIAL_SERVICES_IDS.QIITA]: "https://qiita.com/",
 	[SOCIAL_SERVICES_IDS.OTHER]: "",
+	// Discord は OAuth で連携させるため、ここの定義は不要 (ここの値は Settings の SocialLinks で使われるので)
 };
+
+export type SocialServiceId =
+	(typeof SOCIAL_SERVICES_IDS)[keyof typeof SOCIAL_SERVICES_IDS];
+
+export type ManuallyAddableSocialService = keyof typeof SOCIAL_SERVICES_PREFIX;
 
 export const ICON = {
 	[SOCIAL_SERVICES_IDS.GITHUB]: {
@@ -83,6 +87,10 @@ export const ICON = {
 	[SOCIAL_SERVICES_IDS.QIITA]: {
 		src: "/qiita.svg",
 		alt: "Qiita",
+	},
+	[SOCIAL_SERVICES_IDS.DISCORD]: {
+		src: "/discord.svg",
+		alt: "Discord",
 	},
 	[SOCIAL_SERVICES_IDS.OTHER]: {
 		src: "/globe.svg",
