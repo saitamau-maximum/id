@@ -11,6 +11,17 @@ import type {
 	WithCertifications,
 	WithOAuthConnections,
 } from "./../../../repository/user";
+import { users, userProfiles, socialLinks } from "../../../db/schema"; //users,socialLinks後で消します
+
+export type PublicMember = {
+	id: string;
+	displayName: string;
+	bio: string;
+	socialLinks: string[];
+	roles: string[]; 
+};
+
+
 
 export class CloudflareUserRepository implements IUserRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -507,5 +518,31 @@ export class CloudflareUserRepository implements IUserRepository {
 			.update(schema.users)
 			.set({ lastLoginAt: new Date() })
 			.where(eq(schema.users.id, userId));
+	}
+
+	async fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember | null> {
+		const profile = await this.client.query.userProfiles.findFirst({
+			where: eq(userProfiles.displayId, displayId),
+			with: {
+				user: {
+					with: {
+						socialLinks: true,
+						roles: true, 
+					},
+				},
+			},
+		});
+
+		if (!profile || !profile.user) return null;
+
+		return {
+			id: profile.user.id,
+			displayName: profile.displayName ?? "",
+			bio: profile.bio ?? "",
+			socialLinks: profile.user.socialLinks.map((link) => link.url),
+			roles: profile.user.roles
+				.map((ur) => ROLE_BY_ID[ur.roleId]?.name)
+				.filter((name): name is string => !!name),
+		};
 	}
 }

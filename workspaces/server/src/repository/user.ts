@@ -1,5 +1,6 @@
 import type { Role } from "../constants/role";
 import type { OAuthConnection } from "./oauth-internal";
+import { PublicMember } from "../infrastructure/repository/cloudflare/user";
 
 export type Certification = {
 	id: string;
@@ -92,4 +93,5 @@ export interface IUserRepository {
 	confirmPayment: (userId: string) => Promise<void>;
 	rejectProvisionalUser: (userId: string) => Promise<void>;
 	updateLastLoginAt: (userId: string) => Promise<void>;
+	fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember | null>;
 }

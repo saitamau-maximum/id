@@ -64,6 +64,37 @@ const route = app
 		);
 
 		return c.json(contributions, 200);
+	})
+
+	.get("/public/:userDisplayId", async (c) => {
+		const userDisplayId = c.req.param("userDisplayId");
+		console.log("Request for userDisplayId:", userDisplayId);
+		const { UserRepository } = c.var;
+
+		try {
+			const member = await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
+			if (!member) {
+				console.log("Member not found");
+				return c.json({ error: "member not found" }, 404);
+			}
+			console.log("Member found:", member);
+			return c.json({
+				id: member.id,
+				displayName: member.displayName,
+				bio: member.bio,
+				socialLinks: member.socialLinks,
+				roles: member.roles, // こちらも string[] として返す
+			});
+		} catch (e) {
+			console.error(e);
+
+			if (e instanceof Error) {
+				return c.json({ error: "internal error", detail: e.message }, 500);
+			}
+
+			return c.json({ error: "internal error", detail: String(e) }, 500);
+		}
 	});
+
 
 export { route as memberRoute };
