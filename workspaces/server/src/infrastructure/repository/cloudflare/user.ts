@@ -11,7 +11,6 @@ import type {
 	WithCertifications,
 	WithOAuthConnections,
 } from "./../../../repository/user";
-import { users, userProfiles, socialLinks } from "../../../db/schema"; //users,socialLinks後で消します
 
 export type PublicMember = {
 	id: string;
@@ -522,7 +521,7 @@ export class CloudflareUserRepository implements IUserRepository {
 
 	async fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember | null> {
 		const profile = await this.client.query.userProfiles.findFirst({
-			where: eq(userProfiles.displayId, displayId),
+			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
 				user: {
 					with: {

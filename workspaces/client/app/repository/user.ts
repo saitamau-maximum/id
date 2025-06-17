@@ -232,31 +232,4 @@ export class UserRepositoryImpl implements IUserRepository {
 			throw new Error("Failed to delete OAuth connection");
 		}
 	}
-
-	async findById(userId: string) {
-	const res = await fetch(`/admin/users/${userId}`, {
-		method: "GET",
-		credentials: "include", // Cookie 認証なら必要
-		headers: {
-		"Content-Type": "application/json",
-		// "Authorization": `Bearer ${token}`, // 必要なら
-		},
-	});
-
-	if (!res.ok) {
-		if (res.status === 404) return null;
-		throw new Error("Failed to fetch user by id");
-	}
-
-	const data = await res.json();
-
-	return {
-		id: data.id,
-		profile: {
-		displayName: data.displayName ?? null,
-		bio: data.bio ?? null,
-		},
-		socialLinks: data.socialLinks ?? [],
-	};
-	}
 }

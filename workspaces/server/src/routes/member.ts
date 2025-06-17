@@ -68,31 +68,37 @@ const route = app
 
 	.get("/public/:userDisplayId", async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
-		console.log("Request for userDisplayId:", userDisplayId);
 		const { UserRepository } = c.var;
 
 		try {
 			const member = await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
+
 			if (!member) {
-				console.log("Member not found");
-				return c.json({ error: "member not found" }, 404);
+				return c.json(
+					{
+						error: true,
+						message: "Member not found",
+					},
+					404
+				);
 			}
-			console.log("Member found:", member);
+
 			return c.json({
+				error: false,
 				id: member.id,
 				displayName: member.displayName,
 				bio: member.bio,
 				socialLinks: member.socialLinks,
-				roles: member.roles, // こちらも string[] として返す
+				roles: member.roles,
 			});
 		} catch (e) {
-			console.error(e);
-
-			if (e instanceof Error) {
-				return c.json({ error: "internal error", detail: e.message }, 500);
-			}
-
-			return c.json({ error: "internal error", detail: String(e) }, 500);
+			return c.json(
+				{
+					error: true,
+					message: e instanceof Error ? e.message : String(e),
+				},
+				500
+			);
 		}
 	});
 
