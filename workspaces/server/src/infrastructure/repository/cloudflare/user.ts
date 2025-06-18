@@ -17,10 +17,8 @@ export type PublicMember = {
 	displayName: string;
 	bio: string;
 	socialLinks: string[];
-	roles: string[]; 
+	roles: string[];
 };
-
-
 
 export class CloudflareUserRepository implements IUserRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -519,14 +517,16 @@ export class CloudflareUserRepository implements IUserRepository {
 			.where(eq(schema.users.id, userId));
 	}
 
-	async fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember | null> {
+	async fetchPublicMemberByDisplayId(
+		displayId: string,
+	): Promise<PublicMember | null> {
 		const profile = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
 				user: {
 					with: {
 						socialLinks: true,
-						roles: true, 
+						roles: true,
 					},
 				},
 			},

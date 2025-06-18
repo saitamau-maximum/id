@@ -1,6 +1,6 @@
 import type { Role } from "../constants/role";
+import type { PublicMember } from "../infrastructure/repository/cloudflare/user";
 import type { OAuthConnection } from "./oauth-internal";
-import { PublicMember } from "../infrastructure/repository/cloudflare/user";
 
 export type Certification = {
 	id: string;

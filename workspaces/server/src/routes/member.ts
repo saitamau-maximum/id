@@ -71,7 +71,8 @@ const route = app
 		const { UserRepository } = c.var;
 
 		try {
-			const member = await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
+			const member =
+				await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
 
 			if (!member) {
 				return c.json(
@@ -79,7 +80,7 @@ const route = app
 						error: true,
 						message: "Member not found",
 					},
-					404
+					404,
 				);
 			}
 
@@ -97,10 +98,9 @@ const route = app
 					error: true,
 					message: e instanceof Error ? e.message : String(e),
 				},
-				500
+				500,
 			);
 		}
 	});
-
 
 export { route as memberRoute };
