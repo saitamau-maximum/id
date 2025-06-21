@@ -26,6 +26,7 @@ import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { miscRoute } from "./routes/misc";
 import { oauthRoute } from "./routes/oauth";
+import { publicRoute } from "./routes/public";
 import { userRoute } from "./routes/user";
 
 const app = factory.createApp();
@@ -114,6 +115,7 @@ export const route = app
 	.route("/calendar", calendarRoute)
 	.route("/certification", certificationRoute)
 	.route("/invite", inviteRoute)
-	.route("/misc", miscRoute);
+	.route("/misc", miscRoute)
+	.route("/public", publicRoute);
 
 export default app;
