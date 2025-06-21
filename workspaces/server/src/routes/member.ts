@@ -64,6 +64,6 @@ const route = app
 		);
 
 		return c.json(contributions, 200);
-	})
+	});
 
 export { route as memberRoute };

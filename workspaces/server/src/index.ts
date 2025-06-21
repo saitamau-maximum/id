@@ -25,8 +25,8 @@ import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { miscRoute } from "./routes/misc";
 import { oauthRoute } from "./routes/oauth";
-import { userRoute } from "./routes/user";
 import { publicRoute } from "./routes/public";
+import { userRoute } from "./routes/user";
 
 const app = factory.createApp();
 
