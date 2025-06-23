@@ -160,6 +160,16 @@ const route = app
 					);
 			} catch {
 				// ユーザーが存在しなかった場合
+
+				// ユーザーが存在する場合・新規作成の場合にまとめて更新しちゃうので、一時的に null 埋めする
+				const temporaryConnectionPayload = {
+					refreshToken: null,
+					refreshTokenExpiresAt: null,
+					name: null,
+					email: null,
+					profileImageUrl: null,
+				};
+
 				if (typeof invitationId === "string") {
 					// 招待コードの署名検証に成功しているので、コードを検証する
 					try {
@@ -181,12 +191,7 @@ const route = app
 						userId: foundUserId,
 						providerId: OAUTH_PROVIDER_IDS.GITHUB,
 						providerUserId: githubUserIdStr,
-						// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
-						refreshToken: access_token,
-						refreshTokenExpiresAt: null,
-						name: user.login,
-						email: user.email ?? null,
-						profileImageUrl: user.avatar_url,
+						...temporaryConnectionPayload,
 					});
 				} else if (invitationId === undefined) {
 					// 招待コードが提供されなかった場合、GitHub Organization メンバーかどうかを確認する処理
@@ -200,21 +205,31 @@ const route = app
 						displayName: user.login,
 						profileImageURL: user.avatar_url,
 					});
+					// 最低限の OAuth Connection 情報を作成
 					await c.var.OAuthInternalRepository.createOAuthConnection({
 						userId: foundUserId,
 						providerId: OAUTH_PROVIDER_IDS.GITHUB,
 						providerUserId: githubUserIdStr,
-						refreshToken: access_token,
-						refreshTokenExpiresAt: null,
-						name: user.login,
-						email: user.email ?? null,
-						profileImageUrl: user.avatar_url,
+						...temporaryConnectionPayload,
 					});
 				} else {
 					// invitationId が不正な場合の処理
 					return c.text(INVITATION_ERROR_MESSAGE, 400);
 				}
 			}
+
+			// OAuth Connection 情報を更新
+			await c.var.OAuthInternalRepository.updateOAuthConnection({
+				userId: foundUserId,
+				providerId: OAUTH_PROVIDER_IDS.GITHUB,
+				providerUserId: githubUserIdStr,
+				// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
+				refreshToken: access_token,
+				refreshTokenExpiresAt: null,
+				name: user.login,
+				email: user.email ?? null,
+				profileImageUrl: user.avatar_url,
+			});
 
 			// ユーザーの存在確認後、最終ログイン日時を更新
 			await c.var.UserRepository.updateLastLoginAt(foundUserId);
