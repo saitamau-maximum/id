@@ -2,7 +2,7 @@ import {
 	OAuth2Routes,
 	type RESTPostOAuth2AccessTokenResult,
 } from "discord-api-types/v10";
-import { and, eq, gte } from "drizzle-orm";
+import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { OAUTH_PROVIDER_IDS } from "../../../constants/oauth";
 import * as schema from "../../../db/schema";
@@ -106,7 +106,10 @@ export class CloudflareOAuthInternalRepository
 			where: and(
 				eq(schema.oauthConnections.userId, userId),
 				eq(schema.oauthConnections.providerId, providerId),
-				gte(schema.oauthConnections.refreshTokenExpiresAt, now),
+				or(
+					isNull(schema.oauthConnections.refreshTokenExpiresAt),
+					gte(schema.oauthConnections.refreshTokenExpiresAt, now),
+				),
 			),
 			columns: {
 				refreshToken: true,
