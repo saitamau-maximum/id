@@ -43,9 +43,7 @@ const fetchAccessToken = async ({
 	redirectUri,
 	clientId,
 	clientSecret,
-}: FetchAccessTokenParams): Promise<
-	RESTPostOAuth2AccessTokenResult | { access_token: null }
-> => {
+}: FetchAccessTokenParams): Promise<RESTPostOAuth2AccessTokenResult | null> => {
 	const body = new URLSearchParams();
 	body.set("grant_type", "authorization_code");
 	body.set("code", code);
@@ -64,9 +62,7 @@ const fetchAccessToken = async ({
 		});
 		return await res.json<RESTPostOAuth2AccessTokenResult>();
 	} catch {
-		return {
-			access_token: null,
-		};
+		return null;
 	}
 };
 
@@ -169,16 +165,18 @@ const route = app
 				return c.text("state mismatch", 400);
 			}
 
-			const { access_token } = await fetchAccessToken({
+			const discordAccessTokenRes = await fetchAccessToken({
 				code,
 				redirectUri: `${new URL(c.req.url).origin}/auth/login/discord/callback`,
 				clientId: c.env.DISCORD_OAUTH_ID,
 				clientSecret: c.env.DISCORD_OAUTH_SECRET,
 			});
 
-			if (!access_token) {
+			if (!discordAccessTokenRes) {
 				return c.text("invalid code", 400);
 			}
+
+			const { access_token, refresh_token } = discordAccessTokenRes;
 
 			const discordUser = await fetchUser(access_token);
 
@@ -237,6 +235,8 @@ const route = app
 					userId: loggedInUserId,
 					providerId: OAUTH_PROVIDER_IDS.DISCORD,
 					providerUserId: discordUser.id,
+					refreshToken: refresh_token ?? null,
+					refreshTokenExpiresAt: null, // Discord では Refresh Token の有効期限はないっぽい？
 					name: discordUser.username,
 					// avatar は image hash が入る
 					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting

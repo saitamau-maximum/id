@@ -2,6 +2,8 @@ export type OAuthConnection = {
 	userId: string;
 	providerId: number;
 	providerUserId: string;
+	refreshToken: string | null;
+	refreshTokenExpiresAt: Date | null;
 	email: string | null;
 	name: string | null;
 	profileImageUrl: string | null;

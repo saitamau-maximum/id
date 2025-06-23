@@ -181,6 +181,9 @@ const route = app
 						userId: foundUserId,
 						providerId: OAUTH_PROVIDER_IDS.GITHUB,
 						providerUserId: githubUserIdStr,
+						// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
+						refreshToken: access_token,
+						refreshTokenExpiresAt: null,
 						name: user.login,
 						email: user.email ?? null,
 						profileImageUrl: user.avatar_url,
@@ -201,6 +204,8 @@ const route = app
 						userId: foundUserId,
 						providerId: OAUTH_PROVIDER_IDS.GITHUB,
 						providerUserId: githubUserIdStr,
+						refreshToken: access_token,
+						refreshTokenExpiresAt: null,
 						name: user.login,
 						email: user.email ?? null,
 						profileImageUrl: user.avatar_url,
