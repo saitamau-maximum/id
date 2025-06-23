@@ -1,8 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
+	type APIUser,
 	OAuth2Routes,
 	OAuth2Scopes,
-	type RESTGetAPICurrentUserResult,
 	type RESTPostOAuth2AccessTokenResult,
 } from "discord-api-types/v10";
 import {
@@ -63,23 +63,6 @@ const fetchAccessToken = async ({
 		return await res.json<RESTPostOAuth2AccessTokenResult>();
 	} catch {
 		return null;
-	}
-};
-
-// ここでしか使わないので特にリポジトリ抽象化しない
-const fetchUser = async (accessToken: string) => {
-	const endpoint = "https://discord.com/api/v10/users/@me";
-	try {
-		const res = await fetch(endpoint, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		return await res.json<RESTGetAPICurrentUserResult>();
-	} catch {
-		return {
-			id: null,
-		};
 	}
 };
 
@@ -178,9 +161,11 @@ const route = app
 
 			const { access_token, refresh_token } = discordAccessTokenRes;
 
-			const discordUser = await fetchUser(access_token);
-
-			if (!discordUser.id) {
+			let discordUser: APIUser;
+			try {
+				discordUser =
+					await c.var.DiscordBotRepository.fetchUserByAccessToken(access_token);
+			} catch {
 				return c.text("invalid user", 400);
 			}
 

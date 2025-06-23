@@ -1,4 +1,5 @@
 import {
+	type RESTGetAPICurrentUserResult,
 	type RESTGetAPIGuildMemberResult,
 	RouteBases,
 	Routes,
@@ -32,5 +33,15 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 			throw new Error(`Failed to fetch guild member: ${res.statusText}`);
 		}
 		return await res.json<RESTGetAPIGuildMemberResult>();
+	}
+
+	async fetchUserByAccessToken(accessToken: string) {
+		const endpoint = RouteBases.api + Routes.user("@me");
+		const res = await fetch(endpoint, {
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		});
+		return await res.json<RESTGetAPICurrentUserResult>();
 	}
 }

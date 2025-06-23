@@ -1,5 +1,11 @@
-import type { RESTGetAPIGuildMemberResult } from "discord-api-types/v10";
+import type {
+	RESTGetAPICurrentUserResult,
+	RESTGetAPIGuildMemberResult,
+} from "discord-api-types/v10";
 
 export interface IDiscordBotRepository {
 	getGuildMember(memberId: string): Promise<RESTGetAPIGuildMemberResult>;
+	fetchUserByAccessToken(
+		accessToken: string,
+	): Promise<RESTGetAPICurrentUserResult>;
 }
