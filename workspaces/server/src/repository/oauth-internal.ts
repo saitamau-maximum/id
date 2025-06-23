@@ -21,4 +21,8 @@ export type IOAuthInternalRepository = {
 	createOAuthConnection: (data: OAuthConnection) => Promise<void>;
 	updateOAuthConnection: (data: OAuthConnection) => Promise<void>;
 	deleteOAuthConnection: (userId: string, providerId: number) => Promise<void>;
+	fetchAccessTokenByUserId: (
+		userId: string,
+		providerId: number,
+	) => Promise<string | null>;
 };

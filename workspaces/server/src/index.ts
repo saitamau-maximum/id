@@ -82,7 +82,7 @@ export const route = app
 		// 内外の OAuth 関連
 		c.set(
 			"OAuthInternalRepository",
-			new CloudflareOAuthInternalRepository(c.env.DB),
+			new CloudflareOAuthInternalRepository(c.env.DB, c.env),
 		);
 		c.set(
 			"OAuthExternalRepository",
