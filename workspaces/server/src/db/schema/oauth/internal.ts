@@ -11,6 +11,10 @@ export const oauthConnections = sqliteTable(
 		providerId: int("provider_id", { mode: "number" }).notNull(),
 		providerUserId: text("provider_user_id").notNull(), // OAuth Provider 側の User ID
 		// 以下取れそうな情報を書く
+		refreshToken: text("refresh_token"),
+		refreshTokenExpiresAt: int("refresh_token_expires_at", {
+			mode: "timestamp",
+		}),
 		email: text("email"),
 		name: text("name"),
 		profileImageUrl: text("profile_image_url"),
