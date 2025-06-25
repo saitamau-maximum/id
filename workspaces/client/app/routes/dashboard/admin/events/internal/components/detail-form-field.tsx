@@ -72,7 +72,6 @@ export const DescriptionFormField = ({
 			) : (
 				<Form.Field.TextArea
 					label="説明"
-					required
 					rows={rows}
 					error={error}
 					{...register}

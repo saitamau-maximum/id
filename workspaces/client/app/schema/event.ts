@@ -12,7 +12,6 @@ export const EventSchemas = {
 	),
 	Description: v.pipe(
 		v.string(),
-		v.nonEmpty("説明を入力してください"),
 		v.maxLength(
 			EVENT_DESCRIPTION_MAX_LENGTH,
 			"説明は255文字以下で入力してください",

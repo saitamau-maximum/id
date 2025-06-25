@@ -12,7 +12,7 @@ const app = factory.createApp();
 
 const createEventSchema = v.object({
 	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.pipe(v.string(), v.nonEmpty()),
+	description: v.pipe(v.string()),
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	locationId: v.optional(v.string()),
@@ -21,7 +21,7 @@ const createEventSchema = v.object({
 
 const updateEventSchema = v.object({
 	userId: v.pipe(v.string(), v.nonEmpty()),
-	title: v.pipe(v.string(), v.nonEmpty()),
+	title: v.pipe(v.string()),
 	description: v.pipe(v.string(), v.nonEmpty()),
 	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
 	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
