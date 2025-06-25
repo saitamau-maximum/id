@@ -65,7 +65,7 @@ const route = app
 					event.endAt.getMinutes(),
 				],
 				title: event.title,
-				description: event.description,
+				description: event.description ?? undefined,
 				location: event.location?.name,
 				url: `${c.env.CLIENT_ORIGIN}/calendar`,
 				uid: event.id,

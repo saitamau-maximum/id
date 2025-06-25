@@ -2,7 +2,7 @@ export interface ICalendarEvent {
 	id: string;
 	userId: string;
 	title: string;
-	description: string;
+	description: string | null;
 	startAt: Date;
 	endAt: Date;
 	locationId?: string;
