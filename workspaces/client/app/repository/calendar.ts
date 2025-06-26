@@ -33,6 +33,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		const res = await client.calendar.events.$post({
 			json: {
 				...event,
+				description: event.description ?? "",
 				startAt: event.startAt.toISOString(),
 				endAt: event.endAt.toISOString(),
 			},
@@ -49,6 +50,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 			},
 			json: {
 				...event,
+				description: event.description ?? "",
 				startAt: event.startAt.toISOString(),
 				endAt: event.endAt.toISOString(),
 			},
