@@ -65,7 +65,10 @@ export type WithCertifications<T> = T & {
 };
 
 export type WithOAuthConnections<T> = T & {
-	oauthConnections: Omit<OAuthConnection, "userId" | "email">[];
+	oauthConnections: Omit<
+		OAuthConnection,
+		"userId" | "email" | "refreshToken" | "refreshTokenExpiresAt"
+	>[];
 };
 
 export interface IUserRepository {

@@ -1,8 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
+	type APIUser,
 	OAuth2Routes,
 	OAuth2Scopes,
-	type RESTGetAPICurrentUserResult,
 	type RESTPostOAuth2AccessTokenResult,
 } from "discord-api-types/v10";
 import {
@@ -43,9 +43,7 @@ const fetchAccessToken = async ({
 	redirectUri,
 	clientId,
 	clientSecret,
-}: FetchAccessTokenParams): Promise<
-	RESTPostOAuth2AccessTokenResult | { access_token: null }
-> => {
+}: FetchAccessTokenParams): Promise<RESTPostOAuth2AccessTokenResult | null> => {
 	const body = new URLSearchParams();
 	body.set("grant_type", "authorization_code");
 	body.set("code", code);
@@ -64,26 +62,7 @@ const fetchAccessToken = async ({
 		});
 		return await res.json<RESTPostOAuth2AccessTokenResult>();
 	} catch {
-		return {
-			access_token: null,
-		};
-	}
-};
-
-// ここでしか使わないので特にリポジトリ抽象化しない
-const fetchUser = async (accessToken: string) => {
-	const endpoint = "https://discord.com/api/v10/users/@me";
-	try {
-		const res = await fetch(endpoint, {
-			headers: {
-				Authorization: `Bearer ${accessToken}`,
-			},
-		});
-		return await res.json<RESTGetAPICurrentUserResult>();
-	} catch {
-		return {
-			id: null,
-		};
+		return null;
 	}
 };
 
@@ -169,20 +148,24 @@ const route = app
 				return c.text("state mismatch", 400);
 			}
 
-			const { access_token } = await fetchAccessToken({
+			const discordAccessTokenRes = await fetchAccessToken({
 				code,
 				redirectUri: `${new URL(c.req.url).origin}/auth/login/discord/callback`,
 				clientId: c.env.DISCORD_OAUTH_ID,
 				clientSecret: c.env.DISCORD_OAUTH_SECRET,
 			});
 
-			if (!access_token) {
+			if (!discordAccessTokenRes) {
 				return c.text("invalid code", 400);
 			}
 
-			const discordUser = await fetchUser(access_token);
+			const { access_token, refresh_token } = discordAccessTokenRes;
 
-			if (!discordUser.id) {
+			let discordUser: APIUser;
+			try {
+				discordUser =
+					await c.var.DiscordBotRepository.fetchUserByAccessToken(access_token);
+			} catch {
 				return c.text("invalid user", 400);
 			}
 
@@ -237,6 +220,8 @@ const route = app
 					userId: loggedInUserId,
 					providerId: OAUTH_PROVIDER_IDS.DISCORD,
 					providerUserId: discordUser.id,
+					refreshToken: refresh_token ?? null,
+					refreshTokenExpiresAt: null, // Discord では Refresh Token の有効期限はないっぽい？
 					name: discordUser.username,
 					// avatar は image hash が入る
 					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting
