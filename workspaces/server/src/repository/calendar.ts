@@ -27,7 +27,9 @@ export interface ICalendarRepository {
 	deleteEvent: (eventId: ICalendarEvent["id"]) => Promise<void>;
 }
 
-export type ICalendarEventNotify = Omit<ICalendarEventWithLocation, "id">;
+export type ICalendarEventNotify = Omit<ICalendarEventWithLocation, "id"> & {
+	description: string;
+};
 
 export interface ICalendarNotifier {
 	notifyAddEvent: (event: ICalendarEventNotify) => Promise<void>;

@@ -63,7 +63,7 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 	private embedBuilder(embedInfo: ICalendarEventNotify & { color: number }) {
 		return {
 			title: embedInfo.title,
-			description: embedInfo.description ?? "",
+			description: embedInfo.description,
 			color: embedInfo.color,
 			fields: [
 				{

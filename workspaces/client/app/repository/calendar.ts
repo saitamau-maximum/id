@@ -20,7 +20,6 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		}
 		return (await res.json()).map((event) => ({
 			...event,
-			description: event.description ?? null,
 			startAt: new Date(event.startAt),
 			endAt: new Date(event.endAt),
 		}));
