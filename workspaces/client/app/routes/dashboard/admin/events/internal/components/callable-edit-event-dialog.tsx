@@ -51,6 +51,7 @@ export const EditEventDialog = createCallable<Props, Payload>(
 			resolver: valibotResolver(UpdateFormSchema),
 			defaultValues: {
 				title: event.title,
+				description: event.description,
 				startAt: toHTMLDateTimePickerFormat(event.startAt),
 				endAt: toHTMLDateTimePickerFormat(event.endAt),
 				locationId: event.locationId ?? null,
