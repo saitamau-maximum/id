@@ -137,7 +137,7 @@ export const calendarEvents = sqliteTable(
 			.references(() => users.id)
 			.notNull(),
 		title: text("title").notNull(),
-		description: text("description").notNull(),
+		description: text("description"),
 		startAt: text("start_at").notNull(),
 		endAt: text("end_at").notNull(),
 		locationId: text("location_id").references(() => locations.id, {

@@ -39,7 +39,7 @@ const EventRow = ({ event }: { event: CalendarEvent }) => {
 		});
 	}, []);
 
-	const { reactContent } = useMarkdown(event.description);
+	const { reactContent } = useMarkdown(event.description ?? "");
 
 	return (
 		<div

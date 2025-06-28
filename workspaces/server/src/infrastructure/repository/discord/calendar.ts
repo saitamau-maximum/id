@@ -82,7 +82,7 @@ export class DiscordCalendarNotifier implements ICalendarNotifier {
 		content: string;
 		embeds: {
 			title: string;
-			description: string;
+			description?: string;
 			color: number;
 			fields: { name: string; value: string }[];
 		}[];

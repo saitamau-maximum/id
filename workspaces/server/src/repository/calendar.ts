@@ -2,7 +2,7 @@ export interface ICalendarEvent {
 	id: string;
 	userId: string;
 	title: string;
-	description: string;
+	description?: string;
 	startAt: Date;
 	endAt: Date;
 	locationId?: string;
@@ -14,7 +14,7 @@ export type ICalendarEventWithLocation = ICalendarEvent & {
 	location?: {
 		id: string;
 		name: string;
-		description: string;
+		description?: string;
 	};
 };
 

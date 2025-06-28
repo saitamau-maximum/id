@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e83847f2-d8ab-4e44-95cb-b253f7192b67",
+  "id": "e6508909-9d97-4b16-9124-32c6f7cad267",
   "prevId": "5fca2309-b6ac-4539-9bbe-3fb855ba5c70",
   "tables": {
     "calendar_events": {
@@ -32,7 +32,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "start_at": {
