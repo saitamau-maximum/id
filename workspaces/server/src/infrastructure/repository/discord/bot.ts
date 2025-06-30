@@ -26,13 +26,15 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 	}
 
 	async getGuildMember(discordUserId: string) {
-		const res = await this.fetchApi(
-			Routes.guildMember(this.guildId, discordUserId),
-		);
-		if (!res.ok) {
-			throw new Error(`Failed to fetch guild member: ${res.statusText}`);
+		try {
+			const res = await this.fetchApi(
+				Routes.guildMember(this.guildId, discordUserId),
+			);
+			return await res.json<RESTGetAPIGuildMemberResult>();
+		} catch {
+			// ユーザーがサーバーに参加していない
+			return null;
 		}
-		return await res.json<RESTGetAPIGuildMemberResult>();
 	}
 
 	async fetchUserByAccessToken(accessToken: string) {
