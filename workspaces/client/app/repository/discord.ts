@@ -6,6 +6,7 @@ export interface IDiscordRepository {
 		userDisplayId: string,
 	) => Promise<DiscordInfo>;
 	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
+	inviteDiscord: () => Promise<"failed" | "already_joined" | "added">;
 }
 
 export class DiscordRepositoryImpl implements IDiscordRepository {
@@ -29,5 +30,15 @@ export class DiscordRepositoryImpl implements IDiscordRepository {
 				userDisplayId,
 			},
 		];
+	}
+
+	async inviteDiscord() {
+		const res = await client.discord.invite.$post();
+
+		if (!res.ok) {
+			throw new Error("Failed to invite to Discord");
+		}
+
+		return res.text();
 	}
 }
