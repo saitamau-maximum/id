@@ -57,7 +57,7 @@ const route = app
 			);
 
 		if (!discordAccessToken) {
-			return c.text<DiscordAddGuildMemberResult>("failed", 400);
+			return c.text<DiscordAddGuildMemberResult>("failed");
 		}
 
 		const res = await DiscordBotRepository.addGuildMember(discordAccessToken);

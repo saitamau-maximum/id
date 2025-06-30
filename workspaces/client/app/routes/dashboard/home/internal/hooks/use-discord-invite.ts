@@ -1,10 +1,13 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "~/hooks/use-auth";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
 export function useDiscordInvite() {
 	const { discordRepository } = useRepository();
 	const { pushToast } = useToast();
+	const queryClient = useQueryClient();
+	const { user } = useAuth();
 
 	return useMutation({
 		mutationFn: () => discordRepository.inviteDiscord(),
@@ -17,6 +20,12 @@ export function useDiscordInvite() {
 			});
 		},
 		onSuccess: (result) => {
+			queryClient.invalidateQueries({
+				queryKey: discordRepository.getDiscordInfoByUserDisplayID$$key(
+					user?.displayId || "",
+				),
+			});
+
 			if (result === "failed") {
 				pushToast({
 					type: "error",
