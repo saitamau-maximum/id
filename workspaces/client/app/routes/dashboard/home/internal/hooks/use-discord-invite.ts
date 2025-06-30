@@ -1,0 +1,43 @@
+import { useMutation } from "@tanstack/react-query";
+import { useRepository } from "~/hooks/use-repository";
+import { useToast } from "~/hooks/use-toast";
+
+export function useDiscordInvite() {
+	const { discordRepository } = useRepository();
+	const { pushToast } = useToast();
+
+	return useMutation({
+		mutationFn: () => discordRepository.inviteDiscord(),
+		onError: (error) => {
+			pushToast({
+				type: "error",
+				title: "Discord の招待に失敗しました",
+				description:
+					error instanceof Error ? error.message : "不明なエラーが発生しました",
+			});
+		},
+		onSuccess: (result) => {
+			if (result === "failed") {
+				pushToast({
+					type: "error",
+					title: "Discord の招待に失敗しました",
+					description: "Discord アカウントが連携されていない可能性があります。",
+				});
+			}
+			if (result === "already_joined") {
+				pushToast({
+					type: "success",
+					title: "すでに参加しています",
+					description: "すでに Discord サーバーに参加しています。",
+				});
+			}
+			if (result === "added") {
+				pushToast({
+					type: "success",
+					title: "Discord サーバーに参加しました",
+					description: "Maximum の Discord サーバーに参加しました！",
+				});
+			}
+		},
+	});
+}

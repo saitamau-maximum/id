@@ -2,9 +2,8 @@ import { ArrowUpRight } from "react-feather";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { MessageBox } from "~/components/ui/message-box";
-import { useToast } from "~/hooks/use-toast";
 import type { DiscordInfo } from "~/types/discord-info";
-import { useDiscordInvitationURL } from "../hooks/use-discord-invitation-url";
+import { useDiscordInvite } from "../hooks/use-discord-invite";
 
 interface DiscordInvitationMessageBoxProps {
 	discordInfo?: DiscordInfo;
@@ -13,8 +12,7 @@ interface DiscordInvitationMessageBoxProps {
 export const DiscordInvitationMessageBox = ({
 	discordInfo,
 }: DiscordInvitationMessageBoxProps) => {
-	const { data: discordInvitationUrl } = useDiscordInvitationURL();
-	const { pushToast } = useToast();
+	const { mutate: inviteDiscord } = useDiscordInvite();
 	const navigate = useNavigate();
 
 	if (discordInfo?.status === "joined") {
@@ -57,7 +55,7 @@ export const DiscordInvitationMessageBox = ({
 			variant="info"
 			right={<ArrowUpRight size={24} />}
 			onClick={() => {
-				// TODO
+				inviteDiscord();
 			}}
 		>
 			<img
