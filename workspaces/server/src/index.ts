@@ -22,6 +22,7 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { discordRoute } from "./routes/discord";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { miscRoute } from "./routes/misc";
@@ -116,6 +117,7 @@ export const route = app
 	.route("/certification", certificationRoute)
 	.route("/invite", inviteRoute)
 	.route("/misc", miscRoute)
-	.route("/public", publicRoute);
+	.route("/public", publicRoute)
+	.route("/discord", discordRoute);
 
 export default app;

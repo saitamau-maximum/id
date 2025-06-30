@@ -2,13 +2,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 
 export function useDiscordInfo(userDisplayID: string | undefined) {
-	const { memberRepository } = useRepository();
+	const { discordRepository } = useRepository();
 	return useQuery({
-		queryKey: memberRepository.getDiscordInfoByUserDisplayID$$key(
+		queryKey: discordRepository.getDiscordInfoByUserDisplayID$$key(
 			userDisplayID || "",
 		),
 		queryFn: () =>
-			memberRepository.getDiscordInfoByUserDisplayID(userDisplayID || ""),
+			discordRepository.getDiscordInfoByUserDisplayID(userDisplayID || ""),
 		enabled: !!userDisplayID,
 	});
 }
