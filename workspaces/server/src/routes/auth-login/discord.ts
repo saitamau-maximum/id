@@ -124,7 +124,10 @@ const route = app
 			"redirect_uri",
 			`${requestUrl.origin}/auth/login/discord/callback`,
 		);
-		oauthParams.set("scope", [OAuth2Scopes.Identify].join(" "));
+		oauthParams.set(
+			"scope",
+			[OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin].join(" "),
+		);
 		oauthParams.set("state", state);
 		oauthParams.set("response_type", "code");
 		// 個人認証のため USER_INSTALL にする (SERVER_INSTALL はしない)
