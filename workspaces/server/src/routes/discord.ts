@@ -34,7 +34,7 @@ const route = app
 		const member = await DiscordBotRepository.getGuildMember(
 			discordConn.providerUserId,
 		);
-		if (!member) {
+		if (!member || !member.user) {
 			return c.json<DiscordInfoResNotJoined>({ status: "not_joined" });
 		}
 		// 載せたくない情報も含まれているので制限する
