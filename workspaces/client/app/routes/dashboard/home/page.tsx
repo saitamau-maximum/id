@@ -21,13 +21,10 @@ export default function Home() {
 		return null;
 	}
 
-	// 仮実装として、いったん全員に Discord 招待メッセージを表示するようにする
-	const userJoinedDiscord = false;
-
 	return (
 		<>
 			{!hasFiscalYearUpdated && <ProfileUpdateMessageBox />}
-			{!userJoinedDiscord && <DiscordInvitationMessageBox />}
+			<DiscordInvitationMessageBox discordInfo={discordInfo} />
 			{!isFiscalYearPaid && <PaymentMessageBox />}
 			<div
 				className={css({

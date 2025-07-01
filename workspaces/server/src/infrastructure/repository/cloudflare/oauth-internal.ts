@@ -139,6 +139,21 @@ export class CloudflareOAuthInternalRepository
 						Accept: "application/json",
 					},
 				}).then((res) => res.json<RESTPostOAuth2AccessTokenResult>());
+
+				// 新しい refresh_token で更新する
+				await this.client
+					.update(schema.oauthConnections)
+					.set({
+						refreshToken: response.refresh_token,
+						refreshTokenExpiresAt: null,
+					})
+					.where(
+						and(
+							eq(schema.oauthConnections.userId, userId),
+							eq(schema.oauthConnections.providerId, providerId),
+						),
+					);
+
 				// すぐ使う想定なので expires_in は無視
 				return response.access_token;
 			} catch {

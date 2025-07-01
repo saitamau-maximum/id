@@ -96,7 +96,7 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 <details>
 <summary>その他</summary>
 
-- `DISCORD_INVITATION_URL`: Discord の招待 URL
+(なし)
 
 </details>
 

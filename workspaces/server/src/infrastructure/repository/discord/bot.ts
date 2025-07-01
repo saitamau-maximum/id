@@ -1,6 +1,7 @@
 import {
 	type RESTGetAPICurrentUserResult,
 	type RESTGetAPIGuildMemberResult,
+	type RESTPutAPIGuildMemberJSONBody,
 	RouteBases,
 	Routes,
 } from "discord-api-types/v10";
@@ -29,10 +30,38 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		const res = await this.fetchApi(
 			Routes.guildMember(this.guildId, discordUserId),
 		);
+
 		if (!res.ok) {
-			throw new Error(`Failed to fetch guild member: ${res.statusText}`);
+			// ユーザーがサーバーに参加していない
+			return null;
 		}
+
 		return await res.json<RESTGetAPIGuildMemberResult>();
+	}
+
+	async addGuildMember(accessToken: string) {
+		const user = await this.fetchUserByAccessToken(accessToken);
+
+		const payload: RESTPutAPIGuildMemberJSONBody = {
+			access_token: accessToken,
+		};
+
+		try {
+			const res = await this.fetchApi(
+				Routes.guildMember(this.guildId, user.id),
+				{
+					method: "PUT",
+					body: JSON.stringify(payload),
+				},
+			);
+
+			if (res.status === 201) return "added";
+			if (res.status === 204) return "already_joined";
+
+			throw new Error(`Unexpected status code: ${res.status}`);
+		} catch {
+			return "failed";
+		}
 	}
 
 	async fetchUserByAccessToken(accessToken: string) {
