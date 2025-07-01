@@ -30,14 +30,14 @@ export function useDiscordInvite() {
 				pushToast({
 					type: "error",
 					title: "Discord の招待に失敗しました",
-					description: "Discord アカウントが連携されていない可能性があります。",
+					description: "Discord アカウントが連携されていない可能性があります",
 				});
 			}
 			if (result === "already_joined") {
 				pushToast({
 					type: "success",
 					title: "すでに参加しています",
-					description: "すでに Discord サーバーに参加しています。",
+					description: "すでに Discord サーバーに参加しています",
 				});
 			}
 			if (result === "added") {
