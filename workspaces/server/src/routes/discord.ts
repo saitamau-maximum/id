@@ -34,6 +34,8 @@ const route = app
 		const member = await DiscordBotRepository.getGuildMember(
 			discordConn.providerUserId,
 		);
+		// Discord Docs には member.user は存在すると書かれているが
+		// なぜか存在しないことがあるので念のためチェックする
 		if (!member || !member.user) {
 			return c.json<DiscordInfoResNotJoined>({ status: "not_joined" });
 		}
