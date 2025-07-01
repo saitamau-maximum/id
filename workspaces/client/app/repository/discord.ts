@@ -11,7 +11,7 @@ export interface IDiscordRepository {
 			ReturnType<
 				Awaited<ReturnType<typeof client.discord.invite.$post>>["json"]
 			>
-		>
+		>["status"]
 	>;
 }
 
@@ -45,6 +45,6 @@ export class DiscordRepositoryImpl implements IDiscordRepository {
 			throw new Error("Failed to invite to Discord");
 		}
 
-		return res.json();
+		return (await res.json()).status;
 	}
 }

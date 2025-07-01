@@ -19,7 +19,7 @@ export function useDiscordInvite() {
 					error instanceof Error ? error.message : "不明なエラーが発生しました",
 			});
 		},
-		onSuccess: ({ status }) => {
+		onSuccess: (result) => {
 			// DiscordInvitation が表示されている時点で user は存在するはず
 			if (!user || !user.displayId) return;
 
@@ -29,21 +29,21 @@ export function useDiscordInvite() {
 				),
 			});
 
-			if (status === "failed") {
+			if (result === "failed") {
 				pushToast({
 					type: "error",
 					title: "Discord の招待に失敗しました",
 					description: "Discord アカウントが連携されていない可能性があります",
 				});
 			}
-			if (status === "already_joined") {
+			if (result === "already_joined") {
 				pushToast({
 					type: "success",
 					title: "すでに参加しています",
 					description: "すでに Discord サーバーに参加しています",
 				});
 			}
-			if (status === "added") {
+			if (result === "added") {
 				pushToast({
 					type: "success",
 					title: "Discord サーバーに参加しました",
