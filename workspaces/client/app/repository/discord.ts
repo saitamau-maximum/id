@@ -1,17 +1,16 @@
 import type { DiscordInfo } from "~/types/discord-info";
 import { client } from "~/utils/hono";
 
-// ふつうの ReturnType だと res.text() の型がうまく推論されないので
-type TextReturnType<T> = T extends () => Promise<infer R> ? R : never;
-
 export interface IDiscordRepository {
 	getDiscordInfoByUserDisplayID: (
 		userDisplayId: string,
 	) => Promise<DiscordInfo>;
 	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
 	inviteDiscord: () => Promise<
-		TextReturnType<
-			Awaited<ReturnType<typeof client.discord.invite.$post>>["text"]
+		Awaited<
+			ReturnType<
+				Awaited<ReturnType<typeof client.discord.invite.$post>>["json"]
+			>
 		>
 	>;
 }
@@ -46,6 +45,6 @@ export class DiscordRepositoryImpl implements IDiscordRepository {
 			throw new Error("Failed to invite to Discord");
 		}
 
-		return res.text();
+		return res.json();
 	}
 }

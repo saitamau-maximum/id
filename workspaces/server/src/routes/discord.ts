@@ -59,12 +59,14 @@ const route = app
 			);
 
 		if (!discordAccessToken) {
-			return c.text<DiscordAddGuildMemberResult>("failed");
+			return c.json<{ status: DiscordAddGuildMemberResult }>({
+				status: "failed",
+			});
 		}
 
 		const res = await DiscordBotRepository.addGuildMember(discordAccessToken);
 
-		return c.text(res);
+		return c.json<{ status: DiscordAddGuildMemberResult }>({ status: res });
 	});
 
 export { route as discordRoute };
