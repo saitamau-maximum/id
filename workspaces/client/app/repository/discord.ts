@@ -1,18 +1,14 @@
 import type { DiscordInfo } from "~/types/discord-info";
 import { client } from "~/utils/hono";
 
+type DiscordAddGuildMemberResult = "failed" | "already_joined" | "added";
+
 export interface IDiscordRepository {
 	getDiscordInfoByUserDisplayID: (
 		userDisplayId: string,
 	) => Promise<DiscordInfo>;
 	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
-	inviteDiscord: () => Promise<
-		Awaited<
-			ReturnType<
-				Awaited<ReturnType<typeof client.discord.invite.$post>>["json"]
-			>
-		>["status"]
-	>;
+	inviteDiscord: () => Promise<DiscordAddGuildMemberResult>;
 }
 
 export class DiscordRepositoryImpl implements IDiscordRepository {
@@ -45,6 +41,6 @@ export class DiscordRepositoryImpl implements IDiscordRepository {
 			throw new Error("Failed to invite to Discord");
 		}
 
-		return (await res.json()).status;
+		return res.text();
 	}
 }
