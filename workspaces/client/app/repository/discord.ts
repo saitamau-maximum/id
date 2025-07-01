@@ -1,12 +1,19 @@
 import type { DiscordInfo } from "~/types/discord-info";
 import { client } from "~/utils/hono";
 
+// ふつうの ReturnType だと res.text() の型がうまく推論されないので
+type TextReturnType<T> = T extends () => Promise<infer R> ? R : never;
+
 export interface IDiscordRepository {
 	getDiscordInfoByUserDisplayID: (
 		userDisplayId: string,
 	) => Promise<DiscordInfo>;
 	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
-	inviteDiscord: () => Promise<"failed" | "already_joined" | "added">;
+	inviteDiscord: () => Promise<
+		TextReturnType<
+			Awaited<ReturnType<typeof client.discord.invite.$post>>["text"]
+		>
+	>;
 }
 
 export class DiscordRepositoryImpl implements IDiscordRepository {
