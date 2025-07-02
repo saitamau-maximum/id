@@ -34,7 +34,7 @@ const route = app
 		redirectTo.searchParams.set("scope", [OAuth2Scopes.Bot].join(" "));
 		redirectTo.searchParams.set(
 			"permissions",
-			botPermissions.reduce((a, b) => a + b, 0n).toString(),
+			botPermissions.reduce((a, b) => a | b, 0n).toString(),
 		);
 
 		// guild_id を指定して disable_guild_select を true にすることで、
