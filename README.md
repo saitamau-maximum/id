@@ -63,23 +63,14 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 - `DISCORD_CALENDAR_CHANNEL_ID`: Calendar の通知を送信する Discord チャンネルの ID
 
 Discord Developer Portal (<https://discord.com/developers/applications>) から新しくアプリケーションを作成してください。
+Bot タブの Public bot を有効にしてから、 Installation タブの Installation Contexts で User Install と Guild Install の両方を有効にしてください。
 その後設定画面の OAuth2 タブから Client ID と Client Secret を取得してください。
 Redirect URL として、 `http://localhost:8787/auth/login/discord/callback` を設定してください。
 
 Bot を作成する場合、自身の管理するサーバーに Bot を追加してください。
 また、 Bot タブから TOKEN を生成してください。
-Bot の追加については、 OAuth2 タブの Scopes に `bot` にチェックを入れ、 Bot Permissions には少なくとも以下の権限を設定してください。
-
-- Manage Roles (メンバーのロール設定に必要)
-- Create Instant Invite (招待の作成に必要)
-- Send Messages (通知等の送信に必要)
-
-その後、 Integration Type が Guild Install であることを確認し、 Generated URL を開いて追加してください。
-自身の管理するサーバーに Bot を追加してください (再)。
-
-サーバーに Bot を追加出来たら、Installation タブにおいて、 User Install のみにチェックを入れ、 Guild Install のチェックは外しておくとよいでしょう。
-また、 Bot タブから Private Bot としておくとよいと思います。
-なお、権限更新時に Bot の再インストールが必要になる (と思う) ので、再インストール時は Guild Install を再有効化する必要があることに注意してください。
+Bot の追加については、 `DISCORD_OAUTH_ID`, `DISCORD_GUILD_ID` を指定したら、 `pnpm dev` を実行し、ブラウザで `http://localhost:8787/discord/add-bot` にアクセスすることで bot を追加できます。
+念のため、自分が管理しているサーバーが選択されていることを確認してください。
 
 Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL に表示されます。
 `https://discord.com/channels/<Guild ID>/<Channel ID>` です。
