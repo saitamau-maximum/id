@@ -1,9 +1,13 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	type APIUser,
+	CDNRoutes,
+	type DefaultUserAvatarAssets,
+	ImageFormat,
 	OAuth2Routes,
 	OAuth2Scopes,
 	type RESTPostOAuth2AccessTokenResult,
+	RouteBases,
 } from "discord-api-types/v10";
 import {
 	deleteCookie,
@@ -229,8 +233,20 @@ const route = app
 					// avatar は image hash が入る
 					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting
 					profileImageUrl: discordUser.avatar
-						? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`
-						: null,
+						? RouteBases.cdn +
+							CDNRoutes.userAvatar(
+								discordUser.id,
+								discordUser.avatar,
+								ImageFormat.WebP,
+							)
+						: RouteBases.cdn +
+							CDNRoutes.defaultUserAvatar(
+								// new username system なら (id >> 22) % 6 で、 legacy username system なら discriminator % 5 らしい
+								// が、めんどくさいので一律で (id >> 22) % 6 とする
+								// legacy の場合に負になるかもなので、それも考慮して ((id >> 22) % 6 + 6) % 6 とする
+								((((Number.parseInt(discordUser.id, 10) >> 22) % 6) + 6) %
+									6) as DefaultUserAvatarAssets,
+							),
 					// 取得したい場合には email scope をつける
 					email: discordUser.email ?? null,
 				};
