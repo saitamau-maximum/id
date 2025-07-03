@@ -228,7 +228,9 @@ const route = app
 					name: discordUser.username,
 					// avatar は image hash が入る
 					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting
-					profileImageUrl: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`,
+					profileImageUrl: discordUser.avatar
+						? `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`
+						: null,
 					// 取得したい場合には email scope をつける
 					email: discordUser.email ?? null,
 				};
