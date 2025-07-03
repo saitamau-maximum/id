@@ -69,9 +69,8 @@ const route = app
 		// 載せたくない情報も含まれているので制限する
 		return c.json<DiscordInfoResJoined>({
 			status: "joined",
-			// global_name: Discord サーバー内での表示名 (may be undefined)
-			// username: Discord 全体 (defined)
-			displayName: member.user.global_name || member.user.username,
+			displayName:
+				member.nick || member.user.global_name || member.user.username,
 		});
 	})
 	.post("/invite", memberOnlyMiddleware, async (c) => {

@@ -1,9 +1,13 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	type APIUser,
+	CDNRoutes,
+	type DefaultUserAvatarAssets,
+	ImageFormat,
 	OAuth2Routes,
 	OAuth2Scopes,
 	type RESTPostOAuth2AccessTokenResult,
+	RouteBases,
 } from "discord-api-types/v10";
 import {
 	deleteCookie,
@@ -228,7 +232,24 @@ const route = app
 					name: discordUser.username,
 					// avatar は image hash が入る
 					// ref: https://discord.com/developers/docs/resources/user#usernames-and-nicknames, https://discord.com/developers/docs/reference#image-formatting
-					profileImageUrl: `https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.webp`,
+					profileImageUrl: discordUser.avatar
+						? RouteBases.cdn +
+							CDNRoutes.userAvatar(
+								discordUser.id,
+								discordUser.avatar,
+								ImageFormat.WebP,
+							)
+						: RouteBases.cdn +
+							CDNRoutes.defaultUserAvatar(
+								// new username system なら (id >> 22) % 6 で、 legacy username system なら discriminator % 5 らしい
+								// discriminator が "0" の場合は new username system とのこと
+								// ref: https://discord.com/developers/docs/change-log#identifying-migrated-users
+								discordUser.discriminator === "0"
+									? (((((Number.parseInt(discordUser.id, 10) >> 22) % 6) + 6) %
+											6) as DefaultUserAvatarAssets)
+									: ((Number.parseInt(discordUser.discriminator, 10) %
+											5) as DefaultUserAvatarAssets),
+							),
 					// 取得したい場合には email scope をつける
 					email: discordUser.email ?? null,
 				};

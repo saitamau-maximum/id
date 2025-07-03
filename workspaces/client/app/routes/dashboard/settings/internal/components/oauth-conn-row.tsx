@@ -70,15 +70,27 @@ export const OAuthConnRow = ({
 		}
 	}, [conn, providerId, mutate]);
 
+	const profileImageUrl = conn?.profileImageUrl
+		? new URL(conn.profileImageUrl)
+		: null;
+
+	if (profileImageUrl) {
+		if (providerId === OAUTH_PROVIDER_IDS.GITHUB)
+			profileImageUrl.searchParams.set("s", "16");
+
+		if (providerId === OAUTH_PROVIDER_IDS.DISCORD)
+			profileImageUrl.searchParams.set("size", "16");
+	}
+
 	return (
 		<Table.Tr>
 			<ServiceTd providerId={providerId} />
 			<Table.Td>
 				{conn && (
 					<>
-						{conn.profileImageUrl && (
+						{profileImageUrl && (
 							<img
-								src={conn.profileImageUrl}
+								src={profileImageUrl.toString()}
 								alt={OAUTH_PROVIDER_NAMES[providerId]}
 								width={16}
 								height={16}
