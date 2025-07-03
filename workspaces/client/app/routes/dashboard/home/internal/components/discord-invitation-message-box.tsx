@@ -15,12 +15,13 @@ export const DiscordInvitationMessageBox = ({
 	const { mutate: inviteDiscord } = useDiscordInvite();
 	const navigate = useNavigate();
 
-	if (discordInfo?.status === "joined") {
-		// すでにサーバーに参加している場合には何も表示する必要はない
+	if (!discordInfo || discordInfo.status === "joined") {
+		// Loading は表示しない
+		// すでにサーバーに参加している場合にも何も表示する必要はない
 		return null;
 	}
 
-	if (discordInfo?.status === "not_linked") {
+	if (discordInfo.status === "not_linked") {
 		return (
 			<MessageBox
 				variant="info"
