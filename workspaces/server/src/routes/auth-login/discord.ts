@@ -243,6 +243,7 @@ const route = app
 							CDNRoutes.defaultUserAvatar(
 								// new username system なら (id >> 22) % 6 で、 legacy username system なら discriminator % 5 らしい
 								// discriminator が "0" の場合は new username system とのこと
+								// ref: https://discord.com/developers/docs/change-log#identifying-migrated-users
 								discordUser.discriminator === "0"
 									? (((((Number.parseInt(discordUser.id, 10) >> 22) % 6) + 6) %
 											6) as DefaultUserAvatarAssets)
