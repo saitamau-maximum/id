@@ -38,7 +38,7 @@ export function useDiscordInvite() {
 			}
 			if (result === "already_joined") {
 				pushToast({
-					type: "success",
+					type: "info",
 					title: "すでに参加しています",
 					description: "すでに Discord サーバーに参加しています",
 				});
