@@ -5,9 +5,19 @@ import { CertificationCard } from "~/components/feature/user/certification-card"
 import { ContributionCard } from "~/components/feature/user/contribution/card";
 import { ProfileCard } from "~/components/feature/user/profile-card";
 import { useDeviceType } from "~/hooks/use-device-type";
+import type { Route } from "./+types/page";
 import { useDiscordInfo } from "./internal/hooks/use-discord-info";
 import { useMemberContribution } from "./internal/hooks/use-member-contribution";
 import { useMemberProfile } from "./internal/hooks/use-member-profie";
+
+export const clientLoader = ({ params }: Route.ClientLoaderArgs) => {
+	const { userDisplayId } = params;
+	return { userDisplayId };
+};
+
+export const meta = ({ data }: Route.MetaArgs) => {
+	return [{ title: `@${data.userDisplayId} の情報 | Maximum IdP` }];
+};
 
 export default function Profile() {
 	const { userDisplayId } = useParams<{

@@ -6,13 +6,27 @@ import { UserDisplay } from "~/components/feature/user/user-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { useAuth } from "~/hooks/use-auth";
 import { useToast } from "~/hooks/use-toast";
+import { DefaultRepositories } from "~/repository";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 import { useApp } from "../internal/hooks/use-apps";
+import type { Route } from "./+types/page";
 import { AppEditForm } from "./internal/components/app-edit-form";
 import { ConfigSectionHeader } from "./internal/components/config-section-header";
 import { ConfigSectionSubHeader } from "./internal/components/config-section-sub-header";
 import { ManagerEditor } from "./internal/components/manager-editor";
 import { SecretsManager } from "./internal/components/secrets-manager";
+
+export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
+	const { oauthAppId } = params;
+	// clientLoader では React Hooks が使えないので、 Repository を直接使用する
+	const { oauthAppsRepository } = DefaultRepositories;
+	const data = await oauthAppsRepository.getAppById(oauthAppId);
+	return { name: data.name };
+};
+
+export const meta = ({ data }: Route.MetaArgs) => {
+	return [{ title: `${data.name} の設定 | Maximum IdP` }];
+};
 
 const configSectionStyle = css({
 	backgroundColor: "gray.100",
