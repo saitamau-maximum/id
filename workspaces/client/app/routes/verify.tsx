@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { type MetaFunction, useNavigate, useSearchParams } from "react-router";
 import { JWT_STORAGE_KEY } from "~/constant";
 import { client } from "~/utils/hono";
 
