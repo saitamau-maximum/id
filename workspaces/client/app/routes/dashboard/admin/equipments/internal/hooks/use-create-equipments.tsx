@@ -32,7 +32,7 @@ export const useCreateEquipment = () => {
 		},
 		onError: () => {
 			pushToast({
-				title: "機器の追加に失敗しました",
+				title: "備品の追加に失敗しました",
 				type: "error",
 			});
 		},

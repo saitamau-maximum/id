@@ -17,9 +17,9 @@ export const useUpdateEquipment = () => {
 			});
 			return equipment;
 		},
-		onSuccess: (event) => {
+		onSuccess: (equipment) => {
 			pushToast({
-				title: `${event.name}を更新しました`,
+				title: `${equipment.name}を更新しました`,
 				type: "success",
 			});
 			queryClient.invalidateQueries({
