@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 import { GitHub } from "react-feather";
-import { useNavigate, useSearchParams } from "react-router";
+import { type MetaFunction, useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Login | Maximum IdP" }];
+};
 
 export default function Login() {
 	const { isLoading, isAuthorized, isMember } = useAuth();

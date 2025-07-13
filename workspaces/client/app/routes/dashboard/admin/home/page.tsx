@@ -1,8 +1,13 @@
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { Panel } from "./internal/components/panel";
 import { RoleCountsGraph } from "./internal/components/role-counts-graph";
 import { TodayLoggedInUsers } from "./internal/components/today-loggedin-users";
 import { UsersTransitionGraph } from "./internal/components/users-transition-graph";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Admin | Maximum IdP" }];
+};
 
 export default function AdminHome() {
 	return (

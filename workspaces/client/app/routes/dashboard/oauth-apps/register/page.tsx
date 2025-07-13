@@ -3,6 +3,7 @@ import { scope } from "@idp/server/shared/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
+import type { MetaFunction } from "react-router";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
@@ -13,6 +14,10 @@ import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { OAuthSchemas } from "~/schema/oauth";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 import { useRegisterOAuthApp } from "./internal/hooks/use-register-oauth-app";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "OAuth アプリケーションの新規作成 | Maximum IdP" }];
+};
 
 const RegisterFormSchema = v.object({
 	name: OAuthSchemas.ApplicationName,

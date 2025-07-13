@@ -1,10 +1,14 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { type MetaFunction, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 
 import { Progress } from "~/components/ui/progess";
 import { useAuth } from "~/hooks/use-auth";
 import { RegisterForm } from "./internal/components/form";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "初期設定 | Maximum IdP" }];
+};
 
 export default function Onboarding() {
 	const { isLoading, isInitialized, isAuthorized, isProvisional } = useAuth();

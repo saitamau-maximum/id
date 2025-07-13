@@ -1,3 +1,4 @@
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
 import { ROLE_BY_ID, ROLE_IDS } from "~/types/role";
@@ -5,6 +6,10 @@ import {
 	MemberUsersTable,
 	NonMemberUsersTable,
 } from "./internal/components/table";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "ユーザー管理 | Maximum IdP" }];
+};
 
 export default function AdminUsers() {
 	return (

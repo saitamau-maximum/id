@@ -15,7 +15,7 @@ const REGISTRATION_STEPS = [
 ];
 
 export const meta: MetaFunction = () => {
-	return [{ title: "Login - Maximum IdP" }];
+	return [{ title: "サークル費のお支払い | Maximum IdP" }];
 };
 
 export default function PaymentInfo() {
@@ -23,7 +23,6 @@ export default function PaymentInfo() {
 		useAuth();
 	const navigate = useNavigate();
 
-	// そのうち本登録ユーザーでも表示できるようにする？
 	const shouldProceed =
 		!isLoading && isAuthorized && isInitialized && isProvisional;
 

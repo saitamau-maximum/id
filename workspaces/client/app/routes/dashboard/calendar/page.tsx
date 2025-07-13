@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react";
 import { ArrowRight, ArrowUpRight } from "react-feather";
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { Calendar } from "~/components/feature/calendar/calendar";
 import { EventList } from "~/components/feature/calendar/event-list";
@@ -9,6 +10,10 @@ import { useDeviceType } from "~/hooks/use-device-type";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { ICalDisplay } from "./components/ical-display";
 import { useCalendar } from "./hooks/use-calendar";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Calendar | Maximum IdP" }];
+};
 
 const formatYYYYMMDD = (date: Date) =>
 	`${date.getFullYear()}${String(date.getMonth() + 1).padStart(2, "0")}${String(
