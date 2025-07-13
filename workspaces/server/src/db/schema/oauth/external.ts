@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { users } from "../app";
 
-// Maximum IDP OAuthプロバイダを利用して外部連携アプリにログインするための、OAuth Provider関連のスキーマ
+// Maximum IdP OAuthプロバイダを利用して外部連携アプリにログインするための、OAuth Provider関連のスキーマ
 
 export const oauthClients = sqliteTable("oauth_clients", {
 	id: text("id").primaryKey(),

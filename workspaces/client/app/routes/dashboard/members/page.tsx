@@ -23,7 +23,7 @@ export default function Members() {
 		<div>
 			<DashboardHeader
 				title="Members"
-				subtitle="Maximum IDPに登録されているメンバーの一覧です"
+				subtitle="Maximum IdPに登録されているメンバーの一覧です"
 			/>
 			<FilterForm
 				filter={filter}

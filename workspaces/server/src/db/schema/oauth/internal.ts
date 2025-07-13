@@ -2,7 +2,7 @@ import { relations } from "drizzle-orm";
 import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import { userProfiles, users } from "../app";
 
-// 外部OAuthプロバイダを利用して IDP にログインするための、OAuth Clientとしてのスキーマ
+// 外部OAuthプロバイダを利用して IdP にログインするための、OAuth Clientとしてのスキーマ
 
 export const oauthConnections = sqliteTable(
 	"oauth_connections",

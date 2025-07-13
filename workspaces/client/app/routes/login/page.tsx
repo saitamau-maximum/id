@@ -73,7 +73,7 @@ export default function Login() {
 					},
 				})}
 			>
-				Maximum IDP
+				Maximum IdP
 			</h1>
 			<p
 				className={css({
@@ -82,7 +82,7 @@ export default function Login() {
 					lineHeight: 2,
 				})}
 			>
-				Maximum IDPへようこそ！
+				Maximum IdPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
 				{invitationCode && (
