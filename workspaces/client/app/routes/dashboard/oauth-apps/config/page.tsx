@@ -20,11 +20,21 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	const { oauthAppId } = params;
 	// clientLoader では React Hooks が使えないので、 Repository を直接使用する
 	const { oauthAppsRepository } = DefaultRepositories;
-	const data = await oauthAppsRepository.getAppById(oauthAppId);
-	return { name: data.name };
+
+	try {
+		const data = await oauthAppsRepository.getAppById(oauthAppId);
+		return { name: data.name };
+	} catch {
+		// 取得に失敗した場合、ページは表示できるかもしれないのでエラーは吐かない
+		return undefined;
+	}
 };
 
 export const meta = ({ data }: Route.MetaArgs) => {
+	if (!data) {
+		// データがない場合はデフォルトのタイトルを返す
+		return [{ title: "Maximum IdP" }];
+	}
 	return [{ title: `${data.name} の設定 | Maximum IdP` }];
 };
 
