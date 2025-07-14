@@ -133,6 +133,29 @@ export default function Login() {
 					)
 				}
 			</div>
+
+			<p
+				className={css({
+					marginTop: 4,
+					textAlign: "center",
+					color: "gray.600",
+					fontSize: "sm",
+				})}
+			>
+				GitHub ログインで 404 が出る場合:{" "}
+				<a
+					href="https://github.com/saitamau-maximum/id/wiki/github-login-404"
+					target="_blank"
+					rel="noreferrer"
+					className={css({
+						color: "green.600",
+						textDecoration: "underline",
+					})}
+				>
+					Wiki
+				</a>{" "}
+				を参照してください。
+			</p>
 		</div>
 	);
 }
