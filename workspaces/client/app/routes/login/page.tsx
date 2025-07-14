@@ -152,7 +152,7 @@ export default function Login() {
 						textDecoration: "underline",
 					})}
 				>
-					GitHub の Wiki
+					Wiki
 				</a>{" "}
 				を参照してください。
 			</p>
