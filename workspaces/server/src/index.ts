@@ -2,6 +2,7 @@ import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
+import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
@@ -140,20 +141,10 @@ const scheduled: ExportedHandlerScheduledHandler<Env> = async (
 	env,
 	ctx,
 ) => {
-	console.log(`Cron event received: ${controller.cron}`);
-
 	switch (controller.cron) {
 		case "0 18 * * *":
-			// do something
-			ctx.waitUntil(
-				new Promise((resolve) => {
-					setTimeout(() => {
-						console.log("Simulating async operation for cron job...");
-						resolve(void 0);
-					}, 1000);
-				}),
-			); // Simulate async operation
 			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
+			ctx.waitUntil(removeExpiredAccessTokenTask(env));
 			break;
 		default:
 			console.warn(`Unknown cron event: ${controller.cron}`);

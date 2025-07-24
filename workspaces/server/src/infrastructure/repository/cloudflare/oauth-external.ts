@@ -426,4 +426,29 @@ export class CloudflareOAuthExternalRepository
 			user: USER_BASIC_INFO_TRANSFORMER(user),
 		};
 	}
+
+	async deleteExpiredAccessTokens() {
+		// 有効期限ジャストに使われるかもしれないので、念のため 1 日前のものを削除
+		const now = new Date().valueOf() - 1 * 24 * 60 * 60 * 1000;
+
+		// まず一覧を取得
+		const expiredTokenIds = (
+			await this.client.query.oauthTokens.findMany({
+				where: (token, { lt }) => lt(token.accessTokenExpiresAt, new Date(now)),
+				columns: {
+					id: true,
+				},
+			})
+		).map((record) => record.id);
+
+		// 次に token に紐づいた scopes を削除
+		await this.client
+			.delete(schema.oauthTokenScopes)
+			.where(inArray(schema.oauthTokenScopes.tokenId, expiredTokenIds));
+
+		// 最後に tokens を削除
+		await this.client
+			.delete(schema.oauthTokens)
+			.where(inArray(schema.oauthTokens.id, expiredTokenIds));
+	}
 }
