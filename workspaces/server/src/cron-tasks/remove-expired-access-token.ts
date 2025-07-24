@@ -4,12 +4,11 @@ import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/
 // 期限切れの Access Token を削除する
 export const removeExpiredAccessTokenTask = async (env: Env) => {
 	const OAuthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
-	await OAuthExternalRepository.deleteExpiredAccessTokens()
-		.then(() => {
-			console.log("Expired access tokens removed successfully.");
-		})
-		.catch((error) => {
-			console.error("Error removing expired access tokens:", error);
-			// TODO: Discord とかで通知する処理を追加する
-		});
+	try {
+		await OAuthExternalRepository.deleteExpiredAccessTokens();
+		console.log("Expired access tokens removed successfully.");
+	} catch (error) {
+		console.error("Error removing expired access tokens:", error);
+		// TODO: Discord とかで通知する処理を追加する
+	}
 };
