@@ -118,4 +118,33 @@ export const route = app
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute);
 
-export default app;
+const scheduled: ExportedHandlerScheduledHandler<Env> = async (
+	controller,
+	env,
+	ctx,
+) => {
+	console.log(`Cron event received: ${controller.cron}`);
+
+	switch (controller.cron) {
+		case "0 18 * * *":
+			// do something
+			ctx.waitUntil(
+				new Promise((resolve) => {
+					setTimeout(() => {
+						console.log("Simulating async operation for cron job...");
+						resolve(void 0);
+					}, 1000);
+				}),
+			); // Simulate async operation
+			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
+			break;
+		default:
+			console.warn(`Unknown cron event: ${controller.cron}`);
+			break;
+	}
+};
+
+export default {
+	fetch: app.fetch,
+	scheduled,
+};
