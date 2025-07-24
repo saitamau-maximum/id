@@ -23,6 +23,7 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
@@ -118,23 +119,7 @@ export const route = app
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute)
-	.get("/dev/cron", (c) => {
-		// Dev のみに制限する
-		if (c.env.ENV !== "development") {
-			return c.text("Not found", 404);
-		}
-
-		// 量が少ないので直書き
-		const res = `
-<h1>Cron Simulator</h1>
-<form method="GET" action="/__scheduled">
-	<label for="cron">Cron expression:</label>
-	<input type="text" id="cron" name="cron" placeholder="0 18 * * *">
-	<button type="submit">Simulate</button>
-</form>
-`;
-		return c.html(res);
-	});
+	.route("/dev", devRoute);
 
 const scheduled: ExportedHandlerScheduledHandler<Env> = async (
 	controller,
