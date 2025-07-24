@@ -2,6 +2,7 @@ import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
+import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
@@ -22,6 +23,7 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
@@ -116,6 +118,26 @@ export const route = app
 	.route("/certification", certificationRoute)
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
-	.route("/discord", discordRoute);
+	.route("/discord", discordRoute)
+	.route("/dev", devRoute);
 
-export default app;
+const scheduled: ExportedHandlerScheduledHandler<Env> = async (
+	controller,
+	env,
+	ctx,
+) => {
+	switch (controller.cron) {
+		case "0 18 * * *":
+			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
+			ctx.waitUntil(removeExpiredAccessTokenTask(env));
+			break;
+		default:
+			console.warn(`Unknown cron event: ${controller.cron}`);
+			break;
+	}
+};
+
+export default {
+	fetch: app.fetch,
+	scheduled,
+};
