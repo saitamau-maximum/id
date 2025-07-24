@@ -441,6 +441,8 @@ export class CloudflareOAuthExternalRepository
 			})
 		).map((record) => record.id);
 
+		if (expiredTokenIds.length === 0) return;
+
 		// 次に token に紐づいた scopes を削除
 		await this.client
 			.delete(schema.oauthTokenScopes)
