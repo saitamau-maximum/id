@@ -131,6 +131,8 @@ pnpm -C workspaces/server run build
 pnpm dev
 ```
 
+Cron Triggers のテストを行いたい場合、 `pnpm dev` 後にブラウザで `localhost:8787/dev/cron` にアクセスすると簡単に発火できます。
+
 ## 機密情報のメモ
 
 Cloudflare に格納されている機密情報のメモ。
