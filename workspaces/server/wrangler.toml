@@ -35,6 +35,10 @@ bucket_name = 'idp-storage-local'
 [triggers]
 crons = ["0 18 * * *"]  # 毎日 18:00 UTC (03:00 JST) に実行
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # --- Preview ---
 
 [env.preview]
@@ -76,6 +80,10 @@ bucket_name = 'idp-storage-preview'
 [env.preview.triggers]
 crons = ["0 18 * * *"]
 
+[env.preview.observability]
+enabled = true
+head_sampling_rate = 1
+
 # --- Production ---
 
 [env.production]
@@ -116,3 +124,7 @@ bucket_name = 'idp-storage'
 
 [env.production.triggers]
 crons = ["0 18 * * *"]
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
