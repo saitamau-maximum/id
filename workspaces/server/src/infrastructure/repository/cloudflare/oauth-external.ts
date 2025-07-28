@@ -443,14 +443,25 @@ export class CloudflareOAuthExternalRepository
 
 		if (expiredTokenIds.length === 0) return;
 
-		// 次に token に紐づいた scopes を削除
-		await this.client
-			.delete(schema.oauthTokenScopes)
-			.where(inArray(schema.oauthTokenScopes.tokenId, expiredTokenIds));
+		// パラメータはクエリ当たり 100 個ずつしかできないようなので、分割しておく
+		// ref: https://developers.cloudflare.com/d1/platform/limits/ (Maximum bound parameters per query の部分)
+		const chunkSize = 80; // 余裕をもって 80 くらいにする
+		const chunks: number[][] = [];
+		for (let i = 0; i < expiredTokenIds.length; i += chunkSize) {
+			chunks.push(expiredTokenIds.slice(i, i + chunkSize));
+		}
 
-		// 最後に tokens を削除
-		await this.client
-			.delete(schema.oauthTokens)
-			.where(inArray(schema.oauthTokens.id, expiredTokenIds));
+		for (const chunk of chunks) {
+			await this.client.batch([
+				// 次に token に紐づいた scopes を削除
+				this.client
+					.delete(schema.oauthTokenScopes)
+					.where(inArray(schema.oauthTokenScopes.tokenId, chunk)),
+				// 最後に tokens を削除
+				this.client
+					.delete(schema.oauthTokens)
+					.where(inArray(schema.oauthTokens.id, chunk)),
+			]);
+		}
 	}
 }
