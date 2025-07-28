@@ -50,6 +50,11 @@ export default [
 								]),
 							]
 						: []),
+					...prefix("equipments", [
+						layout("routes/dashboard/admin/equipments/layout.tsx", [
+							index("routes/dashboard/admin/equipments/page.tsx"),
+						]),
+					]),
 				]),
 			]),
 			route("update-payment-info", "routes/dashboard/payment-info/page.tsx"),
