@@ -96,7 +96,11 @@ export const route = app
 		// Discord 関連
 		c.set(
 			"DiscordBotRepository",
-			new DiscordBotRepository(c.env.DISCORD_BOT_TOKEN, c.env.DISCORD_GUILD_ID),
+			new DiscordBotRepository(
+				c.env.DISCORD_BOT_TOKEN,
+				c.env.DISCORD_GUILD_ID,
+				c.env.DISCORD_CALENDAR_CHANNEL_ID,
+			),
 		);
 
 		// ----- Dynamic Variables ----- //

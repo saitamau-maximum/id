@@ -7,15 +7,27 @@ import {
 	RouteBases,
 	Routes,
 } from "discord-api-types/v10";
-import type { IDiscordBotRepository } from "../../../repository/discord-bot";
+import type {
+	CalendarEventForNotification,
+	CalendarNotifyType,
+	IDiscordBotRepository,
+} from "../../../repository/discord-bot";
+import { formatDuration } from "../../../utils/date";
 
 export class DiscordBotRepository implements IDiscordBotRepository {
 	private botToken: string;
 	private guildId: string;
+	private calendarNotifyChannelId: string;
+	private readonly CALENDAR_URL = "https://id.maximum.vc/calendar/";
 
-	constructor(botToken: string, guildId: string) {
+	constructor(
+		botToken: string,
+		guildId: string,
+		calendarNotifyChannelId: string,
+	) {
 		this.botToken = botToken;
 		this.guildId = guildId;
+		this.calendarNotifyChannelId = calendarNotifyChannelId;
 	}
 
 	private async fetchApi(endpoint: string, options?: RequestInit) {
@@ -88,5 +100,34 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 			body: JSON.stringify(params),
 		});
 		return await res.json<RESTPostAPIChannelMessageResult>();
+	}
+
+	async sendCalendarNotification(
+		type: CalendarNotifyType,
+		event: CalendarEventForNotification,
+	): Promise<void> {
+		await this.sendMessage(this.calendarNotifyChannelId, {
+			content:
+				type === "new"
+					? "**予定が追加されました！**"
+					: "**予定が更新されました！**",
+			embeds: [
+				{
+					title: event.title,
+					description: event.description,
+					color: type === "new" ? 0x2ecc71 : 0x3498db,
+					fields: [
+						{
+							name: "日時",
+							value: formatDuration(event.startAt, event.endAt),
+						},
+						{
+							name: "場所",
+							value: `${event.location?.name || "未定"}\n\n[カレンダーを見る](${this.CALENDAR_URL})`,
+						},
+					],
+				},
+			],
+		});
 	}
 }
