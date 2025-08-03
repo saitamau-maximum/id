@@ -7,6 +7,7 @@ import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
+import { CloudflareEquipmentRepository } from "./infrastructure/repository/cloudflare/equipment";
 import { CloudflareInviteRepository } from "./infrastructure/repository/cloudflare/invite";
 import { CloudflareLocationRepository } from "./infrastructure/repository/cloudflare/location";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
@@ -24,6 +25,7 @@ import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
 import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
+import { equipmentRoute } from "./routes/equipment";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
@@ -73,6 +75,8 @@ export const route = app
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),
 		);
+		// 備品管理
+		c.set("EquipmentRepository", new CloudflareEquipmentRepository(c.env.DB));
 		// 招待
 		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
 		// ----- IdP OAuth & Connect ----- //
@@ -115,6 +119,7 @@ export const route = app
 	.route("/admin", adminRoute)
 	.route("/calendar", calendarRoute)
 	.route("/certification", certificationRoute)
+	.route("/equipment", equipmentRoute)
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute)

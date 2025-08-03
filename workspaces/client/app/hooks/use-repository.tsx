@@ -4,6 +4,7 @@ import type { IAuthRepository } from "~/repository/auth";
 import type { ICalendarRepository } from "~/repository/calendar";
 import type { ICertificationRepository } from "~/repository/certification";
 import type { IDiscordRepository } from "~/repository/discord";
+import type { IEquipmentRepository } from "~/repository/equipment";
 import type { IInvitationRepository } from "~/repository/invitation";
 import type { ILocationRepository } from "~/repository/location";
 import type { IMemberRepository } from "~/repository/member";
@@ -22,6 +23,7 @@ export interface RepositoryContextProps {
 	invitationRepository: IInvitationRepository;
 	miscRepository: IMiscRepository;
 	discordRepository: IDiscordRepository;
+	equipmentRepository: IEquipmentRepository;
 }
 
 export const RepositoryContext =
