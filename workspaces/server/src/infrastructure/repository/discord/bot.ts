@@ -109,7 +109,7 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		await this.sendMessage(this.calendarNotifyChannelId, {
 			content:
 				type === "new"
-					? `🗓️ 新しい予定「${event.title}」が追加されました！`
+					? `🗓️ 予定「${event.title}」が追加されました！`
 					: `✏️ 予定「${event.title}」が更新されました！`,
 			embeds: [
 				{
