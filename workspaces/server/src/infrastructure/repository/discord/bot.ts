@@ -109,11 +109,10 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		await this.sendMessage(this.calendarNotifyChannelId, {
 			content:
 				type === "new"
-					? "**予定が追加されました！**"
-					: "**予定が更新されました！**",
+					? `🗓️ 新しい予定「${event.title}」が追加されました！`
+					: `✏️ 予定「${event.title}」が更新されました！`,
 			embeds: [
 				{
-					title: event.title,
 					description: event.description,
 					color: type === "new" ? 0x2ecc71 : 0x3498db,
 					fields: [
@@ -123,9 +122,13 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 						},
 						{
 							name: "場所",
-							value: `${event.location?.name || "未定"}\n\n[カレンダーを見る](${this.CALENDAR_URL})`,
+							value: event.location?.name || "未定",
 						},
 					],
+					footer: {
+						// [URL](URL) の形式にしてもリンクにならなかったので、 URL だけ表示することで妥協
+						text: `${this.CALENDAR_URL}`,
+					},
 				},
 			],
 		});
