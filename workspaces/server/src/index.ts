@@ -16,7 +16,6 @@ import { CloudflareSessionRepository } from "./infrastructure/repository/cloudfl
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
-import { DiscordCalendarNotifier } from "./infrastructure/repository/discord/calendar";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
@@ -68,10 +67,6 @@ export const route = app
 		);
 		// カレンダー
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
-		c.set(
-			"CalendarNotifier",
-			new DiscordCalendarNotifier(c.env.CALENDAR_NOTIFY_WEBHOOK_URL),
-		);
 		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
 		// 資格・試験
 		c.set(
