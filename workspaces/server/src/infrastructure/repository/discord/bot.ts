@@ -1,6 +1,8 @@
 import {
 	type RESTGetAPICurrentUserResult,
 	type RESTGetAPIGuildMemberResult,
+	type RESTPostAPIChannelMessageJSONBody,
+	type RESTPostAPIChannelMessageResult,
 	type RESTPutAPIGuildMemberJSONBody,
 	RouteBases,
 	Routes,
@@ -72,5 +74,19 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 			},
 		});
 		return await res.json<RESTGetAPICurrentUserResult>();
+	}
+
+	async sendMessage(
+		channelId: string,
+		params: RESTPostAPIChannelMessageJSONBody,
+	): Promise<RESTPostAPIChannelMessageResult> {
+		const res = await this.fetchApi(Routes.channelMessages(channelId), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(params),
+		});
+		return await res.json<RESTPostAPIChannelMessageResult>();
 	}
 }
