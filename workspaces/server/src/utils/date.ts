@@ -2,8 +2,8 @@
  * 開始日時と終了日時を期間表示形式に変換する関数。
  * タイムゾーンは Asia/Tokyo
  *
- * - 同じ日付の場合: `YYYY年MM月DD日(曜日) HH:mm - HH:mm`
- * - 異なる日付の場合: `YYYY年MM月DD日(曜日) HH:mm - YYYY年MM月DD日(曜日) HH:mm`
+ * - 同じ日付の場合: `MM月DD日(曜日) HH:mm - HH:mm`
+ * - 異なる日付の場合: `MM月DD日(曜日) HH:mm - MM月DD日(曜日) HH:mm`
  *
  * @param startAt - 開始日時を表すDateオブジェクト。
  * @param endAt - 終了日時を表すDateオブジェクト。
