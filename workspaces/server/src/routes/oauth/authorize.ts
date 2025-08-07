@@ -17,8 +17,7 @@ const route = app
 	.get(
 		"/",
 		// パラメータチェックしてからログイン処理をさせる
-		// TODO: Bad Request の画面をいい感じにするかも
-		// Memo: なんかうまく型が聞いてくれないので c に明示的に型をつける　おま環ですか
+		// Memo: なんかうまく型が聞いてくれないので c に明示的に型をつける
 		validator("query", async (query, c: Context<HonoEnv>) => {
 			// client_id がパラメータにあるか・複数存在しないか
 			const { output: clientId, success: success1 } = v.safeParse(
