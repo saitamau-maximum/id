@@ -250,6 +250,15 @@ const route = app
 					return forceRelogin();
 				}
 			}
+
+			// request パラメータは OpenID Connect の仕様では存在するが、現状ではサポートしない
+			if (isOidc && query.request) {
+				return errorRedirect(
+					"request_not_supported",
+					"request parameter is not supported",
+				);
+			}
+
 			// ----- End OpenID Connect Parameter Check ----- //
 
 			return {
