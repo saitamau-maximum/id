@@ -367,11 +367,14 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res) return undefined;
 
-		const { scopes, ...token } = res;
+		const { scopes, oidcNonce, ...token } = res;
 
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			oidcParams: {
+				nonce: oidcNonce ?? undefined,
+			},
 		};
 	}
 

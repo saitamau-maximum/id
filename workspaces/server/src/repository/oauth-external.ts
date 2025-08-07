@@ -60,6 +60,9 @@ type GetClientByIdRes = Client & {
 type GetTokenByCodeRes = Token & {
 	client: Client & { secrets: ClientSecret[] };
 	scopes: Scope[];
+	oidcParams: {
+		nonce?: string;
+	};
 };
 
 type GetTokenByATRes = Token & {

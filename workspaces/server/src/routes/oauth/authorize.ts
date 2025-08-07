@@ -183,13 +183,15 @@ const route = app
 			if (!success7) {
 				return errorRedirect("invalid_request", "invalid prompt");
 			}
-			const { output: maxAge, success: success8 } = v.safeParse(
-				v.optional(v.number()),
+			const { output: _maxAge, success: success8 } = v.safeParse(
+				// クエリパラメータなので文字列として受け取る
+				v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
 				query.max_age,
 			);
 			if (!success8) {
 				return errorRedirect("invalid_request", "invalid max_age");
 			}
+			const maxAge = _maxAge ? Number.parseInt(_maxAge, 10) : undefined;
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
 

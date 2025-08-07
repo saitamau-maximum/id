@@ -1,8 +1,30 @@
 import { vValidator } from "@hono/valibot-validator";
+import { sign } from "hono/jwt";
+import type { JWTPayload } from "hono/utils/jwt/types";
 import * as v from "valibot";
 import { factory } from "../../factory";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
+
+interface OidcIdTokenPayload {
+	iss: string;
+	sub: string;
+	aud: string[];
+	exp: number;
+	iat: number;
+	// 仕様上は「max_age が含まれているなら required / それ以外は optional」だが、常に値を入れることにする
+	auth_time: number;
+	nonce?: string;
+	// acr, amr, azp は使わないので省略
+}
+
+interface TokenResponse {
+	access_token: string;
+	token_type: "bearer";
+	expires_in: number;
+	scope: string;
+	id_token?: string;
+}
 
 const requestBodySchema = v.object({
 	grant_type: v.pipe(v.string(), v.nonEmpty()),
@@ -144,15 +166,34 @@ const route = app
 			// token の残り時間を計算
 			const remMs = tokenInfo.accessTokenExpiresAt.getTime() - nowUnixMs;
 
-			return c.json(
-				{
-					access_token: tokenInfo.accessToken,
-					token_type: "bearer",
-					expires_in: Math.floor(remMs / 1000),
-					scope: tokenInfo.scopes.map((s) => s.name).join(" "),
-				},
-				200,
-			);
+			const res: TokenResponse = {
+				access_token: tokenInfo.accessToken,
+				token_type: "bearer",
+				expires_in: Math.floor(remMs / 1000),
+				scope: tokenInfo.scopes.map((s) => s.name).join(" "),
+			};
+
+			if (tokenInfo.scopes.some((s) => s.name === "openid")) {
+				// OpenID Connect の ID Token 生成
+				const payload: OidcIdTokenPayload = {
+					iss: "https://api.id.maximum.vc",
+					sub: crypto.randomUUID(),
+					aud: [tokenInfo.clientId],
+					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
+					iat: Math.floor(nowUnixMs / 1000),
+					auth_time: /*TODO*/ 0,
+				};
+				if (tokenInfo.oidcParams.nonce)
+					payload.nonce = tokenInfo.oidcParams.nonce;
+
+				const idToken = await sign(
+					payload as unknown as JWTPayload,
+					c.env.SECRET,
+				);
+				res.id_token = idToken;
+			}
+
+			return c.json(res, 200);
 		},
 	)
 	.all("/", async (c) => {
