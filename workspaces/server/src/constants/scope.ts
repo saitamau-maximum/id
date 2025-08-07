@@ -1,5 +1,4 @@
 export const SCOPE_IDS = {
-	// TODO: openid が上位互換になるので、 read:basic_info を消す
 	READ_BASIC_INFO: 1,
 
 	// OpenID 系
@@ -26,7 +25,7 @@ export const SCOPES_BY_ID: Record<ScopeId, Scope> = {
 		id: SCOPE_IDS.READ_BASIC_INFO,
 		name: "read:basic_info",
 		description:
-			"[Deprecated] あなたのユーザー名やユーザー ID、プロフィール画像を読み取ります。",
+			"あなたのユーザー名やユーザー ID、プロフィール画像を読み取ります。",
 	},
 	[SCOPE_IDS.OPENID]: {
 		id: SCOPE_IDS.OPENID,
