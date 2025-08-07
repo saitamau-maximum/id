@@ -124,7 +124,11 @@ const route = app
 			}
 			if (tokenInfo.user.profile.profileImageURL)
 				userInfo.picture = tokenInfo.user.profile.profileImageURL;
-			if (tokenInfo.user.profile.socialLinks)
+			if (
+				tokenInfo.user.profile.socialLinks &&
+				Array.isArray(tokenInfo.user.profile.socialLinks) &&
+				tokenInfo.user.profile.socialLinks.length > 0
+			)
 				userInfo.website = tokenInfo.user.profile.socialLinks[0]; // 最初のリンクを website として使用
 
 			userInfo.zoneinfo = "Asia/Tokyo"; // 現状は固定
