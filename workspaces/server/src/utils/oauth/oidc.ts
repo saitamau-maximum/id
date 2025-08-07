@@ -53,8 +53,18 @@ export const generateSub = async (
 	userId: string,
 	accessToken: string,
 ) => {
-	// sub は unique かつユーザーを識別できるのが望ましいので、 [clientId]_[userId]_[atHash] の形式で生成
-	return `${clientId}_${userId}_${await generateAtHash(accessToken)}`;
+	// sub は以下の条件を満たす必要がある (pairwise sub としている)
+	// - unique
+	// - User が同じでも、 Client に対して異なる sub を生成する
+	// - OpenID Provider (つまり IdP Server) 以外にとって可逆不可能
+	// - 同じ入力に対しては同じ結果
+	// そのため、 Client ID と User ID, ATHash を組み合わせてハッシュをとることにする
+	const payload = `${clientId}_${userId}_${await generateAtHash(accessToken)}`;
+	const hash = await crypto.subtle.digest(
+		{ name: "SHA-512" },
+		new TextEncoder().encode(payload),
+	);
+	return binaryToBase64Url(new Uint8Array(hash));
 };
 
 export const generateIdToken = async ({
