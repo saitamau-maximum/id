@@ -15,13 +15,16 @@ const OAUTH_ERROR_URI =
 const app = factory.createApp();
 
 const callbackSchema = v.object({
+	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	state: v.optional(v.string()),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
+	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
 	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
+
 	authorized: v.union([v.literal("1"), v.literal("0")]),
 });
 
@@ -42,6 +45,7 @@ const route = app
 				time: _time,
 				scope,
 				state,
+				oidc_nonce,
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
 			const nowUnixMs = Date.now();
@@ -59,6 +63,7 @@ const route = app
 				scope,
 				state,
 				time,
+				oidcNonce: oidc_nonce,
 				key: publicKey,
 				hash: auth_token,
 			});
@@ -130,6 +135,7 @@ const route = app
 				redirect_uri,
 				accessToken,
 				scopes,
+				oidc_nonce,
 			)
 				.then(() => {
 					redirectTo.searchParams.append("code", code);

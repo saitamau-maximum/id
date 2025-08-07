@@ -9,6 +9,7 @@ interface Param {
 	state?: string;
 	scope?: string;
 	time: number;
+	oidcNonce?: string;
 }
 
 interface GenerateParam extends Param {
@@ -26,6 +27,7 @@ const content = (param: Param) => {
 	if (param.redirectUri) p.append("redirect_uri", param.redirectUri);
 	if (param.state) p.append("state", param.state);
 	if (param.scope) p.append("scope", param.scope);
+	if (param.oidcNonce) p.append("oidc_nonce", param.oidcNonce);
 	p.append("time", param.time.toString());
 	return new TextEncoder().encode(p.toString());
 };

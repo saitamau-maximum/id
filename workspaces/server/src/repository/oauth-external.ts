@@ -109,6 +109,7 @@ export type IOAuthExternalRepository = {
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		oidcNonce?: string,
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;

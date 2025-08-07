@@ -256,19 +256,21 @@ const route = app
 				redirectTo,
 				state,
 				scope,
-				oidcParams: {
-					isOidc,
-					nonce,
-					maxAge,
-					prompt,
-				},
+				oidcNonce: nonce,
 				clientInfo: client,
 			};
 		}),
 		cookieAuthMiddleware,
 		async (c) => {
-			const { clientId, redirectUri, redirectTo, state, scope, clientInfo } =
-				c.req.valid("query");
+			const {
+				clientId,
+				redirectUri,
+				redirectTo,
+				state,
+				scope,
+				clientInfo,
+				oidcNonce,
+			} = c.req.valid("query");
 			const nowUnixMs = Date.now();
 			const { userId } = c.get("jwtPayload");
 
@@ -278,6 +280,7 @@ const route = app
 				redirectUri,
 				scope,
 				state,
+				oidcNonce,
 				time: nowUnixMs,
 				key: privateKey,
 			});
@@ -306,6 +309,7 @@ const route = app
 						scope,
 						token,
 						nowUnixMs,
+						oidcNonce,
 					},
 					user: {
 						// 初期登録済みなので displayName は必ず存在する（はず）

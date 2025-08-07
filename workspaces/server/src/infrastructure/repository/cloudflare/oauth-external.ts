@@ -311,6 +311,7 @@ export class CloudflareOAuthExternalRepository
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		oidcNonce?: string,
 	) {
 		const time = Date.now();
 
@@ -324,6 +325,7 @@ export class CloudflareOAuthExternalRepository
 				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
+				oidcNonce,
 				accessToken,
 				accessTokenExpiresAt: new Date(time + 1 * 60 * 60 * 1000), // 1 hour
 			})
