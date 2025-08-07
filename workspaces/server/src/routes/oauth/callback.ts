@@ -57,9 +57,6 @@ const route = app
 
 			const { userId } = c.get("jwtPayload");
 
-			c.header("Cache-Control", "no-store");
-			c.header("Pragma", "no-cache");
-
 			const publicKey = await derivePublicKey(
 				await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey"),
 			);

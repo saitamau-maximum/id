@@ -59,9 +59,6 @@ const route = app
 			const { client_id, client_secret, code, grant_type, redirect_uri } =
 				c.req.valid("form");
 
-			c.header("Cache-Control", "no-store");
-			c.header("Pragma", "no-cache");
-
 			const nowUnixMs = Date.now();
 
 			const tokenInfo =

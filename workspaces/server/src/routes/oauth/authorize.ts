@@ -326,8 +326,6 @@ const route = app
 				subtitle: clientInfo.name,
 			});
 
-			c.header("Cache-Control", "no-store");
-			c.header("Pragma", "no-cache");
 			return c.html(responseHtml);
 		},
 	)
