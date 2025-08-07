@@ -9,6 +9,9 @@ import { derivePublicKey, importKey } from "../../utils/oauth/key";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
+const OAUTH_ERROR_URI =
+	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint";
+
 const app = factory.createApp();
 
 const callbackSchema = v.object({
@@ -98,10 +101,7 @@ const route = app
 					"error_description",
 					"The user denied the request",
 				);
-				redirectTo.searchParams.append(
-					"error_uri",
-					"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
-				);
+				redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
 				return c.redirect(redirectTo.href, 302);
 			}
 
@@ -138,10 +138,7 @@ const route = app
 				.catch((e: Error) => {
 					redirectTo.searchParams.append("error", "server_error");
 					redirectTo.searchParams.append("error_description", e.message);
-					redirectTo.searchParams.append(
-						"error_uri",
-						"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
-					);
+					redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
 					return c.redirect(redirectTo.href, 302);
 				});
 		},
