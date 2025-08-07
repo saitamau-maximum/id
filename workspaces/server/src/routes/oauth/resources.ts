@@ -1,5 +1,9 @@
 // OAuth の Resource Owner としての役割を果たすルーティング
 
+import {
+	FORBIDDEN_RESPONSE,
+	UNAUTHORIZED_RESPONSE,
+} from "../../constants/oauth-external";
 import { SCOPES_BY_ID, SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
@@ -63,12 +67,12 @@ const route = app
 
 		// tokenInfo が存在しない場合は authByAccessTokenMiddleware で処理されるが、型が合わないので明示的にチェック
 		if (!tokenInfo) {
-			return c.text("Unauthorized", 401);
+			return c.text(...UNAUTHORIZED_RESPONSE);
 		}
 
 		// read:basic_info が必要
 		if (!tokenInfo.scopes.includes(SCOPES_BY_ID[SCOPE_IDS.READ_BASIC_INFO])) {
-			return c.text("Forbidden", 403);
+			return c.text(...FORBIDDEN_RESPONSE);
 		}
 
 		// ユーザー情報を返す
@@ -88,12 +92,13 @@ const route = app
 
 		const tokenInfo = c.get("tokenInfo");
 
+		if (!tokenInfo) {
+			return c.text(...UNAUTHORIZED_RESPONSE);
+		}
+
 		// openid scope が必要
-		if (
-			!tokenInfo ||
-			!tokenInfo.scopes.includes(SCOPES_BY_ID[SCOPE_IDS.OPENID])
-		) {
-			return c.text("Unauthorized", 401);
+		if (!tokenInfo.scopes.includes(SCOPES_BY_ID[SCOPE_IDS.OPENID])) {
+			return c.text(...FORBIDDEN_RESPONSE);
 		}
 
 		const userInfo: OidcUserInfo = {
