@@ -21,6 +21,7 @@ const callbackSchema = v.object({
 	state: v.optional(v.string()),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
 	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	oidc_auth_time: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
 	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
@@ -46,9 +47,14 @@ const route = app
 				scope,
 				state,
 				oidc_nonce,
+				oidc_auth_time: _oidc_auth_time,
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
+			const oidc_auth_time = _oidc_auth_time
+				? Number.parseInt(_oidc_auth_time, 10)
+				: undefined;
 			const nowUnixMs = Date.now();
+
 			const { userId } = c.get("jwtPayload");
 
 			c.header("Cache-Control", "no-store");
@@ -64,6 +70,7 @@ const route = app
 				state,
 				time,
 				oidcNonce: oidc_nonce,
+				oidcAuthTime: oidc_auth_time,
 				key: publicKey,
 				hash: auth_token,
 			});
@@ -136,6 +143,7 @@ const route = app
 				accessToken,
 				scopes,
 				oidc_nonce,
+				oidc_auth_time,
 			)
 				.then(() => {
 					redirectTo.searchParams.append("code", code);

@@ -12,8 +12,7 @@ interface OidcIdTokenPayload {
 	aud: string[];
 	exp: number;
 	iat: number;
-	// 仕様上は「max_age が含まれているなら required / それ以外は optional」だが、常に値を入れることにする
-	auth_time: number;
+	auth_time?: number;
 	nonce?: string;
 	// acr, amr, azp は使わないので省略
 }
@@ -181,10 +180,11 @@ const route = app
 					aud: [tokenInfo.clientId],
 					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
 					iat: Math.floor(nowUnixMs / 1000),
-					auth_time: /*TODO*/ 0,
 				};
 				if (tokenInfo.oidcParams.nonce)
 					payload.nonce = tokenInfo.oidcParams.nonce;
+				if (tokenInfo.oidcParams.authTime)
+					payload.auth_time = tokenInfo.oidcParams.authTime;
 
 				const idToken = await sign(
 					payload as unknown as JWTPayload,

@@ -10,6 +10,7 @@ interface Param {
 	scope?: string;
 	time: number;
 	oidcNonce?: string;
+	oidcAuthTime?: number;
 }
 
 interface GenerateParam extends Param {

@@ -86,6 +86,7 @@ export const oauthTokens = sqliteTable("oauth_tokens", {
 	codeUsed: int("code_used", { mode: "boolean" }).notNull(),
 	redirectUri: text("redirect_uri"),
 	oidcNonce: text("oidc_nonce"),
+	oidcAuthTime: int("oidc_auth_time"), // int のままにしたほうが使い勝手がいいので、 timestamp としては扱わない
 	accessToken: text("access_token").notNull().unique(),
 	accessTokenExpiresAt: int("access_token_expires_at", {
 		mode: "timestamp_ms",

@@ -62,6 +62,7 @@ type GetTokenByCodeRes = Token & {
 	scopes: Scope[];
 	oidcParams: {
 		nonce?: string;
+		authTime?: number;
 	};
 };
 
@@ -113,6 +114,7 @@ export type IOAuthExternalRepository = {
 		accessToken: string,
 		scopes: Scope[],
 		oidcNonce?: string,
+		oidcAuthTime?: number,
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;

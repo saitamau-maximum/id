@@ -259,6 +259,7 @@ const route = app
 				state,
 				scope,
 				oidcNonce: nonce,
+				oidcAuthTime: loggedInAt,
 				clientInfo: client,
 			};
 		}),
@@ -272,6 +273,7 @@ const route = app
 				scope,
 				clientInfo,
 				oidcNonce,
+				oidcAuthTime,
 			} = c.req.valid("query");
 			const nowUnixMs = Date.now();
 			const { userId } = c.get("jwtPayload");
@@ -283,6 +285,7 @@ const route = app
 				scope,
 				state,
 				oidcNonce,
+				oidcAuthTime,
 				time: nowUnixMs,
 				key: privateKey,
 			});
@@ -312,6 +315,7 @@ const route = app
 						token,
 						nowUnixMs,
 						oidcNonce,
+						oidcAuthTime,
 					},
 					user: {
 						// 初期登録済みなので displayName は必ず存在する（はず）

@@ -312,6 +312,7 @@ export class CloudflareOAuthExternalRepository
 		accessToken: string,
 		scopes: Scope[],
 		oidcNonce?: string,
+		oidcAuthTime?: number,
 	) {
 		const time = Date.now();
 
@@ -326,6 +327,7 @@ export class CloudflareOAuthExternalRepository
 				codeUsed: false,
 				redirectUri,
 				oidcNonce,
+				oidcAuthTime,
 				accessToken,
 				accessTokenExpiresAt: new Date(time + 1 * 60 * 60 * 1000), // 1 hour
 			})
@@ -367,13 +369,14 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res) return undefined;
 
-		const { scopes, oidcNonce, ...token } = res;
+		const { scopes, oidcNonce, oidcAuthTime, ...token } = res;
 
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
 			oidcParams: {
 				nonce: oidcNonce ?? undefined,
+				authTime: oidcAuthTime ?? undefined,
 			},
 		};
 	}

@@ -16,6 +16,7 @@ interface AuthorizeProps {
 		token: string;
 		nowUnixMs: number;
 		oidcNonce?: string;
+		oidcAuthTime?: number;
 	};
 	user: {
 		displayName: string;
@@ -106,6 +107,15 @@ export const _Authorize = ({
               name="oidc_nonce"
               value="${oauthFields.oidcNonce}"
               />`
+						: ""
+				}
+        ${
+					oauthFields.oidcAuthTime
+						? html`<input
+              type="hidden"
+              name="oidc_auth_time"
+              value="${oauthFields.oidcAuthTime.toString()}"
+            />`
 						: ""
 				}
         <input type="hidden" name="time" value="${oauthFields.nowUnixMs}" />
