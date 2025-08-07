@@ -1,4 +1,6 @@
+// TODO: openid が上位互換になるので、 read:basic_info を消す
 export const SCOPE_IDS = {
+	OPENID: 0,
 	READ_BASIC_INFO: 1,
 } as const;
 
@@ -13,11 +15,17 @@ export type Scope = {
 };
 
 export const SCOPES_BY_ID: Record<ScopeId, Scope> = {
+	[SCOPE_IDS.OPENID]: {
+		id: SCOPE_IDS.OPENID,
+		name: "openid",
+		description:
+			"Maximum IdP で本人確認を行い、 OpenID Connect を通してこのサービスへのサインインを許可します。",
+	},
 	[SCOPE_IDS.READ_BASIC_INFO]: {
 		id: SCOPE_IDS.READ_BASIC_INFO,
 		name: "read:basic_info",
 		description:
-			"あなたのユーザー名やユーザー ID、プロフィール画像を読み取ります。",
+			"[Deprecated] あなたのユーザー名やユーザー ID、プロフィール画像を読み取ります。",
 	},
 };
 
