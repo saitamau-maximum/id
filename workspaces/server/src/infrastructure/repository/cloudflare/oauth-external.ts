@@ -420,7 +420,16 @@ export class CloudflareOAuthExternalRepository
 			with: {
 				client: true,
 				scopes: true,
-				user: USER_BASIC_INFO_COLUMNS_GETTER,
+				user: {
+					columns: {
+						id: true,
+					},
+					with: {
+						profile: true,
+						socialLinks: true,
+						roles: true,
+					},
+				},
 			},
 		});
 
@@ -431,7 +440,25 @@ export class CloudflareOAuthExternalRepository
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
-			user: USER_BASIC_INFO_TRANSFORMER(user),
+			user: {
+				...user,
+				profile: {
+					displayId: user.profile.displayId ?? undefined,
+					displayName: user.profile.displayName ?? undefined,
+					profileImageURL: user.profile.profileImageURL ?? undefined,
+					academicEmail: user.profile.academicEmail ?? undefined,
+					email: user.profile.email ?? undefined,
+					studentId: user.profile.studentId ?? undefined,
+					grade: user.profile.grade ?? undefined,
+					bio: user.profile.bio ?? undefined,
+					updatedAt: user.profile.updatedAt ?? undefined,
+					realName: user.profile.realName ?? undefined,
+					realNameKana: user.profile.realNameKana ?? undefined,
+					socialLinks: user.socialLinks.map((link) => link.url),
+				},
+				roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+				socialLinks: undefined,
+			},
 		};
 	}
 

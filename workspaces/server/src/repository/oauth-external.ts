@@ -1,5 +1,6 @@
+import type { Role } from "../constants/role";
 import type { Scope, ScopeId } from "../constants/scope";
-import type { User } from "./user";
+import type { Profile, User } from "./user";
 
 export type Client = {
 	id: string;
@@ -69,7 +70,7 @@ type GetTokenByCodeRes = Token & {
 type GetTokenByATRes = Token & {
 	client: Client;
 	scopes: Scope[];
-	user: UserBasicInfo;
+	user: Pick<User, "id"> & { profile: Partial<Profile>; roles: Role[] };
 };
 
 export type IOAuthExternalRepository = {

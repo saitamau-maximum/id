@@ -48,6 +48,15 @@ const generateAtHash = async (accessToken: string) => {
 	return binaryToBase64Url(leftHalf);
 };
 
+export const generateSub = async (
+	clientId: string,
+	userId: string,
+	accessToken: string,
+) => {
+	// sub は unique かつユーザーを識別できるのが望ましいので、 [clientId]_[userId]_[atHash] の形式で生成
+	return `${clientId}_${userId}_${await generateAtHash(accessToken)}`;
+};
+
 export const generateIdToken = async ({
 	clientId,
 	userId,
@@ -65,8 +74,7 @@ export const generateIdToken = async ({
 
 	const payload: OidcIdTokenPayload = {
 		iss: "https://api.id.maximum.vc",
-		// sub は unique かつユーザーを識別できるのが望ましいので、 [clientId]_[userId]_[atHash] の形式で生成
-		sub: `${clientId}_${userId}_${atHash}`,
+		sub: await generateSub(clientId, userId, accessToken),
 		aud: [clientId],
 		exp: exp,
 		iat: nowUnixS,
