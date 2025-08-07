@@ -1,8 +1,17 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../../factory";
+import { generateIdToken } from "../../utils/oauth/oidc";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
+
+interface TokenResponse {
+	access_token: string;
+	token_type: "bearer";
+	expires_in: number;
+	scope: string;
+	id_token?: string;
+}
 
 const requestBodySchema = v.object({
 	grant_type: v.pipe(v.string(), v.nonEmpty()),
@@ -49,9 +58,6 @@ const route = app
 		async (c) => {
 			const { client_id, client_secret, code, grant_type, redirect_uri } =
 				c.req.valid("form");
-
-			c.header("Cache-Control", "no-store");
-			c.header("Pragma", "no-cache");
 
 			const nowUnixMs = Date.now();
 
@@ -144,15 +150,25 @@ const route = app
 			// token の残り時間を計算
 			const remMs = tokenInfo.accessTokenExpiresAt.getTime() - nowUnixMs;
 
-			return c.json(
-				{
-					access_token: tokenInfo.accessToken,
-					token_type: "bearer",
-					expires_in: Math.floor(remMs / 1000),
-					scope: tokenInfo.scopes.map((s) => s.name).join(" "),
-				},
-				200,
-			);
+			const res: TokenResponse = {
+				access_token: tokenInfo.accessToken,
+				token_type: "bearer",
+				expires_in: Math.floor(remMs / 1000),
+				scope: tokenInfo.scopes.map((s) => s.name).join(" "),
+			};
+
+			if (tokenInfo.scopes.some((s) => s.name === "openid"))
+				res.id_token = await generateIdToken({
+					clientId: tokenInfo.clientId,
+					userId: tokenInfo.userId,
+					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
+					authTime: tokenInfo.oidcParams.authTime,
+					nonce: tokenInfo.oidcParams.nonce,
+					accessToken: tokenInfo.accessToken,
+					privateKey: c.env.PRIVKEY_FOR_OAUTH,
+				});
+
+			return c.json(res, 200);
 		},
 	)
 	.all("/", async (c) => {

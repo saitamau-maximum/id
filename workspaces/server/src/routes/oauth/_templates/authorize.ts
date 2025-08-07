@@ -15,6 +15,8 @@ interface AuthorizeProps {
 		scope?: string;
 		token: string;
 		nowUnixMs: number;
+		oidcNonce?: string;
+		oidcAuthTime?: number;
 	};
 	user: {
 		displayName: string;
@@ -95,6 +97,24 @@ export const _Authorize = ({
               type="hidden"
               name="scope"
               value="${oauthFields.scope}"
+            />`
+						: ""
+				}
+        ${
+					oauthFields.oidcNonce
+						? html`<input
+              type="hidden"
+              name="oidc_nonce"
+              value="${oauthFields.oidcNonce}"
+              />`
+						: ""
+				}
+        ${
+					oauthFields.oidcAuthTime
+						? html`<input
+              type="hidden"
+              name="oidc_auth_time"
+              value="${oauthFields.oidcAuthTime.toString()}"
             />`
 						: ""
 				}

@@ -36,9 +36,6 @@ const INVALID_REQUEST_RESPONSE: InvalidResponseType = {
 
 const route = app
 	.get("/", async (c) => {
-		c.header("Cache-Control", "no-store");
-		c.header("Pragma", "no-cache");
-
 		// authByAccessTokenMiddleware は、 tokenInfo が存在しない場合に 401 Unauthorized を返したくないので使わない
 		const authorization = c.req.header("Authorization");
 		const AUTHORIZATION_REGEX = /^Bearer (.+)$/;

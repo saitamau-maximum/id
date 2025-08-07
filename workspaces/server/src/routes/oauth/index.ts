@@ -10,6 +10,13 @@ import { oauthVerifyTokenRoute } from "./verifyToken";
 const app = factory.createApp();
 
 const route = app
+	.use(async (c, next) => {
+		await next();
+		// それぞれで設定して漏れがあると怖いので、ここで一括設定
+		c.header("Cache-Control", "no-store");
+		c.header("Pragma", "no-cache");
+		c.header("Expires", "0");
+	})
 	.route("/authorize", oauthAuthorizeRoute)
 	.route("/callback", oauthCallbackRoute)
 	.route("/access-token", oauthAccessTokenRoute)

@@ -40,10 +40,18 @@ export const PLEASE_CONNECT_OAUTH_ACCOUNT: ToastItem = {
 		"この機能を利用するには、まず設定画面からアカウントを紐づける必要があります。",
 } as const;
 
+export const PLEASE_RELOGIN_FOR_OAUTH: ToastItem = {
+	type: "error",
+	title: "再ログインしてください",
+	description:
+		"この OAuth アプリケーションを利用するためには再ログインが必要です",
+} as const;
+
 const TOAST_ITEMS = [
 	PLEASE_LOGIN_FOR_OAUTH,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
+	PLEASE_RELOGIN_FOR_OAUTH,
 ];
 
 // ハッシュ衝突チェック
