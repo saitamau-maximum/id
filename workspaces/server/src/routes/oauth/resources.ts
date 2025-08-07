@@ -102,11 +102,7 @@ const route = app
 		}
 
 		const userInfo: OidcUserInfo = {
-			sub: await generateSub(
-				tokenInfo.clientId,
-				tokenInfo.userId,
-				tokenInfo.accessToken,
-			),
+			sub: await generateSub(tokenInfo.clientId, tokenInfo.userId),
 		};
 		if (tokenInfo.user.profile.updatedAt)
 			userInfo.updated_at = Math.floor(

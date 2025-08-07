@@ -48,18 +48,14 @@ const generateAtHash = async (accessToken: string) => {
 	return binaryToBase64Url(leftHalf);
 };
 
-export const generateSub = async (
-	clientId: string,
-	userId: string,
-	accessToken: string,
-) => {
+export const generateSub = async (clientId: string, userId: string) => {
 	// sub は以下の条件を満たす必要がある (pairwise sub としている)
 	// - unique
 	// - User が同じでも、 Client に対して異なる sub を生成する
 	// - OpenID Provider (つまり IdP Server) 以外にとって可逆不可能
 	// - 同じ入力に対しては同じ結果
-	// そのため、 Client ID と User ID, ATHash を組み合わせてハッシュをとることにする
-	const payload = `${clientId}_${userId}_${await generateAtHash(accessToken)}`;
+	// そのため、 Client ID と User ID を組み合わせてハッシュをとることにする
+	const payload = `${clientId}_${userId}`;
 	const hash = await crypto.subtle.digest(
 		{ name: "SHA-512" },
 		new TextEncoder().encode(payload),
@@ -84,7 +80,7 @@ export const generateIdToken = async ({
 
 	const payload: OidcIdTokenPayload = {
 		iss: "https://api.id.maximum.vc",
-		sub: await generateSub(clientId, userId, accessToken),
+		sub: await generateSub(clientId, userId),
 		aud: [clientId],
 		exp: exp,
 		iat: nowUnixS,
