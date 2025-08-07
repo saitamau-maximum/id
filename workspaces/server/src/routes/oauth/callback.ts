@@ -98,7 +98,10 @@ const route = app
 					"error_description",
 					"The user denied the request",
 				);
-				// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
+				redirectTo.searchParams.append(
+					"error_uri",
+					"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
+				);
 				return c.redirect(redirectTo.href, 302);
 			}
 
@@ -135,7 +138,10 @@ const route = app
 				.catch((e: Error) => {
 					redirectTo.searchParams.append("error", "server_error");
 					redirectTo.searchParams.append("error_description", e.message);
-					// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
+					redirectTo.searchParams.append(
+						"error_uri",
+						"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
+					);
 					return c.redirect(redirectTo.href, 302);
 				});
 		},

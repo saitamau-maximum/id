@@ -25,7 +25,8 @@ const route = app
 					{
 						error: "invalid_request",
 						error_description: "Authorization header is not allowed",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					401,
 				);
@@ -33,13 +34,13 @@ const route = app
 			return next();
 		},
 		vValidator("form", requestBodySchema, async (res, c) => {
-			// TODO: いい感じのエラー画面を作るかも
 			if (!res.success)
 				return c.json(
 					{
 						error: "invalid_request",
 						error_description: "Invalid Parameters",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					400,
 				);
@@ -62,7 +63,8 @@ const route = app
 					{
 						error: "invalid_grant",
 						error_description: "Invalid Code (Not Found, Expired, etc)",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					401,
 				);
@@ -77,7 +79,8 @@ const route = app
 					{
 						error: "invalid_request",
 						error_description: "Redirect URI mismatch",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					400,
 				);
@@ -92,7 +95,8 @@ const route = app
 					{
 						error: "invalid_client",
 						error_description: "Invalid client_id or client_secret",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					401,
 				);
@@ -104,7 +108,8 @@ const route = app
 					{
 						error: "unsupported_grant_type",
 						error_description: "grant_type must be authorization_code",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					400,
 				);
@@ -119,7 +124,8 @@ const route = app
 					{
 						error: "invalid_grant",
 						error_description: "Invalid Code (Already Used)",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					401,
 				);
@@ -133,7 +139,8 @@ const route = app
 					{
 						error: "server_error",
 						error_description: "Failed to set code used",
-						// "error_uri": "" // そのうち書く
+						error_uri:
+							"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint",
 					},
 					500,
 				);

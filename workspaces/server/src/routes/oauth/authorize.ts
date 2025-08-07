@@ -100,7 +100,10 @@ const route = app
 
 				callback.searchParams.append("error", error);
 				callback.searchParams.append("error_description", description);
-				// callback.searchParams.append("error_uri", _errorUri) // そのうちドキュメント書いておきたいね
+				callback.searchParams.append(
+					"error_uri",
+					"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
+				);
 				if (state) callback.searchParams.append("state", state);
 
 				return c.redirect(callback.toString(), 302);
