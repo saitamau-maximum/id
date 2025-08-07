@@ -1,7 +1,15 @@
 import type { Context } from "hono";
+import { deleteCookie, getSignedCookie } from "hono/cookie";
+import { verify } from "hono/jwt";
 import { validator } from "hono/validator";
 import * as v from "valibot";
+import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
+import {
+	PLEASE_RELOGIN_FOR_OAUTH,
+	TOAST_SEARCHPARAM,
+	ToastHashFn,
+} from "../../constants/toast";
 import { type HonoEnv, factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { generateAuthToken } from "../../utils/oauth/auth-token";
@@ -90,11 +98,7 @@ const route = app
 			}
 
 			// ---------- 以下エラー時リダイレクトさせるやつ ---------- //
-			const errorRedirect = (
-				error: string,
-				description: string,
-				_errorUri: string,
-			) => {
+			const errorRedirect = (error: string, description: string) => {
 				const callback = new URL(redirectTo);
 
 				callback.searchParams.append("error", error);
@@ -113,13 +117,12 @@ const route = app
 				query.response_type,
 			);
 			if (!success4) {
-				return errorRedirect("invalid_request", "response_type required", "");
+				return errorRedirect("invalid_request", "response_type required");
 			}
 			if (responseType !== "code") {
 				return errorRedirect(
 					"unsupported_response_type",
 					"only 'code' is supported",
-					"",
 				);
 			}
 
@@ -128,7 +131,7 @@ const route = app
 				query.scope,
 			);
 			if (!success5) {
-				return errorRedirect("invalid_scope", "invalid scope", "");
+				return errorRedirect("invalid_scope", "invalid scope");
 			}
 
 			if (scope) {
@@ -138,7 +141,6 @@ const route = app
 					return errorRedirect(
 						"invalid_scope",
 						"there are duplicates in scopes",
-						"",
 					);
 				}
 
@@ -149,7 +151,6 @@ const route = app
 					return errorRedirect(
 						"invalid_scope",
 						`non-registered scope(s): ${unknownScopes.join(", ")}`,
-						"",
 					);
 				}
 
@@ -162,9 +163,92 @@ const route = app
 				return errorRedirect(
 					"invalid_scope",
 					"there must be at least one scope specified",
-					"",
 				);
 			}
+
+			// ----- OpenID Connect パラメータのチェック ----- //
+			const { output: nonce, success: success6 } = v.safeParse(
+				v.optional(v.string()),
+				query.nonce,
+			);
+			if (!success6) {
+				return errorRedirect("invalid_request", "invalid nonce");
+			}
+			const { output: prompt, success: success7 } = v.safeParse(
+				v.optional(
+					v.picklist(["none", "login", "consent", "select_account"] as const),
+				),
+				query.prompt,
+			);
+			if (!success7) {
+				return errorRedirect("invalid_request", "invalid prompt");
+			}
+			const { output: maxAge, success: success8 } = v.safeParse(
+				v.optional(v.number()),
+				query.max_age,
+			);
+			if (!success8) {
+				return errorRedirect("invalid_request", "invalid max_age");
+			}
+			// TODO: その他のパラメータもチェックする
+			// 仕様的には must, must not がないので無視しても問題はない
+
+			const nowMs = Date.now();
+			const loggedInAt = await (async () => {
+				const jwt = await getSignedCookie(
+					c,
+					c.env.SECRET,
+					COOKIE_NAME.LOGIN_STATE,
+				);
+				if (jwt) {
+					const payload = await verify(jwt, c.env.SECRET);
+					if (payload) return payload.iat;
+				}
+				return undefined;
+			})();
+			const forceRelogin = () => {
+				// Server 側でも再ログインを強制したいので、 cookie を削除する
+				deleteCookie(c, COOKIE_NAME.LOGIN_STATE);
+
+				// ref: middleware/auth.ts
+				const requestUrl = new URL(c.req.url);
+
+				const redirectTo = new URL("/login", c.env.CLIENT_ORIGIN);
+				redirectTo.searchParams.set("continue_to", requestUrl.toString());
+				redirectTo.searchParams.set(
+					TOAST_SEARCHPARAM,
+					ToastHashFn(PLEASE_RELOGIN_FOR_OAUTH),
+				);
+
+				return c.redirect(redirectTo.toString(), 302);
+			};
+
+			const isOidc = client.scopes.some((scope) => scope.name === "openid");
+			if (isOidc && prompt === "none") {
+				// 現状では同意済みフラグを持っていないので、 consent interaction を強制することになる
+				// TODO: none でもうまくできるようにする
+				return errorRedirect(
+					"interaction_required",
+					"End-User must consent to use OpenID Connect",
+				);
+			}
+			if (isOidc && prompt === "login") {
+				if (loggedInAt && loggedInAt + 20 > nowMs / 1000) {
+					// ログイン直後とみなし、再ログインを不要とする
+				} else {
+					return forceRelogin();
+				}
+			}
+			// Memo: prompt === consent: IdP OAuth では毎回同意を求めているので特に何もしない
+			// Memo: prompt === select_account: IdP では 1 人 1 アカウント前提なので特に何もしない
+
+			if (isOidc && maxAge) {
+				if (loggedInAt && loggedInAt + maxAge < nowMs / 1000) {
+					// max_age を超えているので再ログインを強制する
+					return forceRelogin();
+				}
+			}
+			// ----- End OpenID Connect Parameter Check ----- //
 
 			return {
 				clientId,
@@ -172,6 +256,12 @@ const route = app
 				redirectTo,
 				state,
 				scope,
+				oidcParams: {
+					isOidc,
+					nonce,
+					maxAge,
+					prompt,
+				},
 				clientInfo: client,
 			};
 		}),
