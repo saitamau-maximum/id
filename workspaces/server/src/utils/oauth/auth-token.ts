@@ -2,6 +2,7 @@
 // https://github.com/saitamau-maximum/auth/issues/27
 
 import { base64ToBinary, binaryToBase64 } from "./convert-bin-base64";
+import { sign, verify } from "./key";
 
 interface Param {
 	clientId: string;
@@ -33,19 +34,13 @@ const content = (param: Param) => {
 	return new TextEncoder().encode(p.toString());
 };
 
-const ALG = {
-	name: "ECDSA",
-	hash: "SHA-512",
-};
-
 export const generateAuthToken = async (param: GenerateParam) => {
 	const { key, ...rest } = param;
-	const signedBuf = await crypto.subtle.sign(ALG, key, content(rest));
-	return binaryToBase64(new Uint8Array(signedBuf));
+	return binaryToBase64(await sign(content(rest), key));
 };
 
 export const validateAuthToken = (param: ValidateParam) => {
 	const { key, hash, ...rest } = param;
 	const signBuf = base64ToBinary(hash);
-	return crypto.subtle.verify(ALG, key, signBuf, content(rest));
+	return verify(content(rest), key, signBuf);
 };
