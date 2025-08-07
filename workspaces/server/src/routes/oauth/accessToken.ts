@@ -1,21 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
-import { sign } from "hono/jwt";
-import type { JWTPayload } from "hono/utils/jwt/types";
 import * as v from "valibot";
 import { factory } from "../../factory";
+import { generateIdToken } from "../../utils/oauth/oidc";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
-
-interface OidcIdTokenPayload {
-	iss: string;
-	sub: string;
-	aud: string[];
-	exp: number;
-	iat: number;
-	auth_time?: number;
-	nonce?: string;
-	// acr, amr, azp は使わないので省略
-}
 
 interface TokenResponse {
 	access_token: string;
@@ -172,26 +160,15 @@ const route = app
 				scope: tokenInfo.scopes.map((s) => s.name).join(" "),
 			};
 
-			if (tokenInfo.scopes.some((s) => s.name === "openid")) {
-				// OpenID Connect の ID Token 生成
-				const payload: OidcIdTokenPayload = {
-					iss: "https://api.id.maximum.vc",
-					sub: crypto.randomUUID(),
-					aud: [tokenInfo.clientId],
+			if (tokenInfo.scopes.some((s) => s.name === "openid"))
+				res.id_token = await generateIdToken({
+					clientId: tokenInfo.clientId,
 					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
-					iat: Math.floor(nowUnixMs / 1000),
-				};
-				if (tokenInfo.oidcParams.nonce)
-					payload.nonce = tokenInfo.oidcParams.nonce;
-				if (tokenInfo.oidcParams.authTime)
-					payload.auth_time = tokenInfo.oidcParams.authTime;
-
-				const idToken = await sign(
-					payload as unknown as JWTPayload,
-					c.env.SECRET,
-				);
-				res.id_token = idToken;
-			}
+					authTime: tokenInfo.oidcParams.authTime,
+					nonce: tokenInfo.oidcParams.nonce,
+					accessToken: tokenInfo.accessToken,
+					privateKey: c.env.PRIVKEY_FOR_OAUTH,
+				});
 
 			return c.json(res, 200);
 		},
