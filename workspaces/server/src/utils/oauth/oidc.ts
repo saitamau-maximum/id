@@ -15,6 +15,7 @@ interface OidcIdTokenPayload {
 
 interface Param {
 	clientId: string;
+	userId: string;
 	exp: number;
 	authTime?: number;
 	nonce?: string;
@@ -49,6 +50,7 @@ const generateAtHash = async (accessToken: string) => {
 
 export const generateIdToken = async ({
 	clientId,
+	userId,
 	exp,
 	authTime,
 	nonce,
@@ -59,14 +61,16 @@ export const generateIdToken = async ({
 
 	// OpenID Connect の ID Token 生成
 	const nowUnixS = Math.floor(Date.now() / 1000);
+	const atHash = await generateAtHash(accessToken);
 
 	const payload: OidcIdTokenPayload = {
 		iss: "https://api.id.maximum.vc",
-		sub: crypto.randomUUID(),
+		// sub は unique かつユーザーを識別できるのが望ましいので、 [clientId]_[userId]_[atHash] の形式で生成
+		sub: `${clientId}_${userId}_${atHash}`,
 		aud: [clientId],
 		exp: exp,
 		iat: nowUnixS,
-		at_hash: await generateAtHash(accessToken),
+		at_hash: atHash,
 	};
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;

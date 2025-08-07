@@ -160,6 +160,7 @@ const route = app
 			if (tokenInfo.scopes.some((s) => s.name === "openid"))
 				res.id_token = await generateIdToken({
 					clientId: tokenInfo.clientId,
+					userId: tokenInfo.userId,
 					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
 					authTime: tokenInfo.oidcParams.authTime,
 					nonce: tokenInfo.oidcParams.nonce,
