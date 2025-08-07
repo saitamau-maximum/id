@@ -36,12 +36,23 @@ const signJWT = async (payload: OidcIdTokenPayload, key: CryptoKey) => {
 	return `${partial}.${encodedSignature}`;
 };
 
+const generateAtHash = async (accessToken: string) => {
+	// at_hash は access_token のハッシュ値の左半分を Base64url エンコードしたもの
+	// ハッシュアルゴリズムは signJWT と同じ = SHA-512
+	const hash = await crypto.subtle.digest(
+		{ name: "SHA-512" },
+		new TextEncoder().encode(accessToken),
+	);
+	const leftHalf = new Uint8Array(hash.slice(0, 32)); // SHA-512 は 64B なので左半分は 32B
+	return binaryToBase64Url(leftHalf);
+};
+
 export const generateIdToken = async ({
 	clientId,
 	exp,
 	authTime,
 	nonce,
-	_accessToken,
+	accessToken,
 	privateKey,
 }: Param) => {
 	const key = await importKey(privateKey, "privateKey");
@@ -55,7 +66,7 @@ export const generateIdToken = async ({
 		aud: [clientId],
 		exp: exp,
 		iat: nowUnixS,
-		at_hash: "TODO",
+		at_hash: await generateAtHash(accessToken),
 	};
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
