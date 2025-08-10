@@ -70,7 +70,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 				name: equipment.name,
 				description: equipment.description,
 				ownerId: equipment.ownerId,
-			} as { name: string; description?: string; ownerId: string },
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to create equipment");
@@ -91,7 +91,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 				id: equipment.id,
 				name: equipment.name,
 				description: equipment.description,
-			} as { id: string; name: string; description?: string },
+			},
 		});
 		if (!res.ok) {
 			throw new Error("Failed to update equipment");
