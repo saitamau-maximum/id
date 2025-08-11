@@ -90,7 +90,6 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 				id: equipment.id,
 			},
 			json: {
-				id: equipment.id,
 				name: equipment.name,
 				description: equipment.description?.trim() || null,
 				ownerId: equipment.ownerId,
