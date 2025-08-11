@@ -7,7 +7,7 @@ export interface IEquipmentRepository {
 	getEquipmentById: (
 		equipmentId: Equipment["id"],
 	) => Promise<EquipmentWithOwner>;
-	getEquipmentsById$$key: (equipmentId: Equipment["id"]) => unknown[];
+	getEquipmentById$$key: (equipmentId: Equipment["id"]) => unknown[];
 	createEquipment: (equipment: {
 		name: string;
 		description?: string;
@@ -57,8 +57,8 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		};
 	}
 
-	getEquipmentsById$$key(equipmentId: Equipment["id"]) {
-		return ["equipment", equipmentId];
+	getEquipmentById$$key(equipmentId: Equipment["id"]) {
+		return ["equipments", equipmentId];
 	}
 
 	async createEquipment(equipment: {
