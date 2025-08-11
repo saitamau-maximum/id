@@ -1,12 +1,18 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { useCallback } from "react";
 import { createCallable } from "react-call";
+import { Plus, X } from "react-feather";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import * as v from "valibot";
+import { UserDisplay } from "~/components/feature/user/user-display";
+import { UserSelector } from "~/components/feature/user/user-selector";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
+import { IconButton } from "~/components/ui/icon-button";
 import { useAllUsers } from "~/routes/dashboard/admin/users/internal/hooks/use-all-user";
+import { ConfigSectionSubHeader } from "~/routes/dashboard/oauth-apps/config/internal/components/config-section-sub-header";
 import { EquipmentSchemas } from "~/schema/equipment";
 import type { Equipment, EquipmentWithOwner } from "~/types/equipment";
 
@@ -41,6 +47,8 @@ export const EquipmentDialog = createCallable<DialogProps, Payload>(
 			handleSubmit,
 			register,
 			formState: { errors },
+			setValue,
+			watch,
 		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
 			resolver: valibotResolver(CreateEquipmentSchema),
 			defaultValues: {
@@ -58,6 +66,26 @@ export const EquipmentDialog = createCallable<DialogProps, Payload>(
 				},
 			});
 		};
+
+		const currentOwnerId = watch("ownerId");
+		const currentOwner = users?.find((user) => user.id === currentOwnerId);
+
+		const handleAddOwner = useCallback(async () => {
+			if (!users) return;
+			const res = await UserSelector.call({
+				users,
+				selectedUserIds: currentOwnerId ? [currentOwnerId] : [],
+				multiple: false,
+			});
+			if (res.type === "dismiss") return;
+
+			const selectedUserId = res.newSelectedUserIds[0] || "";
+			setValue("ownerId", selectedUserId);
+		}, [users, currentOwnerId, setValue]);
+
+		const handleRemoveOwner = useCallback(() => {
+			setValue("ownerId", "");
+		}, [setValue]);
 
 		return (
 			<Dialog
@@ -90,47 +118,58 @@ export const EquipmentDialog = createCallable<DialogProps, Payload>(
 							gap: 2,
 						})}
 					>
-						<label
-							htmlFor="equipment-owner"
+						<ConfigSectionSubHeader title="所有者">
+							<IconButton type="button" onClick={handleAddOwner} label="Add">
+								<Plus size={16} />
+							</IconButton>
+						</ConfigSectionSubHeader>
+						<div
 							className={css({
-								fontSize: "sm",
-								fontWeight: "medium",
-								color: "gray.700",
+								display: "flex",
+								flexWrap: "wrap",
+								gap: "token(spacing.1) token(spacing.4)",
 							})}
 						>
-							所有者 *
-						</label>
-						<select
-							id="equipment-owner"
-							className={css({
-								display: "block",
-								width: "100%",
-								padding: "0.5rem",
-								borderRadius: "0.375rem",
-								borderWidth: 1,
-								borderStyle: "solid",
-								borderColor: errors.ownerId ? "red.300" : "gray.300",
-								backgroundColor: "white",
-								"&:focus": {
-									outline: "none",
-									borderColor: "blue.500",
-									boxShadow: "0 0 0 3px rgba(59, 130, 246, 0.1)",
-								},
-							})}
-							{...register("ownerId")}
-						>
-							<option value="">所有者を選択してください</option>
-							{users.map((user) => (
-								<option key={user.id} value={user.id}>
-									{user.displayName || user.email || user.id}
-								</option>
-							))}
-						</select>
+							{currentOwner ? (
+								<div
+									className={css({
+										display: "flex",
+										alignItems: "center",
+										gap: 2,
+									})}
+								>
+									<UserDisplay
+										displayId={currentOwner.displayId ?? ""}
+										name={`${currentOwner.displayName} (@${currentOwner.displayId})`}
+										iconURL={currentOwner.profileImageURL ?? ""}
+										link
+									/>
+									<IconButton
+										type="button"
+										onClick={handleRemoveOwner}
+										label="Remove owner"
+									>
+										<X size={16} />
+									</IconButton>
+								</div>
+							) : (
+								<p
+									className={css({
+										color: "gray.500",
+										marginTop: "token(spacing.1)",
+										textAlign: "center",
+										width: "100%",
+									})}
+								>
+									所有者が選択されていません
+								</p>
+							)}
+						</div>
 						{errors.ownerId && (
 							<span
 								className={css({
 									fontSize: "sm",
-									color: "red.600",
+									color: "rose.500",
 								})}
 							>
 								{errors.ownerId.message}
