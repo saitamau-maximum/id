@@ -51,6 +51,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	roles: many(userRoles),
 	certifications: many(userCertifications),
 	socialLinks: many(socialLinks),
+	equipments: many(equipments),
 }));
 
 export const userProfiles = sqliteTable(
