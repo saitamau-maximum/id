@@ -1,24 +1,24 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
-import { adminOnlyMiddleware, memberOnlyMiddleware } from "../middleware/auth";
+import { equipmentMutableMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
 
 const createEquipmentSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	description: v.nullable(v.string()),
 	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const updateEquipmentSchema = v.object({
 	id: v.pipe(v.string(), v.nonEmpty()),
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	description: v.nullable(v.string()),
 });
 
 const route = app
-	.get("/", memberOnlyMiddleware, async (c) => {
+	.get("/", equipmentMutableMiddleware, async (c) => {
 		const { EquipmentRepository } = c.var;
 
 		try {
@@ -28,7 +28,7 @@ const route = app
 			return c.text("equipments not found", 404);
 		}
 	})
-	.get("/:id", memberOnlyMiddleware, async (c) => {
+	.get("/:id", equipmentMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
 
@@ -41,7 +41,7 @@ const route = app
 	})
 	.post(
 		"/",
-		adminOnlyMiddleware,
+		equipmentMutableMiddleware,
 		vValidator("json", createEquipmentSchema),
 		async (c) => {
 			const { name, description, ownerId } = c.req.valid("json");
@@ -50,7 +50,7 @@ const route = app
 			try {
 				const id = await EquipmentRepository.createEquipment({
 					name,
-					description: description ?? null,
+					description,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					ownerId,
@@ -63,7 +63,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		adminOnlyMiddleware,
+		equipmentMutableMiddleware,
 		vValidator("json", updateEquipmentSchema),
 		async (c) => {
 			const id = c.req.param("id");
@@ -76,7 +76,7 @@ const route = app
 				await EquipmentRepository.updateEquipment({
 					id,
 					name,
-					description: description ?? null,
+					description,
 					createdAt: currentEquipment.createdAt,
 					updatedAt: new Date(),
 					ownerId: currentEquipment.ownerId,
@@ -87,7 +87,7 @@ const route = app
 			}
 		},
 	)
-	.delete("/:id", adminOnlyMiddleware, async (c) => {
+	.delete("/:id", equipmentMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
 
