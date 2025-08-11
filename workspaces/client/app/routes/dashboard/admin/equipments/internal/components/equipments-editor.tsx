@@ -99,16 +99,18 @@ export const EquipmentEditor = () => {
 									</span>
 								</Table.Td>
 								<Table.Td>
-									{equipment.description !== null && (
+									{equipment.description && (
 										<span
 											className={css({
 												color: "gray.600",
 												textOverflow: "ellipsis",
+												overflow: "hidden",
+												whiteSpace: "nowrap",
+												display: "block",
+												maxWidth: 800,
 											})}
 										>
-											{equipment.description.length > 50
-												? `${equipment.description.slice(0, 50)}...`
-												: equipment.description}
+											{equipment.description}
 										</span>
 									)}
 								</Table.Td>

@@ -19,6 +19,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		await this.client.insert(schema.equipments).values({
 			id,
 			...params,
+			description: params.description ?? null,
 		});
 		return id;
 	}
@@ -48,7 +49,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		return {
 			id: result.id,
 			name: result.name,
-			description: result.description,
+			description: result.description ?? undefined,
 			createdAt: result.createdAt,
 			updatedAt: result.updatedAt,
 			ownerId: result.ownerId,
@@ -82,7 +83,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		return results.map((result) => ({
 			id: result.id,
 			name: result.name,
-			description: result.description,
+			description: result.description ?? undefined,
 			createdAt: result.createdAt,
 			updatedAt: result.updatedAt,
 			ownerId: result.ownerId,
@@ -100,7 +101,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 			.update(schema.equipments)
 			.set({
 				name: params.name,
-				description: params.description,
+				description: params.description ?? null,
 				ownerId: params.ownerId,
 				updatedAt: params.updatedAt,
 			})

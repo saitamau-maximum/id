@@ -13,7 +13,7 @@ const createEquipmentSchema = v.object({
 
 const updateEquipmentSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.nullable(v.string()),
+	description: v.optional(v.string()),
 	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
@@ -50,7 +50,7 @@ const route = app
 			try {
 				const id = await EquipmentRepository.createEquipment({
 					name,
-					description,
+					description: description ?? undefined,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					ownerId,
@@ -76,7 +76,7 @@ const route = app
 				await EquipmentRepository.updateEquipment({
 					id,
 					name,
-					description,
+					description: description ?? undefined,
 					createdAt: currentEquipment.createdAt,
 					updatedAt: new Date(),
 					ownerId,
