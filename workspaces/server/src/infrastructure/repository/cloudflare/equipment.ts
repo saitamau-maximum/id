@@ -101,6 +101,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 			.set({
 				name: params.name,
 				description: params.description,
+				ownerId: params.ownerId,
 				updatedAt: params.updatedAt,
 			})
 			.where(eq(schema.equipments.id, params.id));

@@ -13,6 +13,7 @@ export const useUpdateEquipment = () => {
 				id: equipment.id,
 				name: equipment.name,
 				description: equipment.description ?? undefined,
+				ownerId: equipment.ownerId,
 				updatedAt: equipment.updatedAt,
 			});
 			return equipment;

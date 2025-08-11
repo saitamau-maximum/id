@@ -99,7 +99,7 @@ export const EquipmentEditor = () => {
 									</span>
 								</Table.Td>
 								<Table.Td>
-									{equipment.description ? (
+									{equipment.description !== null && (
 										<span
 											className={css({
 												color: "gray.600",
@@ -109,15 +109,6 @@ export const EquipmentEditor = () => {
 											{equipment.description.length > 50
 												? `${equipment.description.slice(0, 50)}...`
 												: equipment.description}
-										</span>
-									) : (
-										<span
-											className={css({
-												color: "gray.400",
-												fontStyle: "italic",
-											})}
-										>
-											説明なし
 										</span>
 									)}
 								</Table.Td>

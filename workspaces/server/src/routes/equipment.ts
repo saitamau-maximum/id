@@ -12,9 +12,9 @@ const createEquipmentSchema = v.object({
 });
 
 const updateEquipmentSchema = v.object({
-	id: v.pipe(v.string(), v.nonEmpty()),
 	name: v.pipe(v.string(), v.nonEmpty()),
 	description: v.nullable(v.string()),
+	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const route = app
@@ -67,7 +67,7 @@ const route = app
 		vValidator("json", updateEquipmentSchema),
 		async (c) => {
 			const id = c.req.param("id");
-			const { name, description } = c.req.valid("json");
+			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
 
 			try {
@@ -79,7 +79,7 @@ const route = app
 					description,
 					createdAt: currentEquipment.createdAt,
 					updatedAt: new Date(),
-					ownerId: currentEquipment.ownerId,
+					ownerId,
 				});
 				return c.json({ id, message: "equipment updated" });
 			} catch (e) {

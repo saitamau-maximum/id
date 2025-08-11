@@ -7,7 +7,7 @@ export interface IEquipmentRepository {
 	getEquipmentById: (
 		equipmentId: Equipment["id"],
 	) => Promise<EquipmentWithOwner>;
-	getEquipmentById$$key: (equipmentId: Equipment["id"]) => unknown[];
+	getEquipmentsById$$key: (equipmentId: Equipment["id"]) => unknown[];
 	createEquipment: (equipment: {
 		name: string;
 		description?: string;
@@ -17,6 +17,7 @@ export interface IEquipmentRepository {
 		id: string;
 		name: string;
 		description?: string;
+		ownerId: string;
 		updatedAt: Date;
 	}) => Promise<void>;
 	deleteEquipment: (equipmentId: Equipment["id"]) => Promise<void>;
@@ -56,7 +57,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		};
 	}
 
-	getEquipmentById$$key(equipmentId: Equipment["id"]) {
+	getEquipmentsById$$key(equipmentId: Equipment["id"]) {
 		return ["equipment", equipmentId];
 	}
 
@@ -68,7 +69,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		const res = await client.equipment.$post({
 			json: {
 				name: equipment.name,
-				description: equipment.description,
+				description: equipment.description?.trim() || null,
 				ownerId: equipment.ownerId,
 			},
 		});
@@ -81,6 +82,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		id: string;
 		name: string;
 		description?: string;
+		ownerId: string;
 		updatedAt: Date;
 	}) {
 		const res = await client.equipment[":id"].$put({
@@ -90,7 +92,8 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 			json: {
 				id: equipment.id,
 				name: equipment.name,
-				description: equipment.description,
+				description: equipment.description?.trim() || null,
+				ownerId: equipment.ownerId,
 			},
 		});
 		if (!res.ok) {
