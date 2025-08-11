@@ -6,7 +6,7 @@ export default function OAuthLayout() {
 		<div>
 			<DashboardHeader
 				title="OAuth Apps"
-				subtitle="Maximum IDP の OAuth 2.0 機能を用いたアプリケーションの管理"
+				subtitle="Maximum IdP の OAuth 2.0 機能を用いたアプリケーションの管理"
 			/>
 			<Outlet />
 		</div>

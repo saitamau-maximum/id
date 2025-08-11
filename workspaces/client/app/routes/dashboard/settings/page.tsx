@@ -1,7 +1,12 @@
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { CertificationRequest } from "./internal/components/certification-request";
 import { ProfileUpdateForm } from "./internal/components/form";
 import { ProfileImageEditor } from "./internal/components/profile-image-editor";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Settings | Maximum IdP" }];
+};
 
 export default function Settings() {
 	return (

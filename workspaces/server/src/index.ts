@@ -2,6 +2,7 @@ import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
+import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
@@ -16,13 +17,13 @@ import { CloudflareSessionRepository } from "./infrastructure/repository/cloudfl
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
-import { DiscordCalendarNotifier } from "./infrastructure/repository/discord/calendar";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
 import { equipmentRoute } from "./routes/equipment";
 import { inviteRoute } from "./routes/invite";
@@ -68,10 +69,6 @@ export const route = app
 		);
 		// カレンダー
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
-		c.set(
-			"CalendarNotifier",
-			new DiscordCalendarNotifier(c.env.CALENDAR_NOTIFY_WEBHOOK_URL),
-		);
 		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
 		// 資格・試験
 		c.set(
@@ -98,7 +95,11 @@ export const route = app
 		// Discord 関連
 		c.set(
 			"DiscordBotRepository",
-			new DiscordBotRepository(c.env.DISCORD_BOT_TOKEN, c.env.DISCORD_GUILD_ID),
+			new DiscordBotRepository(
+				c.env.DISCORD_BOT_TOKEN,
+				c.env.DISCORD_GUILD_ID,
+				c.env.DISCORD_CALENDAR_CHANNEL_ID,
+			),
 		);
 
 		// ----- Dynamic Variables ----- //
@@ -121,6 +122,26 @@ export const route = app
 	.route("/equipment", equipmentRoute)
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
-	.route("/discord", discordRoute);
+	.route("/discord", discordRoute)
+	.route("/dev", devRoute);
 
-export default app;
+const scheduled: ExportedHandlerScheduledHandler<Env> = async (
+	controller,
+	env,
+	ctx,
+) => {
+	switch (controller.cron) {
+		case "0 18 * * *":
+			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
+			ctx.waitUntil(removeExpiredAccessTokenTask(env));
+			break;
+		default:
+			console.warn(`Unknown cron event: ${controller.cron}`);
+			break;
+	}
+};
+
+export default {
+	fetch: app.fetch,
+	scheduled,
+};

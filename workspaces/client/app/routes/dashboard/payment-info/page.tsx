@@ -1,9 +1,13 @@
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { PaymentInfoDisplay } from "~/components/feature/payment/info-display";
 import { MemberCard } from "~/components/feature/user/member-card";
 import { Progress } from "~/components/ui/progess";
-
 import { useAuth } from "~/hooks/use-auth";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "サークル費のお支払い | Maximum IdP" }];
+};
 
 const PAYMENT_UPDATE_STEPS = [
 	{ label: "入金", isActive: true, isCompleted: false },

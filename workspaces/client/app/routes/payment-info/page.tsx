@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router";
+import { type MetaFunction, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { PaymentInfoDisplay } from "~/components/feature/payment/info-display";
 import { MemberCard } from "~/components/feature/user/member-card";
@@ -14,12 +14,15 @@ const REGISTRATION_STEPS = [
 	{ label: "完了", isActive: false, isCompleted: false },
 ];
 
+export const meta: MetaFunction = () => {
+	return [{ title: "サークル費のお支払い | Maximum IdP" }];
+};
+
 export default function PaymentInfo() {
 	const { isLoading, isInitialized, isAuthorized, isProvisional, user } =
 		useAuth();
 	const navigate = useNavigate();
 
-	// そのうち本登録ユーザーでも表示できるようにする？
 	const shouldProceed =
 		!isLoading && isAuthorized && isInitialized && isProvisional;
 

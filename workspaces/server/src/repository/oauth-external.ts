@@ -116,4 +116,7 @@ export type IOAuthExternalRepository = {
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
+
+	// cron
+	deleteExpiredAccessTokens: () => Promise<void>;
 };

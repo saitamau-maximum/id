@@ -1,12 +1,16 @@
 import { useEffect } from "react";
 import { GitHub } from "react-feather";
-import { useNavigate, useSearchParams } from "react-router";
+import { type MetaFunction, useNavigate, useSearchParams } from "react-router";
 import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { env } from "~/utils/env";
 import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Login | Maximum IdP" }];
+};
 
 export default function Login() {
 	const { isLoading, isAuthorized, isMember } = useAuth();
@@ -73,7 +77,7 @@ export default function Login() {
 					},
 				})}
 			>
-				Maximum IDP
+				Maximum IdP
 			</h1>
 			<p
 				className={css({
@@ -82,7 +86,7 @@ export default function Login() {
 					lineHeight: 2,
 				})}
 			>
-				Maximum IDPへようこそ！
+				Maximum IdPへようこそ！
 				<br />
 				埼玉大学のプログラミングサークル「Maximum」のプロフィール管理システムです
 				{invitationCode && (
@@ -129,6 +133,29 @@ export default function Login() {
 					)
 				}
 			</div>
+
+			<p
+				className={css({
+					marginTop: 4,
+					textAlign: "center",
+					color: "gray.600",
+					fontSize: "sm",
+				})}
+			>
+				GitHub ログインで 404 が出る場合:{" "}
+				<a
+					href="https://github.com/saitamau-maximum/id/wiki/github-login-404"
+					target="_blank"
+					rel="noreferrer"
+					className={css({
+						color: "green.600",
+						textDecoration: "underline",
+					})}
+				>
+					Wiki
+				</a>{" "}
+				を参照してください。
+			</p>
 		</div>
 	);
 }

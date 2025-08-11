@@ -38,11 +38,11 @@ export const links: Route.LinksFunction = () => [
 
 export const meta: Route.MetaFunction = () => {
 	return [
-		{ title: "Maximum IDP" },
+		{ title: "Maximum IdP" },
 		{
 			name: "description",
 			content:
-				"埼玉大学のプログラミングサークル「Maximum」のメンバーのみが利用可能なプロフィールシステム「Maximum IDP」です。",
+				"埼玉大学のプログラミングサークル「Maximum」のメンバーのみが利用可能なプロフィールシステム「Maximum IdP」です。",
 		},
 		{
 			name: "robots",

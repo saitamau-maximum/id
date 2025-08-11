@@ -1,9 +1,14 @@
+import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { MemberCard } from "~/components/feature/user/member-card";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { FilterForm } from "./internal/components/filter-form";
 import { useMembers } from "./internal/hooks/use-members";
 import { useMembersFilter } from "./internal/hooks/use-members-filter";
+
+export const meta: MetaFunction = () => {
+	return [{ title: "Members | Maximum IdP" }];
+};
 
 export default function Members() {
 	const { data } = useMembers();
@@ -23,7 +28,7 @@ export default function Members() {
 		<div>
 			<DashboardHeader
 				title="Members"
-				subtitle="Maximum IDPに登録されているメンバーの一覧です"
+				subtitle="Maximum IdPに登録されているメンバーの一覧です"
 			/>
 			<FilterForm
 				filter={filter}

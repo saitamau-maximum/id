@@ -1,3 +1,4 @@
+import type { MetaFunction } from "react-router";
 import { CreateEventDialog } from "./internal/components/callable-create-event-dialog";
 import { CreateLocationDialog } from "./internal/components/callable-create-location-dialog";
 import { EditEventDialog } from "./internal/components/callable-edit-event-dialog";
@@ -5,6 +6,9 @@ import { EditLocationDialog } from "./internal/components/callable-edit-location
 import { EventsEditor } from "./internal/components/events-editor";
 import { LocationEditor } from "./internal/components/location-editor";
 
+export const meta: MetaFunction = () => {
+	return [{ title: "イベント管理 | Maximum IdP" }];
+};
 export default function AdminEvents() {
 	return (
 		<div>

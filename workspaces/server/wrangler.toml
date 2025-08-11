@@ -32,6 +32,13 @@ migrations_dir = "drizzle"
 binding = 'STORAGE'
 bucket_name = 'idp-storage-local'
 
+[triggers]
+crons = ["0 18 * * *"]  # 毎日 18:00 UTC (03:00 JST) に実行
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 # --- Preview ---
 
 [env.preview]
@@ -70,6 +77,13 @@ id = "8566bd47321c43cab679ab65bb60e38b"
 binding = 'STORAGE'
 bucket_name = 'idp-storage-preview'
 
+[env.preview.triggers]
+crons = ["0 18 * * *"]
+
+[env.preview.observability]
+enabled = true
+head_sampling_rate = 1
+
 # --- Production ---
 
 [env.production]
@@ -107,3 +121,10 @@ id = "0cd11121be304250a5246b2c1a5e185d"
 [[env.production.r2_buckets]]
 binding = 'STORAGE'
 bucket_name = 'idp-storage'
+
+[env.production.triggers]
+crons = ["0 18 * * *"]
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1

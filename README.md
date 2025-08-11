@@ -78,13 +78,6 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 </details>
 
 <details>
-<summary>通知系</summary>
-
-- `CALENDAR_NOTIFY_WEBHOOK_URL`: Calendar の追加・更新時に通知を受け取る Webhook URL
-
-</details>
-
-<details>
 <summary>その他</summary>
 
 (なし)
@@ -130,6 +123,8 @@ pnpm -C workspaces/server run build
 ```bash
 pnpm dev
 ```
+
+Cron Triggers のテストを行いたい場合、 `pnpm dev` 後にブラウザで `localhost:8787/dev/cron` にアクセスすると簡単に発火できます。
 
 ## 機密情報のメモ
 

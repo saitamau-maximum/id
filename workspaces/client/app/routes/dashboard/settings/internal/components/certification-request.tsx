@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
+import { ErrorDisplay } from "~/components/ui/form/error-display";
 import type { CertificationRequestParams } from "~/repository/certification";
 import type { Certification } from "~/types/certification";
 
@@ -150,17 +151,7 @@ export const CertificationRequest = createCallable<Props, Payload>(
 							)
 						}
 					</Form.Field.WithLabel>
-					{validationError && (
-						<p
-							className={css({
-								color: "red.500",
-								textAlign: "center",
-								fontSize: "sm",
-							})}
-						>
-							{validationError}
-						</p>
-					)}
+					<ErrorDisplay error={validationError ?? undefined} center />
 					<div
 						className={css({
 							display: "flex",

@@ -426,4 +426,42 @@ export class CloudflareOAuthExternalRepository
 			user: USER_BASIC_INFO_TRANSFORMER(user),
 		};
 	}
+
+	async deleteExpiredAccessTokens() {
+		// 有効期限ジャストに使われるかもしれないので、念のため 1 日前のものを削除
+		const now = new Date().valueOf() - 1 * 24 * 60 * 60 * 1000;
+
+		// まず一覧を取得
+		const expiredTokenIds = (
+			await this.client.query.oauthTokens.findMany({
+				where: (token, { lt }) => lt(token.accessTokenExpiresAt, new Date(now)),
+				columns: {
+					id: true,
+				},
+			})
+		).map((record) => record.id);
+
+		if (expiredTokenIds.length === 0) return;
+
+		// パラメータはクエリ当たり 100 個ずつしかできないようなので、分割しておく
+		// ref: https://developers.cloudflare.com/d1/platform/limits/ (Maximum bound parameters per query の部分)
+		const chunkSize = 80; // 余裕をもって 80 くらいにする
+		const chunks: number[][] = [];
+		for (let i = 0; i < expiredTokenIds.length; i += chunkSize) {
+			chunks.push(expiredTokenIds.slice(i, i + chunkSize));
+		}
+
+		for (const chunk of chunks) {
+			await this.client.batch([
+				// 次に token に紐づいた scopes を削除
+				this.client
+					.delete(schema.oauthTokenScopes)
+					.where(inArray(schema.oauthTokenScopes.tokenId, chunk)),
+				// 最後に tokens を削除
+				this.client
+					.delete(schema.oauthTokens)
+					.where(inArray(schema.oauthTokens.id, chunk)),
+			]);
+		}
+	}
 }

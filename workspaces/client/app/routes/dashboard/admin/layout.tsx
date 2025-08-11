@@ -81,7 +81,7 @@ export default function AdminLayout() {
 
 	return (
 		<div>
-			<DashboardHeader title="Admin" subtitle="Maximum IDPの管理画面です" />
+			<DashboardHeader title="Admin" subtitle="Maximum IdPの管理画面です" />
 			<Tab.List>
 				{NAVIGATION.map(
 					(nav) =>
