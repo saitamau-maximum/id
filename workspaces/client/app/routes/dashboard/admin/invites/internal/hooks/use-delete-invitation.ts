@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
-export const useDeleteInvititation = () => {
+export const useDeleteInvitation = () => {
 	const { invitationRepository } = useRepository();
 	const { pushToast } = useToast();
 	const queryClient = useQueryClient();

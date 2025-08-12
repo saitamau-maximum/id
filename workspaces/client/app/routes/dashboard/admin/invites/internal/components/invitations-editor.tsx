@@ -10,7 +10,7 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { Invitation } from "~/types/invitation";
 import { formatDateTime } from "~/utils/date";
-import { useDeleteInvititation } from "../hooks/use-delete-invitation";
+import { useDeleteInvitation } from "../hooks/use-delete-invitation";
 import { useGenerateInvitation } from "../hooks/use-generate-invitation";
 import { useInvitations } from "../hooks/use-invitations";
 import { GenerateInvitationURLDialog } from "./callable-generate-invitation-url-dialog";
@@ -91,7 +91,7 @@ export const InvitationsEditor = () => {
 };
 
 const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
-	const { mutate: deleteInvitation } = useDeleteInvititation();
+	const { mutate: deleteInvitation } = useDeleteInvitation();
 
 	const handleRowClick = useCallback(async (invitation: Invitation) => {
 		await InformationDialog.call({
