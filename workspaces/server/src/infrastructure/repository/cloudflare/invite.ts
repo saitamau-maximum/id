@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm";
+import { and, eq, notExists, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -68,19 +68,27 @@ export class CloudflareInviteRepository implements IInviteRepository {
 	}
 
 	async deleteInvite(id: string) {
-		// その招待リンクで招待された仮登録ユーザーが存在するなら、削除できないようにする
-		const user = await this.client.query.users.findFirst({
-			where: eq(schema.users.invitationId, id),
-		});
-		if (user) {
+		const res = await this.client
+			.delete(schema.invites)
+			.where(
+				and(
+					eq(schema.invites.id, id),
+					// その招待リンクで招待された仮登録ユーザーが存在するなら、削除できないようにする
+					notExists(
+						this.client
+							.select()
+							.from(schema.users)
+							.where(eq(schema.users.invitationId, id)),
+					),
+				),
+			)
+			.returning({ id: schema.invites.id });
+
+		// 削除された行がない = 仮登録ユーザーがいる -> エラーとする
+		if (res.length === 0) {
 			throw new Error(
 				`Cannot delete invite with ID ${id} because it has associated users.`,
 			);
 		}
-
-		await this.client
-			.delete(schema.invites)
-			.where(eq(schema.invites.id, id))
-			.execute();
 	}
 }
