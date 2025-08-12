@@ -1,6 +1,20 @@
 import type { Equipment, EquipmentWithOwner } from "~/types/equipment";
 import { client } from "~/utils/hono";
 
+export interface EquipmentCreateParams {
+	name: string;
+	description?: string;
+	ownerId: string;
+}
+
+export interface EquipmentUpdateParams {
+	id: string;
+	name: string;
+	description?: string;
+	ownerId: string;
+	updatedAt: Date;
+}
+
 export interface IEquipmentRepository {
 	getAllEquipments: () => Promise<EquipmentWithOwner[]>;
 	getAllEquipments$$key: () => unknown[];
@@ -8,18 +22,15 @@ export interface IEquipmentRepository {
 		equipmentId: Equipment["id"],
 	) => Promise<EquipmentWithOwner>;
 	getEquipmentById$$key: (equipmentId: Equipment["id"]) => unknown[];
-	createEquipment: (equipment: {
-		name: string;
-		description?: string;
-		ownerId: string;
-	}) => Promise<void>;
-	updateEquipment: (equipment: {
-		id: string;
-		name: string;
-		description?: string;
-		ownerId: string;
-		updatedAt: Date;
-	}) => Promise<void>;
+	createEquipment: (
+		equipment: Pick<Equipment, "name" | "description" | "ownerId">,
+	) => Promise<void>;
+	updateEquipment: (
+		equipment: Pick<
+			Equipment,
+			"id" | "name" | "description" | "ownerId" | "updatedAt"
+		>,
+	) => Promise<void>;
 	deleteEquipment: (equipmentId: Equipment["id"]) => Promise<void>;
 }
 

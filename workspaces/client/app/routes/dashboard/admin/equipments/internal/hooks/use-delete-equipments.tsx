@@ -8,11 +8,9 @@ export const useDeleteEquipment = () => {
 	const queryClient = useQueryClient();
 	const { pushToast } = useToast();
 	return useMutation({
-		mutationFn: async (equipment: EquipmentWithOwner) => {
-			await equipmentRepository.deleteEquipment(equipment.id);
-			return equipment;
-		},
-		onSuccess: (equipment) => {
+		mutationFn: (equipment: EquipmentWithOwner) =>
+			equipmentRepository.deleteEquipment(equipment.id),
+		onSuccess: (_, equipment) => {
 			pushToast({
 				title: `${equipment.name}を削除しました`,
 				type: "success",
