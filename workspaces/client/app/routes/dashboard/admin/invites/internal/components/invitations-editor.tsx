@@ -1,12 +1,16 @@
-import { useCallback } from "react";
-import { Plus } from "react-feather";
+import { type MouseEventHandler, useCallback } from "react";
+import { Plus, Trash } from "react-feather";
 import { css } from "styled-system/css";
+import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { UserDisplay } from "~/components/feature/user/user-display";
+import { ConfirmDialog } from "~/components/logic/callable/comfirm";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
+import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { Invitation } from "~/types/invitation";
 import { formatDateTime } from "~/utils/date";
+import { useDeleteInvititation } from "../hooks/use-delete-invitation";
 import { useGenerateInvitation } from "../hooks/use-generate-invitation";
 import { useInvitations } from "../hooks/use-invitations";
 import { GenerateInvitationURLDialog } from "./callable-generate-invitation-url-dialog";
@@ -61,6 +65,7 @@ export const InvitationsEditor = () => {
 							<Table.Th>期限</Table.Th>
 							<Table.Th>作成日</Table.Th>
 							<Table.Th>作成者</Table.Th>
+							<Table.Th>操作</Table.Th>
 						</Table.Tr>
 					</thead>
 					<tbody>
@@ -86,6 +91,8 @@ export const InvitationsEditor = () => {
 };
 
 const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
+	const { mutate: deleteInvitation } = useDeleteInvititation();
+
 	const handleRowClick = useCallback(async (invitation: Invitation) => {
 		await InformationDialog.call({
 			title: "招待リンク",
@@ -94,6 +101,22 @@ const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
 			),
 		});
 	}, []);
+
+	const handleDeleteInvitation = useCallback<
+		MouseEventHandler<HTMLButtonElement>
+	>(
+		async (e) => {
+			e.stopPropagation();
+			const res = await ConfirmDialog.call({
+				title: "招待リンクの削除",
+				children: <DeleteConfirmation title={invitation.title} />,
+				danger: true,
+			});
+			if (res.type === "dismiss") return;
+			deleteInvitation(invitation.id);
+		},
+		[invitation, deleteInvitation],
+	);
 
 	return (
 		<Table.Tr key={invitation.id} onClick={() => handleRowClick(invitation)}>
@@ -152,6 +175,17 @@ const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
 					displayId={invitation.issuedBy.displayId || ""}
 					link
 				/>
+			</Table.Td>
+			<Table.Td
+				className={css({ display: "flex", gap: 2, justifyContent: "center" })}
+			>
+				<IconButton
+					label="削除"
+					color="danger"
+					onClick={handleDeleteInvitation}
+				>
+					<Trash size={16} />
+				</IconButton>
 			</Table.Td>
 		</Table.Tr>
 	);
