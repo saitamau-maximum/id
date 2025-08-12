@@ -26,15 +26,6 @@ export const InvitationsEditor = () => {
 		});
 	}, [generateInvitation]);
 
-	const handleRowClick = useCallback(async (invitation: Invitation) => {
-		await InformationDialog.call({
-			title: "招待リンク",
-			children: (
-				<InvitationURLDisplay title={invitation.title} id={invitation.id} />
-			),
-		});
-	}, []);
-
 	return (
 		<div>
 			<div
@@ -74,67 +65,7 @@ export const InvitationsEditor = () => {
 					</thead>
 					<tbody>
 						{invitations.map((invitation) => (
-							<Table.Tr
-								key={invitation.id}
-								onClick={() => handleRowClick(invitation)}
-							>
-								<Table.Td>{invitation.title}</Table.Td>
-								<Table.Td>
-									{invitation.remainingUse !== null && (
-										<div
-											className={css({
-												display: "flex",
-												gap: 2,
-												alignItems: "center",
-											})}
-										>
-											{invitation.remainingUse}
-											{invitation.remainingUse <= 0 && (
-												<span
-													className={css({
-														color: "rose.500",
-														fontSize: "xs",
-													})}
-												>
-													(使用済み)
-												</span>
-											)}
-										</div>
-									)}
-								</Table.Td>
-								<Table.Td>
-									{invitation.expiresAt && (
-										<div
-											className={css({
-												display: "flex",
-												gap: 2,
-												alignItems: "center",
-											})}
-										>
-											{formatDateTime(invitation.expiresAt)}
-											{invitation.expiresAt < new Date() && (
-												<span
-													className={css({
-														color: "rose.500",
-														fontSize: "xs",
-													})}
-												>
-													(期限切れ)
-												</span>
-											)}
-										</div>
-									)}
-								</Table.Td>
-								<Table.Td>{formatDateTime(invitation.createdAt)}</Table.Td>
-								<Table.Td>
-									<UserDisplay
-										iconURL={invitation.issuedBy.profileImageURL}
-										name={invitation.issuedBy.displayName || ""}
-										displayId={invitation.issuedBy.displayId || ""}
-										link
-									/>
-								</Table.Td>
-							</Table.Tr>
+							<InvitationTableRow key={invitation.id} invitation={invitation} />
 						))}
 					</tbody>
 				</Table.Root>
@@ -151,5 +82,77 @@ export const InvitationsEditor = () => {
 				</p>
 			)}
 		</div>
+	);
+};
+
+const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
+	const handleRowClick = useCallback(async (invitation: Invitation) => {
+		await InformationDialog.call({
+			title: "招待リンク",
+			children: (
+				<InvitationURLDisplay title={invitation.title} id={invitation.id} />
+			),
+		});
+	}, []);
+
+	return (
+		<Table.Tr key={invitation.id} onClick={() => handleRowClick(invitation)}>
+			<Table.Td>{invitation.title}</Table.Td>
+			<Table.Td>
+				{invitation.remainingUse !== null && (
+					<div
+						className={css({
+							display: "flex",
+							gap: 2,
+							alignItems: "center",
+						})}
+					>
+						{invitation.remainingUse}
+						{invitation.remainingUse <= 0 && (
+							<span
+								className={css({
+									color: "rose.500",
+									fontSize: "xs",
+								})}
+							>
+								(使用済み)
+							</span>
+						)}
+					</div>
+				)}
+			</Table.Td>
+			<Table.Td>
+				{invitation.expiresAt && (
+					<div
+						className={css({
+							display: "flex",
+							gap: 2,
+							alignItems: "center",
+						})}
+					>
+						{formatDateTime(invitation.expiresAt)}
+						{invitation.expiresAt < new Date() && (
+							<span
+								className={css({
+									color: "rose.500",
+									fontSize: "xs",
+								})}
+							>
+								(期限切れ)
+							</span>
+						)}
+					</div>
+				)}
+			</Table.Td>
+			<Table.Td>{formatDateTime(invitation.createdAt)}</Table.Td>
+			<Table.Td>
+				<UserDisplay
+					iconURL={invitation.issuedBy.profileImageURL}
+					name={invitation.issuedBy.displayName || ""}
+					displayId={invitation.issuedBy.displayId || ""}
+					link
+				/>
+			</Table.Td>
+		</Table.Tr>
 	);
 };
