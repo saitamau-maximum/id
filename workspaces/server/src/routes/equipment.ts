@@ -81,7 +81,7 @@ const route = app
 					updatedAt: new Date(),
 					ownerId,
 				});
-				return c.json({ id, message: "equipment updated" });
+				return c.json({ id }, 200);
 			} catch (e) {
 				return c.text("Internal Server Error", 500);
 			}
@@ -93,7 +93,6 @@ const route = app
 
 		try {
 			await EquipmentRepository.deleteEquipment(id);
-			return c.json({ message: "equipment deleted" });
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}

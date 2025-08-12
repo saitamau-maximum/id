@@ -94,7 +94,7 @@ export const EquipmentEditor = () => {
 						{equipments.map((equipment) => (
 							<Table.Tr key={equipment.id}>
 								<Table.Td>
-									<span className={css({ fontWeight: "semibold" })}>
+									<span className={css({ fontWeight: "bold" })}>
 										{equipment.name}
 									</span>
 								</Table.Td>
