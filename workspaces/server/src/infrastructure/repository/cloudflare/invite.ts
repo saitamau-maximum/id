@@ -68,6 +68,16 @@ export class CloudflareInviteRepository implements IInviteRepository {
 	}
 
 	async deleteInvite(id: string) {
+		// その招待リンクで招待された仮登録ユーザーが存在するなら、削除できないようにする
+		const user = await this.client.query.users.findFirst({
+			where: eq(schema.users.invitationId, id),
+		});
+		if (user) {
+			throw new Error(
+				`Cannot delete invite with ID ${id} because it has associated users.`,
+			);
+		}
+
 		await this.client
 			.delete(schema.invites)
 			.where(eq(schema.invites.id, id))
