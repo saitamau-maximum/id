@@ -21,6 +21,7 @@ export interface IInvitationRepository {
 	}: GenerateInvitationOptions) => Promise<string>;
 	fetchInvitation: (params: FetchInvitationParams) => Promise<boolean>;
 	fetchInvitation$$key: (invitationId: string) => unknown[];
+	deleteInvitation: (id: string) => Promise<void>;
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
@@ -71,5 +72,16 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 
 	fetchInvitation$$key(invitationId: string): unknown[] {
 		return ["invitation", invitationId];
+	}
+
+	async deleteInvitation(id: string): Promise<void> {
+		const res = await client.invite[":id"].$delete({
+			param: {
+				id,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to delete invitation");
+		}
 	}
 }
