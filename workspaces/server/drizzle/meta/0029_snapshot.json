@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "391da406-cc7a-4eb9-94b7-1a6bbfb920e2",
+  "id": "970c8637-28e4-4cb6-83e5-128ae0fa628b",
   "prevId": "b0da6fee-e3a1-46f6-9562-793617b53552",
   "tables": {
     "calendar_events": {
@@ -1097,6 +1097,20 @@
             "access_token"
           ],
           "isUnique": true
+        },
+        "oauth_tokens_access_token_expires_at_idx": {
+          "name": "oauth_tokens_access_token_expires_at_idx",
+          "columns": [
+            "access_token_expires_at"
+          ],
+          "isUnique": false
+        },
+        "oauth_tokens_code_expires_at_idx": {
+          "name": "oauth_tokens_code_expires_at_idx",
+          "columns": [
+            "code_expires_at"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
