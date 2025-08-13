@@ -5,7 +5,6 @@ import { css } from "styled-system/css";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { env } from "~/utils/env";
-import { FLAG } from "~/utils/flag";
 import { LoginButtonLike } from "./internal/components/login-button";
 
 export const meta: MetaFunction = () => {
@@ -107,7 +106,7 @@ export default function Login() {
 				</a>
 				{
 					// invitationCode がある場合には GitHub ログインを強制
-					FLAG.ENABLE_DISCORD_LOGIN && !invitationCode && (
+					!invitationCode && (
 						<a
 							href={`${env("SERVER_HOST")}/auth/login/discord?${loginSearchParams.toString()}`}
 						>

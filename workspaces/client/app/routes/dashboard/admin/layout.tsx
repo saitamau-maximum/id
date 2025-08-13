@@ -2,7 +2,6 @@ import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/types/user";
-import { FLAG } from "~/utils/flag";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
 import { EVENTS_ALLOWED_ROLES } from "./events/layout";
@@ -23,19 +22,15 @@ const NAVIGATION = [
 		to: "/admin/users",
 		isActive: (location: string) => location.startsWith("/admin/users"),
 	},
-	...(FLAG.ENABLE_INVITE
-		? [
-				{
-					shouldDisplay: (user: User) =>
-						user.roles.some((r) =>
-							(INVITES_ALLOWED_ROLES as number[]).includes(r.id),
-						),
-					label: "Invites",
-					to: "/admin/invites",
-					isActive: (location: string) => location.startsWith("/admin/invites"),
-				},
-			]
-		: []),
+	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) =>
+				(INVITES_ALLOWED_ROLES as number[]).includes(r.id),
+			),
+		label: "Invites",
+		to: "/admin/invites",
+		isActive: (location: string) => location.startsWith("/admin/invites"),
+	},
 	{
 		shouldDisplay: (user: User) =>
 			user.roles.some((r) =>
@@ -46,19 +41,13 @@ const NAVIGATION = [
 		isActive: (location: string) =>
 			location.startsWith("/admin/certifications"),
 	},
-	...(FLAG.ENABLE_CALENDAR
-		? [
-				{
-					shouldDisplay: (user: User) =>
-						user.roles.some((r) =>
-							(EVENTS_ALLOWED_ROLES as number[]).includes(r.id),
-						),
-					label: "Events",
-					to: "/admin/events",
-					isActive: (location: string) => location.startsWith("/admin/events"),
-				},
-			]
-		: []),
+	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) => (EVENTS_ALLOWED_ROLES as number[]).includes(r.id)),
+		label: "Events",
+		to: "/admin/events",
+		isActive: (location: string) => location.startsWith("/admin/events"),
+	},
 ];
 
 export default function AdminLayout() {
