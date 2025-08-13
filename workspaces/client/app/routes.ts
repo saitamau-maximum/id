@@ -5,7 +5,6 @@ import {
 	prefix,
 	route,
 } from "@react-router/dev/routes";
-import { FLAG } from "./utils/flag";
 
 export default [
 	layout("routes/layout.tsx", [
@@ -25,15 +24,11 @@ export default [
 							index("routes/dashboard/admin/users/page.tsx"),
 						]),
 					]),
-					...(FLAG.ENABLE_INVITE
-						? [
-								...prefix("invites", [
-									layout("routes/dashboard/admin/invites/layout.tsx", [
-										index("routes/dashboard/admin/invites/page.tsx"),
-									]),
-								]),
-							]
-						: []),
+					...prefix("invites", [
+						layout("routes/dashboard/admin/invites/layout.tsx", [
+							index("routes/dashboard/admin/invites/page.tsx"),
+						]),
+					]),
 					...prefix("certifications", [
 						layout("routes/dashboard/admin/certifications/layout.tsx", [
 							index("routes/dashboard/admin/certifications/page.tsx"),
@@ -55,9 +50,7 @@ export default [
 				]),
 			]),
 		]),
-		...(FLAG.ENABLE_INVITE
-			? prefix("invitation", [route(":id", "routes/invitation/page.tsx")])
-			: []),
+		...prefix("invitation", [route(":id", "routes/invitation/page.tsx")]),
 		route("payment-info", "routes/payment-info/page.tsx"),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("verify", "routes/verify.tsx"),
