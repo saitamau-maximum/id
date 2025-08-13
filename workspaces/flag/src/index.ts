@@ -1,6 +1,4 @@
-const FLAGS_DEFAULT = {
-	ENABLE_DISCORD_LOGIN: true, // merged in 2025-07-02
-};
+const FLAGS_DEFAULT = {};
 
 export const DEV_FLAGS = {
 	...FLAGS_DEFAULT,
