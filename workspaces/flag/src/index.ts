@@ -1,5 +1,4 @@
 const FLAGS_DEFAULT = {
-	ENABLE_CALENDAR: true, // merged in 2025-03-28
 	ENABLE_INVITE: true, // merged in 2025-04-07
 	ENABLE_DISCORD_LOGIN: true, // merged in 2025-07-02
 };

@@ -46,19 +46,13 @@ const NAVIGATION = [
 		isActive: (location: string) =>
 			location.startsWith("/admin/certifications"),
 	},
-	...(FLAG.ENABLE_CALENDAR
-		? [
-				{
-					shouldDisplay: (user: User) =>
-						user.roles.some((r) =>
-							(EVENTS_ALLOWED_ROLES as number[]).includes(r.id),
-						),
-					label: "Events",
-					to: "/admin/events",
-					isActive: (location: string) => location.startsWith("/admin/events"),
-				},
-			]
-		: []),
+	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) => (EVENTS_ALLOWED_ROLES as number[]).includes(r.id)),
+		label: "Events",
+		to: "/admin/events",
+		isActive: (location: string) => location.startsWith("/admin/events"),
+	},
 ];
 
 export default function AdminLayout() {
