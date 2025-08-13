@@ -21,14 +21,21 @@ interface Param {
 	nonce?: string;
 	accessToken: string;
 	privateKey: string;
+	keyId?: string;
 }
 
-const signJWT = async (payload: OidcIdTokenPayload, key: CryptoKey) => {
+const signJWT = async (
+	payload: OidcIdTokenPayload,
+	key: CryptoKey,
+	keyId: string,
+) => {
 	const encodedPayload = binaryToBase64Url(
 		new TextEncoder().encode(JSON.stringify(payload)),
 	);
 	const encodedHeader = binaryToBase64Url(
-		new TextEncoder().encode(JSON.stringify({ alg: "ES512", typ: "JWT" })),
+		new TextEncoder().encode(
+			JSON.stringify({ alg: "ES512", typ: "JWT", kid: keyId }),
+		),
 	);
 	const partial = `${encodedHeader}.${encodedPayload}`;
 	const signature = await sign(new TextEncoder().encode(partial), key);
@@ -71,6 +78,7 @@ export const generateIdToken = async ({
 	nonce,
 	accessToken,
 	privateKey,
+	keyId = DEFAULT_KEY_ID,
 }: Param) => {
 	const key = await importKey(privateKey, "privateKey");
 
@@ -89,7 +97,11 @@ export const generateIdToken = async ({
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
 
-	const idToken = await signJWT(payload, key);
+	const idToken = await signJWT(payload, key, keyId);
 
 	return idToken;
 };
+
+// Rotation で鍵を変更する可能性があるので kid を指定できるようにする
+// 一応かぶらなさそうなランダムな値にしておく
+export const DEFAULT_KEY_ID = "W9u5j1sH";
