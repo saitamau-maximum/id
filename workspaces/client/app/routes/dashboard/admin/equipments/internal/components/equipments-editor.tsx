@@ -102,9 +102,8 @@ export const EquipmentEditor = () => {
 									{equipment.description && (
 										<span
 											className={css({
-												color: "gray.600",
 												textOverflow: "ellipsis",
-												overflow: "hidden",
+												overflowX: "hidden",
 												whiteSpace: "nowrap",
 												display: "block",
 												maxWidth: 800,
