@@ -44,18 +44,19 @@ const NAVIGATION = [
 	},
 	{
 		shouldDisplay: (user: User) =>
+			user.roles.some((r) => (EVENTS_ALLOWED_ROLES as number[]).includes(r.id)),
+		label: "Events",
+		to: "/admin/events",
+		isActive: (location: string) => location.startsWith("/admin/events"),
+	},
+	{
+		shouldDisplay: (user: User) =>
 			user.roles.some((r) =>
 				(EQUIPMENTS_ALLOWED_ROLES as number[]).includes(r.id),
 			),
 		label: "Equipments",
 		to: "/admin/equipments",
 		isActive: (location: string) => location.startsWith("/admin/equipments"),
-	{
-		shouldDisplay: (user: User) =>
-			user.roles.some((r) => (EVENTS_ALLOWED_ROLES as number[]).includes(r.id)),
-		label: "Events",
-		to: "/admin/events",
-		isActive: (location: string) => location.startsWith("/admin/events"),
 	},
 ];
 
