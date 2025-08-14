@@ -2,7 +2,7 @@ import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
 import { Outlet } from "react-router";
 import { useRoleBlock } from "../internal/hooks/use-role-block";
 
-export const EQUIPMENTS_ALLOWED_ROLES = [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT];
+export const EQUIPMENTS_ALLOWED_ROLES = [ROLE_IDS.MEMBER];
 
 export default function EquipmentsAdminLayout() {
 	const shouldProceed = useRoleBlock({
