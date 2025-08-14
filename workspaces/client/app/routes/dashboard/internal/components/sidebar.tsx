@@ -316,9 +316,7 @@ export const Sidebar = () => {
 										overflow: "hidden",
 										textOverflow: "ellipsis",
 										maxWidth: "160px",
-										fontSize: [
-											(user.displayName?.length ?? 0) < 10 ? "lg" : "md",
-										],
+										fontSize: "md",
 									})}
 									title={user.displayName}
 								>
