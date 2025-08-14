@@ -12,6 +12,9 @@ export const TabList = ({ children }: Props) => {
 				marginBottom: 8,
 				borderBottomWidth: "2px",
 				borderColor: "gray.200",
+				maxWidth: "100%",
+				overflowX: "auto",
+				overflowY: "hidden",
 			})}
 		>
 			{children}
