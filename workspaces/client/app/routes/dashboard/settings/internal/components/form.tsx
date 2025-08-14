@@ -19,7 +19,6 @@ import { GRADE, OUTSIDE_GRADE } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
-import { FLAG } from "~/utils/flag";
 import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
@@ -344,28 +343,26 @@ export const ProfileUpdateForm = () => {
 				</p>
 			</Form.FieldSet>
 
-			{FLAG.ENABLE_DISCORD_LOGIN && (
-				<Form.FieldSet>
-					<legend>
-						<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
-					</legend>
+			<Form.FieldSet>
+				<legend>
+					<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
+				</legend>
 
-					<Table.Root>
-						<Table.Tr>
-							<Table.Th>サービス</Table.Th>
-							<Table.Th>アカウント</Table.Th>
-							<Table.Th>連携</Table.Th>
-						</Table.Tr>
-						{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
-							<OAuthConnRow
-								key={providerId}
-								providerId={providerId}
-								conns={user?.oauthConnections ?? []}
-							/>
-						))}
-					</Table.Root>
-				</Form.FieldSet>
-			)}
+				<Table.Root>
+					<Table.Tr>
+						<Table.Th>サービス</Table.Th>
+						<Table.Th>アカウント</Table.Th>
+						<Table.Th>連携</Table.Th>
+					</Table.Tr>
+					{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
+						<OAuthConnRow
+							key={providerId}
+							providerId={providerId}
+							conns={user?.oauthConnections ?? []}
+						/>
+					))}
+				</Table.Root>
+			</Form.FieldSet>
 
 			<Form.FieldSet>
 				<legend>

@@ -61,6 +61,16 @@ const protectedRoute = app
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}
+	})
+	.delete("/:id", async (c) => {
+		const id = c.req.param("id");
+		const { InviteRepository } = c.var;
+		try {
+			await InviteRepository.deleteInvite(id);
+			return c.text("ok", 200);
+		} catch (e) {
+			return c.text("Internal Server Error", 500);
+		}
 	});
 
 const route = app.route("/", publicRoute).route("/", protectedRoute);
