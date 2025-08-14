@@ -77,10 +77,11 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		description?: string;
 		ownerId: string;
 	}) {
+		const description = equipment.description?.trim();
 		const res = await client.equipment.$post({
 			json: {
 				name: equipment.name,
-				description: equipment.description ?? null,
+				description: description,
 				ownerId: equipment.ownerId,
 			},
 		});
@@ -96,13 +97,14 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		ownerId: string;
 		updatedAt: Date;
 	}) {
+		const description = equipment.description?.trim();
 		const res = await client.equipment[":id"].$put({
 			param: {
 				id: equipment.id,
 			},
 			json: {
 				name: equipment.name,
-				description: equipment.description ?? undefined,
+				description: description || "",
 				ownerId: equipment.ownerId,
 			},
 		});

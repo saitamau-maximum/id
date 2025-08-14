@@ -1,24 +1,27 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
-import { equipmentMutableMiddleware } from "../middleware/auth";
+import {
+	equipmentMutableMiddleware,
+	memberOnlyMiddleware,
+} from "../middleware/auth";
 
 const app = factory.createApp();
 
 const createEquipmentSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.nullable(v.string()),
+	description: v.optional(v.string()),
 	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const updateEquipmentSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
+	description: v.string(),
 	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const route = app
-	.get("/", equipmentMutableMiddleware, async (c) => {
+	.get("/", memberOnlyMiddleware, async (c) => {
 		const { EquipmentRepository } = c.var;
 
 		try {
@@ -76,7 +79,7 @@ const route = app
 				await EquipmentRepository.updateEquipment({
 					id,
 					name,
-					description: description ?? undefined,
+					description: description === "" ? undefined : description,
 					createdAt: currentEquipment.createdAt,
 					updatedAt: new Date(),
 					ownerId,
@@ -93,6 +96,7 @@ const route = app
 
 		try {
 			await EquipmentRepository.deleteEquipment(id);
+			return c.text("ok", 200);
 		} catch (e) {
 			return c.text("Internal Server Error", 500);
 		}
