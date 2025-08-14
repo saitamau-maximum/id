@@ -37,7 +37,7 @@ export default [
 					...prefix("equipments", [
 						layout("routes/dashboard/admin/equipments/layout.tsx", [
 							index("routes/dashboard/admin/equipments/page.tsx"),
-            ]),
+						]),
 					]),
 					...prefix("events", [
 						layout("routes/dashboard/admin/events/layout.tsx", [

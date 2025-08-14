@@ -16,7 +16,7 @@ const createEquipmentSchema = v.object({
 
 const updateEquipmentSchema = v.object({
 	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.string(),
+	description: v.optional(v.string()),
 	ownerId: v.pipe(v.string(), v.nonEmpty()),
 });
 
