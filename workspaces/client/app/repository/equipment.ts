@@ -104,7 +104,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 			},
 			json: {
 				name: equipment.name,
-				description: description || "",
+				description: description ?? "",
 				ownerId: equipment.ownerId,
 			},
 		});
