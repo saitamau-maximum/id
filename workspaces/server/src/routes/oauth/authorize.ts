@@ -289,7 +289,10 @@ const route = app
 			const nowUnixMs = Date.now();
 			const { userId } = c.get("jwtPayload");
 
-			const privateKey = await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey");
+			const { key: privateKey } = await importKey(
+				c.env.PRIVKEY_FOR_OAUTH,
+				"privateKey",
+			);
 			const token = await generateAuthToken({
 				clientId,
 				redirectUri,

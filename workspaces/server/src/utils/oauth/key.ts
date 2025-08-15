@@ -1,6 +1,6 @@
 import { binaryToBase64Url } from "./convert-bin-base64";
 
-type JsonWebKeyWithKid = JsonWebKey & { kid?: string };
+type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 
 const keypairGenAlgorithm = {
 	name: "ECDSA",
@@ -14,7 +14,16 @@ const signatureAlgorithm = {
 
 const keypairUsage = ["sign", "verify"];
 
-const generateKeyPair = async () => {
+export const jwkToKey = (jwk: JsonWebKey, type: "publicKey" | "privateKey") =>
+	crypto.subtle.importKey(
+		"jwk",
+		jwk,
+		keypairGenAlgorithm,
+		true,
+		type === "publicKey" ? ["verify"] : ["sign"],
+	);
+
+export const generateKeyPair = async () => {
 	const { privateKey, publicKey } = (await crypto.subtle.generateKey(
 		keypairGenAlgorithm,
 		true,
@@ -45,44 +54,42 @@ const generateKeyPair = async () => {
 	};
 };
 
-const exportKey = async (key: JsonWebKeyWithKid) => {
+export const exportKey = async (key: JsonWebKeyWithKid) => {
 	return btoa(JSON.stringify(key));
 };
 
-const importKey = async (data: string, type: "publicKey" | "privateKey") => {
-	const keyData = JSON.parse(atob(data));
-	return crypto.subtle.importKey(
-		"jwk",
-		keyData,
-		keypairGenAlgorithm,
-		true,
-		type === "publicKey" ? ["verify"] : ["sign"],
-	);
+export const importKey = async (
+	data: string,
+	type: "publicKey" | "privateKey",
+) => {
+	const { kid, ...keyData }: JsonWebKeyWithKid = JSON.parse(atob(data));
+	return {
+		jwk: {
+			...keyData,
+			kid,
+		},
+		key: await jwkToKey(keyData, type),
+	};
 };
 
-const derivePublicKey = async (privateKey: CryptoKey) => {
-	const publicKey = (await crypto.subtle.exportKey(
-		"jwk",
-		privateKey,
-	)) as JsonWebKey;
-	// biome-ignore lint/performance/noDelete: <explanation>
+export const derivePublicKey = (
+	privateKey: JsonWebKeyWithKid,
+): JsonWebKeyWithKid => {
+	const publicKey = privateKey;
+	// biome-ignore lint/performance/noDelete: d は秘密鍵の情報なので削除、 d = undefined とはしない
 	delete publicKey.d;
-	publicKey.use = "sig";
-	publicKey.key_ops = ["verify"];
-	return importKey(btoa(JSON.stringify(publicKey)), "publicKey");
+	return publicKey;
 };
 
-const sign = async (payload: Uint8Array, key: CryptoKey) => {
+export const sign = async (payload: Uint8Array, key: CryptoKey) => {
 	const signedBuf = await crypto.subtle.sign(signatureAlgorithm, key, payload);
 	return new Uint8Array(signedBuf);
 };
 
-const verify = async (
+export const verify = async (
 	payload: Uint8Array,
 	key: CryptoKey,
 	signature: Uint8Array,
 ) => {
 	return crypto.subtle.verify(signatureAlgorithm, key, signature, payload);
 };
-
-export { derivePublicKey, importKey, exportKey, generateKeyPair, sign, verify };

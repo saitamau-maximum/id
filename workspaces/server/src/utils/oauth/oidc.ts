@@ -78,9 +78,11 @@ export const generateIdToken = async ({
 	nonce,
 	accessToken,
 	privateKey,
-	keyId = DEFAULT_KEY_ID,
 }: Param) => {
-	const key = await importKey(privateKey, "privateKey");
+	const {
+		key,
+		jwk: { kid },
+	} = await importKey(privateKey, "privateKey");
 
 	// OpenID Connect の ID Token 生成
 	const nowUnixS = Math.floor(Date.now() / 1000);
@@ -97,11 +99,7 @@ export const generateIdToken = async ({
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
 
-	const idToken = await signJWT(payload, key, keyId);
+	const idToken = await signJWT(payload, key, kid);
 
 	return idToken;
 };
-
-// Rotation で鍵を変更する可能性があるので kid を指定できるようにする
-// 一応かぶらなさそうなランダムな値にしておく
-export const DEFAULT_KEY_ID = "W9u5j1sH";

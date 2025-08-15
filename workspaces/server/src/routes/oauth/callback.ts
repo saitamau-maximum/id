@@ -5,7 +5,7 @@ import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
-import { derivePublicKey, importKey } from "../../utils/oauth/key";
+import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
@@ -57,9 +57,12 @@ const route = app
 
 			const { userId } = c.get("jwtPayload");
 
-			const publicKey = await derivePublicKey(
-				await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey"),
+			const { jwk: privKeyJwk } = await importKey(
+				c.env.PRIVKEY_FOR_OAUTH,
+				"privateKey",
 			);
+			const pubKeyJwk = derivePublicKey(privKeyJwk);
+			const publicKey = await jwkToKey(pubKeyJwk, "publicKey");
 			const isValidToken = await validateAuthToken({
 				clientId: client_id,
 				redirectUri: redirect_uri,
