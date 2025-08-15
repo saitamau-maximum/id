@@ -9,7 +9,6 @@ import {
 } from "react-router";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import type React from "react";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
