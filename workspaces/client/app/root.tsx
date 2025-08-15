@@ -277,10 +277,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 					alignItems: "center",
 					gap: "6",
 					justifyContent: "center",
-                    height: "100%",
-                    color: "gray.600",
-                    paddingLeft: "4",
-                    paddingRight: "4",
+					height: "100%",
+					color: "gray.600",
+					paddingLeft: "4",
+					paddingRight: "4",
 				})}
 			>
 				<h1
