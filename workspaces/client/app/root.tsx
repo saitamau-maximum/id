@@ -142,7 +142,7 @@ function ClassifyError(error: unknown) {
 			status_code: status,
 			error_title: "Forbidden",
 			error_message:
-				"この操作を行う権限がありません。管理者にお問い合わせください。",
+				"この操作を行う権限がありません。Adminにお問い合わせください。",
 		};
 	}
 
@@ -242,7 +242,7 @@ function ClassifyError(error: unknown) {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-	const { status_code, error_title, error_message } = ClassifyError(error) || {
+	const { status_code, error_title, error_message } = ClassifyError(error) ?? {
 		status_code: 500,
 		error_title: "Unexpected Error",
 		error_message: "予期しないエラーが発生しました。",
