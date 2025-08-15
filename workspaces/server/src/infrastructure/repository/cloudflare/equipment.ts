@@ -96,7 +96,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		}));
 	}
 
-	async updateEquipment(params: Equipment): Promise<void> {
+	async updateEquipment(params: Omit<Equipment, "createdAt">): Promise<void> {
 		await this.client
 			.update(schema.equipments)
 			.set({

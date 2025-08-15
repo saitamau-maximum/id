@@ -20,6 +20,6 @@ export interface IEquipmentRepository {
 	createEquipment: (params: Omit<Equipment, "id">) => Promise<string>;
 	getEquipmentById: (id: string) => Promise<EquipmentWithOwner>;
 	getAllEquipments: () => Promise<EquipmentWithOwner[]>;
-	updateEquipment: (params: Equipment) => Promise<void>;
+	updateEquipment: (params: Omit<Equipment, "createdAt">) => Promise<void>;
 	deleteEquipment: (id: string) => Promise<void>;
 }
