@@ -13,7 +13,7 @@ import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
 import { RoleSelector } from "./components/feature/user/role-selector";
 import { UserSelector } from "./components/feature/user/user-selector";
-import { ConfirmDialog } from "./components/logic/callable/comfirm";
+import { ConfirmDialog } from "./components/logic/callable/confirm";
 import { InformationDialog } from "./components/logic/callable/information";
 import { InvitationProvider } from "./hooks/use-invitation/invitation-provider";
 import { RepositoryProvider } from "./hooks/use-repository";

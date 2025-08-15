@@ -6,7 +6,7 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { css, cx } from "styled-system/css";
 import * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";

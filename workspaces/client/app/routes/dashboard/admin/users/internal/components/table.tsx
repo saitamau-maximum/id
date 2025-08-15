@@ -4,7 +4,7 @@ import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
 import { RoleSelector } from "~/components/feature/user/role-selector";
 import { UserDisplay } from "~/components/feature/user/user-display";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
