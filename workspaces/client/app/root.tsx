@@ -9,7 +9,7 @@ import {
 } from "react-router";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
+import type React from "react";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
@@ -251,65 +251,66 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 		error_message: "予期しないエラーが発生しました。",
 	};
 
-	React.useEffect(() => {
-		document.title = `${status_code} ${error_title} | Maximum IdP`;
-	});
+	const pageTitle = `${status_code} ${error_title} | Maximum IdP`;
 
 	return (
-		<div
-			className={css({
-				margin: "6",
-				width: "calc(100% - token(spacing.6) * 2)",
-				height: "calc(100dvh - token(spacing.6) * 2)",
-				overflow: "hidden",
-				background: "white",
-				borderRadius: "md",
-				lgDown: {
-					margin: "4",
-					width: "calc(100% - token(spacing.4) * 2)",
-					height: "calc(100dvh - token(spacing.4) * 2)",
-				},
-				mdDown: {
-					margin: "2",
-					width: "calc(100% - token(spacing.2) * 2)",
-					height: "calc(100dvh - token(spacing.2) * 2)",
-				},
-			})}
-		>
+		<>
+			<title>{pageTitle}</title>
 			<div
 				className={css({
-					display: "flex",
-					flexDirection: "column",
-					alignItems: "center",
-					gap: "6",
-					justifyContent: "center",
-					height: "100%",
-					color: "gray.600",
-					paddingLeft: "4",
-					paddingRight: "4",
+					margin: "6",
+					width: "calc(100% - token(spacing.6) * 2)",
+					height: "calc(100dvh - token(spacing.6) * 2)",
+					overflow: "hidden",
+					background: "white",
+					borderRadius: "md",
+					lgDown: {
+						margin: "4",
+						width: "calc(100% - token(spacing.4) * 2)",
+						height: "calc(100dvh - token(spacing.4) * 2)",
+					},
+					mdDown: {
+						margin: "2",
+						width: "calc(100% - token(spacing.2) * 2)",
+						height: "calc(100dvh - token(spacing.2) * 2)",
+					},
 				})}
 			>
-				<h1
+				<div
 					className={css({
-						fontSize: "6xl",
-						fontWeight: "bold",
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						gap: "6",
+						justifyContent: "center",
+						height: "100%",
+						color: "gray.600",
+						paddingLeft: "4",
+						paddingRight: "4",
 					})}
 				>
-					{status_code}
-				</h1>
-				<p
-					className={css({
-						fontSize: "2xl",
-						fontWeight: "bold",
-					})}
-				>
-					{error_title}
-				</p>
-				<p>{error_message}</p>
-				<ButtonLike>
-					<Link to="/">トップページに戻る</Link>
-				</ButtonLike>
+					<h1
+						className={css({
+							fontSize: "6xl",
+							fontWeight: "bold",
+						})}
+					>
+						{status_code}
+					</h1>
+					<p
+						className={css({
+							fontSize: "2xl",
+							fontWeight: "bold",
+						})}
+					>
+						{error_title}
+					</p>
+					<p>{error_message}</p>
+					<ButtonLike>
+						<Link to="/">トップページに戻る</Link>
+					</ButtonLike>
+				</div>
 			</div>
-		</div>
+		</>
 	);
 }
