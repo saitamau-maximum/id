@@ -10,9 +10,11 @@ const onlyDevMiddleware = factory.createMiddleware(async (c, next) => {
 	return next();
 });
 
-const route = app.use(onlyDevMiddleware).get("/cron", (c) => {
-	// 量が少ないので直書き
-	const res = `
+const route = app
+	.use(onlyDevMiddleware)
+	.get("/cron", (c) => {
+		// 量が少ないので直書き
+		const res = `
 <h1>Cron Simulator</h1>
 <form method="GET" action="/__scheduled">
   <label for="cron">Cron expression:</label>
@@ -20,7 +22,45 @@ const route = app.use(onlyDevMiddleware).get("/cron", (c) => {
   <button type="submit">Simulate</button>
 </form>
 `;
-	return c.html(res);
-});
+		return c.html(res);
+	})
+	.get("/oauth/:clientId/:clientSecret", async (c) => {
+		const { clientId, clientSecret } = c.req.param();
+		const redirectTo = new URL(c.req.url);
+		redirectTo.pathname = "/oauth/authorize";
+		redirectTo.searchParams.set("response_type", "code");
+		redirectTo.searchParams.set("client_id", clientId);
+		redirectTo.searchParams.set(
+			"redirect_uri",
+			`${redirectTo.origin}/dev/oauth/${clientId}/${clientSecret}/callback`,
+		);
+		return c.redirect(redirectTo.toString(), 302);
+	})
+	.get("/oauth/:clientId/:clientSecret/callback", async (c) => {
+		const { clientId, clientSecret } = c.req.param();
+		const { code } = c.req.query();
+		if (!code) {
+			return c.text("Bad Request: code is required", 400);
+		}
+		const url = new URL(c.req.url);
+		const body = new FormData();
+		body.append("grant_type", "authorization_code");
+		body.append("code", code);
+		body.append("client_id", clientId);
+		body.append("client_secret", clientSecret);
+		body.append(
+			"redirect_uri",
+			`${url.origin}/dev/oauth/${clientId}/${clientSecret}/callback`,
+		);
+
+		const res = await fetch(`${url.origin}/oauth/access-token`, {
+			method: "POST",
+			body,
+		});
+		c.header("Cache-Control", "no-store");
+		c.header("Pragma", "no-cache");
+		const resj = await res.json();
+		return c.json(resj as Record<string, unknown>, 200);
+	});
 
 export { route as devRoute };

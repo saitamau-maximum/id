@@ -3,6 +3,11 @@ const keypairGenAlgorithm = {
 	namedCurve: "P-521",
 };
 
+const signatureAlgorithm = {
+	name: "ECDSA",
+	hash: "SHA-512",
+};
+
 const keypairUsage = ["sign", "verify"];
 
 const generateKeyPair = () =>
@@ -39,4 +44,17 @@ const derivePublicKey = async (privateKey: CryptoKey) => {
 	return importKey(btoa(JSON.stringify(publicKey)), "publicKey");
 };
 
-export { derivePublicKey, importKey, exportKey, generateKeyPair };
+const sign = async (payload: Uint8Array, key: CryptoKey) => {
+	const signedBuf = await crypto.subtle.sign(signatureAlgorithm, key, payload);
+	return new Uint8Array(signedBuf);
+};
+
+const verify = async (
+	payload: Uint8Array,
+	key: CryptoKey,
+	signature: Uint8Array,
+) => {
+	return crypto.subtle.verify(signatureAlgorithm, key, signature, payload);
+};
+
+export { derivePublicKey, importKey, exportKey, generateKeyPair, sign, verify };

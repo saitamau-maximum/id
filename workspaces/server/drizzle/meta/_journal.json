@@ -211,6 +211,13 @@
       "when": 1752255313815,
       "tag": "0029_amused_loa",
       "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "6",
+      "when": 1755221987973,
+      "tag": "0030_overconfident_scarlet_witch",
+      "breakpoints": true
     }
   ]
 }

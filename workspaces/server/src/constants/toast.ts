@@ -6,10 +6,11 @@ interface ToastItem {
 	title: string;
 	description?: string;
 	to?: string;
+	needsReauth?: boolean;
 }
 
 export const ToastHashFn = (item: ToastItem): string => {
-	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}`;
+	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}--${item.needsReauth || ""}`;
 	let hash = 0;
 	for (let i = 0; i < key.length; i++) {
 		hash = (hash << 5) - hash + key.charCodeAt(i);
@@ -40,10 +41,19 @@ export const PLEASE_CONNECT_OAUTH_ACCOUNT: ToastItem = {
 		"この機能を利用するには、まず設定画面からアカウントを紐づける必要があります。",
 } as const;
 
+export const PLEASE_RELOGIN_FOR_OAUTH: ToastItem = {
+	type: "error",
+	title: "再ログインしてください",
+	description:
+		"この OAuth アプリケーションを利用するためには再ログインが必要です",
+	needsReauth: true,
+} as const;
+
 const TOAST_ITEMS = [
 	PLEASE_LOGIN_FOR_OAUTH,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
+	PLEASE_RELOGIN_FOR_OAUTH,
 ];
 
 // ハッシュ衝突チェック

@@ -1,5 +1,6 @@
+import type { Role } from "../constants/role";
 import type { Scope, ScopeId } from "../constants/scope";
-import type { User } from "./user";
+import type { Profile, User } from "./user";
 
 export type Client = {
 	id: string;
@@ -60,12 +61,16 @@ type GetClientByIdRes = Client & {
 type GetTokenByCodeRes = Token & {
 	client: Client & { secrets: ClientSecret[] };
 	scopes: Scope[];
+	oidcParams: {
+		nonce?: string;
+		authTime?: number;
+	};
 };
 
 type GetTokenByATRes = Token & {
 	client: Client;
 	scopes: Scope[];
-	user: UserBasicInfo;
+	user: Pick<User, "id"> & { profile: Partial<Profile>; roles: Role[] };
 };
 
 export type IOAuthExternalRepository = {
@@ -109,6 +114,8 @@ export type IOAuthExternalRepository = {
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		oidcNonce?: string,
+		oidcAuthTime?: number,
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;
