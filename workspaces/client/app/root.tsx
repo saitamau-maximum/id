@@ -106,7 +106,7 @@ export default function App() {
 
 function ClassifyError(error: unknown) {
 	if (!isRouteErrorResponse(error)) {
-		return;
+		return undefined;
 	}
 
 	const status = error.status;
