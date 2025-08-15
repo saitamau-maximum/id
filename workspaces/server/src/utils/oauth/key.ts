@@ -75,7 +75,8 @@ export const importKey = async (
 export const derivePublicKey = (
 	privateKey: JsonWebKeyWithKid,
 ): JsonWebKeyWithKid => {
-	const publicKey = privateKey;
+	// shallow copy する
+	const publicKey = { ...privateKey };
 	// biome-ignore lint/performance/noDelete: d は秘密鍵の情報なので削除、 d = undefined とはしない
 	delete publicKey.d;
 	return publicKey;
