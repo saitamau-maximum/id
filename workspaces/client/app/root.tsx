@@ -1,5 +1,5 @@
 import {
-    Link,
+	Link,
 	Links,
 	Meta,
 	Outlet,
@@ -9,6 +9,7 @@ import {
 } from "react-router";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";
@@ -249,6 +250,10 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 		error_title: "Unexpected Error",
 		error_message: "予期しないエラーが発生しました。",
 	};
+
+	React.useEffect(() => {
+		document.title = `${status_code} ${error_title} | Maximum IdP`;
+	});
 
 	return (
 		<div
