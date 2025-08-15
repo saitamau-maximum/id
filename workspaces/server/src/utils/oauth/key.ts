@@ -79,6 +79,7 @@ export const derivePublicKey = (
 	const publicKey = { ...privateKey };
 	// biome-ignore lint/performance/noDelete: d は秘密鍵の情報なので削除、 d = undefined とはしない
 	delete publicKey.d;
+	publicKey.key_ops = ["verify"];
 	return publicKey;
 };
 
