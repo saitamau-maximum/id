@@ -15,11 +15,11 @@ import { RoleSelector } from "./components/feature/user/role-selector";
 import { UserSelector } from "./components/feature/user/user-selector";
 import { ConfirmDialog } from "./components/logic/callable/comfirm";
 import { InformationDialog } from "./components/logic/callable/information";
+import { ButtonLike } from "./components/ui/button-like";
 import { InvitationProvider } from "./hooks/use-invitation/invitation-provider";
 import { RepositoryProvider } from "./hooks/use-repository";
 import { ToastProvider } from "./hooks/use-toast/toast-provider";
 import { initializeEnv } from "./utils/env";
-import { ButtonLike } from "./components/ui/button-like";
 
 initializeEnv();
 
@@ -270,13 +270,15 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 				},
 			})}
 		>
-			<main
+			<div
 				className={css({
 					display: "flex",
 					flexDirection: "column",
+					justifyContent: "space-between",
 					alignItems: "center",
 					height: "100%",
 					padding: { base: "8", md: "12" },
+					color: "gray.600",
 				})}
 			>
 				<div
@@ -284,65 +286,36 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 						display: "flex",
 						flexDirection: "column",
 						alignItems: "center",
-						gap: "8",
-						textAlign: "center",
-						paddingTop: { base: "8", md: "10" },
-						flexGrow: 1,
+						gap: 4,
+						paddingTop: { base: "13", md: "10" },
 					})}
 				>
-					<header
+					<h1
 						className={css({
-							display: "flex",
-							flexDirection: "column",
-							gap: "4",
-							maxWidth: "3xl",
-							width: "100%",
-							alignItems: "center",
+							fontSize: { base: "3xl", md: "6xl" },
+							fontWeight: "bold",
 						})}
 					>
-						<h1
-							className={css({
-								fontSize: { base: "4xl", md: "6xl" },
-								fontWeight: "bold",
-								color: "gray.900",
-								lineHeight: "1.15",
-								letterSpacing: "-0.02em",
-							})}
-						>
-							{status_code}
-						</h1>
-					</header>
+						{status_code}
+					</h1>
 					<p
 						className={css({
-							fontSize: { base: "lg", md: "2xl" },
-							fontWeight: "semibold",
-							color: "gray.800",
-							lineHeight: "1.2",
-							letterSpacing: "-0.01em",
+							fontSize: "lg",
+							fontWeight: "bold",
 						})}
 					>
 						{error_title}
 					</p>
-					<p
-						className={css({
-							fontSize: { base: "sm", md: "md" },
-							color: "gray.600",
-							lineHeight: "tall",
-							maxWidth: "xl",
-							fontWeight: "medium",
-							marginTop: "2",
-						})}
-					>
-						{error_message}
-					</p>
+					<p>{error_message}</p>
 				</div>
-            
-                <ButtonLike>
-                    <a href="/">
-                        トップページに戻る
-                    </a>
-                </ButtonLike>
-			</main>
+				<ButtonLike
+					className={css({
+						marginBottom: { base: "4", md: "6" },
+					})}
+				>
+					<a href="/">トップページに戻る</a>
+				</ButtonLike>
+			</div>
 		</div>
 	);
 }
