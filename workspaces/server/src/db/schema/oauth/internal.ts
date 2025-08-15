@@ -19,9 +19,7 @@ export const oauthConnections = sqliteTable(
 		name: text("name"),
 		profileImageUrl: text("profile_image_url"),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.providerId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.userId, table.providerId] })],
 );
 
 export const oauthConnectionsRelations = relations(

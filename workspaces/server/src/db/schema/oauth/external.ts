@@ -30,9 +30,7 @@ export const oauthClientManagers = sqliteTable(
 			.notNull()
 			.references(() => users.id),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.userId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.userId] })],
 );
 
 export const oauthClientSecrets = sqliteTable(
@@ -48,9 +46,7 @@ export const oauthClientSecrets = sqliteTable(
 			.references(() => users.id),
 		issuedAt: int("issued_at", { mode: "timestamp_ms" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.secret] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.secret] })],
 );
 
 export const oauthClientCallbacks = sqliteTable(
@@ -61,9 +57,7 @@ export const oauthClientCallbacks = sqliteTable(
 			.references(() => oauthClients.id),
 		callbackUrl: text("callback_url").notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.callbackUrl] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.callbackUrl] })],
 );
 
 export const oauthClientScopes = sqliteTable(
@@ -74,9 +68,7 @@ export const oauthClientScopes = sqliteTable(
 			.references(() => oauthClients.id),
 		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.scopeId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.scopeId] })],
 );
 
 export const oauthTokens = sqliteTable(
@@ -100,7 +92,6 @@ export const oauthTokens = sqliteTable(
 			mode: "timestamp_ms",
 		}).notNull(),
 	},
-	// これまでの () => ({ }) は deprecated になったらしいので、後で書き換える
 	(table) => [
 		index("oauth_tokens_access_token_expires_at_idx").on(
 			table.accessTokenExpiresAt,
@@ -117,9 +108,7 @@ export const oauthTokenScopes = sqliteTable(
 			.references(() => oauthTokens.id),
 		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.tokenId, table.scopeId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.tokenId, table.scopeId] })],
 );
 
 // ---------- OAuth Relations ---------- //
