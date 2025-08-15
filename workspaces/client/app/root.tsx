@@ -1,4 +1,5 @@
 import {
+    Link,
 	Links,
 	Meta,
 	Outlet,
@@ -301,7 +302,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 				</p>
 				<p>{error_message}</p>
 				<ButtonLike>
-					<a href="/">トップページに戻る</a>
+					<Link to="/">トップページに戻る</Link>
 				</ButtonLike>
 			</div>
 		</div>
