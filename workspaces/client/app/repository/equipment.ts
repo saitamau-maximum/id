@@ -81,7 +81,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		const res = await client.equipment.$post({
 			json: {
 				name: equipment.name,
-				description: description,
+				description,
 				ownerId: equipment.ownerId,
 			},
 		});
@@ -104,7 +104,7 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 			},
 			json: {
 				name: equipment.name,
-				description: description ?? "",
+				description,
 				ownerId: equipment.ownerId,
 			},
 		});

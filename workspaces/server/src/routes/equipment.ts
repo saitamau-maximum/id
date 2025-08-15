@@ -31,7 +31,7 @@ const route = app
 			return c.text("equipments not found", 404);
 		}
 	})
-	.get("/:id", equipmentMutableMiddleware, async (c) => {
+	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
 
