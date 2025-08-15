@@ -203,7 +203,9 @@ const route = app
 					COOKIE_NAME.LOGIN_STATE,
 				);
 				if (jwt) {
-					const payload = await verify(jwt, c.env.SECRET);
+					const payload = await verify(jwt, c.env.SECRET).catch(
+						() => undefined,
+					);
 					if (payload) return payload.iat;
 				}
 				return undefined;
