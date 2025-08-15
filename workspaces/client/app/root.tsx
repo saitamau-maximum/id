@@ -19,6 +19,7 @@ import { InvitationProvider } from "./hooks/use-invitation/invitation-provider";
 import { RepositoryProvider } from "./hooks/use-repository";
 import { ToastProvider } from "./hooks/use-toast/toast-provider";
 import { initializeEnv } from "./utils/env";
+import { ButtonLike } from "./components/ui/button-like";
 
 initializeEnv();
 
@@ -335,32 +336,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 						{error_message}
 					</p>
 				</div>
-
-				<a
-					href="/"
-					className={css({
-						display: "inline-flex",
-						alignItems: "center",
-						justifyContent: "center",
-						gap: "2",
-						color: "white",
-						borderRadius: "md",
-						fontSize: { base: "sm", md: "md" },
-						background: "green.500",
-						transition: "background 0.2s",
-						paddingLeft: { base: "8", md: "10" },
-						paddingRight: { base: "8", md: "10" },
-						paddingTop: { base: "2", md: "3" },
-						paddingBottom: { base: "2", md: "3" },
-						marginBottom: { base: "8", md: "12" },
-						_hover: {
-							background: "green.600",
-						},
-					})}
-					aria-label="トップページへ戻る"
-				>
-					トップページへ戻る
-				</a>
+            
+                <ButtonLike>
+                    <a href="/">
+                        トップページに戻る
+                    </a>
+                </ButtonLike>
 			</main>
 		</div>
 	);
