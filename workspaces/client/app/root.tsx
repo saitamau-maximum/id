@@ -274,45 +274,33 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 				className={css({
 					display: "flex",
 					flexDirection: "column",
-					justifyContent: "space-between",
 					alignItems: "center",
-					height: "100%",
-					padding: { base: "8", md: "12" },
-					color: "gray.600",
+					gap: "6",
+					justifyContent: "center",
+                    height: "100%",
+                    color: "gray.600",
+                    paddingLeft: "4",
+                    paddingRight: "4",
 				})}
 			>
-				<div
+				<h1
 					className={css({
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						gap: 4,
-						paddingTop: { base: "13", md: "10" },
+						fontSize: "6xl",
+						fontWeight: "bold",
 					})}
 				>
-					<h1
-						className={css({
-							fontSize: { base: "3xl", md: "6xl" },
-							fontWeight: "bold",
-						})}
-					>
-						{status_code}
-					</h1>
-					<p
-						className={css({
-							fontSize: "lg",
-							fontWeight: "bold",
-						})}
-					>
-						{error_title}
-					</p>
-					<p>{error_message}</p>
-				</div>
-				<ButtonLike
+					{status_code}
+				</h1>
+				<p
 					className={css({
-						marginBottom: { base: "4", md: "6" },
+						fontSize: "2xl",
+						fontWeight: "bold",
 					})}
 				>
+					{error_title}
+				</p>
+				<p>{error_message}</p>
+				<ButtonLike>
 					<a href="/">トップページに戻る</a>
 				</ButtonLike>
 			</div>
