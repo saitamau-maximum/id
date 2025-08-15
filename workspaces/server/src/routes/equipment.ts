@@ -53,7 +53,7 @@ const route = app
 			try {
 				const id = await EquipmentRepository.createEquipment({
 					name,
-					description: description ?? undefined,
+					description: description !== "" ? description : undefined,
 					createdAt: new Date(),
 					updatedAt: new Date(),
 					ownerId,
@@ -74,13 +74,10 @@ const route = app
 			const { EquipmentRepository } = c.var;
 
 			try {
-				const currentEquipment = await EquipmentRepository.getEquipmentById(id);
-
 				await EquipmentRepository.updateEquipment({
 					id,
 					name,
-					description: description === "" ? undefined : description,
-					createdAt: currentEquipment.createdAt,
+					description: description !== "" ? description : undefined,
 					updatedAt: new Date(),
 					ownerId,
 				});
