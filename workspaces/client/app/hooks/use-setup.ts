@@ -12,8 +12,8 @@ export const useSetup = () => {
 	useEffect(() => {
 		const toastId = searchParams.get(TOAST_SEARCHPARAM);
 		if (toastId) {
-			const msg = TOAST_MESSAGES[toastId];
-			if (msg.title.includes("再ログイン")) {
+			const { needsReauth, ...msg } = TOAST_MESSAGES[toastId];
+			if (needsReauth) {
 				// 再ログインが必要な場合は、認証情報を削除する
 				localStorage.removeItem(JWT_STORAGE_KEY);
 			}

@@ -6,10 +6,11 @@ interface ToastItem {
 	title: string;
 	description?: string;
 	to?: string;
+	needsReauth?: boolean;
 }
 
 export const ToastHashFn = (item: ToastItem): string => {
-	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}`;
+	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}--${item.needsReauth || ""}`;
 	let hash = 0;
 	for (let i = 0; i < key.length; i++) {
 		hash = (hash << 5) - hash + key.charCodeAt(i);
@@ -45,6 +46,7 @@ export const PLEASE_RELOGIN_FOR_OAUTH: ToastItem = {
 	title: "再ログインしてください",
 	description:
 		"この OAuth アプリケーションを利用するためには再ログインが必要です",
+	needsReauth: true,
 } as const;
 
 const TOAST_ITEMS = [
