@@ -7,7 +7,7 @@ import { css } from "styled-system/css";
 import * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { CertificationCard } from "~/components/feature/user/certification-card";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";

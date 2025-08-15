@@ -3,7 +3,7 @@ import { Plus, Trash2 } from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { UserDisplay } from "~/components/feature/user/user-display";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { IconButton } from "~/components/ui/icon-button";
 import { useMembers } from "~/routes/dashboard/members/internal/hooks/use-members";
 import type { OAuthClientSecret } from "~/types/oauth-external";
