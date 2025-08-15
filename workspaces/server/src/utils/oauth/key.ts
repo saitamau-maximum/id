@@ -1,3 +1,7 @@
+import { binaryToBase64Url } from "./convert-bin-base64";
+
+type JsonWebKeyWithKid = JsonWebKey & { kid?: string };
+
 const keypairGenAlgorithm = {
 	name: "ECDSA",
 	namedCurve: "P-521",
@@ -10,16 +14,39 @@ const signatureAlgorithm = {
 
 const keypairUsage = ["sign", "verify"];
 
-const generateKeyPair = () =>
-	crypto.subtle.generateKey(
+const generateKeyPair = async () => {
+	const { privateKey, publicKey } = (await crypto.subtle.generateKey(
 		keypairGenAlgorithm,
 		true,
 		keypairUsage,
-	) as Promise<CryptoKeyPair>;
+	)) as CryptoKeyPair;
 
-const exportKey = async (key: CryptoKey) => {
-	const exportedKey = (await crypto.subtle.exportKey("jwk", key)) as JsonWebKey;
-	return btoa(JSON.stringify(exportedKey));
+	const privKeyJwk = (await crypto.subtle.exportKey(
+		"jwk",
+		privateKey,
+	)) as JsonWebKeyWithKid;
+	const pubKeyJwk = (await crypto.subtle.exportKey(
+		"jwk",
+		publicKey,
+	)) as JsonWebKeyWithKid;
+
+	// kid を設定
+	const kid = binaryToBase64Url(crypto.getRandomValues(new Uint8Array(16)));
+	privKeyJwk.kid = kid;
+	pubKeyJwk.kid = kid;
+
+	// use を設定 (署名用; 暗号化用にしたい場合は enc にする)
+	privKeyJwk.use = "sig";
+	pubKeyJwk.use = "sig";
+
+	return {
+		privateKey: privKeyJwk,
+		publicKey: pubKeyJwk,
+	};
+};
+
+const exportKey = async (key: JsonWebKeyWithKid) => {
+	return btoa(JSON.stringify(key));
 };
 
 const importKey = async (data: string, type: "publicKey" | "privateKey") => {
@@ -40,6 +67,7 @@ const derivePublicKey = async (privateKey: CryptoKey) => {
 	)) as JsonWebKey;
 	// biome-ignore lint/performance/noDelete: <explanation>
 	delete publicKey.d;
+	publicKey.use = "sig";
 	publicKey.key_ops = ["verify"];
 	return importKey(btoa(JSON.stringify(publicKey)), "publicKey");
 };
