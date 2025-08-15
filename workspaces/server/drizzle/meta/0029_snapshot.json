@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "970c8637-28e4-4cb6-83e5-128ae0fa628b",
+  "id": "f0241642-e480-466b-8cca-5d7c8a28d579",
   "prevId": "b0da6fee-e3a1-46f6-9562-793617b53552",
   "tables": {
     "calendar_events": {
@@ -148,6 +148,72 @@
         }
       },
       "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "equipments": {
+      "name": "equipments",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "equipments_owner_id_users_id_fk": {
+          "name": "equipments_owner_id_users_id_fk",
+          "tableFrom": "equipments",
+          "tableTo": "users",
+          "columnsFrom": [
+            "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraints": {}
@@ -1054,20 +1120,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "oidc_nonce": {
-          "name": "oidc_nonce",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "oidc_auth_time": {
-          "name": "oidc_auth_time",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "access_token": {
           "name": "access_token",
           "type": "text",
@@ -1097,20 +1149,6 @@
             "access_token"
           ],
           "isUnique": true
-        },
-        "oauth_tokens_access_token_expires_at_idx": {
-          "name": "oauth_tokens_access_token_expires_at_idx",
-          "columns": [
-            "access_token_expires_at"
-          ],
-          "isUnique": false
-        },
-        "oauth_tokens_code_expires_at_idx": {
-          "name": "oauth_tokens_code_expires_at_idx",
-          "columns": [
-            "code_expires_at"
-          ],
-          "isUnique": false
         }
       },
       "foreignKeys": {
