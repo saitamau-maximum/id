@@ -92,3 +92,10 @@ export const invitesMutableMiddleware = every(
 		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],
 	}),
 );
+
+export const equipmentMutableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],
+	}),
+);

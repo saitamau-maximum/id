@@ -51,6 +51,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	roles: many(userRoles),
 	certifications: many(userCertifications),
 	socialLinks: many(socialLinks),
+	equipments: many(equipments),
 }));
 
 export const userProfiles = sqliteTable(
@@ -247,3 +248,21 @@ export const inviteRoles = sqliteTable(
 		pk: primaryKey({ columns: [table.inviteId, table.roleId] }),
 	}),
 );
+
+export const equipments = sqliteTable("equipments", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	description: text("description"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+	ownerId: text("owner_id")
+		.references(() => users.id)
+		.notNull(),
+});
+
+export const equipmentsRelations = relations(equipments, ({ one }) => ({
+	owner: one(users, {
+		fields: [equipments.ownerId],
+		references: [users.id],
+	}),
+}));

@@ -5,7 +5,6 @@ import {
 	prefix,
 	route,
 } from "@react-router/dev/routes";
-import { FLAG } from "./utils/flag";
 
 export default [
 	layout("routes/layout.tsx", [
@@ -15,9 +14,7 @@ export default [
 				index("routes/dashboard/members/page.tsx"),
 				route(":userDisplayId", "routes/dashboard/members/profile/page.tsx"),
 			]),
-			...(FLAG.ENABLE_CALENDAR
-				? [route("calendar", "routes/dashboard/calendar/page.tsx")]
-				: []),
+			route("calendar", "routes/dashboard/calendar/page.tsx"),
 			route("settings", "routes/dashboard/settings/page.tsx"),
 			...prefix("admin", [
 				layout("routes/dashboard/admin/layout.tsx", [
@@ -27,29 +24,26 @@ export default [
 							index("routes/dashboard/admin/users/page.tsx"),
 						]),
 					]),
-					...(FLAG.ENABLE_INVITE
-						? [
-								...prefix("invites", [
-									layout("routes/dashboard/admin/invites/layout.tsx", [
-										index("routes/dashboard/admin/invites/page.tsx"),
-									]),
-								]),
-							]
-						: []),
+					...prefix("invites", [
+						layout("routes/dashboard/admin/invites/layout.tsx", [
+							index("routes/dashboard/admin/invites/page.tsx"),
+						]),
+					]),
 					...prefix("certifications", [
 						layout("routes/dashboard/admin/certifications/layout.tsx", [
 							index("routes/dashboard/admin/certifications/page.tsx"),
 						]),
 					]),
-					...(FLAG.ENABLE_CALENDAR
-						? [
-								...prefix("events", [
-									layout("routes/dashboard/admin/events/layout.tsx", [
-										index("routes/dashboard/admin/events/page.tsx"),
-									]),
-								]),
-							]
-						: []),
+					...prefix("equipments", [
+						layout("routes/dashboard/admin/equipments/layout.tsx", [
+							index("routes/dashboard/admin/equipments/page.tsx"),
+						]),
+					]),
+					...prefix("events", [
+						layout("routes/dashboard/admin/events/layout.tsx", [
+							index("routes/dashboard/admin/events/page.tsx"),
+						]),
+					]),
 				]),
 			]),
 			route("update-payment-info", "routes/dashboard/payment-info/page.tsx"),
@@ -61,9 +55,7 @@ export default [
 				]),
 			]),
 		]),
-		...(FLAG.ENABLE_INVITE
-			? prefix("invitation", [route(":id", "routes/invitation/page.tsx")])
-			: []),
+		...prefix("invitation", [route(":id", "routes/invitation/page.tsx")]),
 		route("payment-info", "routes/payment-info/page.tsx"),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("verify", "routes/verify.tsx"),

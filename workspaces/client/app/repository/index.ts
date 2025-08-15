@@ -2,6 +2,7 @@ import { AuthRepositoryImpl } from "./auth";
 import { CalendarRepositoryImpl } from "./calendar";
 import { CertificationRepositoryImpl } from "./certification";
 import { DiscordRepositoryImpl } from "./discord";
+import { EquipmentRepositoryImpl } from "./equipment";
 import { InvitationRepositoryImpl } from "./invitation";
 import { LocationRepositoryImpl } from "./location";
 import { MemberRepositoryImpl } from "./member";
@@ -20,4 +21,5 @@ export const DefaultRepositories = {
 	invitationRepository: new InvitationRepositoryImpl(),
 	miscRepository: new MiscRepositoryImpl(),
 	discordRepository: new DiscordRepositoryImpl(),
+	equipmentRepository: new EquipmentRepositoryImpl(),
 };
