@@ -20,7 +20,7 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 	async (c, next) => {
 		const jwt = await getSignedCookie(c, c.env.SECRET, COOKIE_NAME.LOGIN_STATE);
 		if (jwt) {
-			const payload = await verify(jwt, c.env.SECRET);
+			const payload = await verify(jwt, c.env.SECRET).catch(() => undefined);
 			if (payload) {
 				c.set("jwtPayload", payload);
 				return next();

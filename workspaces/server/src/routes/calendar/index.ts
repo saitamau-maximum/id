@@ -30,7 +30,7 @@ const route = app
 		const { token } = c.req.valid("query");
 		const { UserRepository } = c.var;
 		try {
-			const payload = await verify(token, c.env.SECRET);
+			const payload = await verify(token, c.env.SECRET).catch(() => undefined);
 			if (!payload) {
 				return c.text("Unauthorized", 401);
 			}
