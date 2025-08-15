@@ -5,6 +5,7 @@ import type { ICalendarRepository } from "./repository/calendar";
 import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
 import type { IDiscordBotRepository } from "./repository/discord-bot";
+import type { IEquipmentRepository } from "./repository/equipment";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -34,6 +35,8 @@ export type HonoEnv = {
 		LocationRepository: ILocationRepository;
 		// 資格・試験
 		CertificationRepository: ICertificationRepository;
+		// 備品管理
+		EquipmentRepository: IEquipmentRepository;
 		// 招待
 		InviteRepository: IInviteRepository;
 		// ----- IdP OAuth & Connect ----- //

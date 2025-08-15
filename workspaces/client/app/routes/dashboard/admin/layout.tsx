@@ -4,6 +4,7 @@ import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/types/user";
 import { DashboardHeader } from "../internal/components/dashboard-title";
 import { CERTIFICATIONS_ALLOWED_ROLES } from "./certifications/layout";
+import { EQUIPMENTS_ALLOWED_ROLES } from "./equipments/layout";
 import { EVENTS_ALLOWED_ROLES } from "./events/layout";
 import { useCertificationRequests } from "./internal/hooks/use-certification-requests";
 import { INVITES_ALLOWED_ROLES } from "./invites/layout";
@@ -47,6 +48,15 @@ const NAVIGATION = [
 		label: "Events",
 		to: "/admin/events",
 		isActive: (location: string) => location.startsWith("/admin/events"),
+	},
+	{
+		shouldDisplay: (user: User) =>
+			user.roles.some((r) =>
+				(EQUIPMENTS_ALLOWED_ROLES as number[]).includes(r.id),
+			),
+		label: "Equipments",
+		to: "/admin/equipments",
+		isActive: (location: string) => location.startsWith("/admin/equipments"),
 	},
 ];
 

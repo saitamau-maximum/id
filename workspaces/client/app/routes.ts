@@ -34,6 +34,11 @@ export default [
 							index("routes/dashboard/admin/certifications/page.tsx"),
 						]),
 					]),
+					...prefix("equipments", [
+						layout("routes/dashboard/admin/equipments/layout.tsx", [
+							index("routes/dashboard/admin/equipments/page.tsx"),
+						]),
+					]),
 					...prefix("events", [
 						layout("routes/dashboard/admin/events/layout.tsx", [
 							index("routes/dashboard/admin/events/page.tsx"),
