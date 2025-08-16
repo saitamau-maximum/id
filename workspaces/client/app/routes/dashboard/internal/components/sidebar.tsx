@@ -311,9 +311,14 @@ export const Sidebar = () => {
 							>
 								<p
 									className={css({
-										fontSize: "lg",
 										fontWeight: 500,
+										whiteSpace: "nowrap",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										maxWidth: "160px",
+										fontSize: "md",
 									})}
+									title={user.displayName}
 								>
 									{user.displayName}
 								</p>
