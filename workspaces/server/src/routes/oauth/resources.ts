@@ -7,7 +7,8 @@ import {
 import { SCOPES_BY_ID, SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
-import { generateSub } from "../../utils/oauth/oidc";
+import type { OidcUserInfo } from "../../utils/oauth/oidc-constant";
+import { generateSub } from "../../utils/oauth/oidc-logic";
 
 const app = factory.createApp();
 
@@ -18,47 +19,6 @@ interface UserInfo {
 	profile_image_url: string | undefined;
 	roles: string[];
 }
-
-interface OidcBasicUserInfo {
-	sub: string;
-	updated_at?: number;
-}
-interface OidcProfile {
-	name: string;
-	given_name: string;
-	family_name: string;
-	nickname: string;
-	preferred_username: string;
-	profile?: string; // TODO: public profile ができたらやる
-	picture: string;
-	website?: string;
-	gender?: string; // まだ持ってない
-	zoneinfo: string; // 持ってないがみんな Asia/Tokyo でよさそう
-	birthdate?: string; // まだ持ってない
-	locale: string; // 持ってないが現状みんな ja-JP
-}
-interface OidcEmail {
-	email: string;
-	email_verified: false; // メールアドレス検証はしていないので false 固定
-}
-// // まだ持ってない
-// interface OidcPhone {
-// 	phone_number?: string;
-// 	phone_number_verified?: boolean;
-// }
-// interface OidcAddress {
-// 	address?: {
-// 		formatted?: string;
-// 		street_address?: string;
-// 		locality: string; // 市町村
-// 		region?: string; // 都道府県
-// 		postal_code?: string;
-// 		country?: string;
-// 	};
-// }
-type OidcUserInfo = OidcBasicUserInfo &
-	Partial<OidcProfile> &
-	Partial<OidcEmail>;
 
 const route = app
 	.use(authByAccessTokenMiddleware)

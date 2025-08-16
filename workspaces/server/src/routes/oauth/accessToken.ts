@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../../factory";
-import { generateIdToken } from "../../utils/oauth/oidc";
+import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 

@@ -31,6 +31,7 @@ import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { publicRoute } from "./routes/public";
 import { userRoute } from "./routes/user";
+import { wellKnownRoute } from "./routes/well-known";
 
 const app = factory.createApp();
 
@@ -123,7 +124,8 @@ export const route = app
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute)
-	.route("/dev", devRoute);
+	.route("/dev", devRoute)
+	.route("/.well-known", wellKnownRoute);
 
 const scheduled: ExportedHandlerScheduledHandler<Env> = async (
 	controller,
