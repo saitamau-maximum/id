@@ -198,8 +198,7 @@ const route = app
 					const isMember = await c.var.OrganizationRepository.checkIsMember(
 						user.login,
 					);
-					if (!isMember)
-						return c.text("invitation code required for non-members", 403);
+					if (!isMember) return c.redirect("https://maximum.vc/join", 302);
 					// Organization のメンバーであれば、本登録処理を行う
 					foundUserId = await c.var.UserRepository.createUser({
 						displayName: user.login,
