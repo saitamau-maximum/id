@@ -13,27 +13,35 @@ import {
 	deleteCookie,
 	getCookie,
 	getSignedCookie,
-	setCookie,
 	setSignedCookie,
 } from "hono/cookie";
 import { sign, verify } from "hono/jwt";
-import type { CookieOptions } from "hono/utils/cookie";
-import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import {
-	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	TOAST_SEARCHPARAM,
 	ToastHashFn,
 } from "../../constants/toast";
 import { type HonoEnv, factory } from "../../factory";
 import type { OAuthConnection } from "../../repository/oauth-internal";
-import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
+import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
 
-const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+const discordLogin = new OAuthLoginProvider({
+	enableInvitation: false,
+	clientIdEnvName: "DISCORD_OAUTH_ID",
+	clientSecretEnvName: "DISCORD_OAUTH_SECRET",
+	callbackPath: "/auth/login/discord/callback",
+
+	// ref: https://discord.com/developers/docs/topics/oauth2
+	scopes: [OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin],
+	authorizationUrl: OAuth2Routes.authorizationURL,
+	authorizationOptions: {
+		integration_type: "1", // 個人認証のため USER_INSTALL にする
+	},
+});
 
 interface FetchAccessTokenParams {
 	code: string;
@@ -70,74 +78,8 @@ const fetchAccessToken = async ({
 	}
 };
 
-const getCookieOptions = (isLocal: boolean): CookieOptions => ({
-	path: "/",
-	secure: !isLocal,
-	sameSite: "lax", // "strict" にすると callback で読み取れなくなる
-	httpOnly: true,
-	maxAge: JWT_EXPIRATION,
-});
-
-const callbackRequestQuerySchema = v.object({
-	code: v.pipe(v.string(), v.nonEmpty()),
-	state: v.pipe(v.string(), v.nonEmpty()),
-});
-
-const loginRequestQuerySchema = v.object({
-	continue_to: v.string(),
-	invitation_id: v.optional(v.string()),
-});
-
 const route = app
-	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
-		const { continue_to, invitation_id } = c.req.valid("query");
-
-		const requestUrl = new URL(c.req.url);
-
-		// invitation_id がセットされている場合は GitHub でしかログインできないようにする
-		if (invitation_id) {
-			// invitation_id はそのままにしておく
-			const redirectUrl = new URL(
-				`/invitation/${invitation_id}`,
-				c.env.CLIENT_ORIGIN,
-			);
-			// GitHub でしかログインできないことを Toast で表示
-			redirectUrl.searchParams.set(
-				TOAST_SEARCHPARAM,
-				ToastHashFn(ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION),
-			);
-			return c.redirect(redirectUrl.toString(), 302);
-		}
-
-		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
-
-		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
-		await setSignedCookie(
-			c,
-			COOKIE_NAME.OAUTH_SESSION_STATE,
-			state,
-			c.env.SECRET,
-			getCookieOptions(requestUrl.protocol === "http:"),
-		);
-
-		// ref: https://discord.com/developers/docs/topics/oauth2
-		const oauthUrl = new URL(OAuth2Routes.authorizationURL);
-		const oauthParams = new URLSearchParams();
-		oauthParams.set("client_id", c.env.DISCORD_OAUTH_ID);
-		oauthParams.set(
-			"redirect_uri",
-			`${requestUrl.origin}/auth/login/discord/callback`,
-		);
-		oauthParams.set(
-			"scope",
-			[OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin].join(" "),
-		);
-		oauthParams.set("state", state);
-		oauthParams.set("response_type", "code");
-		// 個人認証のため USER_INSTALL にする (SERVER_INSTALL はしない)
-		oauthParams.set("integration_type", "1");
-		return c.redirect(`${oauthUrl.toString()}?${oauthParams.toString()}`, 302);
-	})
+	.get("/", ...discordLogin.getLoginHandlers())
 	.get(
 		"/callback",
 		vValidator("query", callbackRequestQuerySchema),

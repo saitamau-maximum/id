@@ -3,22 +3,32 @@ import {
 	deleteCookie,
 	getCookie,
 	getSignedCookie,
-	setCookie,
 	setSignedCookie,
 } from "hono/cookie";
 import { sign } from "hono/jwt";
-import type { CookieOptions } from "hono/utils/cookie";
 import { Octokit } from "octokit";
-import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { validateInvitation } from "../../service/invite";
-import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
+import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
 
-const JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+const githubLogin = new OAuthLoginProvider({
+	enableInvitation: true,
+	clientIdEnvName: "GITHUB_OAUTH_ID",
+	clientSecretEnvName: "GITHUB_OAUTH_SECRET",
+	callbackPath: "/auth/login/github/callback",
+
+	// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+	scopes: ["read:user"],
+	authorizationUrl: "https://github.com/login/oauth/authorize",
+	authorizationOptions: {
+		allow_signup: "false",
+	},
+});
+
 const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
 interface GitHubOAuthTokenParams {
@@ -51,63 +61,8 @@ const fetchAccessToken = (params: GitHubOAuthTokenParams) =>
 		.then((res) => res.json<GitHubOAuthTokenResponse>())
 		.catch(() => ({ access_token: null }));
 
-const getCookieOptions = (isLocal: boolean): CookieOptions => ({
-	path: "/",
-	secure: !isLocal,
-	sameSite: "lax", // "strict" にすると callback で読み取れなくなる
-	httpOnly: true,
-	maxAge: JWT_EXPIRATION,
-});
-
-const callbackRequestQuerySchema = v.object({
-	code: v.pipe(v.string(), v.nonEmpty()),
-	state: v.pipe(v.string(), v.nonEmpty()),
-});
-
-const loginRequestQuerySchema = v.object({
-	continue_to: v.string(),
-	invitation_id: v.optional(v.string()),
-});
-
 const route = app
-	.get("/", vValidator("query", loginRequestQuerySchema), async (c) => {
-		const { continue_to, invitation_id } = c.req.valid("query");
-
-		setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
-		if (invitation_id) {
-			setSignedCookie(
-				c,
-				COOKIE_NAME.INVITATION_ID,
-				invitation_id,
-				c.env.SECRET,
-				getCookieOptions(new URL(c.req.url).protocol === "http:"),
-			);
-		}
-
-		const requestUrl = new URL(c.req.url);
-
-		const state = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
-		await setSignedCookie(
-			c,
-			COOKIE_NAME.OAUTH_SESSION_STATE,
-			state,
-			c.env.SECRET,
-			getCookieOptions(requestUrl.protocol === "http:"),
-		);
-
-		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-		const oauthUrl = new URL("https://github.com/login/oauth/authorize");
-		const oauthParams = new URLSearchParams();
-		oauthParams.set("client_id", c.env.GITHUB_OAUTH_ID);
-		oauthParams.set(
-			"redirect_uri",
-			`${requestUrl.origin}/auth/login/github/callback`,
-		);
-		oauthParams.set("scope", "read:user");
-		oauthParams.set("state", state);
-		oauthParams.set("allow_signup", "false");
-		return c.redirect(`${oauthUrl.toString()}?${oauthParams.toString()}`, 302);
-	})
+	.get("/", ...githubLogin.getLoginHandlers())
 	.get(
 		"/callback",
 		vValidator("query", callbackRequestQuerySchema),
