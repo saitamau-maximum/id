@@ -264,6 +264,21 @@ export abstract class OAuthLoginProvider {
 							await this.getProviderUserId(),
 							this.getProviderId(),
 						);
+
+					// ユーザーが存在する場合
+					const payload: OAuthConnection = {
+						userId: foundUserId,
+						providerId: this.getProviderId(),
+						providerUserId: await this.getProviderUserId(),
+						refreshToken: await this.getRefreshToken(),
+						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
+						...(await this.getOAuthConnectionUserPayload()),
+					};
+					// OAuth Connection 情報を更新
+					await c.var.OAuthInternalRepository.updateOAuthConnection(payload);
+
+					// 最終ログイン日時を更新
+					await c.var.UserRepository.updateLastLoginAt(foundUserId);
 				} catch {
 					// ユーザーが存在しない場合
 
@@ -309,34 +324,19 @@ export abstract class OAuthLoginProvider {
 							// ここに到達する = 招待コードが提供されていないのにユーザーが存在しない場合
 							return c.text("invalid invitation code", 400);
 						}
+					} else {
+						// 招待コードでログインできない場合 = OAuth 未連携
+						// ログインページに差し戻し
+						const redirectUrl = new URL("/login", c.env.CLIENT_ORIGIN);
+						// continue_to はそのままにしておく
+						redirectUrl.searchParams.set("continue_to", continueTo);
+						redirectUrl.searchParams.set(
+							TOAST_SEARCHPARAM,
+							ToastHashFn(PLEASE_CONNECT_OAUTH_ACCOUNT),
+						);
+						return c.redirect(redirectUrl.toString(), 302);
 					}
-
-					// 招待コードでログインできない場合 = OAuth 未連携
-					// ログインページに差し戻し
-					const redirectUrl = new URL("/login", c.env.CLIENT_ORIGIN);
-					// continue_to はそのままにしておく
-					redirectUrl.searchParams.set("continue_to", continueTo);
-					redirectUrl.searchParams.set(
-						TOAST_SEARCHPARAM,
-						ToastHashFn(PLEASE_CONNECT_OAUTH_ACCOUNT),
-					);
-					return c.redirect(redirectUrl.toString(), 302);
 				}
-
-				// ユーザーが存在する場合
-				const payload: OAuthConnection = {
-					userId: foundUserId,
-					providerId: this.getProviderId(),
-					providerUserId: await this.getProviderUserId(),
-					refreshToken: await this.getRefreshToken(),
-					refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
-					...(await this.getOAuthConnectionUserPayload()),
-				};
-				// OAuth Connection 情報を更新
-				await c.var.OAuthInternalRepository.updateOAuthConnection(payload);
-
-				// 最終ログイン日時を更新
-				await c.var.UserRepository.updateLastLoginAt(foundUserId);
 
 				// JWT 構築 & セット
 				const now = Math.floor(Date.now() / 1000);
