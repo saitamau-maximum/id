@@ -11,13 +11,10 @@ import {
 } from "../constants/toast";
 import { factory } from "../factory";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
-import type { KeyOfType } from "./types";
 
 interface OAuthLoginProviderOptions {
 	// 全般設定
 	enableInvitation: boolean;
-	clientIdEnvName: KeyOfType<Env, string>;
-	clientSecretEnvName: KeyOfType<Env, string>;
 	callbackPath: string;
 	// authorization 関連
 	scopes: string[];
@@ -35,7 +32,7 @@ interface OAuthLoginProviderOptions {
  *   .get("/callback", ...provider.getCallbackHandler());
  * ```
  */
-export class OAuthLoginProvider {
+export abstract class OAuthLoginProvider {
 	static readonly JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
 
 	static readonly COOKIE_OPTIONS = {
@@ -62,7 +59,9 @@ export class OAuthLoginProvider {
 		this.options = options;
 	}
 
-	getLoginHandlers() {
+	abstract getClientId(env: Env): string;
+
+	public getLoginHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
 			async (c) => {
@@ -112,10 +111,7 @@ export class OAuthLoginProvider {
 				const requestUrl = new URL(c.req.url);
 				const authorizationUrl = new URL(this.options.authorizationUrl);
 				authorizationUrl.searchParams.set("response_type", "code");
-				authorizationUrl.searchParams.set(
-					"client_id",
-					c.env[this.options.clientIdEnvName],
-				);
+				authorizationUrl.searchParams.set("client_id", this.getClientId(c.env));
 				authorizationUrl.searchParams.set(
 					"redirect_uri",
 					`${requestUrl.origin}${this.options.callbackPath}`,
@@ -145,7 +141,7 @@ export class OAuthLoginProvider {
 		);
 	}
 
-	getCallbackHandlers() {
+	public getCallbackHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
 			async (c) => {},

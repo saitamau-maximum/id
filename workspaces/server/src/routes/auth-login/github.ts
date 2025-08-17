@@ -15,10 +15,14 @@ import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
 
-const githubLogin = new OAuthLoginProvider({
+class GitHubLoginProvider extends OAuthLoginProvider {
+	getClientId(env: Env): string {
+		return env.GITHUB_OAUTH_ID;
+	}
+}
+
+const githubLogin = new GitHubLoginProvider({
 	enableInvitation: true,
-	clientIdEnvName: "GITHUB_OAUTH_ID",
-	clientSecretEnvName: "GITHUB_OAUTH_SECRET",
 	callbackPath: "/auth/login/github/callback",
 
 	// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps

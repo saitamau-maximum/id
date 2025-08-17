@@ -29,10 +29,14 @@ import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
 
-const discordLogin = new OAuthLoginProvider({
+class DiscordLoginProvider extends OAuthLoginProvider {
+	getClientId(env: Env): string {
+		return env.DISCORD_OAUTH_ID;
+	}
+}
+
+const discordLogin = new DiscordLoginProvider({
 	enableInvitation: false,
-	clientIdEnvName: "DISCORD_OAUTH_ID",
-	clientSecretEnvName: "DISCORD_OAUTH_SECRET",
 	callbackPath: "/auth/login/discord/callback",
 
 	// ref: https://discord.com/developers/docs/topics/oauth2
