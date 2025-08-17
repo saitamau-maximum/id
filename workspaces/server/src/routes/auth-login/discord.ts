@@ -19,6 +19,41 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: RESTPostOAuth2AccessTokenResult | null = null;
 	private user: APIUser | null = null;
 
+	private async makeAccessTokenRequest(code: string): Promise<void> {
+		const body = new URLSearchParams();
+		body.set("grant_type", "authorization_code");
+		body.set("code", code);
+		body.set("redirect_uri", this.getCallbackUrl());
+		body.set("client_id", this.getClientId());
+		body.set("client_secret", this.getClientSecret());
+
+		return fetch(OAuth2Routes.tokenURL, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: "application/json",
+			},
+			body,
+		}).then(async (res) => {
+			this.accessTokenResponse =
+				await res.json<RESTPostOAuth2AccessTokenResult>();
+		});
+	}
+
+	private async getDiscordUser(): Promise<APIUser> {
+		if (!this.honoVariables) throw new Error("honoVariables is not set");
+		if (!this.accessTokenResponse || !this.accessTokenResponse.access_token)
+			throw new Error("Access token response is not available");
+
+		if (!this.user)
+			this.user =
+				await this.honoVariables.DiscordBotRepository.fetchUserByAccessToken(
+					this.accessTokenResponse.access_token,
+				);
+
+		return this.user;
+	}
+
 	acceptsInvitation(): boolean {
 		return false;
 	}
@@ -49,27 +84,6 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return `${origin}/auth/login/discord/callback`;
 	}
 
-	private async makeAccessTokenRequest(code: string): Promise<void> {
-		const body = new URLSearchParams();
-		body.set("grant_type", "authorization_code");
-		body.set("code", code);
-		body.set("redirect_uri", this.getCallbackUrl());
-		body.set("client_id", this.getClientId());
-		body.set("client_secret", this.getClientSecret());
-
-		return fetch(OAuth2Routes.tokenURL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Accept: "application/json",
-			},
-			body,
-		}).then(async (res) => {
-			this.accessTokenResponse =
-				await res.json<RESTPostOAuth2AccessTokenResult>();
-		});
-	}
-
 	async getAccessToken(code: string): Promise<string> {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
@@ -98,20 +112,6 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 
 	getProviderId(): number {
 		return OAUTH_PROVIDER_IDS.DISCORD;
-	}
-
-	private async getDiscordUser(): Promise<APIUser> {
-		if (!this.honoVariables) throw new Error("honoVariables is not set");
-		if (!this.accessTokenResponse || !this.accessTokenResponse.access_token)
-			throw new Error("Access token response is not available");
-
-		if (!this.user)
-			this.user =
-				await this.honoVariables.DiscordBotRepository.fetchUserByAccessToken(
-					this.accessTokenResponse.access_token,
-				);
-
-		return this.user;
 	}
 
 	async getProviderUserId(): Promise<string> {
@@ -156,7 +156,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 const discordLogin = new DiscordLoginProvider();
 
 const route = app
-	.get("/", ...discordLogin.getLoginHandlers())
-	.get("/callback", ...discordLogin.getCallbackHandlers());
+	.get("/", ...discordLogin.loginHandlers())
+	.get("/callback", ...discordLogin.callbackHandlers());
 
 export { route as authLoginDiscordRoute };

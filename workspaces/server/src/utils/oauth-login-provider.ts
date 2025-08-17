@@ -89,7 +89,7 @@ export abstract class OAuthLoginProvider {
 	>;
 
 	// ----- public methods ----- //
-	public getLoginHandlers() {
+	public loginHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
 			async (c) => {
@@ -154,7 +154,7 @@ export abstract class OAuthLoginProvider {
 		);
 	}
 
-	public getCallbackHandlers() {
+	public callbackHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
 			async (c) => {

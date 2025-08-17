@@ -19,6 +19,39 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: GitHubOAuthTokenResponse | null = null;
 	private user: GitHubUser | null = null;
 
+	private async makeAccessTokenRequest(code: string) {
+		return fetch("https://github.com/login/oauth/access_token", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+			},
+			body: JSON.stringify({
+				client_id: this.getClientId(),
+				client_secret: this.getClientSecret(),
+				redirect_uri: this.getCallbackUrl(),
+				code,
+			}),
+		}).then(async (res) => {
+			this.accessTokenResponse = await res.json<GitHubOAuthTokenResponse>();
+		});
+	}
+
+	private getCachedAccessToken(): string {
+		if (!this.accessTokenResponse)
+			throw new Error("Access token response is not available");
+		return this.accessTokenResponse.access_token;
+	}
+
+	private async getGitHubUser(): Promise<GitHubUser> {
+		if (!this.user) {
+			const userOctokit = new Octokit({ auth: this.getCachedAccessToken() });
+			const { data } = await userOctokit.request("GET /user");
+			this.user = data;
+		}
+		return this.user;
+	}
+
 	acceptsInvitation(): boolean {
 		return true;
 	}
@@ -46,34 +79,10 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return `${origin}/auth/login/github/callback`;
 	}
 
-	private async makeAccessTokenRequest(code: string) {
-		return fetch("https://github.com/login/oauth/access_token", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				Accept: "application/json",
-			},
-			body: JSON.stringify({
-				client_id: this.getClientId(),
-				client_secret: this.getClientSecret(),
-				redirect_uri: this.getCallbackUrl(),
-				code,
-			}),
-		}).then(async (res) => {
-			this.accessTokenResponse = await res.json<GitHubOAuthTokenResponse>();
-		});
-	}
-
 	async getAccessToken(code: string): Promise<string> {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
-		return this.accessTokenResponse.access_token;
-	}
-
-	private getCachedAccessToken(): string {
-		if (!this.accessTokenResponse)
-			throw new Error("Access token response is not available");
 		return this.accessTokenResponse.access_token;
 	}
 
@@ -97,15 +106,6 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return OAUTH_PROVIDER_IDS.GITHUB;
 	}
 
-	private async getGitHubUser(): Promise<GitHubUser> {
-		if (!this.user) {
-			const userOctokit = new Octokit({ auth: this.getCachedAccessToken() });
-			const { data } = await userOctokit.request("GET /user");
-			this.user = data;
-		}
-		return this.user;
-	}
-
 	async getProviderUserId(): Promise<string> {
 		return (await this.getGitHubUser()).id.toString();
 	}
@@ -126,7 +126,7 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 const githubLogin = new GitHubLoginProvider();
 
 const route = app
-	.get("/", ...githubLogin.getLoginHandlers())
-	.get("/callback", ...githubLogin.getCallbackHandlers());
+	.get("/", ...githubLogin.loginHandlers())
+	.get("/callback", ...githubLogin.callbackHandlers());
 
 export { route as authLoginGithubRoute };
