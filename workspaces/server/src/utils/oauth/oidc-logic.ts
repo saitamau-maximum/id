@@ -1,5 +1,6 @@
 import { binaryToBase64Url } from "./convert-bin-base64";
 import { importKey, sign } from "./key";
+import { iss } from "./oidc-constant";
 
 interface OidcIdTokenPayload {
 	iss: string;
@@ -89,7 +90,7 @@ export const generateIdToken = async ({
 	const atHash = await generateAtHash(accessToken);
 
 	const payload: OidcIdTokenPayload = {
-		iss: "https://api.id.maximum.vc",
+		iss,
 		sub: await generateSub(clientId, userId),
 		aud: [clientId],
 		exp: exp,
