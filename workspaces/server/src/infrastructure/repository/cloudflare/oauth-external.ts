@@ -271,7 +271,7 @@ export class CloudflareOAuthExternalRepository
 						// client.query ではなく .select にすることで、
 						// クエリを構築するだけにして取得処理は行わないようにする
 						this.client
-							.select({ clientId: schema.oauthTokens.clientId })
+							.select({ tokenId: schema.oauthTokens.id })
 							.from(schema.oauthTokens)
 							.where(eq(schema.oauthTokens.clientId, clientId)),
 					),
