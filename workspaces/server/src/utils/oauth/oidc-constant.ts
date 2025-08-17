@@ -57,3 +57,5 @@ export const claimsSupported: (keyof OidcUserInfo)[] = [
 	"email",
 	"email_verified",
 ] as const;
+
+export const iss = "https://api.id.maximum.vc" as const;

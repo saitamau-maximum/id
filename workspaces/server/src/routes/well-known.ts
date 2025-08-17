@@ -1,20 +1,18 @@
 import { cors } from "hono/cors";
 import { factory } from "../factory";
-import { claimsSupported } from "../utils/oauth/oidc-constant";
+import { claimsSupported, iss } from "../utils/oauth/oidc-constant";
 
 const app = factory.createApp();
 
 const route = app.get("/openid-configuration", cors(), (c) => {
-	const host = "https://api.id.maximum.vc";
-
 	return c.json(
 		{
 			// https://openid.net/specs/openid-connect-discovery-1_0.html に定義されている順
-			issuer: host,
-			authorization_endpoint: `${host}/oauth/authorize`,
-			token_endpoint: `${host}/oauth/access-token`,
-			userinfo_endpoint: `${host}/oauth/resources/userinfo`,
-			jwks_uri: `${host}/oauth/jwks`,
+			issuer: iss,
+			authorization_endpoint: `${iss}/oauth/authorize`,
+			token_endpoint: `${iss}/oauth/access-token`,
+			userinfo_endpoint: `${iss}/oauth/resources/userinfo`,
+			jwks_uri: `${iss}/oauth/jwks`,
 			// registration_endpoint: "", // 未実装
 			scopes_supported: ["openid", "profile", "email"],
 			response_types_supported: ["code"],
