@@ -19,6 +19,21 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: RESTPostOAuth2AccessTokenResult | null = null;
 	private user: APIUser | null = null;
 
+	acceptsInvitation(): boolean {
+		return false;
+	}
+
+	getAuthorizationUrl(): URL {
+		// ref: https://discord.com/developers/docs/topics/oauth2
+		const url = new URL(OAuth2Routes.authorizationURL);
+		url.searchParams.set(
+			"scope",
+			[OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin].join(" "),
+		);
+		url.searchParams.set("integration_type", "1"); // 個人認証のため USER_INSTALL にする
+		return url;
+	}
+
 	getClientId(): string {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.DISCORD_OAUTH_ID;
@@ -138,16 +153,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const discordLogin = new DiscordLoginProvider({
-	enableInvitation: false,
-
-	// ref: https://discord.com/developers/docs/topics/oauth2
-	scopes: [OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin],
-	authorizationUrl: OAuth2Routes.authorizationURL,
-	authorizationOptions: {
-		integration_type: "1", // 個人認証のため USER_INSTALL にする
-	},
-});
+const discordLogin = new DiscordLoginProvider();
 
 const route = app
 	.get("/", ...discordLogin.getLoginHandlers())

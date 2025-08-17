@@ -23,19 +23,16 @@ import { validateInvitation } from "../service/invite";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
 import { type Awaitable, NullToUndefined } from "./types";
 
-interface OAuthLoginProviderOptions {
-	// 全般設定
-	enableInvitation: boolean;
-	// authorization 関連
-	scopes: string[];
-	authorizationUrl: string;
-	authorizationOptions?: Record<string, string | string[]>;
-}
-
 /**
  * @example
  * ```typescript
- * const provider = new OAuthLoginProvider(options);
+ * class Provider extends OAuthLoginProvider {
+ *   // implement abstract methods
+ *   getClientId(): string { ... }
+ *   ...
+ * }
+ *
+ * const provider = new Provider();
  *
  * const route = app
  *   .get("/", ...provider.getLoginHandler())
@@ -64,20 +61,20 @@ export abstract class OAuthLoginProvider {
 		invitation_id: v.optional(v.string()),
 	});
 
-	// ----- private members ----- //
-	private options: OAuthLoginProviderOptions;
-
 	// ----- protected members ----- //
 	protected env: Env | undefined;
 	protected origin: string | undefined;
 	protected honoVariables: HonoEnv["Variables"] | undefined;
 
-	// ----- constructor ----- //
-	constructor(options: OAuthLoginProviderOptions) {
-		this.options = options;
-	}
-
 	// ----- abstract methods ----- //
+	/**
+	 * 招待コードが付与された状態でのログインを許可するか
+	 */
+	abstract acceptsInvitation(): boolean;
+	/**
+	 * Authorization URL (response_type, client_id, redirect_uri, state 以外)
+	 */
+	abstract getAuthorizationUrl(): URL;
 	abstract getClientId(): string;
 	abstract getClientSecret(): string;
 	abstract getCallbackUrl(): string;
@@ -103,7 +100,7 @@ export abstract class OAuthLoginProvider {
 				const { continue_to, invitation_id } = c.req.valid("query");
 
 				if (invitation_id) {
-					if (!this.options.enableInvitation) {
+					if (!this.acceptsInvitation()) {
 						// もし招待コードがある場合にログインを許可しない場合、差戻す
 
 						// invitation_id はそのままにしておく
@@ -143,32 +140,14 @@ export abstract class OAuthLoginProvider {
 					OAuthLoginProvider.COOKIE_OPTIONS,
 				);
 
-				const authorizationUrl = new URL(this.options.authorizationUrl);
+				const authorizationUrl = this.getAuthorizationUrl();
 				authorizationUrl.searchParams.set("response_type", "code");
 				authorizationUrl.searchParams.set("client_id", this.getClientId());
 				authorizationUrl.searchParams.set(
 					"redirect_uri",
 					this.getCallbackUrl(),
 				);
-				authorizationUrl.searchParams.set(
-					"scope",
-					this.options.scopes.join(" "),
-				);
 				authorizationUrl.searchParams.set("state", state);
-
-				// 追加のパラメータがあれば設定
-				if (this.options.authorizationOptions) {
-					for (const [key, value] of Object.entries(
-						this.options.authorizationOptions,
-					)) {
-						if (Array.isArray(value)) {
-							for (const v of value)
-								authorizationUrl.searchParams.append(key, v);
-						} else {
-							authorizationUrl.searchParams.set(key, value);
-						}
-					}
-				}
 
 				return c.redirect(authorizationUrl.toString(), 302);
 			},
@@ -289,7 +268,7 @@ export abstract class OAuthLoginProvider {
 					// ユーザーが存在しない場合
 
 					// 招待経由かチェックする
-					if (this.options.enableInvitation) {
+					if (this.acceptsInvitation()) {
 						const invitationId = await getSignedCookie(
 							c,
 							c.env.SECRET,

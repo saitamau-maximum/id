@@ -19,6 +19,18 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: GitHubOAuthTokenResponse | null = null;
 	private user: GitHubUser | null = null;
 
+	acceptsInvitation(): boolean {
+		return true;
+	}
+
+	getAuthorizationUrl(): URL {
+		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
+		const url = new URL("https://github.com/login/oauth/authorize");
+		url.searchParams.set("scope", "read:user");
+		url.searchParams.set("allow_signup", "false");
+		return url;
+	}
+
 	getClientId(): string {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_ID;
@@ -111,16 +123,7 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const githubLogin = new GitHubLoginProvider({
-	enableInvitation: true,
-
-	// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
-	scopes: ["read:user"],
-	authorizationUrl: "https://github.com/login/oauth/authorize",
-	authorizationOptions: {
-		allow_signup: "false",
-	},
-});
+const githubLogin = new GitHubLoginProvider();
 
 const route = app
 	.get("/", ...githubLogin.getLoginHandlers())
