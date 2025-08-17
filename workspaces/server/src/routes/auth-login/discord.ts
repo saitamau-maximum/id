@@ -9,12 +9,7 @@ import {
 	type RESTPostOAuth2AccessTokenResult,
 	RouteBases,
 } from "discord-api-types/v10";
-import {
-	deleteCookie,
-	getCookie,
-	getSignedCookie,
-	setSignedCookie,
-} from "hono/cookie";
+import { getSignedCookie, setSignedCookie } from "hono/cookie";
 import { sign, verify } from "hono/jwt";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
@@ -92,41 +87,6 @@ const discordLogin = new DiscordLoginProvider({
 	},
 });
 
-interface FetchAccessTokenParams {
-	code: string;
-	redirectUri: string;
-	clientId: string;
-	clientSecret: string;
-}
-
-const fetchAccessToken = async ({
-	code,
-	redirectUri,
-	clientId,
-	clientSecret,
-}: FetchAccessTokenParams): Promise<RESTPostOAuth2AccessTokenResult | null> => {
-	const body = new URLSearchParams();
-	body.set("grant_type", "authorization_code");
-	body.set("code", code);
-	body.set("redirect_uri", redirectUri);
-	body.set("client_id", clientId);
-	body.set("client_secret", clientSecret);
-
-	try {
-		const res = await fetch(OAuth2Routes.tokenURL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Accept: "application/json",
-			},
-			body,
-		});
-		return await res.json<RESTPostOAuth2AccessTokenResult>();
-	} catch {
-		return null;
-	}
-};
-
 const route = app
 	.get("/", ...discordLogin.getLoginHandlers())
 	.get(
@@ -143,28 +103,6 @@ const route = app
 					await c.var.DiscordBotRepository.fetchUserByAccessToken(access_token);
 			} catch {
 				return c.text("invalid user", 400);
-			}
-
-			// 先に Redirect URL の validate (共通なので)
-			const requestUrl = new URL(c.req.url);
-			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
-			deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
-			if (continueTo === undefined) {
-				return c.text("Bad Request", 400);
-			}
-			if (!URL.canParse(continueTo)) {
-				return c.text("Bad Request", 400);
-			}
-
-			const continueToUrl = new URL(continueTo);
-
-			// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
-			if (
-				(c.env.ENV as string) === "production" &&
-				continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
-				continueToUrl.origin !== requestUrl.origin
-			) {
-				return c.text("Bad Request", 400);
 			}
 
 			// ログイン状態をチェック

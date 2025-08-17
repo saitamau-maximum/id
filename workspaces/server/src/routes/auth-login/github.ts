@@ -1,10 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import {
-	deleteCookie,
-	getCookie,
-	getSignedCookie,
-	setSignedCookie,
-} from "hono/cookie";
+import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 import { Octokit } from "octokit";
 import { COOKIE_NAME } from "../../constants/cookie";
@@ -79,30 +74,6 @@ const githubLogin = new GitHubLoginProvider({
 
 const INVITATION_ERROR_MESSAGE = "invalid invitation code";
 
-interface GitHubOAuthTokenParams {
-	code: string;
-	redirectUri: string;
-	clientId: string;
-	clientSecret: string;
-}
-
-const fetchAccessToken = (params: GitHubOAuthTokenParams) =>
-	fetch("https://github.com/login/oauth/access_token", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			Accept: "application/json",
-		},
-		body: JSON.stringify({
-			client_id: params.clientId,
-			client_secret: params.clientSecret,
-			redirect_uri: params.redirectUri,
-			code: params.code,
-		}),
-	})
-		.then((res) => res.json<GitHubOAuthTokenResponse>())
-		.catch(() => ({ access_token: null }));
-
 const route = app
 	.get("/", ...githubLogin.getLoginHandlers())
 	.get(
@@ -112,17 +83,6 @@ const route = app
 			const { code, state } = c.req.valid("query");
 
 			const requestUrl = new URL(c.req.url);
-
-			const { access_token } = await fetchAccessToken({
-				code,
-				clientId: c.env.GITHUB_OAUTH_ID,
-				clientSecret: c.env.GITHUB_OAUTH_SECRET,
-				redirectUri: `${requestUrl.origin}/auth/login/github/callback`,
-			});
-
-			if (!access_token) {
-				return c.text("invalid code", 400);
-			}
 
 			// ここでしか使わないので user 側は特にリポジトリ抽象化しない
 			const userOctokit = new Octokit({ auth: access_token });
@@ -237,26 +197,6 @@ const route = app
 				c.env.SECRET,
 				getCookieOptions(requestUrl.protocol === "http:"),
 			);
-
-			const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
-			deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
-			if (continueTo === undefined) {
-				return c.text("Bad Request", 400);
-			}
-			if (!URL.canParse(continueTo)) {
-				return c.text("Bad Request", 400);
-			}
-
-			const continueToUrl = new URL(continueTo);
-
-			// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
-			if (
-				(c.env.ENV as string) === "production" &&
-				continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
-				continueToUrl.origin !== requestUrl.origin
-			) {
-				return c.text("Bad Request", 400);
-			}
 
 			const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
 

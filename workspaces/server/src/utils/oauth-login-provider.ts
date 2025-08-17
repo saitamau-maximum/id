@@ -3,6 +3,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	deleteCookie,
+	getCookie,
 	getSignedCookie,
 	setCookie,
 	setSignedCookie,
@@ -185,6 +186,25 @@ export abstract class OAuthLoginProvider {
 					);
 				} catch {
 					return c.text("invalid code", 400);
+				}
+
+				// ContinueTo の validate
+				const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
+				deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
+				if (continueTo === undefined) {
+					return c.text("Bad Request", 400);
+				}
+				if (!URL.canParse(continueTo)) {
+					return c.text("Bad Request", 400);
+				}
+				const continueToUrl = new URL(continueTo);
+				// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
+				if (
+					(c.env.ENV as string) === "production" &&
+					continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
+					continueToUrl.origin !== requestUrl.origin
+				) {
+					return c.text("Bad Request", 400);
 				}
 			},
 		);
