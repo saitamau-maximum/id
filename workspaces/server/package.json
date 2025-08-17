@@ -32,6 +32,7 @@
 		"wasm-image-optimization": "^1.2.28"
 	},
 	"devDependencies": {
+		"@octokit/types": "^14.1.0",
 		"@types/minimist": "^1.2.5",
 		"@types/prompts": "^2.4.9",
 		"drizzle-kit": "^0.30.6",
