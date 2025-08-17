@@ -30,14 +30,59 @@ import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 const app = factory.createApp();
 
 class DiscordLoginProvider extends OAuthLoginProvider {
+	private accessTokenResponse: RESTPostOAuth2AccessTokenResult | null = null;
+
 	getClientId(env: Env): string {
 		return env.DISCORD_OAUTH_ID;
+	}
+
+	getClientSecret(env: Env): string {
+		return env.DISCORD_OAUTH_SECRET;
+	}
+
+	getCallbackUrl(origin: string): string {
+		return `${origin}/auth/login/discord/callback`;
+	}
+
+	async makeAccessTokenRequest(
+		code: string,
+		origin: string,
+		env: Env,
+	): Promise<void> {
+		const body = new URLSearchParams();
+		body.set("grant_type", "authorization_code");
+		body.set("code", code);
+		body.set("redirect_uri", this.getCallbackUrl(origin));
+		body.set("client_id", this.getClientId(env));
+		body.set("client_secret", this.getClientSecret(env));
+
+		return fetch(OAuth2Routes.tokenURL, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Accept: "application/json",
+			},
+			body,
+		}).then(async (res) => {
+			this.accessTokenResponse =
+				await res.json<RESTPostOAuth2AccessTokenResult>();
+		});
+	}
+
+	async getAccessToken(
+		code: string,
+		origin: string,
+		env: Env,
+	): Promise<string> {
+		await this.makeAccessTokenRequest(code, origin, env);
+		const accessToken = this.accessTokenResponse?.access_token;
+		if (!accessToken) throw new Error("Failed to fetch access token");
+		return accessToken;
 	}
 }
 
 const discordLogin = new DiscordLoginProvider({
 	enableInvitation: false,
-	callbackPath: "/auth/login/discord/callback",
 
 	// ref: https://discord.com/developers/docs/topics/oauth2
 	scopes: [OAuth2Scopes.Identify, OAuth2Scopes.GuildsJoin],
@@ -89,28 +134,6 @@ const route = app
 		vValidator("query", callbackRequestQuerySchema),
 		async (c) => {
 			const { code, state } = c.req.valid("query");
-
-			const storedState = await getSignedCookie(
-				c,
-				c.env.SECRET,
-				COOKIE_NAME.OAUTH_SESSION_STATE,
-			);
-			deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
-
-			if (state !== storedState) {
-				return c.text("state mismatch", 400);
-			}
-
-			const discordAccessTokenRes = await fetchAccessToken({
-				code,
-				redirectUri: `${new URL(c.req.url).origin}/auth/login/discord/callback`,
-				clientId: c.env.DISCORD_OAUTH_ID,
-				clientSecret: c.env.DISCORD_OAUTH_SECRET,
-			});
-
-			if (!discordAccessTokenRes) {
-				return c.text("invalid code", 400);
-			}
 
 			const { access_token, refresh_token } = discordAccessTokenRes;
 

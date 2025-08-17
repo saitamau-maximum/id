@@ -15,15 +15,59 @@ import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
 
+interface GitHubOAuthTokenResponse {
+	access_token: string;
+	scope: string;
+	token_type: string;
+}
+
 class GitHubLoginProvider extends OAuthLoginProvider {
+	private accessTokenResponse: GitHubOAuthTokenResponse | null = null;
+
 	getClientId(env: Env): string {
 		return env.GITHUB_OAUTH_ID;
+	}
+
+	getClientSecret(env: Env): string {
+		return env.GITHUB_OAUTH_SECRET;
+	}
+
+	getCallbackUrl(origin: string): string {
+		return `${origin}/auth/login/github/callback`;
+	}
+
+	async makeAccessTokenRequest(code: string, origin: string, env: Env) {
+		return fetch("https://github.com/login/oauth/access_token", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+				Accept: "application/json",
+			},
+			body: JSON.stringify({
+				client_id: this.getClientId(env),
+				client_secret: this.getClientSecret(env),
+				redirect_uri: this.getCallbackUrl(origin),
+				code,
+			}),
+		}).then(async (res) => {
+			this.accessTokenResponse = await res.json<GitHubOAuthTokenResponse>();
+		});
+	}
+
+	async getAccessToken(
+		code: string,
+		origin: string,
+		env: Env,
+	): Promise<string> {
+		await this.makeAccessTokenRequest(code, origin, env);
+		const accessToken = this.accessTokenResponse?.access_token;
+		if (!accessToken) throw new Error("Failed to fetch access token");
+		return accessToken;
 	}
 }
 
 const githubLogin = new GitHubLoginProvider({
 	enableInvitation: true,
-	callbackPath: "/auth/login/github/callback",
 
 	// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 	scopes: ["read:user"],
@@ -40,12 +84,6 @@ interface GitHubOAuthTokenParams {
 	redirectUri: string;
 	clientId: string;
 	clientSecret: string;
-}
-
-interface GitHubOAuthTokenResponse {
-	access_token: string;
-	scope: string;
-	token_type: string;
 }
 
 const fetchAccessToken = (params: GitHubOAuthTokenParams) =>
@@ -72,17 +110,6 @@ const route = app
 		vValidator("query", callbackRequestQuerySchema),
 		async (c) => {
 			const { code, state } = c.req.valid("query");
-
-			const storedState = await getSignedCookie(
-				c,
-				c.env.SECRET,
-				COOKIE_NAME.OAUTH_SESSION_STATE,
-			);
-			deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
-
-			if (state !== storedState) {
-				return c.text("state mismatch", 400);
-			}
 
 			const requestUrl = new URL(c.req.url);
 

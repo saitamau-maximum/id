@@ -1,7 +1,12 @@
 // OAuth によるログインフローを共通化するためのクラス
 
 import { vValidator } from "@hono/valibot-validator";
-import { setCookie, setSignedCookie } from "hono/cookie";
+import {
+	deleteCookie,
+	getSignedCookie,
+	setCookie,
+	setSignedCookie,
+} from "hono/cookie";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
 import {
@@ -15,7 +20,6 @@ import { binaryToBase64 } from "./oauth/convert-bin-base64";
 interface OAuthLoginProviderOptions {
 	// 全般設定
 	enableInvitation: boolean;
-	callbackPath: string;
 	// authorization 関連
 	scopes: string[];
 	authorizationUrl: string;
@@ -60,6 +64,18 @@ export abstract class OAuthLoginProvider {
 	}
 
 	abstract getClientId(env: Env): string;
+	abstract getClientSecret(env: Env): string;
+	abstract getCallbackUrl(origin: string): string;
+	abstract makeAccessTokenRequest(
+		code: string,
+		origin: string,
+		env: Env,
+	): Promise<void>;
+	abstract getAccessToken(
+		code: string,
+		origin: string,
+		env: Env,
+	): Promise<string>;
 
 	public getLoginHandlers() {
 		return factory.createHandlers(
@@ -114,7 +130,7 @@ export abstract class OAuthLoginProvider {
 				authorizationUrl.searchParams.set("client_id", this.getClientId(c.env));
 				authorizationUrl.searchParams.set(
 					"redirect_uri",
-					`${requestUrl.origin}${this.options.callbackPath}`,
+					this.getCallbackUrl(requestUrl.origin),
 				);
 				authorizationUrl.searchParams.set(
 					"scope",
@@ -144,7 +160,33 @@ export abstract class OAuthLoginProvider {
 	public getCallbackHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
-			async (c) => {},
+			async (c) => {
+				const { code, state } = c.req.valid("query");
+				const requestUrl = new URL(c.req.url);
+
+				// state check
+				const storedState = await getSignedCookie(
+					c,
+					c.env.SECRET,
+					COOKIE_NAME.OAUTH_SESSION_STATE,
+				);
+				deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
+				if (state !== storedState) {
+					return c.text("state mismatch", 400);
+				}
+
+				// access token を取得
+				let accessToken = "";
+				try {
+					accessToken = await this.getAccessToken(
+						code,
+						requestUrl.origin,
+						c.env,
+					);
+				} catch {
+					return c.text("invalid code", 400);
+				}
+			},
 		);
 	}
 }
