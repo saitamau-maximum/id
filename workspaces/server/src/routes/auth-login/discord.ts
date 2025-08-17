@@ -10,7 +10,6 @@ import {
 } from "discord-api-types/v10";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
-import type { OAuthConnection } from "../../repository/oauth-internal";
 import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
@@ -19,7 +18,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: RESTPostOAuth2AccessTokenResult | null = null;
 	private user: APIUser | null = null;
 
-	private async makeAccessTokenRequest(code: string): Promise<void> {
+	private async makeAccessTokenRequest(code: string) {
 		const body = new URLSearchParams();
 		body.set("grant_type", "authorization_code");
 		body.set("code", code);
@@ -40,7 +39,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		});
 	}
 
-	private async getDiscordUser(): Promise<APIUser> {
+	private async getDiscordUser() {
 		if (!this.honoVariables) throw new Error("honoVariables is not set");
 		if (!this.accessTokenResponse || !this.accessTokenResponse.access_token)
 			throw new Error("Access token response is not available");
@@ -54,11 +53,11 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return this.user;
 	}
 
-	acceptsInvitation(): boolean {
+	acceptsInvitation() {
 		return false;
 	}
 
-	getAuthorizationUrl(): URL {
+	getAuthorizationUrl() {
 		// ref: https://discord.com/developers/docs/topics/oauth2
 		const url = new URL(OAuth2Routes.authorizationURL);
 		url.searchParams.set(
@@ -69,29 +68,29 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return url;
 	}
 
-	getClientId(): string {
+	getClientId() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.DISCORD_OAUTH_ID;
 	}
 
-	getClientSecret(): string {
+	getClientSecret() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.DISCORD_OAUTH_SECRET;
 	}
 
-	getCallbackUrl(): string {
+	getCallbackUrl() {
 		if (!this.origin) throw new Error("Origin is not set");
 		return `${this.origin}/auth/login/discord/callback`;
 	}
 
-	async getAccessToken(code: string): Promise<string> {
+	async getAccessToken(code: string) {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
 		return this.accessTokenResponse.access_token;
 	}
 
-	getAccessTokenExpiresAt(): Date | null {
+	getAccessTokenExpiresAt() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		const unixMs =
@@ -99,30 +98,28 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return new Date(unixMs);
 	}
 
-	getRefreshToken(): string {
+	getRefreshToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		return this.accessTokenResponse.refresh_token;
 	}
 
-	getRefreshTokenExpiresAt(): Date | null {
+	getRefreshTokenExpiresAt() {
 		// Discord では Refresh Token の有効期限はないっぽい？
 		return null;
 	}
 
-	getProviderId(): number {
+	getProviderId() {
 		return OAUTH_PROVIDER_IDS.DISCORD;
 	}
 
-	async getProviderUserId(): Promise<string> {
+	async getProviderUserId() {
 		const user = await this.getDiscordUser();
 		if (!user) throw new Error("Discord user is not available");
 		return user.id;
 	}
 
-	async getOAuthConnectionUserPayload(): Promise<
-		Pick<OAuthConnection, "name" | "profileImageUrl" | "email">
-	> {
+	async getOAuthConnectionUserPayload() {
 		const discordUser = await this.getDiscordUser();
 
 		return {

@@ -2,7 +2,6 @@ import type { Endpoints } from "@octokit/types";
 import { Octokit } from "octokit";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
-import type { OAuthConnection } from "../../repository/oauth-internal";
 import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
@@ -37,13 +36,13 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		});
 	}
 
-	private getCachedAccessToken(): string {
+	private getCachedAccessToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		return this.accessTokenResponse.access_token;
 	}
 
-	private async getGitHubUser(): Promise<GitHubUser> {
+	private async getGitHubUser() {
 		if (!this.user) {
 			const userOctokit = new Octokit({ auth: this.getCachedAccessToken() });
 			const { data } = await userOctokit.request("GET /user");
@@ -52,11 +51,11 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return this.user;
 	}
 
-	acceptsInvitation(): boolean {
+	acceptsInvitation() {
 		return true;
 	}
 
-	getAuthorizationUrl(): URL {
+	getAuthorizationUrl() {
 		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 		const url = new URL("https://github.com/login/oauth/authorize");
 		url.searchParams.set("scope", "read:user");
@@ -64,41 +63,41 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return url;
 	}
 
-	getClientId(): string {
+	getClientId() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_ID;
 	}
 
-	getClientSecret(): string {
+	getClientSecret() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_SECRET;
 	}
 
-	getCallbackUrl(): string {
+	getCallbackUrl() {
 		if (!this.origin) throw new Error("Origin is not set");
 		return `${this.origin}/auth/login/github/callback`;
 	}
 
-	async getAccessToken(code: string): Promise<string> {
+	async getAccessToken(code: string) {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
 		return this.accessTokenResponse.access_token;
 	}
 
-	getAccessTokenExpiresAt(): Date | null {
+	getAccessTokenExpiresAt() {
 		// GitHub では Access Token の有効期限はないっぽい？
 		return null;
 	}
 
-	getRefreshToken(): string {
+	getRefreshToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
 		return this.accessTokenResponse.access_token;
 	}
 
-	getRefreshTokenExpiresAt(): Date | null {
+	getRefreshTokenExpiresAt() {
 		return null;
 	}
 
@@ -106,13 +105,11 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return OAUTH_PROVIDER_IDS.GITHUB;
 	}
 
-	async getProviderUserId(): Promise<string> {
+	async getProviderUserId() {
 		return (await this.getGitHubUser()).id.toString();
 	}
 
-	async getOAuthConnectionUserPayload(): Promise<
-		Pick<OAuthConnection, "name" | "profileImageUrl" | "email">
-	> {
+	async getOAuthConnectionUserPayload() {
 		const user = await this.getGitHubUser();
 
 		return {
