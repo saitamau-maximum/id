@@ -21,7 +21,7 @@ import { type HonoEnv, factory } from "../factory";
 import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
-import { type Awaitable, NullToUndefined } from "./types";
+import type { Awaitable } from "./types";
 
 /**
  * @example
@@ -286,10 +286,16 @@ export abstract class OAuthLoginProvider {
 								return c.text((e as Error).message, 400);
 							}
 
+							const userPayload = await this.getOAuthConnectionUserPayload();
+
 							// 招待コードが有効な場合、仮登録処理を行う
 							foundUserId = await c.var.UserRepository.createTemporaryUser(
 								invitationId,
-								NullToUndefined(await this.getOAuthConnectionUserPayload()),
+								{
+									email: userPayload.email ?? undefined,
+									displayName: userPayload.name ?? undefined,
+									profileImageURL: userPayload.profileImageUrl ?? undefined,
+								},
 							);
 							await c.var.OAuthInternalRepository.createOAuthConnection({
 								userId: foundUserId,
