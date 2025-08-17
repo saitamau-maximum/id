@@ -60,28 +60,28 @@ export abstract class OAuthLoginProvider {
 
 	private options: OAuthLoginProviderOptions;
 
+	protected env: Env | undefined;
+	protected origin: string | undefined;
+
 	constructor(options: OAuthLoginProviderOptions) {
 		this.options = options;
 	}
 
-	abstract getClientId(env: Env): string;
-	abstract getClientSecret(env: Env): string;
-	abstract getCallbackUrl(origin: string): string;
-	abstract makeAccessTokenRequest(
-		code: string,
-		origin: string,
-		env: Env,
-	): Promise<void>;
-	abstract getAccessToken(
-		code: string,
-		origin: string,
-		env: Env,
-	): Promise<string>;
+	abstract getClientId(): string;
+	abstract getClientSecret(): string;
+	abstract getCallbackUrl(): string;
+	abstract makeAccessTokenRequest(code: string): Promise<void>;
+	abstract getAccessToken(code: string): Promise<string>;
+	abstract getProviderId(): number;
+	abstract getProviderUserId(): string;
 
 	public getLoginHandlers() {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
 			async (c) => {
+				this.env = c.env;
+				this.origin = new URL(c.req.url).origin;
+
 				const { continue_to, invitation_id } = c.req.valid("query");
 
 				if (invitation_id) {
@@ -128,10 +128,10 @@ export abstract class OAuthLoginProvider {
 				const requestUrl = new URL(c.req.url);
 				const authorizationUrl = new URL(this.options.authorizationUrl);
 				authorizationUrl.searchParams.set("response_type", "code");
-				authorizationUrl.searchParams.set("client_id", this.getClientId(c.env));
+				authorizationUrl.searchParams.set("client_id", this.getClientId());
 				authorizationUrl.searchParams.set(
 					"redirect_uri",
-					this.getCallbackUrl(requestUrl.origin),
+					this.getCallbackUrl(),
 				);
 				authorizationUrl.searchParams.set(
 					"scope",
@@ -162,6 +162,9 @@ export abstract class OAuthLoginProvider {
 		return factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
 			async (c) => {
+				this.env = c.env;
+				this.origin = new URL(c.req.url).origin;
+
 				const { code, state } = c.req.valid("query");
 				const requestUrl = new URL(c.req.url);
 
@@ -179,11 +182,7 @@ export abstract class OAuthLoginProvider {
 				// access token を取得
 				let accessToken = "";
 				try {
-					accessToken = await this.getAccessToken(
-						code,
-						requestUrl.origin,
-						c.env,
-					);
+					accessToken = await this.getAccessToken(code);
 				} catch {
 					return c.text("invalid code", 400);
 				}

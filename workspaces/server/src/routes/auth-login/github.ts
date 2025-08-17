@@ -19,19 +19,22 @@ interface GitHubOAuthTokenResponse {
 class GitHubLoginProvider extends OAuthLoginProvider {
 	private accessTokenResponse: GitHubOAuthTokenResponse | null = null;
 
-	getClientId(env: Env): string {
-		return env.GITHUB_OAUTH_ID;
+	getClientId(): string {
+		if (!this.env) throw new Error("Environment is not set");
+		return this.env.GITHUB_OAUTH_ID;
 	}
 
-	getClientSecret(env: Env): string {
-		return env.GITHUB_OAUTH_SECRET;
+	getClientSecret(): string {
+		if (!this.env) throw new Error("Environment is not set");
+		return this.env.GITHUB_OAUTH_SECRET;
 	}
 
-	getCallbackUrl(origin: string): string {
+	getCallbackUrl(): string {
+		if (!this.origin) throw new Error("Origin is not set");
 		return `${origin}/auth/login/github/callback`;
 	}
 
-	async makeAccessTokenRequest(code: string, origin: string, env: Env) {
+	async makeAccessTokenRequest(code: string) {
 		return fetch("https://github.com/login/oauth/access_token", {
 			method: "POST",
 			headers: {
@@ -39,9 +42,9 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 				Accept: "application/json",
 			},
 			body: JSON.stringify({
-				client_id: this.getClientId(env),
-				client_secret: this.getClientSecret(env),
-				redirect_uri: this.getCallbackUrl(origin),
+				client_id: this.getClientId(),
+				client_secret: this.getClientSecret(),
+				redirect_uri: this.getCallbackUrl(),
 				code,
 			}),
 		}).then(async (res) => {
@@ -49,15 +52,11 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		});
 	}
 
-	async getAccessToken(
-		code: string,
-		origin: string,
-		env: Env,
-	): Promise<string> {
-		await this.makeAccessTokenRequest(code, origin, env);
-		const accessToken = this.accessTokenResponse?.access_token;
-		if (!accessToken) throw new Error("Failed to fetch access token");
-		return accessToken;
+	async getAccessToken(code: string): Promise<string> {
+		await this.makeAccessTokenRequest(code);
+		if (!this.accessTokenResponse)
+			throw new Error("Failed to fetch access token");
+		return this.accessTokenResponse.access_token;
 	}
 }
 
