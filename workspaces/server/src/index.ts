@@ -7,6 +7,7 @@ import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
+import { CloudflareEquipmentRepository } from "./infrastructure/repository/cloudflare/equipment";
 import { CloudflareInviteRepository } from "./infrastructure/repository/cloudflare/invite";
 import { CloudflareLocationRepository } from "./infrastructure/repository/cloudflare/location";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
@@ -16,7 +17,6 @@ import { CloudflareSessionRepository } from "./infrastructure/repository/cloudfl
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
-import { DiscordCalendarNotifier } from "./infrastructure/repository/discord/calendar";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
@@ -25,11 +25,13 @@ import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
 import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
+import { equipmentRoute } from "./routes/equipment";
 import { inviteRoute } from "./routes/invite";
 import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { publicRoute } from "./routes/public";
 import { userRoute } from "./routes/user";
+import { wellKnownRoute } from "./routes/well-known";
 
 const app = factory.createApp();
 
@@ -68,16 +70,14 @@ export const route = app
 		);
 		// カレンダー
 		c.set("CalendarRepository", new CloudflareCalendarRepository(c.env.DB));
-		c.set(
-			"CalendarNotifier",
-			new DiscordCalendarNotifier(c.env.CALENDAR_NOTIFY_WEBHOOK_URL),
-		);
 		c.set("LocationRepository", new CloudflareLocationRepository(c.env.DB));
 		// 資格・試験
 		c.set(
 			"CertificationRepository",
 			new CloudflareCertificationRepository(c.env.DB),
 		);
+		// 備品管理
+		c.set("EquipmentRepository", new CloudflareEquipmentRepository(c.env.DB));
 		// 招待
 		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
 		// ----- IdP OAuth & Connect ----- //
@@ -96,7 +96,11 @@ export const route = app
 		// Discord 関連
 		c.set(
 			"DiscordBotRepository",
-			new DiscordBotRepository(c.env.DISCORD_BOT_TOKEN, c.env.DISCORD_GUILD_ID),
+			new DiscordBotRepository(
+				c.env.DISCORD_BOT_TOKEN,
+				c.env.DISCORD_GUILD_ID,
+				c.env.DISCORD_CALENDAR_CHANNEL_ID,
+			),
 		);
 
 		// ----- Dynamic Variables ----- //
@@ -116,10 +120,12 @@ export const route = app
 	.route("/admin", adminRoute)
 	.route("/calendar", calendarRoute)
 	.route("/certification", certificationRoute)
+	.route("/equipment", equipmentRoute)
 	.route("/invite", inviteRoute)
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute)
-	.route("/dev", devRoute);
+	.route("/dev", devRoute)
+	.route("/.well-known", wellKnownRoute);
 
 const scheduled: ExportedHandlerScheduledHandler<Env> = async (
 	controller,

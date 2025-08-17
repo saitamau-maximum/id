@@ -271,7 +271,7 @@ export class CloudflareOAuthExternalRepository
 						// client.query ではなく .select にすることで、
 						// クエリを構築するだけにして取得処理は行わないようにする
 						this.client
-							.select({ clientId: schema.oauthTokens.clientId })
+							.select({ tokenId: schema.oauthTokens.id })
 							.from(schema.oauthTokens)
 							.where(eq(schema.oauthTokens.clientId, clientId)),
 					),
@@ -311,6 +311,8 @@ export class CloudflareOAuthExternalRepository
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		oidcNonce?: string,
+		oidcAuthTime?: number,
 	) {
 		const time = Date.now();
 
@@ -324,6 +326,8 @@ export class CloudflareOAuthExternalRepository
 				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
+				oidcNonce,
+				oidcAuthTime,
 				accessToken,
 				accessTokenExpiresAt: new Date(time + 1 * 60 * 60 * 1000), // 1 hour
 			})
@@ -365,11 +369,15 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res) return undefined;
 
-		const { scopes, ...token } = res;
+		const { scopes, oidcNonce, oidcAuthTime, ...token } = res;
 
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			oidcParams: {
+				nonce: oidcNonce ?? undefined,
+				authTime: oidcAuthTime ?? undefined,
+			},
 		};
 	}
 
@@ -412,7 +420,16 @@ export class CloudflareOAuthExternalRepository
 			with: {
 				client: true,
 				scopes: true,
-				user: USER_BASIC_INFO_COLUMNS_GETTER,
+				user: {
+					columns: {
+						id: true,
+					},
+					with: {
+						profile: true,
+						socialLinks: true,
+						roles: true,
+					},
+				},
 			},
 		});
 
@@ -423,7 +440,25 @@ export class CloudflareOAuthExternalRepository
 		return {
 			...token,
 			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
-			user: USER_BASIC_INFO_TRANSFORMER(user),
+			user: {
+				...user,
+				profile: {
+					displayId: user.profile.displayId ?? undefined,
+					displayName: user.profile.displayName ?? undefined,
+					profileImageURL: user.profile.profileImageURL ?? undefined,
+					academicEmail: user.profile.academicEmail ?? undefined,
+					email: user.profile.email ?? undefined,
+					studentId: user.profile.studentId ?? undefined,
+					grade: user.profile.grade ?? undefined,
+					bio: user.profile.bio ?? undefined,
+					updatedAt: user.profile.updatedAt ?? undefined,
+					realName: user.profile.realName ?? undefined,
+					realNameKana: user.profile.realNameKana ?? undefined,
+					socialLinks: user.socialLinks.map((link) => link.url),
+				},
+				roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+				socialLinks: undefined,
+			},
 		};
 	}
 

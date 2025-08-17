@@ -206,7 +206,9 @@ const route = app
 				COOKIE_NAME.LOGIN_STATE,
 			);
 			if (cookieJwt) {
-				const payload = await verify(cookieJwt, c.env.SECRET);
+				const payload = await verify(cookieJwt, c.env.SECRET).catch(
+					() => undefined,
+				);
 				if (payload) {
 					loggedInUserId = (payload as HonoEnv["Variables"]["jwtPayload"])
 						.userId;

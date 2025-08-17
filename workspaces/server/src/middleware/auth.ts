@@ -20,7 +20,7 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 	async (c, next) => {
 		const jwt = await getSignedCookie(c, c.env.SECRET, COOKIE_NAME.LOGIN_STATE);
 		if (jwt) {
-			const payload = await verify(jwt, c.env.SECRET);
+			const payload = await verify(jwt, c.env.SECRET).catch(() => undefined);
 			if (payload) {
 				c.set("jwtPayload", payload);
 				return next();
@@ -87,6 +87,13 @@ export const calendarMutableMiddleware = every(
 );
 
 export const invitesMutableMiddleware = every(
+	authMiddleware,
+	roleAuthorizationMiddleware({
+		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],
+	}),
+);
+
+export const equipmentMutableMiddleware = every(
 	authMiddleware,
 	roleAuthorizationMiddleware({
 		ALLOWED_ROLES: [ROLE_IDS.ADMIN, ROLE_IDS.ACCOUNTANT],

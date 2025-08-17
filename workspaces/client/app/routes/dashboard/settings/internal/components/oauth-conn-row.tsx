@@ -6,7 +6,7 @@ import { useCallback } from "react";
 import { GitHub } from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { Table } from "~/components/ui/table";
 import type { OAuthConnection } from "~/types/oauth-internal";

@@ -5,20 +5,27 @@ import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
-import { derivePublicKey, importKey } from "../../utils/oauth/key";
+import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
+
+const OAUTH_ERROR_URI =
+	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint";
 
 const app = factory.createApp();
 
 const callbackSchema = v.object({
+	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	state: v.optional(v.string()),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
+	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	oidc_auth_time: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
 	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
+
 	authorized: v.union([v.literal("1"), v.literal("0")]),
 });
 
@@ -39,23 +46,31 @@ const route = app
 				time: _time,
 				scope,
 				state,
+				oidc_nonce,
+				oidc_auth_time: _oidc_auth_time,
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
+			const oidc_auth_time = _oidc_auth_time
+				? Number.parseInt(_oidc_auth_time, 10)
+				: undefined;
 			const nowUnixMs = Date.now();
+
 			const { userId } = c.get("jwtPayload");
 
-			c.header("Cache-Control", "no-store");
-			c.header("Pragma", "no-cache");
-
-			const publicKey = await derivePublicKey(
-				await importKey(c.env.PRIVKEY_FOR_OAUTH, "privateKey"),
+			const { jwk: privKeyJwk } = await importKey(
+				c.env.PRIVKEY_FOR_OAUTH,
+				"privateKey",
 			);
+			const pubKeyJwk = derivePublicKey(privKeyJwk);
+			const publicKey = await jwkToKey(pubKeyJwk, "publicKey");
 			const isValidToken = await validateAuthToken({
 				clientId: client_id,
 				redirectUri: redirect_uri,
 				scope,
 				state,
 				time,
+				oidcNonce: oidc_nonce,
+				oidcAuthTime: oidc_auth_time,
 				key: publicKey,
 				hash: auth_token,
 			});
@@ -98,7 +113,7 @@ const route = app
 					"error_description",
 					"The user denied the request",
 				);
-				// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
+				redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
 				return c.redirect(redirectTo.href, 302);
 			}
 
@@ -127,6 +142,8 @@ const route = app
 				redirect_uri,
 				accessToken,
 				scopes,
+				oidc_nonce,
+				oidc_auth_time,
 			)
 				.then(() => {
 					redirectTo.searchParams.append("code", code);
@@ -135,7 +152,7 @@ const route = app
 				.catch((e: Error) => {
 					redirectTo.searchParams.append("error", "server_error");
 					redirectTo.searchParams.append("error_description", e.message);
-					// redirectTo.searchParams.append('error_uri', '') // そのうち書きたいね
+					redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
 					return c.redirect(redirectTo.href, 302);
 				});
 		},

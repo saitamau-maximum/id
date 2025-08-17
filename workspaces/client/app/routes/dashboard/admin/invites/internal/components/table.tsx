@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import type { User } from "~/types/user";

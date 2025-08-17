@@ -1,5 +1,11 @@
 import { relations } from "drizzle-orm";
-import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+	index,
+	int,
+	primaryKey,
+	sqliteTable,
+	text,
+} from "drizzle-orm/sqlite-core";
 import { users } from "../app";
 
 // Maximum IdP OAuthプロバイダを利用して外部連携アプリにログインするための、OAuth Provider関連のスキーマ
@@ -24,9 +30,7 @@ export const oauthClientManagers = sqliteTable(
 			.notNull()
 			.references(() => users.id),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.userId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.userId] })],
 );
 
 export const oauthClientSecrets = sqliteTable(
@@ -42,9 +46,7 @@ export const oauthClientSecrets = sqliteTable(
 			.references(() => users.id),
 		issuedAt: int("issued_at", { mode: "timestamp_ms" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.secret] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.secret] })],
 );
 
 export const oauthClientCallbacks = sqliteTable(
@@ -55,9 +57,7 @@ export const oauthClientCallbacks = sqliteTable(
 			.references(() => oauthClients.id),
 		callbackUrl: text("callback_url").notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.callbackUrl] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.callbackUrl] })],
 );
 
 export const oauthClientScopes = sqliteTable(
@@ -68,28 +68,37 @@ export const oauthClientScopes = sqliteTable(
 			.references(() => oauthClients.id),
 		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.clientId, table.scopeId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.clientId, table.scopeId] })],
 );
 
-export const oauthTokens = sqliteTable("oauth_tokens", {
-	id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
-	clientId: text("client_id")
-		.notNull()
-		.references(() => oauthClients.id),
-	userId: text("user_id")
-		.notNull()
-		.references(() => users.id),
-	code: text("code").notNull().unique(),
-	codeExpiresAt: int("code_expires_at", { mode: "timestamp_ms" }).notNull(),
-	codeUsed: int("code_used", { mode: "boolean" }).notNull(),
-	redirectUri: text("redirect_uri"),
-	accessToken: text("access_token").notNull().unique(),
-	accessTokenExpiresAt: int("access_token_expires_at", {
-		mode: "timestamp_ms",
-	}).notNull(),
-});
+export const oauthTokens = sqliteTable(
+	"oauth_tokens",
+	{
+		id: int("id", { mode: "number" }).primaryKey({ autoIncrement: true }),
+		clientId: text("client_id")
+			.notNull()
+			.references(() => oauthClients.id),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		code: text("code").notNull().unique(),
+		codeExpiresAt: int("code_expires_at", { mode: "timestamp_ms" }).notNull(),
+		codeUsed: int("code_used", { mode: "boolean" }).notNull(),
+		redirectUri: text("redirect_uri"),
+		oidcNonce: text("oidc_nonce"),
+		oidcAuthTime: int("oidc_auth_time"), // int のままにしたほうが使い勝手がいいので、 timestamp としては扱わない
+		accessToken: text("access_token").notNull().unique(),
+		accessTokenExpiresAt: int("access_token_expires_at", {
+			mode: "timestamp_ms",
+		}).notNull(),
+	},
+	(table) => [
+		index("oauth_tokens_access_token_expires_at_idx").on(
+			table.accessTokenExpiresAt,
+		),
+		index("oauth_tokens_code_expires_at_idx").on(table.codeExpiresAt),
+	],
+);
 
 export const oauthTokenScopes = sqliteTable(
 	"oauth_token_scopes",
@@ -99,9 +108,7 @@ export const oauthTokenScopes = sqliteTable(
 			.references(() => oauthTokens.id),
 		scopeId: int("scope_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.tokenId, table.scopeId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.tokenId, table.scopeId] })],
 );
 
 // ---------- OAuth Relations ---------- //

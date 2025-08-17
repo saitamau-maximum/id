@@ -10,6 +10,7 @@ import { UserDisplay } from "./user-display";
 interface Props {
 	users: UserBasicInfo[];
 	selectedUserIds: string[];
+	multiple?: boolean;
 }
 
 type Payload =
@@ -22,7 +23,7 @@ type Payload =
 	  };
 
 export const UserSelector = createCallable<Props, Payload>(
-	({ call, users, selectedUserIds: _selectedUserIds }) => {
+	({ call, users, selectedUserIds: _selectedUserIds, multiple = true }) => {
 		const [filter, setFilter] = useState("");
 		const [selectedUserIds, setSelectedUserIds] = useState(_selectedUserIds);
 
@@ -48,13 +49,23 @@ export const UserSelector = createCallable<Props, Payload>(
 
 		const onToggleUser = useCallback(
 			(userId: string) => {
-				if (selectedUserIds.includes(userId)) {
-					setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
+				if (multiple) {
+					// 複数選択モード
+					if (selectedUserIds.includes(userId)) {
+						setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
+					} else {
+						setSelectedUserIds((prev) => [...prev, userId]);
+					}
 				} else {
-					setSelectedUserIds((prev) => [...prev, userId]);
+					// 単数選択モード
+					if (selectedUserIds.includes(userId)) {
+						setSelectedUserIds([]);
+					} else {
+						setSelectedUserIds([userId]);
+					}
 				}
 			},
-			[selectedUserIds],
+			[selectedUserIds, multiple],
 		);
 
 		return (
@@ -74,6 +85,16 @@ export const UserSelector = createCallable<Props, Payload>(
 						width: "100%",
 					})}
 				>
+					{multiple && (
+						<p
+							className={css({
+								color: "gray.500",
+								fontSize: "sm",
+							})}
+						>
+							複数のユーザーを選択することができます
+						</p>
+					)}
 					<Form.Field.TextInput
 						label="ユーザー名"
 						onChange={(e) => setFilter(e.target.value)}

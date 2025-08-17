@@ -51,6 +51,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	roles: many(userRoles),
 	certifications: many(userCertifications),
 	socialLinks: many(socialLinks),
+	equipments: many(equipments),
 }));
 
 export const userProfiles = sqliteTable(
@@ -72,10 +73,10 @@ export const userProfiles = sqliteTable(
 		bio: text("bio"),
 		updatedAt: integer("updated_at", { mode: "timestamp" }),
 	},
-	(table) => ({
-		gradeIdx: index("grade_idx").on(table.grade),
-		displayIdUnique: uniqueIndex("display_id_unique").on(table.displayId),
-	}),
+	(table) => [
+		index("grade_idx").on(table.grade),
+		uniqueIndex("display_id_unique").on(table.displayId),
+	],
 );
 
 export const userProfilesRelations = relations(
@@ -97,9 +98,7 @@ export const userRoles = sqliteTable(
 			.references(() => users.id),
 		roleId: int("role_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.roleId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.userId, table.roleId] })],
 );
 
 export const userRolesRelations = relations(userRoles, ({ one }) => ({
@@ -117,9 +116,7 @@ export const socialLinks = sqliteTable(
 			.notNull(),
 		url: text("url").notNull().primaryKey(),
 	},
-	(table) => ({
-		userIdx: index("social_links_user_idx").on(table.userId),
-	}),
+	(table) => [index("social_links_user_idx").on(table.userId)],
 );
 
 export const socialLinksRelations = relations(socialLinks, ({ one }) => ({
@@ -144,11 +141,11 @@ export const calendarEvents = sqliteTable(
 			onDelete: "set null",
 		}),
 	},
-	(table) => ({
-		userIdx: index("user_idx").on(table.userId),
-		startAtIdx: index("start_at_idx").on(table.startAt),
-		endAtIdx: index("end_at_idx").on(table.endAt),
-	}),
+	(table) => [
+		index("user_idx").on(table.userId),
+		index("start_at_idx").on(table.startAt),
+		index("end_at_idx").on(table.endAt),
+	],
 );
 
 export const calendarEventsRelations = relations(calendarEvents, ({ one }) => ({
@@ -190,13 +187,10 @@ export const userCertifications = sqliteTable(
 			.notNull()
 			.default(false),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.userId, table.certificationId] }),
-		userCertifiedAtIdx: index("user_certifiedat_idx").on(
-			table.userId,
-			table.certifiedIn,
-		),
-	}),
+	(table) => [
+		primaryKey({ columns: [table.userId, table.certificationId] }),
+		index("user_certifiedat_idx").on(table.userId, table.certifiedIn),
+	],
 );
 
 export const certificationRelations = relations(certifications, ({ many }) => ({
@@ -243,7 +237,23 @@ export const inviteRoles = sqliteTable(
 			.notNull(),
 		roleId: int("role_id", { mode: "number" }).notNull(),
 	},
-	(table) => ({
-		pk: primaryKey({ columns: [table.inviteId, table.roleId] }),
-	}),
+	(table) => [primaryKey({ columns: [table.inviteId, table.roleId] })],
 );
+
+export const equipments = sqliteTable("equipments", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+	description: text("description"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+	ownerId: text("owner_id")
+		.references(() => users.id)
+		.notNull(),
+});
+
+export const equipmentsRelations = relations(equipments, ({ one }) => ({
+	owner: one(users, {
+		fields: [equipments.ownerId],
+		references: [users.id],
+	}),
+}));

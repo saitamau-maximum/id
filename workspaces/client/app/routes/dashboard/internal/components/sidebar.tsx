@@ -7,7 +7,6 @@ import { JWT_STORAGE_KEY } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import type { User } from "~/types/user";
 import { env } from "~/utils/env";
-import { FLAG } from "~/utils/flag";
 
 type Navigation = {
 	label: string;
@@ -35,8 +34,7 @@ const NAVIGATION: Navigation[] = [
 	},
 	{
 		label: "Calendar",
-		to: FLAG.ENABLE_CALENDAR ? "/calendar" : "#",
-		comingSoon: !FLAG.ENABLE_CALENDAR,
+		to: "/calendar",
 		isActive: (location: string) => location.startsWith("/calendar"),
 	},
 ];
@@ -313,9 +311,14 @@ export const Sidebar = () => {
 							>
 								<p
 									className={css({
-										fontSize: "lg",
 										fontWeight: 500,
+										whiteSpace: "nowrap",
+										overflow: "hidden",
+										textOverflow: "ellipsis",
+										maxWidth: "160px",
+										fontSize: "md",
 									})}
+									title={user.displayName}
 								>
 									{user.displayName}
 								</p>

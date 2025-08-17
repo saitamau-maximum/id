@@ -9,7 +9,7 @@ import {
 } from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
-import { ConfirmDialog } from "~/components/logic/callable/comfirm";
+import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
