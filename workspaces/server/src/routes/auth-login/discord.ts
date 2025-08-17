@@ -81,7 +81,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 
 	getCallbackUrl(): string {
 		if (!this.origin) throw new Error("Origin is not set");
-		return `${origin}/auth/login/discord/callback`;
+		return `${this.origin}/auth/login/discord/callback`;
 	}
 
 	async getAccessToken(code: string): Promise<string> {

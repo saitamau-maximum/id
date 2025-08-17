@@ -76,7 +76,7 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 
 	getCallbackUrl(): string {
 		if (!this.origin) throw new Error("Origin is not set");
-		return `${origin}/auth/login/github/callback`;
+		return `${this.origin}/auth/login/github/callback`;
 	}
 
 	async getAccessToken(code: string): Promise<string> {
