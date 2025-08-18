@@ -41,7 +41,7 @@ export const ProfileCard: React.FC<Props> = ({
 			if (conn.providerId === OAUTH_PROVIDER_IDS.GITHUB) {
 				return {
 					service: SOCIAL_SERVICES_IDS.GITHUB,
-					handle: conn.name,
+					handle: conn.name ?? "Unknown", // null にはならないはずだが念のため
 					url: `https://github.com/${conn.name}`,
 				};
 			}
@@ -52,7 +52,7 @@ export const ProfileCard: React.FC<Props> = ({
 				return {
 					service: SOCIAL_SERVICES_IDS.DISCORD,
 					handle: discordInfo.displayName,
-					url: null, // Discord は public profile URL がない
+					url: "", // Discord は public profile URL がない
 				};
 			}
 			return undefined;
@@ -250,7 +250,7 @@ export const ProfileCard: React.FC<Props> = ({
 					})}
 				>
 					{[...oauthConnectionsDetail, ...socialLinksDetail].map((link) =>
-						link.url ? (
+						link.url !== "" ? (
 							<a
 								key={link.url}
 								href={link.url}
