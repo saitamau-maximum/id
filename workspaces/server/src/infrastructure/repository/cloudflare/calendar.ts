@@ -1,10 +1,12 @@
-import { eq } from "drizzle-orm";
+import { count, desc, eq, gte, lte, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
 	CreateEventPayload,
 	ICalendarEvent,
 	ICalendarRepository,
+	PaginatedEventsResult,
+	PaginationParams,
 } from "../../../repository/calendar";
 
 export class CloudflareCalendarRepository implements ICalendarRepository {
@@ -54,6 +56,54 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 			locationId: res.locationId ?? undefined,
 			startAt: new Date(res.startAt),
 			endAt: new Date(res.endAt),
+		};
+	}
+
+	async getPaginatedEvents(params: PaginationParams): Promise<PaginatedEventsResult> {
+		const { page, limit, fiscalYear } = params;
+		const offset = (page - 1) * limit;
+
+		// Create fiscal year filter if provided
+		let whereClause;
+		if (fiscalYear) {
+			const fiscalYearStart = new Date(`${fiscalYear}-04-01T00:00:00Z`);
+			const fiscalYearEnd = new Date(`${fiscalYear + 1}-03-31T23:59:59Z`);
+			whereClause = or(
+				gte(schema.calendarEvents.startAt, fiscalYearStart.toISOString()),
+				lte(schema.calendarEvents.endAt, fiscalYearEnd.toISOString())
+			);
+		}
+
+		// Get total count
+		const totalCountResult = await this.client
+			.select({ count: count() })
+			.from(schema.calendarEvents)
+			.where(whereClause);
+		const total = totalCountResult[0]?.count ?? 0;
+
+		// Get paginated events
+		const events = await this.client
+			.select()
+			.from(schema.calendarEvents)
+			.where(whereClause)
+			.orderBy(desc(schema.calendarEvents.startAt))
+			.limit(limit)
+			.offset(offset);
+
+		const totalPages = Math.ceil(total / limit);
+
+		return {
+			events: events.map((event) => ({
+				...event,
+				description: event.description ?? undefined,
+				locationId: event.locationId ?? undefined,
+				startAt: new Date(event.startAt),
+				endAt: new Date(event.endAt),
+			})),
+			total,
+			page,
+			limit,
+			totalPages,
 		};
 	}
 
