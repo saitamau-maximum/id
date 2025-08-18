@@ -137,7 +137,7 @@ const route = app
 				grade,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.put(
@@ -185,7 +185,7 @@ const route = app
 				socialLinks,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.get("/contributions", memberOnlyMiddleware, async (c) => {
@@ -199,14 +199,14 @@ const route = app
 		const oauthConnections =
 			await OAuthInternalRepository.fetchOAuthConnectionsByUserId(
 				payload.userId,
-			);
+			).catch(() => []);
 
 		const githubConn = oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 
 		if (!githubConn || !githubConn.name) {
-			return c.text("User not found", 404);
+			return c.body(null, 404);
 		}
 
 		const cached = await ContributionCacheRepository.get(
@@ -240,34 +240,30 @@ const route = app
 
 			const { image } = c.req.valid("form");
 
-			try {
-				const optimizedImageArrayBuffer = await optimizeImage({
-					image: await image.arrayBuffer(),
-					width: 256,
-					height: 256,
-					format: "webp",
-				});
-				if (!optimizedImageArrayBuffer) {
-					throw new Error("Failed to optimize image");
-				}
-
-				const optimizedImageUint8Array = new Uint8Array(
-					optimizedImageArrayBuffer,
-				);
-
-				await UserStorageRepository.uploadProfileImage(
-					new Blob([optimizedImageUint8Array], { type: "image/webp" }),
-					payload.userId,
-				);
-
-				await UserRepository.updateUser(payload.userId, {
-					profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
-				});
-
-				return c.text("ok", 200);
-			} catch (e) {
-				return c.text("Failed to upload profile image", 500);
+			const optimizedImageArrayBuffer = await optimizeImage({
+				image: await image.arrayBuffer(),
+				width: 256,
+				height: 256,
+				format: "webp",
+			});
+			if (!optimizedImageArrayBuffer) {
+				throw new Error("Failed to optimize image");
 			}
+
+			const optimizedImageUint8Array = new Uint8Array(
+				optimizedImageArrayBuffer,
+			);
+
+			await UserStorageRepository.uploadProfileImage(
+				new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+				payload.userId,
+			);
+
+			await UserRepository.updateUser(payload.userId, {
+				profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
+			});
+
+			return c.body(null, 204);
 		},
 	)
 	.delete("/oauth-connection/:providerId", memberOnlyMiddleware, async (c) => {
@@ -290,12 +286,8 @@ const route = app
 			return c.text("Invalid providerId", 400);
 		}
 
-		try {
-			await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
-			return c.text("ok", 200);
-		} catch {
-			return c.text("Failed to delete OAuth connection", 500);
-		}
+		await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
+		return c.body(null, 204);
 	})
 	.get("/profile-image/:userId", async (c) => {
 		// TODO 画像のキャッシュを考慮する
@@ -306,7 +298,7 @@ const route = app
 			const body = await UserStorageRepository.getProfileImageURL(userId);
 			c.header("Content-Type", "image/webp");
 			return stream(c, (s) => s.pipe(body));
-		} catch (e) {
+		} catch {
 			return c.text("Not found", 404);
 		}
 	});
