@@ -41,17 +41,9 @@ export const getHandle = (
 export const parseSocialLink = (url: string) => {
 	const service = detectSocialService(url);
 
-	if (service === SOCIAL_SERVICES_IDS.OTHER) {
-		return {
-			service,
-			handle: getHandle(url, service),
-			url,
-		};
-	}
-
 	return {
 		service,
-		handle: `@${getHandle(url, service)}`,
+		handle: getHandle(url, service),
 		url,
 	};
 };
