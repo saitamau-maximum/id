@@ -33,7 +33,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 - TypeScript
 - Valibot (バリデーション)
 
-###共通ツール
+### 共通ツール
 - pnpm (パッケージマネージャー)
 - Biome (リンター・フォーマッター)
 - TypeScript
