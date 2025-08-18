@@ -18,6 +18,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 ## 技術スタック
 
 ### Client (workspaces/client)
+
 - React 19 + React Router v7
 - TypeScript
 - Panda CSS (CSS-in-JS)
@@ -27,6 +28,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 - Chart.js (データ可視化)
 
 ### Server (workspaces/server)
+
 - Hono (Web フレームワーク)
 - Cloudflare Workers (ランタイム)
 - Drizzle ORM + Cloudflare D1
@@ -34,6 +36,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 - Valibot (バリデーション)
 
 ### 共通ツール
+
 - pnpm (パッケージマネージャー)
 - Biome (リンター・フォーマッター)
 - TypeScript
@@ -41,36 +44,42 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 ## 開発環境セットアップ
 
 ### 前提条件
+
 - Node.js (バージョンは `.node-version` を参照)
 - pnpm (package.jsonに指定されたバージョン)
 
 ### 初期セットアップ
 
 1. **依存関係のインストール**
+
    ```bash
    pnpm install
    ```
 
 2. **環境変数の設定**
-   
+
    Client側:
+
    ```bash
    cp workspaces/client/.env.example workspaces/client/.env
    ```
-   
+
    Server側:
+
    ```bash
    cp workspaces/server/.dev.vars.example workspaces/server/.dev.vars
    ```
-   
+
    必要な環境変数については README.md を参照してください。
 
 3. **データベースのマイグレーション**
+
    ```bash
    pnpm apply:migrations:local
    ```
 
 4. **Server側の型生成**
+
    ```bash
    pnpm -C workspaces/server run build
    ```
@@ -78,13 +87,16 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 ## 開発ワークフロー
 
 ### 開発サーバーの起動
+
 ```bash
 pnpm dev
 ```
-- Client: http://localhost:5173
-- Server: http://localhost:8787
+
+- Client: <http://localhost:5173>
+- Server: <http://localhost:8787>
 
 ### コード品質チェック
+
 ```bash
 # 全体のリント・フォーマット
 pnpm check
@@ -97,6 +109,7 @@ pnpm -C workspaces/client run typecheck
 ```
 
 ### ビルド
+
 ```bash
 # 全体のビルド
 pnpm build
@@ -107,6 +120,7 @@ pnpm -C workspaces/server run build
 ```
 
 ### データベース操作
+
 ```bash
 # マイグレーション生成
 pnpm generate:migrations
@@ -158,23 +172,31 @@ pnpm seed
 ## 開発時の注意点
 
 ### 環境変数
+
 - 機密情報は `.env` や `.dev.vars` に設定（Git管理対象外）
 - 公開情報は `wrangler.toml` に設定
 
 ### データベース
+
 - スキーマ変更時は必ずマイグレーションファイルを生成
 - Server側の型変更後は Client 側でビルドを実行
 
 ### コード品質
+
 - コミット前に `pnpm check` を実行
 - Biome の設定に従ってコードを記述
 - TypeScript の型安全性を重視
+- Trailing space は削除する
+- 空行の Trailing space も削除する
+- ファイルの末尾には改行を入れる
 
 ### Conventional Commit
+
 - コミットメッセージは Conventional Commit 形式で記述する
 - PR タイトルも Conventional Commit 形式で記述する
 
 #### コミットメッセージの形式
+
 ```
 <type>(<scope>): <description>
 
@@ -184,6 +206,7 @@ pnpm seed
 ```
 
 #### 使用可能なタイプ
+
 - `feat`: 新機能の追加
 - `fix`: バグ修正
 - `docs`: ドキュメントの変更
@@ -194,6 +217,7 @@ pnpm seed
 - `chore`: ビルドプロセスやツールの変更など
 
 #### 例
+
 ```
 feat(auth): OpenID Connect Discovery 実装
 fix(client): クライアント削除の不具合を修正
@@ -206,12 +230,14 @@ chore: 依存関係を更新
 ### よくある問題
 
 1. **型エラーが発生する場合**
+
    ```bash
    # Server側をビルドして型を生成
    pnpm -C workspaces/server run build
    ```
 
 2. **マイグレーションエラー**
+
    ```bash
    # ローカルデータベースをリセット
    rm -rf .wrangler/state/v3/d1/miniflare-D1DatabaseObject/
@@ -219,6 +245,7 @@ chore: 依存関係を更新
    ```
 
 3. **依存関係の問題**
+
    ```bash
    # node_modules を削除して再インストール
    rm -rf node_modules workspaces/*/node_modules
@@ -244,6 +271,7 @@ chore: 依存関係を更新
 5. **テスト**: 関連するテストファイルも同時に更新
 
 ## リンク
+
 - [本番環境](https://id.maximum.vc)
 - [GitHub リポジトリ](https://github.com/saitamau-maximum/id)
 - [Wiki（OAuth ドキュメント）](https://github.com/saitamau-maximum/id/wiki/oauth-docs)
