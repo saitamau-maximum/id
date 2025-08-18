@@ -1,5 +1,4 @@
 import { vValidator } from "@hono/valibot-validator";
-import { validator } from "hono/validator";
 import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
@@ -39,12 +38,13 @@ const route = app
 		"/",
 		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
-		validator("json", (value: v.InferOutput<typeof createEventSchema>, c) => {
-			if (new Date(value.startAt) >= new Date(value.endAt)) {
+		(c, next) => {
+			const { startAt, endAt } = c.req.valid("json");
+			if (new Date(startAt) >= new Date(endAt)) {
 				return c.text("startAt must be before endAt", 400);
 			}
-			return value;
-		}),
+			return next();
+		},
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
@@ -79,12 +79,13 @@ const route = app
 		"/:id",
 		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
-		validator("json", (value: v.InferOutput<typeof updateEventSchema>, c) => {
-			if (new Date(value.startAt) >= new Date(value.endAt)) {
+		(c, next) => {
+			const { startAt, endAt } = c.req.valid("json");
+			if (new Date(startAt) >= new Date(endAt)) {
 				return c.text("startAt must be before endAt", 400);
 			}
-			return value;
-		}),
+			return next();
+		},
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
