@@ -52,7 +52,7 @@ const protectedRoute = app
 			createdAt,
 			issuedByUserId,
 		});
-		return c.json({ id });
+		return c.json({ id }, 201);
 	})
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");

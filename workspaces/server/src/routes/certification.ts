@@ -46,7 +46,7 @@ const route = app
 				certifiedIn,
 			});
 
-			return c.body(null, 204);
+			return c.body(null, 201);
 		},
 	)
 	.get("/request", adminOnlyMiddleware, async (c) => {
@@ -98,7 +98,7 @@ const route = app
 				title,
 				description,
 			});
-			return c.body(null, 204);
+			return c.body(null, 201);
 		},
 	)
 	.put(
