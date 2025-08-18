@@ -18,12 +18,8 @@ const route = app
 	.use(invitesMutableMiddleware)
 	.get("/list", async (c) => {
 		const { UserRepository } = c.var;
-		try {
-			const users = await UserRepository.fetchApprovedUsers();
-			return c.json(users);
-		} catch (e) {
-			return c.json({ error: "Internal Server Error" }, 500);
-		}
+		const users = await UserRepository.fetchApprovedUsers();
+		return c.json(users);
 	})
 	.put(
 		"/:userId/role",
@@ -39,73 +35,56 @@ const route = app
 				return c.json({ error: "Invalid Role ID" }, 400);
 			}
 
-			try {
-				await UserRepository.updateUserRole(userId, roleIds);
-				return c.text("ok", 200);
-			} catch (e) {
-				return c.json({ error: "Internal Server Error" }, 500);
-			}
+			await UserRepository.updateUserRole(userId, roleIds);
+			return c.body(null, 204);
 		},
 	)
 	.get("/provisional", async (c) => {
 		const { UserRepository } = c.var;
-		try {
-			const users = await UserRepository.fetchProvisionalUsers();
-			return c.json(users);
-		} catch (e) {
-			return c.json({ error: "Internal Server Error" }, 500);
-		}
+		const users = await UserRepository.fetchProvisionalUsers();
+		return c.json(users);
 	})
 	.post("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository, OrganizationRepository, OAuthInternalRepository } =
 			c.var;
-		try {
-			// GitHub OAuth で認証している前提
-			const oauthConnections =
-				await OAuthInternalRepository.fetchOAuthConnectionsByUserId(userId);
-			const githubConn = oauthConnections.find(
-				(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+
+		// GitHub OAuth で認証している前提
+		const oauthConnections =
+			await OAuthInternalRepository.fetchOAuthConnectionsByUserId(userId).catch(
+				() => [],
 			);
-			if (!githubConn || !githubConn.providerUserId) {
-				return c.text("User not found", 404);
-			}
-
-			// 念のため int としてパースして検証
-			const githubUserId = Number.parseInt(githubConn.providerUserId, 10);
-			if (githubUserId.toString() !== githubConn.providerUserId) {
-				return c.text("Invalid GitHub user ID", 500);
-			}
-			// GitHub Organization に追加
-			await OrganizationRepository.inviteToOrganization(githubUserId);
-
-			// すべてが終わったら DB を書き換えて承認済みとする
-			await UserRepository.approveProvisionalUser(userId);
-
-			return c.text("ok", 200);
-		} catch (e) {
-			return c.json({ error: "Internal Server Error" }, 500);
+		const githubConn = oauthConnections.find(
+			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
+		);
+		if (!githubConn) {
+			return c.text("User not found", 404);
 		}
+
+		// 念のため int としてパースして検証
+		const githubUserId = Number.parseInt(githubConn.providerUserId, 10);
+		if (githubUserId.toString() !== githubConn.providerUserId) {
+			return c.text("Invalid GitHub user ID", 500);
+		}
+		// GitHub Organization に追加
+		await OrganizationRepository.inviteToOrganization(githubUserId);
+
+		// すべてが終わったら DB を書き換えて承認済みとする
+		await UserRepository.approveProvisionalUser(userId);
+
+		return c.body(null, 204);
 	})
 	.post("/:userId/reject", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
-		try {
-			await UserRepository.rejectProvisionalUser(userId);
-			return c.text("ok", 200);
-		} catch (e) {
-			return c.json({ error: "Internal Server Error" }, 500);
-		}
+		await UserRepository.rejectProvisionalUser(userId);
+		return c.body(null, 204);
 	})
 	.post("/:userId/confirm-payment", async (c) => {
 		const userId = c.req.param("userId");
 		const { UserRepository } = c.var;
-		try {
-			await UserRepository.confirmPayment(userId);
-			return c.text("ok", 200);
-		} catch (e) {
-			return c.json({ error: "Internal Server Error" }, 500);
-		}
+		await UserRepository.confirmPayment(userId);
+		return c.body(null, 204);
 	});
 
 export { route as adminUsersRoute };
