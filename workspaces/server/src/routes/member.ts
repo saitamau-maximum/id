@@ -7,22 +7,21 @@ const app = factory.createApp();
 const route = app
 	.get("/list", memberOnlyMiddleware, async (c) => {
 		const { UserRepository } = c.var;
-		try {
-			const members = await UserRepository.fetchMembers();
-			return c.json(members);
-		} catch (e) {
-			return c.json({ error: "member not found" }, 404);
-		}
+		const members = await UserRepository.fetchMembers();
+		return c.json(members);
 	})
 	.get("/profile/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
 		const { UserRepository } = c.var;
-		try {
-			const member = await UserRepository.fetchMemberByDisplayId(userDisplayId);
-			return c.json(member);
-		} catch (e) {
-			return c.json({ error: "member not found" }, 404);
+
+		const member = await UserRepository.fetchMemberByDisplayId(
+			userDisplayId,
+		).catch(() => null);
+
+		if (!member) {
+			return c.body(null, 404);
 		}
+		return c.json(member);
 	})
 	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
@@ -35,14 +34,14 @@ const route = app
 		const oauthConnections =
 			await OAuthInternalRepository.fetchOAuthConnectionsByUserDisplayId(
 				userDisplayId,
-			);
+			).catch(() => []);
 
 		const githubConn = oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 
 		if (!githubConn || !githubConn.name) {
-			return c.text("User not found", 404);
+			return c.body(null, 404);
 		}
 
 		const cached = await ContributionCacheRepository.get(
@@ -50,7 +49,7 @@ const route = app
 		);
 
 		if (cached) {
-			return c.json(cached, 200);
+			return c.json(cached);
 		}
 
 		const contributions = await ContributionRepository.getContributions(
@@ -63,7 +62,7 @@ const route = app
 			ContributionCacheRepository.set(githubConn.name, contributions),
 		);
 
-		return c.json(contributions, 200);
+		return c.json(contributions);
 	});
 
 export { route as memberRoute };
