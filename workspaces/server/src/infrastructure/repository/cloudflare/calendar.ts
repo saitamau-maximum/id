@@ -1,4 +1,4 @@
-import { count, desc, eq, gte, lte, or } from "drizzle-orm";
+import { and, count, desc, eq, gte, lte, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -59,18 +59,20 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		};
 	}
 
-	async getPaginatedEvents(params: PaginationParams): Promise<PaginatedEventsResult> {
+	async getPaginatedEvents(
+		params: PaginationParams,
+	): Promise<PaginatedEventsResult> {
 		const { page, limit, fiscalYear } = params;
 		const offset = (page - 1) * limit;
 
 		// Create fiscal year filter if provided
-		let whereClause;
+		let whereClause: any = undefined;
 		if (fiscalYear) {
 			const fiscalYearStart = new Date(`${fiscalYear}-04-01T00:00:00Z`);
 			const fiscalYearEnd = new Date(`${fiscalYear + 1}-03-31T23:59:59Z`);
-			whereClause = or(
+			whereClause = and(
 				gte(schema.calendarEvents.startAt, fiscalYearStart.toISOString()),
-				lte(schema.calendarEvents.endAt, fiscalYearEnd.toISOString())
+				lte(schema.calendarEvents.endAt, fiscalYearEnd.toISOString()),
 			);
 		}
 

@@ -44,10 +44,9 @@ const route = app
 		try {
 			const page = Number(c.req.query("page")) || 1;
 			const limit = Number(c.req.query("limit")) || 10;
-			const fiscalYear = c.req.query("fiscalYear") 
-				? Number(c.req.query("fiscalYear")) 
+			const fiscalYear = c.req.query("fiscalYear")
+				? Number(c.req.query("fiscalYear"))
 				: undefined;
-			
 			const result = await CalendarRepository.getPaginatedEvents({
 				page,
 				limit,

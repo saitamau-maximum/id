@@ -36,7 +36,9 @@ export interface ICalendarRepository {
 	getAllEvents: () => Promise<ICalendarEvent[]>;
 	getAllEventsWithLocation: () => Promise<ICalendarEventWithLocation[]>;
 	getEventById: (eventId: ICalendarEvent["id"]) => Promise<ICalendarEvent>;
-	getPaginatedEvents: (params: PaginationParams) => Promise<PaginatedEventsResult>;
+	getPaginatedEvents: (
+		params: PaginationParams,
+	) => Promise<PaginatedEventsResult>;
 	createEvent: (event: CreateEventPayload) => Promise<void>;
 	updateEvent: (event: ICalendarEvent) => Promise<void>;
 	deleteEvent: (eventId: ICalendarEvent["id"]) => Promise<void>;

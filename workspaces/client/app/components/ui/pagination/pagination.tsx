@@ -1,4 +1,9 @@
-import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from "react-feather";
+import {
+	ChevronLeft,
+	ChevronRight,
+	ChevronsLeft,
+	ChevronsRight,
+} from "react-feather";
 import { css } from "styled-system/css";
 import { IconButton } from "../icon-button";
 
@@ -43,7 +48,7 @@ export const Pagination = ({
 			>
 				<ChevronsLeft size={16} />
 			</IconButton>
-			
+
 			<IconButton
 				label="前のページ"
 				onClick={() => onPageChange(currentPage - 1)}
@@ -54,8 +59,14 @@ export const Pagination = ({
 
 			{adjustedStartPage > 1 && (
 				<>
-					<PageButton page={1} currentPage={currentPage} onPageChange={onPageChange} />
-					{adjustedStartPage > 2 && <span className={css({ padding: 2 })}>...</span>}
+					<PageButton
+						page={1}
+						currentPage={currentPage}
+						onPageChange={onPageChange}
+					/>
+					{adjustedStartPage > 2 && (
+						<span className={css({ padding: 2 })}>...</span>
+					)}
 				</>
 			)}
 
@@ -70,7 +81,9 @@ export const Pagination = ({
 
 			{endPage < totalPages && (
 				<>
-					{endPage < totalPages - 1 && <span className={css({ padding: 2 })}>...</span>}
+					{endPage < totalPages - 1 && (
+						<span className={css({ padding: 2 })}>...</span>
+					)}
 					<PageButton
 						page={totalPages}
 						currentPage={currentPage}
@@ -86,7 +99,7 @@ export const Pagination = ({
 			>
 				<ChevronRight size={16} />
 			</IconButton>
-			
+
 			<IconButton
 				label="最後のページ"
 				onClick={() => onPageChange(totalPages)}
