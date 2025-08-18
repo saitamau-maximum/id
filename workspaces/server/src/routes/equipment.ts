@@ -49,14 +49,14 @@ const route = app
 			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
 
-			const id = await EquipmentRepository.createEquipment({
+			await EquipmentRepository.createEquipment({
 				name,
 				description: description !== "" ? description : undefined,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 				ownerId,
 			});
-			return c.json({ id }, 201);
+			return c.body(null, 204);
 		},
 	)
 	.put(
@@ -75,7 +75,7 @@ const route = app
 				updatedAt: new Date(),
 				ownerId,
 			});
-			return c.json({ id }, 200);
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:id", equipmentMutableMiddleware, async (c) => {
