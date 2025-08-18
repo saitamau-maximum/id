@@ -190,6 +190,52 @@ pnpm seed
 - 空行の Trailing space も削除する
 - ファイルの末尾には改行を入れる
 
+### Pre-commit フック
+
+プロジェクトには pre-commit フックが設定されており、コミット時に自動でコード品質チェックと修正を行います。
+
+#### セットアップ
+
+初回セットアップ時に以下のスクリプトを実行してください：
+
+```bash
+./setup-precommit.sh
+```
+
+または手動でセットアップする場合：
+
+```bash
+# 依存関係をインストール
+pnpm install
+
+# pre-commit フックを実行可能にする
+chmod +x .husky/pre-commit
+
+# husky を初期化
+npx husky init
+```
+
+#### 動作
+
+- コミット時に `lint-staged` が実行される
+- ステージングされたファイルのみに対してBiomeによる自動修正が実行される
+- 修正不可能なエラーがある場合、コミットがブロックされる
+- 自動修正されたファイルは手動で再度ステージングする必要がある
+
+#### 設定
+
+`package.json` の `lint-staged` セクションで設定されています：
+
+```json
+{
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx,json,css,md}": [
+      "biome check --write --files-ignore-unknown=true"
+    ]
+  }
+}
+```
+
 ### Conventional Commit
 
 - コミットメッセージは Conventional Commit 形式で記述する
