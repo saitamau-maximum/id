@@ -21,6 +21,17 @@ export type ICalendarEventWithLocation = ICalendarEvent & {
 export interface ICalendarRepository {
 	getAllEvents: () => Promise<ICalendarEvent[]>;
 	getAllEventsWithLocation: () => Promise<ICalendarEventWithLocation[]>;
+	getPaginatedEvents: (options: {
+		page: number;
+		limit: number;
+		fiscalYear?: number;
+	}) => Promise<{
+		events: ICalendarEvent[];
+		total: number;
+		totalPages: number;
+		currentPage: number;
+		limit: number;
+	}>;
 	getEventById: (eventId: ICalendarEvent["id"]) => Promise<ICalendarEvent>;
 	createEvent: (event: CreateEventPayload) => Promise<void>;
 	updateEvent: (event: ICalendarEvent) => Promise<void>;

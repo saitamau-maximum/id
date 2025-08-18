@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
 	ChevronLeft,
 	ChevronRight,
@@ -12,8 +12,9 @@ import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
+import { Pagination } from "~/components/ui/pagination";
 import { Table } from "~/components/ui/table";
-import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
+import { usePaginatedCalendar } from "~/routes/dashboard/calendar/hooks/use-paginated-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
 import { formatDuration, getFiscalYear } from "~/utils/date";
@@ -24,15 +25,26 @@ import { CreateEventDialog } from "./callable-create-event-dialog";
 import { EditEventDialog } from "./callable-edit-event-dialog";
 
 export const EventsEditor = () => {
-	const { data: events } = useCalendar();
 	// 選択中の年度
 	const [selectedFisicalYear, setSelectedFisicalYear] = useState(
 		getFiscalYear(new Date()),
 	);
-	const sortedEvents = [...events].sort(
-		(a, b) => b.startAt.getTime() - a.startAt.getTime(),
-	);
+	
+	const {
+		data: paginationData,
+		page,
+		limit,
+		handlePageChange,
+		handleFiscalYearChange,
+		isLoading,
+	} = usePaginatedCalendar(1, 10);
+
 	const { mutate: createEvent } = useCreateEvent();
+
+	// Update fiscal year filter when selectedFisicalYear changes
+	React.useEffect(() => {
+		handleFiscalYearChange(selectedFisicalYear);
+	}, [selectedFisicalYear, handleFiscalYearChange]);
 
 	const handleCreateEvent = useCallback(async () => {
 		const res = await CreateEventDialog.call();
@@ -40,11 +52,8 @@ export const EventsEditor = () => {
 		createEvent(res.payload);
 	}, [createEvent]);
 
-	const filteredEvents = sortedEvents.filter(
-		(event) =>
-			getFiscalYear(event.startAt) === selectedFisicalYear ||
-			getFiscalYear(event.endAt) === selectedFisicalYear,
-	);
+	const events = paginationData?.events || [];
+	const totalPages = paginationData?.totalPages || 0;
 
 	return (
 		<div>
@@ -100,7 +109,17 @@ export const EventsEditor = () => {
 					</ButtonLike>
 				</button>
 			</div>
-			{filteredEvents.length === 0 ? (
+			{isLoading ? (
+				<p
+					className={css({
+						color: "gray.500",
+						textAlign: "center",
+						marginTop: 8,
+					})}
+				>
+					読み込み中...
+				</p>
+			) : events.length === 0 ? (
 				<p
 					className={css({
 						color: "gray.500",
@@ -111,22 +130,29 @@ export const EventsEditor = () => {
 					イベントはありません
 				</p>
 			) : (
-				<Table.Root>
-					<thead>
-						<Table.Tr>
-							<Table.Th>タイトル</Table.Th>
-							<Table.Th>説明</Table.Th>
-							<Table.Th>期間</Table.Th>
-							<Table.Th>活動場所</Table.Th>
-							<Table.Th>操作</Table.Th>
-						</Table.Tr>
-					</thead>
-					<tbody>
-						{filteredEvents.map((event) => (
-							<EventTableRow event={event} key={event.id} />
-						))}
-					</tbody>
-				</Table.Root>
+				<>
+					<Table.Root>
+						<thead>
+							<Table.Tr>
+								<Table.Th>タイトル</Table.Th>
+								<Table.Th>説明</Table.Th>
+								<Table.Th>期間</Table.Th>
+								<Table.Th>活動場所</Table.Th>
+								<Table.Th>操作</Table.Th>
+							</Table.Tr>
+						</thead>
+						<tbody>
+							{events.map((event) => (
+								<EventTableRow event={event} key={event.id} />
+							))}
+						</tbody>
+					</Table.Root>
+					<Pagination
+						currentPage={page}
+						totalPages={totalPages}
+						onPageChange={handlePageChange}
+					/>
+				</>
 			)}
 		</div>
 	);
