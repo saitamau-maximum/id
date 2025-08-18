@@ -46,7 +46,7 @@ const route = app
 				certifiedIn,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.get("/request", adminOnlyMiddleware, async (c) => {
@@ -73,7 +73,7 @@ const route = app
 					certificationId,
 				);
 			}
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.post(
@@ -87,7 +87,7 @@ const route = app
 				title,
 				description,
 			});
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.put(
@@ -102,14 +102,14 @@ const route = app
 				certificationId,
 				description,
 			});
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:certificationId", adminOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
 		const certificationId = c.req.param("certificationId");
 		await CertificationRepository.deleteCertification(certificationId);
-		return c.text("ok", 200);
+		return c.body(null, 204);
 	})
 	.delete("/:certificationId/my", memberOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
@@ -119,7 +119,7 @@ const route = app
 			userId,
 			certificationId,
 		});
-		return c.text("ok", 200);
+		return c.body(null, 204);
 	});
 
 export { route as certificationRoute };
