@@ -41,7 +41,7 @@ const route = app
 		vValidator("json", createEventSchema),
 		validator("json", (value: v.InferOutput<typeof createEventSchema>, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
-				return c.json({ error: "startAt must be before endAt" }, 400);
+				return c.text("startAt must be before endAt", 400);
 			}
 			return value;
 		}),
@@ -81,7 +81,7 @@ const route = app
 		vValidator("json", updateEventSchema),
 		validator("json", (value: v.InferOutput<typeof updateEventSchema>, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
-				return c.json({ error: "startAt must be before endAt" }, 400);
+				return c.text("startAt must be before endAt", 400);
 			}
 			return value;
 		}),
