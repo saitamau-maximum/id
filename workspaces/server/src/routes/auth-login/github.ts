@@ -120,7 +120,7 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const githubLogin = new GitHubLoginProvider();
+const githubLogin = new GitHubLoginProvider(factory);
 
 const route = app
 	.get("/", ...githubLogin.loginHandlers())

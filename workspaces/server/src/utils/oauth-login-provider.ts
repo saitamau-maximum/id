@@ -8,6 +8,7 @@ import {
 	setCookie,
 	setSignedCookie,
 } from "hono/cookie";
+import type { Factory } from "hono/factory";
 import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
@@ -17,7 +18,7 @@ import {
 	TOAST_SEARCHPARAM,
 	ToastHashFn,
 } from "../constants/toast";
-import { type HonoEnv, factory } from "../factory";
+import type { HonoEnv } from "../factory";
 import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
@@ -32,7 +33,7 @@ import type { Awaitable } from "./types";
  *   ...
  * }
  *
- * const provider = new Provider();
+ * const provider = new Provider(factory);
  *
  * const route = app
  *   .get("/", ...provider.getLoginHandler())
@@ -62,9 +63,15 @@ export abstract class OAuthLoginProvider {
 	});
 
 	// ----- protected members ----- //
+	protected factory: Factory<HonoEnv>;
 	protected env: Env | undefined;
 	protected origin: string | undefined;
 	protected honoVariables: HonoEnv["Variables"] | undefined;
+
+	// ----- constructor ----- //
+	constructor(factory: Factory<HonoEnv>) {
+		this.factory = factory;
+	}
 
 	// ----- abstract methods ----- //
 	/**
@@ -90,7 +97,7 @@ export abstract class OAuthLoginProvider {
 
 	// ----- public methods ----- //
 	public loginHandlers() {
-		return factory.createHandlers(
+		return this.factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
 			async (c) => {
 				this.env = c.env;
@@ -155,7 +162,7 @@ export abstract class OAuthLoginProvider {
 	}
 
 	public callbackHandlers() {
-		return factory.createHandlers(
+		return this.factory.createHandlers(
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
 			async (c) => {
 				this.env = c.env;

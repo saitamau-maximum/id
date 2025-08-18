@@ -150,7 +150,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const discordLogin = new DiscordLoginProvider();
+const discordLogin = new DiscordLoginProvider(factory);
 
 const route = app
 	.get("/", ...discordLogin.loginHandlers())
