@@ -170,6 +170,37 @@ pnpm seed
 - Biome の設定に従ってコードを記述
 - TypeScript の型安全性を重視
 
+### Conventional Commit
+- コミットメッセージは Conventional Commit 形式で記述する
+- PR タイトルも Conventional Commit 形式で記述する
+
+#### コミットメッセージの形式
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### 使用可能なタイプ
+- `feat`: 新機能の追加
+- `fix`: バグ修正
+- `docs`: ドキュメントの変更
+- `style`: コードの動作に影響しない変更（空白、フォーマット、セミコロンの欠如など）
+- `refactor`: バグ修正や機能追加ではないコード変更
+- `perf`: パフォーマンス向上のためのコード変更
+- `test`: 不足しているテストの追加や既存のテストの修正
+- `chore`: ビルドプロセスやツールの変更など
+
+#### 例
+```
+feat(auth): OpenID Connect Discovery 実装
+fix(client): クライアント削除の不具合を修正
+docs: CLAUDE.md に開発ワークフローを追加
+chore: 依存関係を更新
+```
+
 ## トラブルシューティング
 
 ### よくある問題
