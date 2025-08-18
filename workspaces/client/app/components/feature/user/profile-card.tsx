@@ -59,14 +59,20 @@ export const ProfileCard: React.FC<Props> = ({
 		})
 		.filter((conn) => conn !== undefined);
 
-	const socialLinksDetail = (socialLinks ?? []).map((link: string) => {
-		const { service, handle } = parseSocialLink(link);
-		return {
-			service,
-			handle,
-			url: link,
-		};
-	});
+	const socialLinksDetail = (socialLinks ?? [])
+		.map((link: string) => {
+			const { service, handle } = parseSocialLink(link);
+			return {
+				service,
+				handle,
+				url: link,
+			};
+		})
+		// oauthConnections との重複削除
+		.filter(
+			(detail) =>
+				!oauthConnectionsDetail.some((conn) => conn.service === detail.service),
+		);
 
 	return (
 		<div
