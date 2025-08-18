@@ -68,6 +68,14 @@ const route = app
 			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
 
+			// 存在チェック
+			const equipment = await EquipmentRepository.getEquipmentById(id).catch(
+				() => null,
+			);
+			if (!equipment) {
+				return c.body(null, 404);
+			}
+
 			await EquipmentRepository.updateEquipment({
 				id,
 				name,
@@ -81,6 +89,14 @@ const route = app
 	.delete("/:id", equipmentMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
+
+		// 存在チェック
+		const equipment = await EquipmentRepository.getEquipmentById(id).catch(
+			() => null,
+		);
+		if (!equipment) {
+			return c.body(null, 404);
+		}
 
 		await EquipmentRepository.deleteEquipment(id);
 		return c.body(null, 204);

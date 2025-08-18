@@ -35,6 +35,14 @@ const route = app
 				return c.json({ error: "Invalid Role ID" }, 400);
 			}
 
+			// ユーザーが存在するか確認
+			const user = await UserRepository.fetchUserProfileById(userId).catch(
+				() => null,
+			);
+			if (!user) {
+				return c.body(null, 404);
+			}
+
 			await UserRepository.updateUserRole(userId, roleIds);
 			return c.body(null, 204);
 		},

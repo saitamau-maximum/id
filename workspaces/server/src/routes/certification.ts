@@ -62,6 +62,17 @@ const route = app
 		async (c) => {
 			const { CertificationRepository } = c.var;
 			const { userId, certificationId, isApproved } = c.req.valid("json");
+
+			// 存在チェック
+			const certificationExists =
+				await CertificationRepository.existsUserCertification({
+					userId,
+					certificationId,
+				});
+			if (!certificationExists) {
+				return c.body(null, 404);
+			}
+
 			if (isApproved) {
 				await CertificationRepository.approveCertificationRequest(
 					userId,
@@ -98,6 +109,14 @@ const route = app
 			const { CertificationRepository } = c.var;
 			const certificationId = c.req.param("certificationId");
 			const { description } = c.req.valid("json");
+
+			// 存在チェック
+			const certificationExists =
+				await CertificationRepository.existsCertification(certificationId);
+			if (!certificationExists) {
+				return c.body(null, 404);
+			}
+
 			await CertificationRepository.updateCertification({
 				certificationId,
 				description,
@@ -108,6 +127,14 @@ const route = app
 	.delete("/:certificationId", adminOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
 		const certificationId = c.req.param("certificationId");
+
+		// 存在チェック
+		const certificationExists =
+			await CertificationRepository.existsCertification(certificationId);
+		if (!certificationExists) {
+			return c.body(null, 404);
+		}
+
 		await CertificationRepository.deleteCertification(certificationId);
 		return c.body(null, 204);
 	})
@@ -115,6 +142,17 @@ const route = app
 		const { CertificationRepository } = c.var;
 		const { userId } = c.get("jwtPayload");
 		const certificationId = c.req.param("certificationId");
+
+		// 存在チェック
+		const certificationExists =
+			await CertificationRepository.existsUserCertification({
+				userId,
+				certificationId,
+			});
+		if (!certificationExists) {
+			return c.body(null, 404);
+		}
+
 		await CertificationRepository.deleteUserCertification({
 			userId,
 			certificationId,

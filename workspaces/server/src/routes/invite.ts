@@ -57,8 +57,19 @@ const protectedRoute = app
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
 		const { InviteRepository } = c.var;
-		await InviteRepository.deleteInvite(id);
-		return c.body(null, 204);
+
+		// 招待存在チェック
+		const invite = await InviteRepository.getInviteById(id).catch(() => null);
+		if (!invite) {
+			return c.body(null, 404);
+		}
+
+		try {
+			await InviteRepository.deleteInvite(id);
+			return c.body(null, 204);
+		} catch (e) {
+			return c.text((e as Error).message, 500);
+		}
 	});
 
 const route = app.route("/", publicRoute).route("/", protectedRoute);
