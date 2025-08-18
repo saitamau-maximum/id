@@ -39,7 +39,7 @@ const route = app
 		"/",
 		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
-		validator("json", (value, c) => {
+		validator("json", (value: v.InferOutput<typeof createEventSchema>, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
 				return c.json({ error: "startAt must be before endAt" }, 400);
 			}
@@ -79,7 +79,7 @@ const route = app
 		"/:id",
 		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
-		validator("json", (value, c) => {
+		validator("json", (value: v.InferOutput<typeof updateEventSchema>, c) => {
 			if (new Date(value.startAt) >= new Date(value.endAt)) {
 				return c.json({ error: "startAt must be before endAt" }, 400);
 			}
