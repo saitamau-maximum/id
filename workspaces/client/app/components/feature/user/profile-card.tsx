@@ -52,7 +52,7 @@ export const ProfileCard: React.FC<Props> = ({
 				return {
 					service: SOCIAL_SERVICES_IDS.DISCORD,
 					handle: discordInfo.displayName,
-					url: "", // Discord は public profile URL がない
+					// Discord は public profile URL がない
 				};
 			}
 			return undefined;
@@ -256,7 +256,7 @@ export const ProfileCard: React.FC<Props> = ({
 					})}
 				>
 					{[...oauthConnectionsDetail, ...socialLinksDetail].map((link) =>
-						link.url !== "" ? (
+						link.url ? (
 							<a
 								key={link.url}
 								href={link.url}
