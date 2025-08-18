@@ -56,6 +56,7 @@ export default function Home() {
 						socialLinks={user.socialLinks}
 						lastLoginAt={user.lastLoginAt}
 						discordInfo={discordInfo}
+						oauthConnections={user.oauthConnections}
 					/>
 				</div>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>

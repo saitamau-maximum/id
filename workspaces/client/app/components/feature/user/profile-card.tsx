@@ -1,9 +1,11 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { SOCIAL_SERVICES_IDS } from "~/constant";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { DiscordInfo } from "~/types/discord-info";
+import type { OAuthConnection } from "~/types/oauth-internal";
 import type { Member } from "~/types/user";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
@@ -15,6 +17,7 @@ type Props = Omit<Member, "certifications" | "initializedAt"> & {
 	initialized: boolean;
 	lastLoginAt?: Date | undefined;
 	discordInfo?: DiscordInfo;
+	oauthConnections?: OAuthConnection[];
 };
 
 export const ProfileCard: React.FC<Props> = ({
@@ -29,10 +32,34 @@ export const ProfileCard: React.FC<Props> = ({
 	socialLinks,
 	lastLoginAt,
 	discordInfo,
+	oauthConnections,
 }) => {
 	const { reactContent: bioPreviewContent } = useMarkdown(bio);
 
-	const socialLinksDetail = socialLinks?.map((link: string) => {
+	const oauthConnectionsDetail = (oauthConnections ?? [])
+		.map((conn) => {
+			if (conn.providerId === OAUTH_PROVIDER_IDS.GITHUB) {
+				return {
+					service: SOCIAL_SERVICES_IDS.GITHUB,
+					handle: conn.name,
+					url: `https://github.com/${conn.name}`,
+				};
+			}
+			if (
+				conn.providerId === OAUTH_PROVIDER_IDS.DISCORD &&
+				discordInfo?.status === "joined"
+			) {
+				return {
+					service: SOCIAL_SERVICES_IDS.DISCORD,
+					handle: discordInfo.displayName,
+					url: null, // Discord は public profile URL がない
+				};
+			}
+			return undefined;
+		})
+		.filter((conn) => conn !== undefined);
+
+	const socialLinksDetail = (socialLinks ?? []).map((link: string) => {
 		const { service, handle } = parseSocialLink(link);
 		return {
 			service,
@@ -222,59 +249,61 @@ export const ProfileCard: React.FC<Props> = ({
 						minWidth: "120px",
 					})}
 				>
-					{discordInfo?.status === "joined" && (
-						<span
-							className={css({
-								display: "flex",
-								alignItems: "center",
-								gap: 2,
-								textDecoration: "none",
-							})}
-						>
-							<SocialIcon service={SOCIAL_SERVICES_IDS.DISCORD} />
-							<span
+					{[...oauthConnectionsDetail, ...socialLinksDetail].map((link) =>
+						link.url ? (
+							<a
+								key={link.url}
+								href={link.url}
+								target="_blank"
+								rel="noopener noreferrer"
 								className={css({
-									color: "gray.600",
-									fontSize: "sm",
-									mdDown: {
-										fontSize: "sm",
-									},
+									display: "flex",
+									alignItems: "center",
+									gap: 2,
+									textDecoration: "none",
 								})}
 							>
-								{discordInfo.displayName}
+								<SocialIcon service={link.service} />
+								<span
+									className={css({
+										color: "gray.600",
+										fontSize: "sm",
+										mdDown: {
+											fontSize: "sm",
+										},
+										_hover: {
+											color: "gray.800",
+										},
+									})}
+								>
+									{link.handle}
+								</span>
+							</a>
+						) : (
+							<span
+								key={link.service}
+								className={css({
+									display: "flex",
+									alignItems: "center",
+									gap: 2,
+									textDecoration: "none",
+								})}
+							>
+								<SocialIcon service={link.service} />
+								<span
+									className={css({
+										color: "gray.600",
+										fontSize: "sm",
+										mdDown: {
+											fontSize: "sm",
+										},
+									})}
+								>
+									{link.handle}
+								</span>
 							</span>
-						</span>
+						),
 					)}
-					{(socialLinksDetail ?? []).map((link) => (
-						<a
-							key={link.url}
-							href={link.url}
-							target="_blank"
-							rel="noopener noreferrer"
-							className={css({
-								display: "flex",
-								alignItems: "center",
-								gap: 2,
-								textDecoration: "none",
-							})}
-						>
-							<SocialIcon service={link.service} />
-							<span
-								className={css({
-									color: "gray.600",
-									fontSize: "sm",
-									mdDown: {
-										fontSize: "sm",
-									},
-									_hover: {
-										color: "gray.800",
-									},
-								})}
-							>
-								{link.handle}
-							</span>
-						</a>
-					))}
 				</div>
 				<div>
 					{roles.length > 0 && (
