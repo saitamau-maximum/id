@@ -22,24 +22,20 @@ const updateLocationSchema = v.object({
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { LocationRepository } = c.var;
-
-		try {
-			const locations = await LocationRepository.getLocations();
-			return c.json(locations);
-		} catch (e) {
-			return c.json({ error: "location not found" }, 404);
-		}
+		const locations = await LocationRepository.getLocations();
+		return c.json(locations);
 	})
 	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { LocationRepository } = c.var;
 
-		try {
-			const location = await LocationRepository.getLocationById(id);
-			return c.json(location);
-		} catch (e) {
-			return c.json({ error: "location not found" }, 404);
+		const location = await LocationRepository.getLocationById(id).catch(
+			() => null,
+		);
+		if (!location) {
+			return c.body(null, 404);
 		}
+		return c.json(location);
 	})
 	.post(
 		"/",
@@ -49,16 +45,13 @@ const route = app
 			const { name, description } = c.req.valid("json");
 			const { LocationRepository } = c.var;
 
-			try {
-				await LocationRepository.createLocation({
-					name,
-					description,
-					createdAt: new Date(),
-				});
-				return c.json({ message: "location created" });
-			} catch (e) {
-				return c.json({ error: "location not created" }, 404);
-			}
+			await LocationRepository.createLocation({
+				name,
+				description,
+				createdAt: new Date(),
+			});
+
+			return c.body(null, 204);
 		},
 	)
 	.put(
@@ -70,29 +63,37 @@ const route = app
 			const { name, description } = c.req.valid("json");
 			const { LocationRepository } = c.var;
 
-			try {
-				await LocationRepository.updateLocation({
-					id,
-					name,
-					description,
-					createdAt: new Date(),
-				});
-				return c.json({ message: "location updated" });
-			} catch (e) {
-				return c.json({ error: "location not updated" }, 404);
+			// location が存在するかチェック
+			const location = await LocationRepository.getLocationById(id).catch(
+				() => null,
+			);
+			if (!location) {
+				return c.body(null, 404);
 			}
+
+			await LocationRepository.updateLocation({
+				id,
+				name,
+				description,
+				createdAt: new Date(),
+			});
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:id", adminOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { LocationRepository } = c.var;
 
-		try {
-			await LocationRepository.deleteLocation(id);
-			return c.json({ message: "location deleted" });
-		} catch (e) {
-			return c.json({ error: "location not deleted" }, 404);
+		// location が存在するかチェック
+		const location = await LocationRepository.getLocationById(id).catch(
+			() => null,
+		);
+		if (!location) {
+			return c.body(null, 404);
 		}
+
+		await LocationRepository.deleteLocation(id);
+		return c.body(null, 204);
 	});
 
 export { route as calendarLocationRoute };
