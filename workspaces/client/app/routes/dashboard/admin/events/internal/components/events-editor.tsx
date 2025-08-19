@@ -12,8 +12,9 @@ import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
+import { Pagination } from "~/components/ui/pagination";
 import { Table } from "~/components/ui/table";
-import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
+import { usePaginatedCalendar } from "~/routes/dashboard/calendar/hooks/use-paginated-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
 import type { CalendarEvent } from "~/types/event";
 import { formatDuration, getFiscalYear } from "~/utils/date";
@@ -24,14 +25,21 @@ import { CreateEventDialog } from "./callable-create-event-dialog";
 import { EditEventDialog } from "./callable-edit-event-dialog";
 
 export const EventsEditor = () => {
-	const { data: events } = useCalendar();
 	// 選択中の年度
 	const [selectedFisicalYear, setSelectedFisicalYear] = useState(
 		getFiscalYear(new Date()),
 	);
-	const sortedEvents = [...events].sort(
-		(a, b) => b.startAt.getTime() - a.startAt.getTime(),
-	);
+	
+	// Pagination state
+	const [currentPage, setCurrentPage] = useState(1);
+	const [pageSize, setPageSize] = useState(10);
+
+	const { data, isLoading, error } = usePaginatedCalendar({
+		page: currentPage,
+		limit: pageSize,
+		fiscalYear: selectedFisicalYear,
+	});
+
 	const { mutate: createEvent } = useCreateEvent();
 
 	const handleCreateEvent = useCallback(async () => {
@@ -40,11 +48,27 @@ export const EventsEditor = () => {
 		createEvent(res.payload);
 	}, [createEvent]);
 
-	const filteredEvents = sortedEvents.filter(
-		(event) =>
-			getFiscalYear(event.startAt) === selectedFisicalYear ||
-			getFiscalYear(event.endAt) === selectedFisicalYear,
-	);
+	const handleFiscalYearChange = useCallback((newYear: number) => {
+		setSelectedFisicalYear(newYear);
+		setCurrentPage(1); // Reset to first page when changing fiscal year
+	}, []);
+
+	const handlePageChange = useCallback((page: number) => {
+		setCurrentPage(page);
+	}, []);
+
+	const handlePageSizeChange = useCallback((size: number) => {
+		setPageSize(size);
+		setCurrentPage(1); // Reset to first page when changing page size
+	}, []);
+
+	if (error) {
+		return (
+			<div className={css({ textAlign: "center", marginTop: 8, color: "rose.600" })}>
+				イベントの読み込みに失敗しました
+			</div>
+		);
+	}
 
 	return (
 		<div>
@@ -79,7 +103,8 @@ export const EventsEditor = () => {
 						<IconButton
 							type="button"
 							label="前の年度"
-							onClick={() => setSelectedFisicalYear(selectedFisicalYear - 1)}
+							disabled={isLoading}
+							onClick={() => handleFiscalYearChange(selectedFisicalYear - 1)}
 						>
 							<ChevronLeft size={16} />
 						</IconButton>
@@ -87,20 +112,32 @@ export const EventsEditor = () => {
 						<IconButton
 							type="button"
 							label="次の年度"
-							onClick={() => setSelectedFisicalYear(selectedFisicalYear + 1)}
+							disabled={isLoading}
+							onClick={() => handleFiscalYearChange(selectedFisicalYear + 1)}
 						>
 							<ChevronRight size={16} />
 						</IconButton>
 					</div>
 				</div>
-				<button type="button" onClick={handleCreateEvent}>
+				<button type="button" onClick={handleCreateEvent} disabled={isLoading}>
 					<ButtonLike variant="primary" size="sm">
 						<Plus size={16} />
 						新規作成
 					</ButtonLike>
 				</button>
 			</div>
-			{filteredEvents.length === 0 ? (
+
+			{isLoading && data.events.length === 0 ? (
+				<div
+					className={css({
+						textAlign: "center",
+						marginTop: 8,
+						color: "gray.500",
+					})}
+				>
+					読み込み中...
+				</div>
+			) : data.events.length === 0 ? (
 				<p
 					className={css({
 						color: "gray.500",
@@ -108,25 +145,37 @@ export const EventsEditor = () => {
 						marginTop: 8,
 					})}
 				>
-					イベントはありません
+					この年度にイベントはありません
 				</p>
 			) : (
-				<Table.Root>
-					<thead>
-						<Table.Tr>
-							<Table.Th>タイトル</Table.Th>
-							<Table.Th>説明</Table.Th>
-							<Table.Th>期間</Table.Th>
-							<Table.Th>活動場所</Table.Th>
-							<Table.Th>操作</Table.Th>
-						</Table.Tr>
-					</thead>
-					<tbody>
-						{filteredEvents.map((event) => (
-							<EventTableRow event={event} key={event.id} />
-						))}
-					</tbody>
-				</Table.Root>
+				<>
+					<Table.Root>
+						<thead>
+							<Table.Tr>
+								<Table.Th>タイトル</Table.Th>
+								<Table.Th>説明</Table.Th>
+								<Table.Th>期間</Table.Th>
+								<Table.Th>活動場所</Table.Th>
+								<Table.Th>操作</Table.Th>
+							</Table.Tr>
+						</thead>
+						<tbody>
+							{data.events.map((event) => (
+								<EventTableRow event={event} key={event.id} />
+							))}
+						</tbody>
+					</Table.Root>
+
+					<Pagination
+						currentPage={data.page}
+						totalPages={data.totalPages}
+						onPageChange={handlePageChange}
+						pageSize={data.limit}
+						onPageSizeChange={handlePageSizeChange}
+						totalItems={data.total}
+						isLoading={isLoading}
+					/>
+				</>
 			)}
 		</div>
 	);

@@ -1,9 +1,27 @@
 import type { CalendarEvent, CalendarEventWithNotify } from "~/types/event";
 import { client } from "~/utils/hono";
 
+export interface PaginatedEventsResult {
+	events: CalendarEvent[];
+	total: number;
+	page: number;
+	limit: number;
+	totalPages: number;
+}
+
 export interface ICalendarRepository {
 	getAllEvents: () => Promise<CalendarEvent[]>;
 	getAllEvents$$key: () => unknown[];
+	getPaginatedEvents: (params: {
+		page: number;
+		limit: number;
+		fiscalYear?: number;
+	}) => Promise<PaginatedEventsResult>;
+	getPaginatedEvents$$key: (params: {
+		page: number;
+		limit: number;
+		fiscalYear?: number;
+	}) => unknown[];
 	createEvent: (
 		event: Omit<CalendarEventWithNotify, "id" | "userId">,
 	) => Promise<void>;
@@ -27,6 +45,48 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 
 	getAllEvents$$key() {
 		return ["calendar-events"];
+	}
+
+	async getPaginatedEvents(params: {
+		page: number;
+		limit: number;
+		fiscalYear?: number;
+	}) {
+		const queryParams: Record<string, string> = {
+			page: params.page.toString(),
+			limit: params.limit.toString(),
+		};
+		
+		if (params.fiscalYear) {
+			queryParams.fiscalYear = params.fiscalYear.toString();
+		}
+
+		const res = await client.calendar.events.paginated.$get({
+			query: queryParams,
+		});
+		
+		if (!res.ok) {
+			throw new Error("Failed to fetch paginated events");
+		}
+		
+		const result = await res.json();
+		
+		return {
+			...result,
+			events: result.events.map((event) => ({
+				...event,
+				startAt: new Date(event.startAt),
+				endAt: new Date(event.endAt),
+			})),
+		};
+	}
+
+	getPaginatedEvents$$key(params: {
+		page: number;
+		limit: number;
+		fiscalYear?: number;
+	}) {
+		return ["calendar-events-paginated", params.page, params.limit, params.fiscalYear];
 	}
 
 	async createEvent(event: Omit<CalendarEventWithNotify, "id" | "userId">) {

@@ -40,11 +40,29 @@ const updateEventSchema = v.pipe(
 	),
 );
 
+const paginationQuerySchema = v.object({
+	page: v.optional(v.pipe(v.string(), v.transform(Number)), "1"),
+	limit: v.optional(v.pipe(v.string(), v.transform(Number)), "10"),
+	fiscalYear: v.optional(v.pipe(v.string(), v.transform(Number))),
+});
+
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const events = await CalendarRepository.getAllEvents();
 		return c.json(events);
+	})
+	.get("/paginated", memberOnlyMiddleware, vValidator("query", paginationQuerySchema), async (c) => {
+		const { CalendarRepository } = c.var;
+		const { page, limit, fiscalYear } = c.req.valid("query");
+		
+		const result = await CalendarRepository.getPaginatedEvents({
+			page: Number(page) || 1,
+			limit: Math.min(Number(limit) || 10, 100), // Cap at 100 items per page
+			fiscalYear: fiscalYear ? Number(fiscalYear) : undefined,
+		});
+		
+		return c.json(result);
 	})
 	.post(
 		"/",
