@@ -28,7 +28,7 @@ const route = app
 		const jwt = await SessionRepository.verifyOneTimeToken(ott);
 
 		if (!jwt) {
-			return c.json({ error: "invalid ott" }, 400);
+			return c.body(null, 400);
 		}
 
 		return c.json({ jwt });
@@ -36,22 +36,20 @@ const route = app
 	.get("/me", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
-		try {
-			const res = await UserRepository.fetchUserProfileById(payload.userId);
-			return c.json(res);
-		} catch (e) {
-			return c.json({ error: "user not found" }, 404);
+
+		const res = await UserRepository.fetchUserProfileById(payload.userId).catch(
+			() => null,
+		);
+		if (!res) {
+			return c.body(null, 404);
 		}
+		return c.json(res);
 	})
 	.get("/ping", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
-		try {
-			await UserRepository.updateLastLoginAt(payload.userId);
-			return c.json({ ok: true });
-		} catch (e) {
-			return c.json({ ok: false }, 500);
-		}
+		await UserRepository.updateLastLoginAt(payload.userId);
+		return c.body(null, 204);
 	});
 
 export { route as authRoute };

@@ -47,39 +47,36 @@ const route = app
 			return c.text("Unauthorized", 401);
 		}
 		const { CalendarRepository } = c.var;
-		try {
-			const events = await CalendarRepository.getAllEventsWithLocation();
-			const icsEvents: EventAttributes[] = events.map((event) => ({
-				start: [
-					event.startAt.getFullYear(),
-					event.startAt.getMonth() + 1,
-					event.startAt.getDate(),
-					event.startAt.getHours(),
-					event.startAt.getMinutes(),
-				],
-				end: [
-					event.endAt.getFullYear(),
-					event.endAt.getMonth() + 1,
-					event.endAt.getDate(),
-					event.endAt.getHours(),
-					event.endAt.getMinutes(),
-				],
-				title: event.title,
-				description: event.description ?? undefined,
-				location: event.location?.name,
-				url: `${c.env.CLIENT_ORIGIN}/calendar`,
-				uid: event.id,
-			}));
 
-			const { error, value } = createEvents(icsEvents);
-			if (error) {
-				return c.text("Internal Server Error", 500);
-			}
-			c.header("Content-Type", "text/calendar");
-			return c.text(value || "");
-		} catch (e) {
+		const events = await CalendarRepository.getAllEventsWithLocation();
+		const icsEvents: EventAttributes[] = events.map((event) => ({
+			start: [
+				event.startAt.getFullYear(),
+				event.startAt.getMonth() + 1,
+				event.startAt.getDate(),
+				event.startAt.getHours(),
+				event.startAt.getMinutes(),
+			],
+			end: [
+				event.endAt.getFullYear(),
+				event.endAt.getMonth() + 1,
+				event.endAt.getDate(),
+				event.endAt.getHours(),
+				event.endAt.getMinutes(),
+			],
+			title: event.title,
+			description: event.description ?? undefined,
+			location: event.location?.name,
+			url: `${c.env.CLIENT_ORIGIN}/calendar`,
+			uid: event.id,
+		}));
+
+		const { error, value } = createEvents(icsEvents);
+		if (error) {
 			return c.text("Internal Server Error", 500);
 		}
+		c.header("Content-Type", "text/calendar");
+		return c.text(value || "");
 	});
 
 export { route as calendarRoute };

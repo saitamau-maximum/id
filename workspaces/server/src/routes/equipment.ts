@@ -24,23 +24,22 @@ const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { EquipmentRepository } = c.var;
 
-		try {
-			const equipments = await EquipmentRepository.getAllEquipments();
-			return c.json(equipments);
-		} catch (e) {
-			return c.text("equipments not found", 404);
-		}
+		const equipments = await EquipmentRepository.getAllEquipments();
+		return c.json(equipments);
 	})
 	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
 
-		try {
-			const equipment = await EquipmentRepository.getEquipmentById(id);
-			return c.json(equipment);
-		} catch (e) {
-			return c.text("equipment not found", 404);
+		const equipment = await EquipmentRepository.getEquipmentById(id).catch(
+			() => null,
+		);
+
+		if (!equipment) {
+			return c.body(null, 404);
 		}
+
+		return c.json(equipment);
 	})
 	.post(
 		"/",
@@ -50,18 +49,14 @@ const route = app
 			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
 
-			try {
-				const id = await EquipmentRepository.createEquipment({
-					name,
-					description: description !== "" ? description : undefined,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-					ownerId,
-				});
-				return c.json({ id }, 201);
-			} catch (e) {
-				return c.text("Internal Server Error", 500);
-			}
+			await EquipmentRepository.createEquipment({
+				name,
+				description: description !== "" ? description : undefined,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+				ownerId,
+			});
+			return c.body(null, 201);
 		},
 	)
 	.put(
@@ -73,30 +68,38 @@ const route = app
 			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
 
-			try {
-				await EquipmentRepository.updateEquipment({
-					id,
-					name,
-					description: description !== "" ? description : undefined,
-					updatedAt: new Date(),
-					ownerId,
-				});
-				return c.json({ id }, 200);
-			} catch (e) {
-				return c.text("Internal Server Error", 500);
+			// 存在チェック
+			const equipment = await EquipmentRepository.getEquipmentById(id).catch(
+				() => null,
+			);
+			if (!equipment) {
+				return c.body(null, 404);
 			}
+
+			await EquipmentRepository.updateEquipment({
+				id,
+				name,
+				description: description !== "" ? description : undefined,
+				updatedAt: new Date(),
+				ownerId,
+			});
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:id", equipmentMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { EquipmentRepository } = c.var;
 
-		try {
-			await EquipmentRepository.deleteEquipment(id);
-			return c.text("ok", 200);
-		} catch (e) {
-			return c.text("Internal Server Error", 500);
+		// 存在チェック
+		const equipment = await EquipmentRepository.getEquipmentById(id).catch(
+			() => null,
+		);
+		if (!equipment) {
+			return c.body(null, 404);
 		}
+
+		await EquipmentRepository.deleteEquipment(id);
+		return c.body(null, 204);
 	});
 
 export { route as equipmentRoute };

@@ -92,6 +92,13 @@ export class CloudflareCertificationRepository
 			);
 	}
 
+	async existsCertification(certificationId: string): Promise<boolean> {
+		const res = await this.client.query.certifications.findFirst({
+			where: eq(schema.certifications.id, certificationId),
+		});
+		return !!res;
+	}
+
 	async createCertification(params: Omit<ICertification, "id">): Promise<void> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.certifications).values({ ...params, id });
@@ -115,6 +122,22 @@ export class CloudflareCertificationRepository
 				.delete(schema.certifications)
 				.where(eq(schema.certifications.id, certificationId)),
 		]);
+	}
+
+	async existsUserCertification(
+		params: Omit<ICertificationRequest, "certifiedIn">,
+	): Promise<boolean> {
+		const res = await this.client.query.userCertifications.findFirst({
+			where: and(
+				eq(schema.userCertifications.userId, params.userId),
+				eq(schema.userCertifications.certificationId, params.certificationId),
+			),
+			columns: {
+				certifiedIn: true,
+				isApproved: true,
+			},
+		});
+		return !!res;
 	}
 
 	async deleteUserCertification(

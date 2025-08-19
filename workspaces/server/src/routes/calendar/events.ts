@@ -1,5 +1,4 @@
 import { vValidator } from "@hono/valibot-validator";
-import { validator } from "hono/validator";
 import * as v from "valibot";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
@@ -10,45 +9,47 @@ import {
 
 const app = factory.createApp();
 
-const createEventSchema = v.object({
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	locationId: v.optional(v.string()),
-	notifyDiscord: v.boolean(),
-});
+const createEventSchema = v.pipe(
+	v.object({
+		title: v.pipe(v.string(), v.nonEmpty()),
+		description: v.optional(v.string()),
+		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		locationId: v.optional(v.string()),
+		notifyDiscord: v.boolean(),
+	}),
+	v.check(
+		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
+		"startAt must be before endAt",
+	),
+);
 
-const updateEventSchema = v.object({
-	userId: v.pipe(v.string(), v.nonEmpty()),
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	locationId: v.optional(v.string()),
-	notifyDiscord: v.boolean(),
-});
+const updateEventSchema = v.pipe(
+	v.object({
+		userId: v.pipe(v.string(), v.nonEmpty()),
+		title: v.pipe(v.string(), v.nonEmpty()),
+		description: v.optional(v.string()),
+		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		locationId: v.optional(v.string()),
+		notifyDiscord: v.boolean(),
+	}),
+	v.check(
+		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
+		"startAt must be before endAt",
+	),
+);
 
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
-		try {
-			const events = await CalendarRepository.getAllEvents();
-			return c.json(events);
-		} catch (e) {
-			return c.json({ error: "events not found" }, 404);
-		}
+		const events = await CalendarRepository.getAllEvents();
+		return c.json(events);
 	})
 	.post(
 		"/",
 		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
-		validator("json", (value, c) => {
-			if (new Date(value.startAt) >= new Date(value.endAt)) {
-				return c.json({ error: "startAt must be before endAt" }, 400);
-			}
-			return value;
-		}),
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
@@ -64,35 +65,25 @@ const route = app
 				locationId,
 			};
 
-			try {
-				await CalendarRepository.createEvent(eventPayload);
+			await CalendarRepository.createEvent(eventPayload);
 
-				if (notifyDiscord) {
-					const location = locationId
-						? await LocationRepository.getLocationById(locationId)
-						: undefined;
-					await DiscordBotRepository.sendCalendarNotification("new", {
-						...eventPayload,
-						location,
-					});
-				}
-
-				return c.json({ message: "event created" });
-			} catch (e) {
-				return c.json({ error: "failed to create event" }, 500);
+			if (notifyDiscord) {
+				const location = locationId
+					? await LocationRepository.getLocationById(locationId)
+					: undefined;
+				await DiscordBotRepository.sendCalendarNotification("new", {
+					...eventPayload,
+					location,
+				});
 			}
+
+			return c.body(null, 201);
 		},
 	)
 	.put(
 		"/:id",
 		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
-		validator("json", (value, c) => {
-			if (new Date(value.startAt) >= new Date(value.endAt)) {
-				return c.json({ error: "startAt must be before endAt" }, 400);
-			}
-			return value;
-		}),
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
@@ -115,52 +106,54 @@ const route = app
 				endAt: new Date(endAt),
 				locationId,
 			};
-			try {
-				// もしAdminじゃないなら、自分のイベントだけ更新できる
-				const roleIds = c.get("roleIds");
-				if (!roleIds.includes(ROLE_IDS.ADMIN)) {
-					const event = await CalendarRepository.getEventById(id);
-					if (event.userId !== userId) {
-						return c.json({ error: "Forbidden" }, 403);
-					}
-				}
-				// イベントを更新
-				await CalendarRepository.updateEvent(eventPayload);
 
-				if (notifyDiscord) {
-					const location = locationId
-						? await LocationRepository.getLocationById(locationId)
-						: undefined;
-					await DiscordBotRepository.sendCalendarNotification("update", {
-						...eventPayload,
-						location,
-					});
-				}
-				return c.json({ message: "event updated" });
-			} catch (e) {
-				return c.json({ error: "failed to update event" }, 500);
+			// イベントが存在するかチェック
+			const event = await CalendarRepository.getEventById(id).catch(() => null);
+			if (!event) {
+				return c.body(null, 404);
 			}
+
+			// もしAdminじゃないなら、自分のイベントだけ更新できる
+			const roleIds = c.get("roleIds");
+			if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== userId) {
+				return c.body(null, 403);
+			}
+
+			// イベントを更新
+			await CalendarRepository.updateEvent(eventPayload);
+
+			if (notifyDiscord) {
+				const location = locationId
+					? await LocationRepository.getLocationById(locationId)
+					: undefined;
+				await DiscordBotRepository.sendCalendarNotification("update", {
+					...eventPayload,
+					location,
+				});
+			}
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:id", calendarMutableMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const id = c.req.param("id");
 		const { userId } = c.get("jwtPayload");
-		try {
-			// もしAdminじゃないなら、自分のイベントだけ削除できる
-			const roleIds = c.get("roleIds");
-			if (!roleIds.includes(ROLE_IDS.ADMIN)) {
-				const event = await CalendarRepository.getEventById(id);
-				if (event.userId !== userId) {
-					return c.json({ error: "Forbidden" }, 403);
-				}
-			}
-			// イベントを削除
-			await CalendarRepository.deleteEvent(id);
-			return c.json({ message: "event deleted" });
-		} catch (e) {
-			return c.json({ error: "event not deleted" }, 500);
+
+		// イベントが存在するかチェック
+		const event = await CalendarRepository.getEventById(id).catch(() => null);
+		if (!event) {
+			return c.body(null, 404);
 		}
+
+		// もしAdminじゃないなら、自分のイベントだけ削除できる
+		const roleIds = c.get("roleIds");
+		if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== userId) {
+			return c.body(null, 403);
+		}
+
+		// イベントを削除
+		await CalendarRepository.deleteEvent(id);
+		return c.body(null, 204);
 	});
 
 export { route as calendarEventRoute };
