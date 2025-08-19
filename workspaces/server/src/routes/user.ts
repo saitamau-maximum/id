@@ -67,29 +67,51 @@ const ProfileSchema = v.object({
 	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
 });
 
-const registerSchema = v.object({
-	displayName: ProfileSchema.entries.displayName,
-	realName: ProfileSchema.entries.realName,
-	realNameKana: ProfileSchema.entries.realNameKana,
-	displayId: ProfileSchema.entries.displayId,
-	email: ProfileSchema.entries.email,
-	academicEmail: ProfileSchema.entries.academicEmail,
-	studentId: ProfileSchema.entries.studentId,
-	grade: ProfileSchema.entries.grade,
-});
+const registerSchema = v.pipe(
+	v.object({
+		displayName: ProfileSchema.entries.displayName,
+		realName: ProfileSchema.entries.realName,
+		realNameKana: ProfileSchema.entries.realNameKana,
+		displayId: ProfileSchema.entries.displayId,
+		email: ProfileSchema.entries.email,
+		academicEmail: ProfileSchema.entries.academicEmail,
+		studentId: ProfileSchema.entries.studentId,
+		grade: ProfileSchema.entries.grade,
+	}),
+	v.check(({ grade, academicEmail, studentId }) => {
+		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+		if (grade !== "卒業生" && grade !== "ゲスト") {
+			if (!academicEmail || !studentId) {
+				return false;
+			}
+		}
+		return true;
+	}, "academicEmail and studentId are required"),
+);
 
-const updateSchema = v.object({
-	displayName: ProfileSchema.entries.displayName,
-	realName: ProfileSchema.entries.realName,
-	realNameKana: ProfileSchema.entries.realNameKana,
-	displayId: ProfileSchema.entries.displayId,
-	email: ProfileSchema.entries.email,
-	academicEmail: ProfileSchema.entries.academicEmail,
-	studentId: ProfileSchema.entries.studentId,
-	grade: ProfileSchema.entries.grade,
-	bio: ProfileSchema.entries.bio,
-	socialLinks: ProfileSchema.entries.socialLinks,
-});
+const updateSchema = v.pipe(
+	v.object({
+		displayName: ProfileSchema.entries.displayName,
+		realName: ProfileSchema.entries.realName,
+		realNameKana: ProfileSchema.entries.realNameKana,
+		displayId: ProfileSchema.entries.displayId,
+		email: ProfileSchema.entries.email,
+		academicEmail: ProfileSchema.entries.academicEmail,
+		studentId: ProfileSchema.entries.studentId,
+		grade: ProfileSchema.entries.grade,
+		bio: ProfileSchema.entries.bio,
+		socialLinks: ProfileSchema.entries.socialLinks,
+	}),
+	v.check(({ grade, academicEmail, studentId }) => {
+		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+		if (grade !== "卒業生" && grade !== "ゲスト") {
+			if (!academicEmail || !studentId) {
+				return false;
+			}
+		}
+		return true;
+	}, "academicEmail and studentId are required"),
+);
 
 const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
@@ -114,13 +136,6 @@ const route = app
 				studentId,
 				grade,
 			} = c.req.valid("json");
-
-			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-			if (grade !== "卒業生" && grade !== "ゲスト") {
-				if (!academicEmail || !studentId) {
-					return c.text("academicEmail and studentId are required", 400);
-				}
-			}
 
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);
@@ -160,13 +175,6 @@ const route = app
 				bio,
 				socialLinks,
 			} = c.req.valid("json");
-
-			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-			if (grade !== "卒業生" && grade !== "ゲスト") {
-				if (!academicEmail || !studentId) {
-					return c.text("academicEmail and studentId are required", 400);
-				}
-			}
 
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);

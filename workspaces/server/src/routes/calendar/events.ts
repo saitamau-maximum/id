@@ -9,24 +9,36 @@ import {
 
 const app = factory.createApp();
 
-const createEventSchema = v.object({
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	locationId: v.optional(v.string()),
-	notifyDiscord: v.boolean(),
-});
+const createEventSchema = v.pipe(
+	v.object({
+		title: v.pipe(v.string(), v.nonEmpty()),
+		description: v.optional(v.string()),
+		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		locationId: v.optional(v.string()),
+		notifyDiscord: v.boolean(),
+	}),
+	v.check(
+		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
+		"startAt must be before endAt",
+	),
+);
 
-const updateEventSchema = v.object({
-	userId: v.pipe(v.string(), v.nonEmpty()),
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-	locationId: v.optional(v.string()),
-	notifyDiscord: v.boolean(),
-});
+const updateEventSchema = v.pipe(
+	v.object({
+		userId: v.pipe(v.string(), v.nonEmpty()),
+		title: v.pipe(v.string(), v.nonEmpty()),
+		description: v.optional(v.string()),
+		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
+		locationId: v.optional(v.string()),
+		notifyDiscord: v.boolean(),
+	}),
+	v.check(
+		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
+		"startAt must be before endAt",
+	),
+);
 
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
@@ -38,13 +50,6 @@ const route = app
 		"/",
 		calendarMutableMiddleware,
 		vValidator("json", createEventSchema),
-		(c, next) => {
-			const { startAt, endAt } = c.req.valid("json");
-			if (new Date(startAt) >= new Date(endAt)) {
-				return c.text("startAt must be before endAt", 400);
-			}
-			return next();
-		},
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
@@ -79,13 +84,6 @@ const route = app
 		"/:id",
 		calendarMutableMiddleware,
 		vValidator("json", updateEventSchema),
-		(c, next) => {
-			const { startAt, endAt } = c.req.valid("json");
-			if (new Date(startAt) >= new Date(endAt)) {
-				return c.text("startAt must be before endAt", 400);
-			}
-			return next();
-		},
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;

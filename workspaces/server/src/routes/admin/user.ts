@@ -10,9 +10,16 @@ import {
 
 const app = factory.createApp();
 
-const UpdateRoleRequestSchema = v.object({
-	roleIds: v.array(v.number()),
-});
+const UpdateRoleRequestSchema = v.pipe(
+	v.object({
+		roleIds: v.array(v.number()),
+	}),
+	// 存在しない Role ID が含まれていないか検証
+	v.check(
+		({ roleIds }) => roleIds.every((roleId) => ROLE_BY_ID[roleId]),
+		"Invalid Role ID",
+	),
+);
 
 const route = app
 	.use(invitesMutableMiddleware)
@@ -29,11 +36,6 @@ const route = app
 			const userId = c.req.param("userId");
 			const { UserRepository } = c.var;
 			const { roleIds } = c.req.valid("json");
-
-			// 存在しないロールIDが含まれている場合はエラー
-			if (roleIds.some((roleId) => !ROLE_BY_ID[roleId])) {
-				return c.json({ error: "Invalid Role ID" }, 400);
-			}
 
 			// ユーザーが存在するか確認
 			const user = await UserRepository.fetchUserProfileById(userId).catch(
