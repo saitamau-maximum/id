@@ -196,24 +196,13 @@ pnpm seed
 
 #### セットアップ
 
-初回セットアップ時に以下のスクリプトを実行してください：
+初回セットアップ時に以下のスクリプトを実行してください
 
 ```bash
-./setup-precommit.sh
+pnpm i
 ```
 
-または手動でセットアップする場合：
-
-```bash
-# 依存関係をインストール
-pnpm install
-
-# pre-commit フックを実行可能にする
-chmod +x .husky/pre-commit
-
-# husky を初期化
-npx husky init
-```
+同時に prepare スクリプトによって husky がセットアップされます。
 
 #### 動作
 
