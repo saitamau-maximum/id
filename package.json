@@ -21,8 +21,6 @@
 		"lint-staged": "^15.2.8"
 	},
 	"lint-staged": {
-		"**/*.{js,jsx,ts,tsx,json,css,md}": [
-			"biome check --write --files-ignore-unknown=true"
-		]
+		"**/*.{js,jsx,ts,tsx}": ["biome check --write --files-ignore-unknown=true"]
 	}
 }
