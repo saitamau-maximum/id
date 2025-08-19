@@ -209,21 +209,6 @@ pnpm i
 - コミット時に `lint-staged` が実行される
 - ステージングされたファイルのみに対してBiomeによる自動修正が実行される
 - 修正不可能なエラーがある場合、コミットがブロックされる
-- 自動修正されたファイルは手動で再度ステージングする必要がある
-
-#### 設定
-
-`package.json` の `lint-staged` セクションで設定されています：
-
-```json
-{
-  "lint-staged": {
-    "**/*.{js,jsx,ts,tsx,json,css,md}": [
-      "biome check --write --files-ignore-unknown=true"
-    ]
-  }
-}
-```
 
 ### Conventional Commit
 
