@@ -329,7 +329,7 @@ export abstract class OAuthLoginProvider {
 							});
 						} else {
 							// ここに到達する = 招待コードが提供されていないのにユーザーが存在しない場合
-							return c.text("invalid invitation code", 400);
+							return c.redirect("https://maximum.vc/join", 302);
 						}
 					} else {
 						// 招待コードでログインできない場合 = OAuth 未連携
