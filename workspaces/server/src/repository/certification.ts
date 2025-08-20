@@ -39,9 +39,13 @@ export interface ICertificationRepository {
 		userId: string,
 		certificationId: string,
 	): Promise<void>;
+	existsCertification: (certificationId: string) => Promise<boolean>;
 	createCertification: (params: Omit<ICertification, "id">) => Promise<void>;
 	updateCertification: (params: ICertificationUpdateRequest) => Promise<void>;
 	deleteCertification: (certificationId: string) => Promise<void>;
+	existsUserCertification: (
+		params: Omit<ICertificationRequest, "certifiedIn">,
+	) => Promise<boolean>;
 	deleteUserCertification: (
 		params: Omit<ICertificationRequest, "certifiedIn">,
 	) => Promise<void>;

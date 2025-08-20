@@ -46,7 +46,7 @@ const route = app
 				certifiedIn,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 201);
 		},
 	)
 	.get("/request", adminOnlyMiddleware, async (c) => {
@@ -62,6 +62,17 @@ const route = app
 		async (c) => {
 			const { CertificationRepository } = c.var;
 			const { userId, certificationId, isApproved } = c.req.valid("json");
+
+			// 存在チェック
+			const certificationExists =
+				await CertificationRepository.existsUserCertification({
+					userId,
+					certificationId,
+				});
+			if (!certificationExists) {
+				return c.body(null, 404);
+			}
+
 			if (isApproved) {
 				await CertificationRepository.approveCertificationRequest(
 					userId,
@@ -73,7 +84,7 @@ const route = app
 					certificationId,
 				);
 			}
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.post(
@@ -87,7 +98,7 @@ const route = app
 				title,
 				description,
 			});
-			return c.text("ok", 200);
+			return c.body(null, 201);
 		},
 	)
 	.put(
@@ -98,28 +109,55 @@ const route = app
 			const { CertificationRepository } = c.var;
 			const certificationId = c.req.param("certificationId");
 			const { description } = c.req.valid("json");
+
+			// 存在チェック
+			const certificationExists =
+				await CertificationRepository.existsCertification(certificationId);
+			if (!certificationExists) {
+				return c.body(null, 404);
+			}
+
 			await CertificationRepository.updateCertification({
 				certificationId,
 				description,
 			});
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.delete("/:certificationId", adminOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
 		const certificationId = c.req.param("certificationId");
+
+		// 存在チェック
+		const certificationExists =
+			await CertificationRepository.existsCertification(certificationId);
+		if (!certificationExists) {
+			return c.body(null, 404);
+		}
+
 		await CertificationRepository.deleteCertification(certificationId);
-		return c.text("ok", 200);
+		return c.body(null, 204);
 	})
 	.delete("/:certificationId/my", memberOnlyMiddleware, async (c) => {
 		const { CertificationRepository } = c.var;
 		const { userId } = c.get("jwtPayload");
 		const certificationId = c.req.param("certificationId");
+
+		// 存在チェック
+		const certificationExists =
+			await CertificationRepository.existsUserCertification({
+				userId,
+				certificationId,
+			});
+		if (!certificationExists) {
+			return c.body(null, 404);
+		}
+
 		await CertificationRepository.deleteUserCertification({
 			userId,
 			certificationId,
 		});
-		return c.text("ok", 200);
+		return c.body(null, 204);
 	});
 
 export { route as certificationRoute };

@@ -17,7 +17,7 @@ const publicRoute = app.get("/:id", async (c) => {
 	const { InviteRepository } = c.var;
 	try {
 		await validateInvitation(InviteRepository, id);
-		return c.text("OK", 200);
+		return c.body(null, 204);
 	} catch (e) {
 		return c.text((e as Error).message, 400);
 	}
@@ -27,19 +27,15 @@ const protectedRoute = app
 	.use(adminOnlyMiddleware)
 	.get("/", async (c) => {
 		const { InviteRepository } = c.var;
-		try {
-			const invites = await InviteRepository.getAllInvites();
-			return c.json(invites);
-		} catch (e) {
-			return c.text("Internal Server Error", 500);
-		}
+		const invites = await InviteRepository.getAllInvites();
+		return c.json(invites);
 	})
 	.post("/", vValidator("json", createInviteSchema), async (c) => {
 		const { expiresAt, remainingUse, title } = c.req.valid("json");
 
 		// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
 		if (!expiresAt && !remainingUse) {
-			return c.text("Bad Request", 400);
+			return c.body(null, 400);
 		}
 
 		const createdAt = new Date();
@@ -49,27 +45,30 @@ const protectedRoute = app
 		c.header("Pragma", "no-cache");
 
 		// DB に格納して返す
-		try {
-			const id = await c.var.InviteRepository.createInvite({
-				title: title,
-				expiresAt: expiresAt ? new Date(expiresAt) : null,
-				remainingUse: remainingUse ?? null,
-				createdAt,
-				issuedByUserId,
-			});
-			return c.json({ id });
-		} catch (e) {
-			return c.text("Internal Server Error", 500);
-		}
+		const id = await c.var.InviteRepository.createInvite({
+			title: title,
+			expiresAt: expiresAt ? new Date(expiresAt) : null,
+			remainingUse: remainingUse ?? null,
+			createdAt,
+			issuedByUserId,
+		});
+		return c.json({ id }, 201);
 	})
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
 		const { InviteRepository } = c.var;
+
+		// 招待存在チェック
+		const invite = await InviteRepository.getInviteById(id).catch(() => null);
+		if (!invite) {
+			return c.body(null, 404);
+		}
+
 		try {
 			await InviteRepository.deleteInvite(id);
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		} catch (e) {
-			return c.text("Internal Server Error", 500);
+			return c.text((e as Error).message, 500);
 		}
 	});
 

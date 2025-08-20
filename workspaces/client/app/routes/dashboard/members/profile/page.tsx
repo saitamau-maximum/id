@@ -90,6 +90,7 @@ export default function Profile() {
 					socialLinks={memberProfile.socialLinks}
 					lastLoginAt={memberProfile.lastLoginAt}
 					discordInfo={discordInfo}
+					oauthConnections={memberProfile.oauthConnections}
 				/>
 			</div>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>

@@ -6,37 +6,27 @@ const route = app.get("/members/:userDisplayId", async (c) => {
 	const userDisplayId = c.req.param("userDisplayId");
 	const { UserRepository } = c.var;
 
-	try {
-		const member =
-			await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
+	const member =
+		await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
 
-		if (!member) {
-			return c.json(
-				{
-					error: true,
-					message: "Member not found",
-				},
-				404,
-			);
-		}
-
-		return c.json({
-			error: false,
-			id: member.id,
-			displayName: member.displayName,
-			bio: member.bio,
-			socialLinks: member.socialLinks,
-			roles: member.roles,
-		});
-	} catch (e) {
+	if (!member) {
 		return c.json(
 			{
 				error: true,
-				message: e instanceof Error ? e.message : String(e),
+				message: "Member not found",
 			},
-			500,
+			404,
 		);
 	}
+
+	return c.json({
+		error: false,
+		id: member.id,
+		displayName: member.displayName,
+		bio: member.bio,
+		socialLinks: member.socialLinks,
+		roles: member.roles,
+	});
 });
 
 export { route as publicRoute };

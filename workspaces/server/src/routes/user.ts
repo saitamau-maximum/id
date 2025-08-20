@@ -67,29 +67,51 @@ const ProfileSchema = v.object({
 	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
 });
 
-const registerSchema = v.object({
-	displayName: ProfileSchema.entries.displayName,
-	realName: ProfileSchema.entries.realName,
-	realNameKana: ProfileSchema.entries.realNameKana,
-	displayId: ProfileSchema.entries.displayId,
-	email: ProfileSchema.entries.email,
-	academicEmail: ProfileSchema.entries.academicEmail,
-	studentId: ProfileSchema.entries.studentId,
-	grade: ProfileSchema.entries.grade,
-});
+const registerSchema = v.pipe(
+	v.object({
+		displayName: ProfileSchema.entries.displayName,
+		realName: ProfileSchema.entries.realName,
+		realNameKana: ProfileSchema.entries.realNameKana,
+		displayId: ProfileSchema.entries.displayId,
+		email: ProfileSchema.entries.email,
+		academicEmail: ProfileSchema.entries.academicEmail,
+		studentId: ProfileSchema.entries.studentId,
+		grade: ProfileSchema.entries.grade,
+	}),
+	v.check(({ grade, academicEmail, studentId }) => {
+		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+		if (grade !== "卒業生" && grade !== "ゲスト") {
+			if (!academicEmail || !studentId) {
+				return false;
+			}
+		}
+		return true;
+	}, "academicEmail and studentId are required"),
+);
 
-const updateSchema = v.object({
-	displayName: ProfileSchema.entries.displayName,
-	realName: ProfileSchema.entries.realName,
-	realNameKana: ProfileSchema.entries.realNameKana,
-	displayId: ProfileSchema.entries.displayId,
-	email: ProfileSchema.entries.email,
-	academicEmail: ProfileSchema.entries.academicEmail,
-	studentId: ProfileSchema.entries.studentId,
-	grade: ProfileSchema.entries.grade,
-	bio: ProfileSchema.entries.bio,
-	socialLinks: ProfileSchema.entries.socialLinks,
-});
+const updateSchema = v.pipe(
+	v.object({
+		displayName: ProfileSchema.entries.displayName,
+		realName: ProfileSchema.entries.realName,
+		realNameKana: ProfileSchema.entries.realNameKana,
+		displayId: ProfileSchema.entries.displayId,
+		email: ProfileSchema.entries.email,
+		academicEmail: ProfileSchema.entries.academicEmail,
+		studentId: ProfileSchema.entries.studentId,
+		grade: ProfileSchema.entries.grade,
+		bio: ProfileSchema.entries.bio,
+		socialLinks: ProfileSchema.entries.socialLinks,
+	}),
+	v.check(({ grade, academicEmail, studentId }) => {
+		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+		if (grade !== "卒業生" && grade !== "ゲスト") {
+			if (!academicEmail || !studentId) {
+				return false;
+			}
+		}
+		return true;
+	}, "academicEmail and studentId are required"),
+);
 
 const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
@@ -115,13 +137,6 @@ const route = app
 				grade,
 			} = c.req.valid("json");
 
-			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-			if (grade !== "卒業生" && grade !== "ゲスト") {
-				if (!academicEmail || !studentId) {
-					return c.text("academicEmail and studentId are required", 400);
-				}
-			}
-
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);
 			const normalizedRealNameKana = normalizeRealName(realNameKana);
@@ -137,7 +152,7 @@ const route = app
 				grade,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 201);
 		},
 	)
 	.put(
@@ -161,13 +176,6 @@ const route = app
 				socialLinks,
 			} = c.req.valid("json");
 
-			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-			if (grade !== "卒業生" && grade !== "ゲスト") {
-				if (!academicEmail || !studentId) {
-					return c.text("academicEmail and studentId are required", 400);
-				}
-			}
-
 			const normalizedDisplayName = normalizeRealName(displayName);
 			const normalizedRealName = normalizeRealName(realName);
 			const normalizedRealNameKana = normalizeRealName(realNameKana);
@@ -185,7 +193,7 @@ const route = app
 				socialLinks,
 			});
 
-			return c.text("ok", 200);
+			return c.body(null, 204);
 		},
 	)
 	.get("/contributions", memberOnlyMiddleware, async (c) => {
@@ -199,14 +207,14 @@ const route = app
 		const oauthConnections =
 			await OAuthInternalRepository.fetchOAuthConnectionsByUserId(
 				payload.userId,
-			);
+			).catch(() => []);
 
 		const githubConn = oauthConnections.find(
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 
 		if (!githubConn || !githubConn.name) {
-			return c.text("User not found", 404);
+			return c.body(null, 404);
 		}
 
 		const cached = await ContributionCacheRepository.get(
@@ -240,34 +248,30 @@ const route = app
 
 			const { image } = c.req.valid("form");
 
-			try {
-				const optimizedImageArrayBuffer = await optimizeImage({
-					image: await image.arrayBuffer(),
-					width: 256,
-					height: 256,
-					format: "webp",
-				});
-				if (!optimizedImageArrayBuffer) {
-					throw new Error("Failed to optimize image");
-				}
-
-				const optimizedImageUint8Array = new Uint8Array(
-					optimizedImageArrayBuffer,
-				);
-
-				await UserStorageRepository.uploadProfileImage(
-					new Blob([optimizedImageUint8Array], { type: "image/webp" }),
-					payload.userId,
-				);
-
-				await UserRepository.updateUser(payload.userId, {
-					profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
-				});
-
-				return c.text("ok", 200);
-			} catch (e) {
-				return c.text("Failed to upload profile image", 500);
+			const optimizedImageArrayBuffer = await optimizeImage({
+				image: await image.arrayBuffer(),
+				width: 256,
+				height: 256,
+				format: "webp",
+			});
+			if (!optimizedImageArrayBuffer) {
+				throw new Error("Failed to optimize image");
 			}
+
+			const optimizedImageUint8Array = new Uint8Array(
+				optimizedImageArrayBuffer,
+			);
+
+			await UserStorageRepository.uploadProfileImage(
+				new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+				payload.userId,
+			);
+
+			await UserRepository.updateUser(payload.userId, {
+				profileImageURL: `${serverOrigin}/user/profile-image/${payload.userId}?${Date.now()}`,
+			});
+
+			return c.body(null, 204);
 		},
 	)
 	.delete("/oauth-connection/:providerId", memberOnlyMiddleware, async (c) => {
@@ -290,12 +294,8 @@ const route = app
 			return c.text("Invalid providerId", 400);
 		}
 
-		try {
-			await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
-			return c.text("ok", 200);
-		} catch {
-			return c.text("Failed to delete OAuth connection", 500);
-		}
+		await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
+		return c.body(null, 204);
 	})
 	.get("/profile-image/:userId", async (c) => {
 		// TODO 画像のキャッシュを考慮する
@@ -306,7 +306,7 @@ const route = app
 			const body = await UserStorageRepository.getProfileImageURL(userId);
 			c.header("Content-Type", "image/webp");
 			return stream(c, (s) => s.pipe(body));
-		} catch (e) {
+		} catch {
 			return c.text("Not found", 404);
 		}
 	});
