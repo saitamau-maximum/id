@@ -30,7 +30,7 @@ export const ContributionCard = ({
 		<div
 			className={css({
 				display: "grid",
-				gridTemplateColumns: "repeat(auto-fill, 1fr)",
+				gridTemplateColumns: "repeat((auto-fill, 1fr)",
 				gridTemplateRows: "repeat(7, 1fr)",
 				gridAutoFlow: "column",
 				gap: size === "sm" ? 1 : 2,

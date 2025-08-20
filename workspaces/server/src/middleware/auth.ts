@@ -60,7 +60,7 @@ const roleAuthorizationMiddleware = (
 
 		c.set("roleIds", roleIds);
 
-		return c.redirect("https://maximum.vc/join", 302);
+		return c.text("Forbidden", 403);
 	});
 };
 
