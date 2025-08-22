@@ -92,5 +92,147 @@ describe("Certification Handler", () => {
 
 			expect(response.status).toBe(500);
 		});
+
+		describe("POST /certification/request", () => {
+			it("should request certification with valid JWT token", async () => {
+				const userId = "test-user-id";
+				const certificationId = "cert1";
+				const certifiedIn = 2023;
+
+				// メンバーロールを設定
+				vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([
+					ROLE_IDS.MEMBER,
+				]);
+
+				// JWTトークンを生成
+				const token = await createJWTToken(userId);
+
+				const response = await app.request("/certification/request", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						certificationId,
+						certifiedIn,
+					}),
+				});
+
+				expect(response.status).toBe(201);
+				expect(
+					mockCertificationRepository.requestCertification,
+				).toHaveBeenCalledWith({
+					userId,
+					certificationId,
+					certifiedIn,
+				});
+				expect(mockUserRepository.fetchRolesByUserId).toHaveBeenCalledWith(
+					userId,
+				);
+			});
+
+			it("should return 403 for user without member role", async () => {
+				const userId = "test-user-id";
+				const certificationId = "cert1";
+				const certifiedIn = 2023;
+
+				// ロールを設定しない
+				vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([]);
+
+				const token = await createJWTToken(userId);
+
+				const response = await app.request("/certification/request", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: JSON.stringify({
+						certificationId,
+						certifiedIn,
+					}),
+				});
+
+				expect(response.status).toBe(403);
+			});
+
+			it("should return 401 for invalid JWT token", async () => {
+				const response = await app.request("/certification/request", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: "Bearer invalid-token",
+					},
+					body: JSON.stringify({
+						certificationId: "cert1",
+						certifiedIn: 2023,
+					}),
+				});
+
+				expect(response.status).toBe(401);
+			});
+		});
+
+		describe("GET /certification/request", () => {
+			it("should get all certification requests with admin authentication", async () => {
+				const userId = "admin-user";
+				const mockRequests = [
+					{
+						userId: "user1",
+						certificationId: "cert1",
+						certifiedIn: 2023,
+						user: {
+							id: "user1",
+							displayId: "testuser",
+							displayName: "Test User",
+							profileImageURL: "https://example.com/image.jpg",
+						},
+					},
+				];
+
+				// adminロールを設定
+				vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([
+					ROLE_IDS.ADMIN,
+				]);
+				vi.mocked(
+					mockCertificationRepository.getAllCertificationRequests,
+				).mockResolvedValue(mockRequests);
+
+				const token = await createJWTToken(userId);
+
+				const response = await app.request("/certification/request", {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
+				const data = await response.json();
+
+				expect(response.status).toBe(200);
+				expect(data).toEqual(mockRequests);
+				expect(mockUserRepository.fetchRolesByUserId).toHaveBeenCalledWith(
+					userId,
+				);
+			});
+
+			it("should return 403 for non-admin user", async () => {
+				const userId = "regular-user";
+
+				// メンバーロを設定
+				vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([
+					ROLE_IDS.MEMBER,
+				]);
+
+				const token = await createJWTToken(userId);
+
+				const response = await app.request("/certification/request", {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
+
+				expect(response.status).toBe(403);
+			});
+		});
 	});
 });
