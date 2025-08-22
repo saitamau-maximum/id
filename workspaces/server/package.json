@@ -32,6 +32,7 @@
 		"wasm-image-optimization": "^1.2.28"
 	},
 	"devDependencies": {
+		"@cloudflare/vitest-pool-workers": "^0.8.66",
 		"@octokit/types": "^14.1.0",
 		"@types/minimist": "^1.2.5",
 		"@types/prompts": "^2.4.9",
@@ -42,6 +43,7 @@
 		"prompts": "^2.4.2",
 		"tsx": "^4.19.3",
 		"typescript": "^5.8.3",
+		"vitest": "~3.2.0",
 		"wrangler": "^4.8.0"
 	}
 }
