@@ -1,39 +1,44 @@
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
+import { sign } from "hono/jwt";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { HonoEnv } from "../../factory";
 import type {
 	ICertification,
 	ICertificationRepository,
 } from "../../repository/certification";
+import type { IUserRepository } from "../../repository/user";
 import { certificationRoute } from "../../routes/certification";
+import { createMockCertificationRepository } from "../mocks/repository/certification";
+import { createMockUserRepository } from "../mocks/repository/user";
 
-const createMockCertificationRepository = (): ICertificationRepository => {
-	return {
-		getAllCertifications: vi.fn(),
-		requestCertification: vi.fn(),
-		getAllCertificationRequests: vi.fn(),
-		approveCertificationRequest: vi.fn(),
-		rejectCertificationRequest: vi.fn(),
-		existsCertification: vi.fn(),
-		createCertification: vi.fn(),
-		updateCertification: vi.fn(),
-		deleteCertification: vi.fn(),
-		existsUserCertification: vi.fn(),
-		deleteUserCertification: vi.fn(),
-	};
+const TEST_SECRET = "test-secret-key";
+
+const createJWTToken = async (userId: string) => {
+	return await sign({ userId: userId }, TEST_SECRET);
 };
 
 describe("Certification Handler", () => {
 	let app: Hono<HonoEnv>;
-	let mockRepository: ICertificationRepository;
+	let mockCertificationRepository: ICertificationRepository;
+	let mockUserRepository: IUserRepository;
 
 	beforeEach(() => {
 		app = new Hono<HonoEnv>();
-		mockRepository = createMockCertificationRepository();
+		mockCertificationRepository = createMockCertificationRepository();
+		mockUserRepository = createMockUserRepository();
 
+		// 環境変数とリポジトリを注入するミドルウェア
 		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
-			c.set("CertificationRepository", mockRepository);
+			c.set("CertificationRepository", mockCertificationRepository);
+			c.set("UserRepository", mockUserRepository);
+
+			// テスト用の環境変数
+			c.env = {
+				...c.env,
+				SECRET: TEST_SECRET,
+			};
+
 			await next();
 		});
 
@@ -56,9 +61,9 @@ describe("Certification Handler", () => {
 				},
 			];
 
-			vi.mocked(mockRepository.getAllCertifications).mockResolvedValue(
-				mockData,
-			);
+			vi.mocked(
+				mockCertificationRepository.getAllCertifications,
+			).mockResolvedValue(mockData);
 
 			const response = await app.request("/certification/all");
 			const data = await response.json();
@@ -68,7 +73,9 @@ describe("Certification Handler", () => {
 		});
 
 		it("should return empty array when no certifications exist", async () => {
-			vi.mocked(mockRepository.getAllCertifications).mockResolvedValue([]);
+			vi.mocked(
+				mockCertificationRepository.getAllCertifications,
+			).mockResolvedValue([]);
 
 			const response = await app.request("/certification/all");
 			const data = await response.json();
@@ -78,9 +85,9 @@ describe("Certification Handler", () => {
 		});
 
 		it("should handle errors gracefully", async () => {
-			vi.mocked(mockRepository.getAllCertifications).mockRejectedValue(
-				new Error("Database error"),
-			);
+			vi.mocked(
+				mockCertificationRepository.getAllCertifications,
+			).mockRejectedValue(new Error("Database error"));
 			const response = await app.request("/certification/all");
 
 			expect(response.status).toBe(500);
