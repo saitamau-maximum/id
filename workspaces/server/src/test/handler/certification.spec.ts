@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { sign } from "hono/jwt";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ROLE_IDS } from "../../constants/role";
 import type { HonoEnv } from "../../factory";
 import type {
 	ICertification,
