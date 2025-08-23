@@ -306,6 +306,7 @@ const route = app
 
 			return {
 				clientId,
+				responseType,
 				redirectUri,
 				redirectTo,
 				scope,
@@ -319,6 +320,7 @@ const route = app
 		async (c) => {
 			const {
 				clientId,
+				responseType,
 				redirectUri,
 				redirectTo,
 				scope,
@@ -336,6 +338,7 @@ const route = app
 			);
 			const token = await generateAuthToken({
 				clientId,
+				responseType,
 				redirectUri,
 				scope,
 				state,
@@ -363,6 +366,7 @@ const route = app
 					})),
 					oauthFields: {
 						clientId,
+						responseType,
 						redirectUri,
 						redirectTo,
 						scope,

@@ -17,6 +17,11 @@ const app = factory.createApp();
 const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
+	response_type: v.union([
+		v.literal("code"),
+		v.literal("id_token token"),
+		v.literal("id_token"),
+	]),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
 	state: v.optional(v.string()),
@@ -41,6 +46,7 @@ const route = app
 		async (c) => {
 			const {
 				client_id,
+				response_type,
 				redirect_uri,
 				scope,
 				state,
@@ -66,6 +72,7 @@ const route = app
 			const publicKey = await jwkToKey(pubKeyJwk, "publicKey");
 			const isValidToken = await validateAuthToken({
 				clientId: client_id,
+				responseType: response_type,
 				redirectUri: redirect_uri,
 				scope,
 				state,
