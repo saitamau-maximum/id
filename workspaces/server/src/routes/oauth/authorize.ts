@@ -119,10 +119,14 @@ const route = app
 			if (!success4) {
 				return errorRedirect("invalid_request", "response_type required");
 			}
-			if (responseType !== "code") {
+			if (
+				responseType !== "code" &&
+				responseType !== "id_token token" &&
+				responseType !== "id_token"
+			) {
 				return errorRedirect(
 					"unsupported_response_type",
-					"only 'code' is supported",
+					"supported response_type is 'code', 'id_token token' or 'id_token' only",
 				);
 			}
 
@@ -194,6 +198,43 @@ const route = app
 			const maxAge = _maxAge ? Number.parseInt(_maxAge, 10) : undefined;
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
+
+			if (responseType !== "code") {
+				// OpenID Connect Implicit Flow
+				// redirect_uri, nonce は必須
+				if (!redirectUri) {
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri required for OpenID Connect Implicit Flow",
+					);
+				}
+				if (!nonce) {
+					return errorRedirect(
+						"invalid_request",
+						"nonce required for OpenID Connect Implicit Flow",
+					);
+				}
+				// redirect_uri はすでに登録されているものでなければならない
+				// callback URL が複数登録されている場合はチェック済み
+				if (client.callbackUrls.length === 0) {
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri not registered for OpenID Connect Implicit Flow",
+					);
+				}
+				// redirect_uri は https でなければならない (localhost は例外)
+				const redirectToUrl = new URL(redirectTo);
+				if (
+					redirectToUrl.protocol !== "https:" &&
+					redirectToUrl.hostname !== "localhost" &&
+					redirectToUrl.hostname !== "127.0.0.1" &&
+					redirectToUrl.hostname !== "[::1]"
+				)
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri must be https for OpenID Connect Implicit Flow",
+					);
+			}
 
 			const nowMs = Date.now();
 			const loggedInAt = await (async () => {
