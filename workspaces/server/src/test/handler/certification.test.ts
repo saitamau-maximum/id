@@ -220,7 +220,7 @@ describe("Certification Handler", () => {
 		it("should return 403 for non-admin user", async () => {
 			const userId = "regular-user";
 
-			// メンバーロを設定
+			// メンバーロールを設定
 			vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([
 				ROLE_IDS.MEMBER,
 			]);
