@@ -190,7 +190,7 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       vitest:
-        specifier: ~3.2.0
+        specifier: ^3.2.0
         version: 3.2.4(@types/debug@4.1.12)(@types/node@22.15.3)(lightningcss@1.25.1)(tsx@4.19.3)(yaml@2.8.1)
       wrangler:
         specifier: ^4.8.0
