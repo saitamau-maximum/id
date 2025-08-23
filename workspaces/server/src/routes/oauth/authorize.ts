@@ -199,8 +199,17 @@ const route = app
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
 
+			const isOidc = client.scopes.some((scope) => scope.name === "openid");
+
 			if (responseType !== "code") {
 				// OpenID Connect Implicit Flow
+				if (!isOidc) {
+					return errorRedirect(
+						"unsupported_response_type",
+						"response_type='id_token token' or 'id_token' requires 'openid' scope",
+					);
+				}
+
 				// redirect_uri, nonce は必須
 				if (!redirectUri) {
 					return errorRedirect(
@@ -268,7 +277,6 @@ const route = app
 				return c.redirect(redirectTo.toString(), 302);
 			};
 
-			const isOidc = client.scopes.some((scope) => scope.name === "openid");
 			if (isOidc && prompt === "none") {
 				// 現状では同意済みフラグを持っていないので、 consent interaction を強制することになる
 				// TODO: none でもうまくできるようにする
