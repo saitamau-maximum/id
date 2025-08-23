@@ -59,3 +59,5 @@ export const claimsSupported: (keyof OidcUserInfo)[] = [
 ] as const;
 
 export const iss = "https://api.id.maximum.vc" as const;
+
+export const ACCESS_TOKEN_EXPIRES_IN = 3600; // 1 hour (sec)

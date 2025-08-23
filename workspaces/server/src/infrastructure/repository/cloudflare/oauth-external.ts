@@ -3,6 +3,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID } from "../../../constants/role";
 import { type Scope, getScopeById } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
+import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 
@@ -329,7 +330,7 @@ export class CloudflareOAuthExternalRepository
 				oidcNonce,
 				oidcAuthTime,
 				accessToken,
-				accessTokenExpiresAt: new Date(time + 1 * 60 * 60 * 1000), // 1 hour
+				accessTokenExpiresAt: new Date(time + ACCESS_TOKEN_EXPIRES_IN * 1000), // 1 hour
 			})
 			.returning();
 

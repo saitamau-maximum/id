@@ -4,6 +4,7 @@ import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
+import { ACCESS_TOKEN_EXPIRES_IN } from "../../utils/oauth/constant";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
@@ -166,12 +167,12 @@ const route = app
 						// Access Token も返す
 						fragment.append("access_token", accessToken);
 						fragment.append("token_type", "Bearer");
-						fragment.append("expires_in", "3600"); // 1 hour
+						fragment.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
 					}
 					const id_token = await generateIdToken({
 						clientId: client_id,
 						userId,
-						exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+						exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
 						authTime: oidc_auth_time,
 						nonce: oidc_nonce,
 						accessToken,
