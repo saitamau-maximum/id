@@ -15,8 +15,8 @@ const route = app.get("/openid-configuration", cors(), (c) => {
 			jwks_uri: `${iss}/oauth/jwks`,
 			// registration_endpoint: "", // 未実装
 			scopes_supported: ["openid", "profile", "email"],
-			response_types_supported: ["code"],
-			response_modes_supported: ["query"],
+			response_types_supported: ["code", "id_token", "id_token token"],
+			response_modes_supported: ["query", "fragment"],
 			grant_types_supported: ["authorization_code"],
 			// acr_values_supported: [], // 不使用
 			subject_types_supported: ["pairwise"],
