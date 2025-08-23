@@ -18,10 +18,11 @@ const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
-	state: v.optional(v.string()),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
+	state: v.optional(v.string()),
 	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	oidc_auth_time: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
+
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
 	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
@@ -39,15 +40,15 @@ const route = app
 		}),
 		async (c) => {
 			const {
-				auth_token,
-				authorized,
 				client_id,
 				redirect_uri,
-				time: _time,
 				scope,
 				state,
 				oidc_nonce,
 				oidc_auth_time: _oidc_auth_time,
+				time: _time,
+				auth_token,
+				authorized,
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
 			const oidc_auth_time = _oidc_auth_time
@@ -68,9 +69,9 @@ const route = app
 				redirectUri: redirect_uri,
 				scope,
 				state,
-				time,
 				oidcNonce: oidc_nonce,
 				oidcAuthTime: oidc_auth_time,
+				time,
 				key: publicKey,
 				hash: auth_token,
 			});

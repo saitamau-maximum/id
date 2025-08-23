@@ -308,8 +308,8 @@ const route = app
 				clientId,
 				redirectUri,
 				redirectTo,
-				state,
 				scope,
+				state,
 				oidcNonce: nonce,
 				oidcAuthTime: loggedInAt,
 				clientInfo: client,
@@ -321,11 +321,11 @@ const route = app
 				clientId,
 				redirectUri,
 				redirectTo,
-				state,
 				scope,
-				clientInfo,
+				state,
 				oidcNonce,
 				oidcAuthTime,
+				clientInfo,
 			} = c.req.valid("query");
 			const nowUnixMs = Date.now();
 			const { userId } = c.get("jwtPayload");
@@ -350,7 +350,7 @@ const route = app
 
 			// 初期登録まだ
 			if (!userInfo.initializedAt) {
-				return c.text("not implemented", 503);
+				return c.text("not implemented for uninitialized user", 503);
 			}
 
 			const responseHtml = _Layout({
@@ -365,12 +365,12 @@ const route = app
 						clientId,
 						redirectUri,
 						redirectTo,
-						state,
 						scope,
-						token,
-						nowUnixMs,
+						state,
 						oidcNonce,
 						oidcAuthTime,
+						token,
+						nowUnixMs,
 					},
 					user: {
 						// 初期登録済みなので displayName は必ず存在する（はず）

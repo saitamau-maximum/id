@@ -11,12 +11,12 @@ interface AuthorizeProps {
 		redirectUri?: string;
 		// client が指定してきた redirect_uri または DB に保存されている callback
 		redirectTo: string;
-		state?: string;
 		scope?: string;
-		token: string;
-		nowUnixMs: number;
+		state?: string;
 		oidcNonce?: string;
 		oidcAuthTime?: number;
+		token: string;
+		nowUnixMs: number;
 	};
 	user: {
 		displayName: string;
@@ -83,20 +83,20 @@ export const _Authorize = ({
 						: ""
 				}
         ${
-					oauthFields.state
-						? html`<input
-              type="hidden"
-              name="state"
-              value="${oauthFields.state}"
-            />`
-						: ""
-				}
-        ${
 					oauthFields.scope
 						? html`<input
               type="hidden"
               name="scope"
               value="${oauthFields.scope}"
+            />`
+						: ""
+				}
+        ${
+					oauthFields.state
+						? html`<input
+              type="hidden"
+              name="state"
+              value="${oauthFields.state}"
             />`
 						: ""
 				}
