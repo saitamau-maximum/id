@@ -19,11 +19,8 @@ const app = factory.createApp();
 const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
-	response_type: v.union([
-		v.literal("code"),
-		v.literal("id_token token"),
-		v.literal("id_token"),
-	]),
+	response_type: v.picklist(["code", "id_token token", "id_token"] as const),
+	response_mode: v.optional(v.picklist(["query", "fragment"] as const)),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
 	state: v.optional(v.string()),
@@ -49,6 +46,7 @@ const route = app
 			const {
 				client_id,
 				response_type,
+				response_mode,
 				redirect_uri,
 				scope,
 				state,
@@ -75,6 +73,7 @@ const route = app
 			const isValidToken = await validateAuthToken({
 				clientId: client_id,
 				responseType: response_type,
+				responseMode: response_mode,
 				redirectUri: redirect_uri,
 				scope,
 				state,
@@ -161,13 +160,12 @@ const route = app
 						return c.redirect(redirectTo.href, 302);
 					}
 					// OpenID Connect Implicit Flow
-					// Fragment に情報を載せる
-					const fragment = new URLSearchParams();
+					const res = new URLSearchParams();
 					if (response_type === "id_token token") {
 						// Access Token も返す
-						fragment.append("access_token", accessToken);
-						fragment.append("token_type", "Bearer");
-						fragment.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
+						res.append("access_token", accessToken);
+						res.append("token_type", "Bearer");
+						res.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
 					}
 					const id_token = await generateIdToken({
 						clientId: client_id,
@@ -178,9 +176,15 @@ const route = app
 						accessToken,
 						privateKey: c.env.PRIVKEY_FOR_OAUTH,
 					});
-					fragment.append("id_token", id_token);
-					if (state) fragment.append("state", state);
-					redirectTo.hash = fragment.toString();
+					res.append("id_token", id_token);
+					if (state) res.append("state", state);
+
+					if (response_mode === "query") {
+						redirectTo.search = res.toString();
+					} else {
+						// default: fragment (Section 3.2.2.5)
+						redirectTo.hash = res.toString();
+					}
 					return c.redirect(redirectTo.href, 302);
 				})
 				.catch((e: Error) => {

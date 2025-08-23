@@ -7,6 +7,7 @@ import { sign, verify } from "./key";
 interface Param {
 	clientId: string;
 	responseType: string;
+	responseMode?: string;
 	redirectUri?: string;
 	scope?: string;
 	state?: string;
@@ -28,6 +29,7 @@ const content = (param: Param) => {
 	const p = new URLSearchParams();
 	p.append("client_id", param.clientId);
 	p.append("response_type", param.responseType);
+	if (param.responseMode) p.append("response_mode", param.responseMode);
 	if (param.redirectUri) p.append("redirect_uri", param.redirectUri);
 	if (param.scope) p.append("scope", param.scope);
 	if (param.state) p.append("state", param.state);

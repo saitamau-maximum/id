@@ -171,6 +171,8 @@ const route = app
 			}
 
 			// ----- OpenID Connect パラメータのチェック ----- //
+			const isOidc = client.scopes.some((scope) => scope.name === "openid");
+
 			const { output: nonce, success: success6 } = v.safeParse(
 				v.optional(v.string()),
 				query.nonce,
@@ -196,10 +198,21 @@ const route = app
 				return errorRedirect("invalid_request", "invalid max_age");
 			}
 			const maxAge = _maxAge ? Number.parseInt(_maxAge, 10) : undefined;
+			const { output: responseMode, success: success9 } = v.safeParse(
+				v.optional(v.picklist(["query", "fragment"] as const)),
+				query.response_mode,
+			);
+			if (!success9) {
+				return errorRedirect("invalid_request", "invalid response_mode");
+			}
+			if (responseMode === "fragment" && responseType === "code") {
+				return errorRedirect(
+					"invalid_request",
+					"response_mode='fragment' is not allowed when response_type='code'",
+				);
+			}
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
-
-			const isOidc = client.scopes.some((scope) => scope.name === "openid");
 
 			if (responseType !== "code") {
 				// OpenID Connect Implicit Flow
@@ -315,6 +328,7 @@ const route = app
 			return {
 				clientId,
 				responseType,
+				responseMode,
 				redirectUri,
 				redirectTo,
 				scope,
@@ -329,6 +343,7 @@ const route = app
 			const {
 				clientId,
 				responseType,
+				responseMode,
 				redirectUri,
 				redirectTo,
 				scope,
@@ -347,6 +362,7 @@ const route = app
 			const token = await generateAuthToken({
 				clientId,
 				responseType,
+				responseMode,
 				redirectUri,
 				scope,
 				state,
@@ -375,6 +391,7 @@ const route = app
 					oauthFields: {
 						clientId,
 						responseType,
+						responseMode,
 						redirectUri,
 						redirectTo,
 						scope,

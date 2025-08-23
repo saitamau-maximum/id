@@ -8,6 +8,7 @@ interface AuthorizeProps {
 	oauthFields: {
 		clientId: string;
 		responseType: string;
+		responseMode?: string;
 		// client が指定してきた redirect_uri
 		redirectUri?: string;
 		// client が指定してきた redirect_uri または DB に保存されている callback
@@ -75,6 +76,15 @@ export const _Authorize = ({
       <form method="POST" action="/oauth/callback" class="space-y-4">
         <input type="hidden" name="client_id" value="${oauthFields.clientId}" />
         <input type="hidden" name="response_type" value="${oauthFields.responseType}" />
+        ${
+					oauthFields.responseMode
+						? html`<input
+              type="hidden"
+              name="response_mode"
+              value="${oauthFields.responseMode}"
+            />`
+						: ""
+				}
         ${
 					oauthFields.redirectUri
 						? html`<input
