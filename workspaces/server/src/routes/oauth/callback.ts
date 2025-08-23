@@ -114,7 +114,7 @@ const route = app
 				redirectTo = new URL(client.callbackUrls[0]);
 			}
 
-			redirectTo.searchParams.append("state", state || "");
+			if (state) redirectTo.searchParams.append("state", state);
 			if (authorized === "0") {
 				redirectTo.searchParams.append("error", "access_denied");
 				redirectTo.searchParams.append(
@@ -154,7 +154,22 @@ const route = app
 				oidc_auth_time,
 			)
 				.then(() => {
-					redirectTo.searchParams.append("code", code);
+					if (response_type === "code") {
+						redirectTo.searchParams.append("code", code);
+						return c.redirect(redirectTo.href, 302);
+					}
+					// OpenID Connect Implicit Flow
+					// Fragment に情報を載せる
+					const fragment = new URLSearchParams();
+					if (response_type === "id_token token") {
+						// Access Token も返す
+						fragment.append("access_token", accessToken);
+						fragment.append("token_type", "Bearer");
+						fragment.append("expires_in", "3600"); // 1 hour
+					}
+					fragment.append("id_token", /* TODO */ "");
+					if (state) fragment.append("state", state);
+					redirectTo.hash = fragment.toString();
 					return c.redirect(redirectTo.href, 302);
 				})
 				.catch((e: Error) => {
