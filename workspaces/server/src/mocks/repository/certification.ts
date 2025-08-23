@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { ICertificationRepository } from "../../../repository/certification";
+import type { ICertificationRepository } from "../../repository/certification";
 
 export const createMockCertificationRepository =
 	(): ICertificationRepository => {

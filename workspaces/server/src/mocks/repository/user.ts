@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import type { IUserRepository } from "../../../repository/user";
+import type { IUserRepository } from "../../repository/user";
 
 export const createMockUserRepository = (): IUserRepository => {
 	return {

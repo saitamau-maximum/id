@@ -2,16 +2,16 @@ import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { sign } from "hono/jwt";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ROLE_IDS } from "../../constants/role";
-import type { HonoEnv } from "../../factory";
+import { ROLE_IDS } from "../constants/role";
+import type { HonoEnv } from "../factory";
+import { createMockCertificationRepository } from "../mocks/repository/certification";
+import { createMockUserRepository } from "../mocks/repository/user";
 import type {
 	ICertification,
 	ICertificationRepository,
-} from "../../repository/certification";
-import type { IUserRepository } from "../../repository/user";
-import { certificationRoute } from "../../routes/certification";
-import { createMockCertificationRepository } from "../mocks/repository/certification";
-import { createMockUserRepository } from "../mocks/repository/user";
+} from "../repository/certification";
+import type { IUserRepository } from "../repository/user";
+import { certificationRoute } from "../routes/certification";
 
 const TEST_SECRET = "test-secret-key";
 
