@@ -6,6 +6,7 @@ import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
+import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
@@ -153,7 +154,7 @@ const route = app
 				oidc_nonce,
 				oidc_auth_time,
 			)
-				.then(() => {
+				.then(async () => {
 					if (response_type === "code") {
 						redirectTo.searchParams.append("code", code);
 						return c.redirect(redirectTo.href, 302);
@@ -167,7 +168,16 @@ const route = app
 						fragment.append("token_type", "Bearer");
 						fragment.append("expires_in", "3600"); // 1 hour
 					}
-					fragment.append("id_token", /* TODO */ "");
+					const id_token = await generateIdToken({
+						clientId: client_id,
+						userId,
+						exp: Math.floor(Date.now() / 1000) + 3600, // 1 hour
+						authTime: oidc_auth_time,
+						nonce: oidc_nonce,
+						accessToken,
+						privateKey: c.env.PRIVKEY_FOR_OAUTH,
+					});
+					fragment.append("id_token", id_token);
 					if (state) fragment.append("state", state);
 					redirectTo.hash = fragment.toString();
 					return c.redirect(redirectTo.href, 302);
