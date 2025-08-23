@@ -1,6 +1,6 @@
 import { cors } from "hono/cors";
 import { factory } from "../factory";
-import { claimsSupported, iss } from "../utils/oauth/oidc-constant";
+import { claimsSupported, iss } from "../utils/oauth/constant";
 
 const app = factory.createApp();
 

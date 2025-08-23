@@ -7,7 +7,7 @@ import {
 import { SCOPES_BY_ID, SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
-import type { OidcUserInfo } from "../../utils/oauth/oidc-constant";
+import type { OidcUserInfo } from "../../utils/oauth/constant";
 import { generateSub } from "../../utils/oauth/oidc-logic";
 
 const app = factory.createApp();
