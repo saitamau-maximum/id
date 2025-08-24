@@ -15,7 +15,7 @@ import { certificationRoute } from "../routes/certification";
 
 const TEST_SECRET = "test-secret-key";
 
-const createJWTToken = async (userId: string) => {
+const createJWT = async (userId: string) => {
 	return await sign({ userId: userId }, TEST_SECRET);
 };
 
@@ -107,7 +107,7 @@ describe("Certification Handler", () => {
 			]);
 
 			// JWTトークンを生成
-			const token = await createJWTToken(userId);
+			const token = await createJWT(userId);
 
 			const response = await app.request("/certification/request", {
 				method: "POST",
@@ -142,7 +142,7 @@ describe("Certification Handler", () => {
 			// ロールを設定しない
 			vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([]);
 
-			const token = await createJWTToken(userId);
+			const token = await createJWT(userId);
 
 			const response = await app.request("/certification/request", {
 				method: "POST",
@@ -201,7 +201,7 @@ describe("Certification Handler", () => {
 				mockCertificationRepository.getAllCertificationRequests,
 			).mockResolvedValue(mockRequests);
 
-			const token = await createJWTToken(userId);
+			const token = await createJWT(userId);
 
 			const response = await app.request("/certification/request", {
 				headers: {
@@ -225,7 +225,7 @@ describe("Certification Handler", () => {
 				ROLE_IDS.MEMBER,
 			]);
 
-			const token = await createJWTToken(userId);
+			const token = await createJWT(userId);
 
 			const response = await app.request("/certification/request", {
 				headers: {
