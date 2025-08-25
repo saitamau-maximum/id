@@ -117,20 +117,22 @@ export const _Authorize: FC<AuthorizeProps> = ({
 					<input type="hidden" name="time" value={oauthFields.nowUnixMs} />
 					<input type="hidden" name="auth_token" value={oauthFields.token} />
 					<div className="flex justify-around gap-4">
-						{_Button({
-							text: "承認する",
-							variant: "primary",
-							type: "submit",
-							name: "authorized",
-							value: "1",
-						})}
-						{_Button({
-							text: "拒否する",
-							variant: "secondary",
-							type: "submit",
-							name: "authorized",
-							value: "0",
-						})}
+						<_Button
+							variant="primary"
+							type="submit"
+							name="authorized"
+							value="1"
+						>
+							承認する
+						</_Button>
+						<_Button
+							variant="secondary"
+							type="submit"
+							name="authorized"
+							value="0"
+						>
+							拒否する
+						</_Button>
 					</div>
 				</form>
 			</div>
