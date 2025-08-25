@@ -69,7 +69,10 @@ const route = app
 						.split(":", 2)
 						.map((s) => s.trim());
 					// 変なやつは下ではじかれるのでここでは細かいチェックはしない
-					return { client_id: clientId, client_secret: clientSecret };
+					return {
+						client_id: decodeURIComponent(clientId),
+						client_secret: decodeURIComponent(clientSecret),
+					};
 				} catch {
 					return {
 						errorRes: c.json(
