@@ -65,10 +65,13 @@ const route = app
 
 				const base64Credentials = authHeader.slice(6); // "Basic " を除去
 				try {
-					const [clientId, clientSecret] = atob(base64Credentials)
-						.split(":", 2)
+					const parts = atob(base64Credentials)
+						.split(":")
 						.map((s) => s.trim());
-					// 変なやつは下ではじかれるのでここでは細かいチェックはしない
+					if (parts.length !== 2 || !parts[0] || !parts[1])
+						throw new Error("Invalid format"); // 下の catch でレスポンスを返す
+
+					const [clientId, clientSecret] = parts;
 					return {
 						client_id: decodeURIComponent(clientId),
 						client_secret: decodeURIComponent(clientSecret),
