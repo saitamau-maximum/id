@@ -1,4 +1,4 @@
-import { html } from "hono/html";
+import type { FC } from "hono/jsx";
 
 const buttonVariants = {
 	primary:
@@ -15,21 +15,21 @@ interface ButtonProps {
 	value: string;
 }
 
-export const _Button = ({
+export const _Button: FC<ButtonProps> = ({
 	text,
 	variant = "primary",
 	type = "button",
 	name,
 	value,
-}: ButtonProps) => html`
-  <button
-    class="px-4 py-2 rounded-lg font-bold focus:outline-none border-2 w-full ${
+}) => (
+	<button
+		className={`px-4 py-2 rounded-lg font-bold focus:outline-none border-2 w-full ${
 			buttonVariants[variant]
-		}"
-    type="${type}"
-    name="${name}"
-    value="${value}"
-  >
-    ${text}
-  </button>
-`;
+		}`}
+		type={type}
+		name={name}
+		value={value}
+	>
+		{text}
+	</button>
+);
