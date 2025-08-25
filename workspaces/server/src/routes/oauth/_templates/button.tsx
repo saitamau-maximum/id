@@ -1,4 +1,4 @@
-import { html } from "hono/html";
+import type { FC, PropsWithChildren } from "hono/jsx";
 
 const buttonVariants = {
 	primary:
@@ -8,28 +8,27 @@ const buttonVariants = {
 } as const;
 
 interface ButtonProps {
-	text: string;
 	variant?: keyof typeof buttonVariants;
 	type?: "button" | "submit" | "reset";
 	name: string;
 	value: string;
 }
 
-export const _Button = ({
-	text,
+export const _Button: FC<PropsWithChildren<ButtonProps>> = ({
 	variant = "primary",
 	type = "button",
 	name,
 	value,
-}: ButtonProps) => html`
-  <button
-    class="px-4 py-2 rounded-lg font-bold focus:outline-none border-2 w-full ${
+	children,
+}) => (
+	<button
+		className={`px-4 py-2 rounded-lg font-bold focus:outline-none border-2 w-full ${
 			buttonVariants[variant]
-		}"
-    type="${type}"
-    name="${name}"
-    value="${value}"
-  >
-    ${text}
-  </button>
-`;
+		}`}
+		type={type}
+		name={name}
+		value={value}
+	>
+		{children}
+	</button>
+);
