@@ -382,14 +382,14 @@ const route = app
 			}
 
 			return c.render(
-				_Authorize({
-					appName: clientInfo.name,
-					appLogo: clientInfo.logoUrl,
-					scopes: clientInfo.scopes.map((scope) => ({
+				<_Authorize
+					appName={clientInfo.name}
+					appLogo={clientInfo.logoUrl}
+					scopes={clientInfo.scopes.map((scope) => ({
 						name: scope.name,
 						description: scope.description,
-					})),
-					oauthFields: {
+					}))}
+					oauthFields={{
 						clientId,
 						responseType,
 						responseMode,
@@ -401,13 +401,13 @@ const route = app
 						oidcAuthTime,
 						token,
 						nowUnixMs,
-					},
-					user: {
+					}}
+					user={{
 						// 初期登録済みなので displayName は必ず存在する（はず）
 						displayName: userInfo.displayName ?? "",
 						profileImageUrl: userInfo.profileImageURL ?? "",
-					},
-				}),
+					}}
+				/>,
 				{
 					title: `${clientInfo.name} へのアクセス許可`,
 				},
