@@ -1,5 +1,4 @@
-import { Fragment } from "hono/jsx";
-import type { NonNullableFC } from "./_types";
+import { type FC, Fragment } from "hono/jsx";
 import { _Button } from "./button";
 
 interface AuthorizeProps {
@@ -27,7 +26,7 @@ interface AuthorizeProps {
 	};
 }
 
-export const _Authorize: NonNullableFC<AuthorizeProps> = ({
+export const _Authorize: FC<AuthorizeProps> = ({
 	appName,
 	appLogo,
 	scopes,

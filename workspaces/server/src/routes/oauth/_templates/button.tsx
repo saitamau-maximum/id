@@ -1,4 +1,4 @@
-import type { NonNullableFC } from "./_types";
+import type { FC } from "hono/jsx";
 
 const buttonVariants = {
 	primary:
@@ -15,7 +15,7 @@ interface ButtonProps {
 	value: string;
 }
 
-export const _Button: NonNullableFC<ButtonProps> = ({
+export const _Button: FC<ButtonProps> = ({
 	text,
 	variant = "primary",
 	type = "button",
