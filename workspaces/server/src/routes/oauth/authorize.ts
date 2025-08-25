@@ -377,7 +377,7 @@ const route = app
 
 			// 初期登録まだ
 			if (!userInfo.initializedAt) {
-				return c.text("not implemented for uninitialized user", 503);
+				return c.text("Forbidden: user not initialized", 403);
 			}
 
 			const responseHtml = _Layout({
