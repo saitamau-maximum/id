@@ -15,7 +15,7 @@ import { cookieAuthMiddleware } from "../../middleware/auth";
 import { generateAuthToken } from "../../utils/oauth/auth-token";
 import { importKey } from "../../utils/oauth/key";
 import { _Authorize } from "./_templates/authorize";
-import { _Layout } from "./_templates/layout";
+import { layoutRendererMiddleware } from "./_templates/layout";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/27
 
@@ -24,6 +24,7 @@ const app = factory.createApp();
 const route = app
 	.get(
 		"/",
+		layoutRendererMiddleware,
 		// パラメータチェックしてからログイン処理をさせる
 		// Memo: なんかうまく型が聞いてくれないので c に明示的に型をつける
 		validator("query", async (query, c: Context<HonoEnv>) => {
@@ -380,8 +381,8 @@ const route = app
 				return c.text("Forbidden: user not initialized", 403);
 			}
 
-			const responseHtml = _Layout({
-				children: _Authorize({
+			return c.render(
+				_Authorize({
 					appName: clientInfo.name,
 					appLogo: clientInfo.logoUrl,
 					scopes: clientInfo.scopes.map((scope) => ({
@@ -407,10 +408,10 @@ const route = app
 						profileImageUrl: userInfo.profileImageURL ?? "",
 					},
 				}),
-				subtitle: clientInfo.name,
-			});
-
-			return c.html(`<!DOCTYPE html>${responseHtml}`);
+				{
+					title: `${clientInfo.name} へのアクセス許可`,
+				},
+			);
 		},
 	)
 	// OAuth 仕様としては POST も Optional で許容してもよい
