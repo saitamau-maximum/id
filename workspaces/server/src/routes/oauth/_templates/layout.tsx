@@ -1,5 +1,5 @@
-import type { FC } from "hono/jsx";
 import type { HtmlEscapedString } from "hono/utils/html";
+import type { NonNullableFC } from "./_types";
 
 interface LayoutProps {
 	children: HtmlEscapedString | Promise<HtmlEscapedString>;
@@ -9,7 +9,7 @@ interface LayoutProps {
 const TITLE = "Maximum IdP OAuth";
 const ORG_NAME = "埼玉大学 プログラミングサークル Maximum";
 
-export const _Layout: FC<LayoutProps> = ({ subtitle, children }) => (
+export const _Layout: NonNullableFC<LayoutProps> = ({ subtitle, children }) => (
 	<html lang="ja">
 		<head>
 			<meta charset="UTF-8" />
