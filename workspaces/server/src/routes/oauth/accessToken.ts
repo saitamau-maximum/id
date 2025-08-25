@@ -17,8 +17,8 @@ const requestBodySchema = v.object({
 	grant_type: v.pipe(v.string(), v.nonEmpty()),
 	code: v.pipe(v.string(), v.nonEmpty()),
 	redirect_uri: v.optional(v.pipe(v.string(), v.nonEmpty(), v.url())),
-	client_id: v.pipe(v.string(), v.nonEmpty()),
-	client_secret: v.pipe(v.string(), v.nonEmpty()),
+	client_id: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	client_secret: v.optional(v.pipe(v.string(), v.nonEmpty())),
 });
 
 const app = factory.createApp();
@@ -29,21 +29,6 @@ const OAUTH_ERROR_URI =
 const route = app
 	.post(
 		"/",
-		async (c, next) => {
-			// もし Authorization ヘッダーがある場合は 401 を返す
-			const authHeader = c.req.header("Authorization");
-			if (authHeader) {
-				return c.json(
-					{
-						error: "invalid_request",
-						error_description: "Authorization header is not allowed",
-						error_uri: OAUTH_ERROR_URI,
-					},
-					401,
-				);
-			}
-			return next();
-		},
 		vValidator("form", requestBodySchema, async (res, c) => {
 			if (!res.success)
 				return c.json(
@@ -56,8 +41,49 @@ const route = app
 				);
 		}),
 		async (c) => {
-			const { client_id, client_secret, code, grant_type, redirect_uri } =
-				c.req.valid("form");
+			const { code, grant_type, redirect_uri } = c.req.valid("form");
+
+			const { client_id, client_secret, errorRes } = (() => {
+				const { client_id, client_secret } = c.req.valid("form");
+				// もし POST body に client_id, client_secret があればそれを使う
+				if (client_id && client_secret) return { client_id, client_secret };
+
+				// Authorization ヘッダをチェック
+				const authHeader = c.req.header("Authorization");
+				if (!authHeader || !authHeader.startsWith("Basic ")) {
+					return {
+						errorRes: c.json(
+							{
+								error: "invalid_request",
+								error_description: "Missing client_id or client_secret",
+								error_uri: OAUTH_ERROR_URI,
+							},
+							401,
+						),
+					};
+				}
+
+				const base64Credentials = authHeader.slice(6); // "Basic " を除去
+				const [clientId, clientSecret, ...rest] = atob(base64Credentials)
+					.split(":")
+					.map((s) => s.trim());
+				if (rest.length > 0 || !clientId || !clientSecret) {
+					// ":" が複数あった場合
+					return {
+						errorRes: c.json(
+							{
+								error: "invalid_request",
+								error_description: "Invalid Authorization header format",
+								error_uri: OAUTH_ERROR_URI,
+							},
+							400,
+						),
+					};
+				}
+
+				return { client_id: clientId, client_secret: clientSecret };
+			})();
+			if (errorRes) return errorRes;
 
 			const nowUnixMs = Date.now();
 

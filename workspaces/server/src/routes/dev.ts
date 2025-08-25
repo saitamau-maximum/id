@@ -46,8 +46,6 @@ const route = app
 		const body = new FormData();
 		body.append("grant_type", "authorization_code");
 		body.append("code", code);
-		body.append("client_id", clientId);
-		body.append("client_secret", clientSecret);
 		body.append(
 			"redirect_uri",
 			`${url.origin}/dev/oauth/${clientId}/${clientSecret}/callback`,
@@ -56,6 +54,9 @@ const route = app
 		const res = await fetch(`${url.origin}/oauth/access-token`, {
 			method: "POST",
 			body,
+			headers: {
+				Authorization: `Basic ${btoa(`${clientId}:${clientSecret}`)}`, // client_id と client_secret は Basic 認証で送る
+			},
 		});
 		c.header("Cache-Control", "no-store");
 		c.header("Pragma", "no-cache");
