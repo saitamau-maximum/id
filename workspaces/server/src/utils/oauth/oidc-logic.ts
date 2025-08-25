@@ -1,6 +1,6 @@
+import { iss } from "./constant";
 import { binaryToBase64Url } from "./convert-bin-base64";
 import { importKey, sign } from "./key";
-import { iss } from "./oidc-constant";
 
 interface OidcIdTokenPayload {
 	iss: string;

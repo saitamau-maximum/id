@@ -6,12 +6,14 @@ import { sign, verify } from "./key";
 
 interface Param {
 	clientId: string;
+	responseType: string;
+	responseMode?: string;
 	redirectUri?: string;
-	state?: string;
 	scope?: string;
-	time: number;
+	state?: string;
 	oidcNonce?: string;
 	oidcAuthTime?: number;
+	time: number;
 }
 
 interface GenerateParam extends Param {
@@ -26,10 +28,14 @@ interface ValidateParam extends Param {
 const content = (param: Param) => {
 	const p = new URLSearchParams();
 	p.append("client_id", param.clientId);
+	p.append("response_type", param.responseType);
+	if (param.responseMode) p.append("response_mode", param.responseMode);
 	if (param.redirectUri) p.append("redirect_uri", param.redirectUri);
-	if (param.state) p.append("state", param.state);
 	if (param.scope) p.append("scope", param.scope);
+	if (param.state) p.append("state", param.state);
 	if (param.oidcNonce) p.append("oidc_nonce", param.oidcNonce);
+	if (param.oidcAuthTime)
+		p.append("oidc_auth_time", param.oidcAuthTime.toString());
 	p.append("time", param.time.toString());
 	return new TextEncoder().encode(p.toString());
 };

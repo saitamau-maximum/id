@@ -119,10 +119,14 @@ const route = app
 			if (!success4) {
 				return errorRedirect("invalid_request", "response_type required");
 			}
-			if (responseType !== "code") {
+			if (
+				responseType !== "code" &&
+				responseType !== "id_token token" &&
+				responseType !== "id_token"
+			) {
 				return errorRedirect(
 					"unsupported_response_type",
-					"only 'code' is supported",
+					"supported response_type is 'code', 'id_token token' or 'id_token' only",
 				);
 			}
 
@@ -167,6 +171,8 @@ const route = app
 			}
 
 			// ----- OpenID Connect パラメータのチェック ----- //
+			const isOidc = client.scopes.some((scope) => scope.name === "openid");
+
 			const { output: nonce, success: success6 } = v.safeParse(
 				v.optional(v.string()),
 				query.nonce,
@@ -192,8 +198,65 @@ const route = app
 				return errorRedirect("invalid_request", "invalid max_age");
 			}
 			const maxAge = _maxAge ? Number.parseInt(_maxAge, 10) : undefined;
+			const { output: responseMode, success: success9 } = v.safeParse(
+				v.optional(v.picklist(["query", "fragment"] as const)),
+				query.response_mode,
+			);
+			if (!success9) {
+				return errorRedirect("invalid_request", "invalid response_mode");
+			}
+			if (responseMode === "fragment" && responseType === "code") {
+				return errorRedirect(
+					"invalid_request",
+					"response_mode='fragment' is not allowed when response_type='code'",
+				);
+			}
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
+
+			if (responseType !== "code") {
+				// OpenID Connect Implicit Flow
+				if (!isOidc) {
+					return errorRedirect(
+						"unsupported_response_type",
+						"response_type='id_token token' or 'id_token' requires 'openid' scope",
+					);
+				}
+
+				// redirect_uri, nonce は必須
+				if (!redirectUri) {
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri required for OpenID Connect Implicit Flow",
+					);
+				}
+				if (!nonce) {
+					return errorRedirect(
+						"invalid_request",
+						"nonce required for OpenID Connect Implicit Flow",
+					);
+				}
+				// redirect_uri はすでに登録されているものでなければならない
+				// callback URL が複数登録されている場合はチェック済み
+				if (client.callbackUrls.length === 0) {
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri not registered for OpenID Connect Implicit Flow",
+					);
+				}
+				// redirect_uri は https でなければならない (localhost は例外)
+				const redirectToUrl = new URL(redirectTo);
+				if (
+					redirectToUrl.protocol !== "https:" &&
+					redirectToUrl.hostname !== "localhost" &&
+					redirectToUrl.hostname !== "127.0.0.1" &&
+					redirectToUrl.hostname !== "[::1]"
+				)
+					return errorRedirect(
+						"invalid_request",
+						"redirect_uri must be https for OpenID Connect Implicit Flow",
+					);
+			}
 
 			const nowMs = Date.now();
 			const loggedInAt = await (async () => {
@@ -227,7 +290,6 @@ const route = app
 				return c.redirect(redirectTo.toString(), 302);
 			};
 
-			const isOidc = client.scopes.some((scope) => scope.name === "openid");
 			if (isOidc && prompt === "none") {
 				// 現状では同意済みフラグを持っていないので、 consent interaction を強制することになる
 				// TODO: none でもうまくできるようにする
@@ -265,10 +327,12 @@ const route = app
 
 			return {
 				clientId,
+				responseType,
+				responseMode,
 				redirectUri,
 				redirectTo,
-				state,
 				scope,
+				state,
 				oidcNonce: nonce,
 				oidcAuthTime: loggedInAt,
 				clientInfo: client,
@@ -278,13 +342,15 @@ const route = app
 		async (c) => {
 			const {
 				clientId,
+				responseType,
+				responseMode,
 				redirectUri,
 				redirectTo,
-				state,
 				scope,
-				clientInfo,
+				state,
 				oidcNonce,
 				oidcAuthTime,
+				clientInfo,
 			} = c.req.valid("query");
 			const nowUnixMs = Date.now();
 			const { userId } = c.get("jwtPayload");
@@ -295,6 +361,8 @@ const route = app
 			);
 			const token = await generateAuthToken({
 				clientId,
+				responseType,
+				responseMode,
 				redirectUri,
 				scope,
 				state,
@@ -309,7 +377,7 @@ const route = app
 
 			// 初期登録まだ
 			if (!userInfo.initializedAt) {
-				return c.text("not implemented", 503);
+				return c.text("Forbidden: user not initialized", 403);
 			}
 
 			const responseHtml = _Layout({
@@ -322,14 +390,16 @@ const route = app
 					})),
 					oauthFields: {
 						clientId,
+						responseType,
+						responseMode,
 						redirectUri,
 						redirectTo,
-						state,
 						scope,
-						token,
-						nowUnixMs,
+						state,
 						oidcNonce,
 						oidcAuthTime,
+						token,
+						nowUnixMs,
 					},
 					user: {
 						// 初期登録済みなので displayName は必ず存在する（はず）

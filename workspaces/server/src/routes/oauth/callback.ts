@@ -4,8 +4,10 @@ import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
+import { ACCESS_TOKEN_EXPIRES_IN } from "../../utils/oauth/constant";
 import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
+import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
@@ -17,11 +19,14 @@ const app = factory.createApp();
 const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
+	response_type: v.picklist(["code", "id_token token", "id_token"] as const),
+	response_mode: v.optional(v.picklist(["query", "fragment"] as const)),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
-	state: v.optional(v.string()),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
+	state: v.optional(v.string()),
 	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	oidc_auth_time: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
+
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
 	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
@@ -39,15 +44,17 @@ const route = app
 		}),
 		async (c) => {
 			const {
-				auth_token,
-				authorized,
 				client_id,
+				response_type,
+				response_mode,
 				redirect_uri,
-				time: _time,
 				scope,
 				state,
 				oidc_nonce,
 				oidc_auth_time: _oidc_auth_time,
+				time: _time,
+				auth_token,
+				authorized,
 			} = c.req.valid("form");
 			const time = Number.parseInt(_time, 10);
 			const oidc_auth_time = _oidc_auth_time
@@ -65,12 +72,14 @@ const route = app
 			const publicKey = await jwkToKey(pubKeyJwk, "publicKey");
 			const isValidToken = await validateAuthToken({
 				clientId: client_id,
+				responseType: response_type,
+				responseMode: response_mode,
 				redirectUri: redirect_uri,
 				scope,
 				state,
-				time,
 				oidcNonce: oidc_nonce,
 				oidcAuthTime: oidc_auth_time,
+				time,
 				key: publicKey,
 				hash: auth_token,
 			});
@@ -106,7 +115,7 @@ const route = app
 				redirectTo = new URL(client.callbackUrls[0]);
 			}
 
-			redirectTo.searchParams.append("state", state || "");
+			if (state) redirectTo.searchParams.append("state", state);
 			if (authorized === "0") {
 				redirectTo.searchParams.append("error", "access_denied");
 				redirectTo.searchParams.append(
@@ -145,8 +154,37 @@ const route = app
 				oidc_nonce,
 				oidc_auth_time,
 			)
-				.then(() => {
-					redirectTo.searchParams.append("code", code);
+				.then(async () => {
+					if (response_type === "code") {
+						redirectTo.searchParams.append("code", code);
+						return c.redirect(redirectTo.href, 302);
+					}
+					// OpenID Connect Implicit Flow
+					const res = new URLSearchParams();
+					if (response_type === "id_token token") {
+						// Access Token も返す
+						res.append("access_token", accessToken);
+						res.append("token_type", "Bearer");
+						res.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
+					}
+					const id_token = await generateIdToken({
+						clientId: client_id,
+						userId,
+						exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
+						authTime: oidc_auth_time,
+						nonce: oidc_nonce,
+						accessToken,
+						privateKey: c.env.PRIVKEY_FOR_OAUTH,
+					});
+					res.append("id_token", id_token);
+					if (state) res.append("state", state);
+
+					if (response_mode === "query") {
+						redirectTo.search = res.toString();
+					} else {
+						// default: fragment (Section 3.2.2.5)
+						redirectTo.hash = res.toString();
+					}
 					return c.redirect(redirectTo.href, 302);
 				})
 				.catch((e: Error) => {

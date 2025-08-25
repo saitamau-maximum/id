@@ -7,16 +7,18 @@ interface AuthorizeProps {
 	scopes: { name: string; description: string | null }[];
 	oauthFields: {
 		clientId: string;
+		responseType: string;
+		responseMode?: string;
 		// client が指定してきた redirect_uri
 		redirectUri?: string;
 		// client が指定してきた redirect_uri または DB に保存されている callback
 		redirectTo: string;
-		state?: string;
 		scope?: string;
-		token: string;
-		nowUnixMs: number;
+		state?: string;
 		oidcNonce?: string;
 		oidcAuthTime?: number;
+		token: string;
+		nowUnixMs: number;
 	};
 	user: {
 		displayName: string;
@@ -73,6 +75,16 @@ export const _Authorize = ({
       </div>
       <form method="POST" action="/oauth/callback" class="space-y-4">
         <input type="hidden" name="client_id" value="${oauthFields.clientId}" />
+        <input type="hidden" name="response_type" value="${oauthFields.responseType}" />
+        ${
+					oauthFields.responseMode
+						? html`<input
+              type="hidden"
+              name="response_mode"
+              value="${oauthFields.responseMode}"
+            />`
+						: ""
+				}
         ${
 					oauthFields.redirectUri
 						? html`<input
@@ -83,20 +95,20 @@ export const _Authorize = ({
 						: ""
 				}
         ${
-					oauthFields.state
-						? html`<input
-              type="hidden"
-              name="state"
-              value="${oauthFields.state}"
-            />`
-						: ""
-				}
-        ${
 					oauthFields.scope
 						? html`<input
               type="hidden"
               name="scope"
               value="${oauthFields.scope}"
+            />`
+						: ""
+				}
+        ${
+					oauthFields.state
+						? html`<input
+              type="hidden"
+              name="state"
+              value="${oauthFields.state}"
             />`
 						: ""
 				}
