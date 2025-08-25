@@ -64,24 +64,24 @@ const route = app
 				}
 
 				const base64Credentials = authHeader.slice(6); // "Basic " を除去
-				const [clientId, clientSecret, ...rest] = atob(base64Credentials)
-					.split(":")
-					.map((s) => s.trim());
-				if (rest.length > 0 || !clientId || !clientSecret) {
-					// ":" が複数あった場合
+				try {
+					const [clientId, clientSecret] = atob(base64Credentials)
+						.split(":", 2)
+						.map((s) => s.trim());
+					// 変なやつは下ではじかれるのでここでは細かいチェックはしない
+					return { client_id: clientId, client_secret: clientSecret };
+				} catch {
 					return {
 						errorRes: c.json(
 							{
 								error: "invalid_request",
-								error_description: "Invalid Authorization header format",
+								error_description: "Invalid Authorization Header",
 								error_uri: OAUTH_ERROR_URI,
 							},
 							400,
 						),
 					};
 				}
-
-				return { client_id: clientId, client_secret: clientSecret };
 			})();
 			if (errorRes) return errorRes;
 
