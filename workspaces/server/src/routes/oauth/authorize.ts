@@ -410,7 +410,7 @@ const route = app
 				subtitle: clientInfo.name,
 			});
 
-			return c.html(responseHtml);
+			return c.html(`<!DOCTYPE html>${responseHtml}`);
 		},
 	)
 	// OAuth 仕様としては POST も Optional で許容してもよい
