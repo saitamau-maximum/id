@@ -7,28 +7,25 @@ import { createMiddleware } from "hono/factory";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { oauthRoute } from ".";
 import type { HonoEnv } from "../../factory";
-import { CloudflareOAuthInternalRepository } from "../../infrastructure/repository/cloudflare/oauth-internal";
+import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
-	let oauthInternalRepository: CloudflareOAuthInternalRepository;
+	let oauthExternalRepository: CloudflareOAuthExternalRepository;
 
 	beforeEach(() => {
 		vi.useFakeTimers();
 
 		app = new Hono<HonoEnv>();
-		oauthInternalRepository = new CloudflareOAuthInternalRepository(
-			env.DB,
-			env,
-		);
+		oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
 
 		// 環境変数とリポジトリを注入するミドルウェア
 		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
 			c.env = env;
-			c.set("OAuthInternalRepository", oauthInternalRepository);
+			c.set("OAuthExternalRepository", oauthExternalRepository);
 			await next();
 		});
 
@@ -43,6 +40,7 @@ describe("OAuth 2.0 spec", () => {
 		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
+			// console.log(await oauthExternalRepository.getClients());
 			// const res = await app.request(AUTHORIZATION_ENDPOINT);
 			// console.log(await res.text());
 			expect(true).toBe(true);
