@@ -1,16 +1,34 @@
-// OAuth 2.0 の仕様に沿っているかのテスト
-// ref: https://datatracker.ietf.org/doc/html/rfc6749
-
-import { describe, expect, it } from "vitest";
+import type { Context, Next } from "hono";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
 
 describe("OAuth 2.0 spec", () => {
+	beforeEach(() => {
+		vi.useFakeTimers();
+
+		// log 消し
+		vi.mock("hono/logger", () => ({
+			logger: () => (_c: Context, next: Next) => next(),
+		}));
+		// Worker 環境で動かないが、どうせ使わないので mock する
+		// ref: https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#importing-modules-from-global-setup-file
+		vi.mock("wasm-image-optimization", () => ({ default: vi.fn() }));
+		vi.mock("discord-api-types/v10", () => ({ default: vi.fn() }));
+		vi.mock("ics", () => ({ default: vi.fn() }));
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	describe("Authorization Endpoint (common)", () => {
-		it("verifies the identity of the resource owner [MUST]", () => {
+		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
+			// const res = await SELF.fetch("https://example.com/oauth/authorize");
+			// console.log(await res.text());
 			expect(true).toBe(true);
 		});
 
