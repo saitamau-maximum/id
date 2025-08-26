@@ -12,10 +12,21 @@ export default defineWorkersConfig(async () => {
 
 	return {
 		test: {
-			setupFiles: [
-				"./src/tests/import-mocks.ts",
-				"./src/tests/apply-migrations.ts",
-			],
+			setupFiles: ["./src/tests/apply-migrations.ts"],
+			// Error: no such module みたいなのが出てくるので
+			// ref: https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
+			deps: {
+				optimizer: {
+					ssr: {
+						enabled: true,
+						include: [
+							"discord-api-types/v10",
+							"ics",
+							"wasm-image-optimization",
+						],
+					},
+				},
+			},
 			poolOptions: {
 				workers: {
 					singleWorker: true,
