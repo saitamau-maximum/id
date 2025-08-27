@@ -506,6 +506,30 @@ describe("OAuth 2.0 spec", () => {
 				const returnedState = callbackUrl.searchParams.get("state");
 				expect(returnedState).toBe(state);
 			});
+
+			it("returns additional query parameters in the redirect_uri [MUST]", async () => {
+				// 3.1.2 - Redirection Endpoint
+				// The endpoint URI MAY include an "application/x-www-form-urlencoded" formatted (per Appendix B) query component ([RFC3986] Section 3.4), which MUST be retained when adding additional query parameters
+				const { cookie, clientId } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+					redirect_uri: `${DEFAULT_REDIRECT_URI}?foo=bar`,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(app, resText, cookie);
+				const returnedFoo = callbackUrl.searchParams.get("foo");
+				expect(returnedFoo).toBe("bar");
+			});
 		});
 
 		describe("Access Token Request", () => {
