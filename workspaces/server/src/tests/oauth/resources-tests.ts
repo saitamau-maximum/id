@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
-import { assert, describe, expect, it } from "vitest";
-import type { ScopeId } from "../../constants/scope";
+import { assert, describe, expect, it, vi } from "vitest";
+import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import type { IOAuthExternalRepository } from "../../repository/oauth-external";
 import type { IUserRepository } from "../../repository/user";
@@ -83,11 +83,41 @@ export const resourcesOAuth2Test = (params: ResourcesOAuth2TestParams) => {
 
 		describe("Access Token Validation [MUST]", () => {
 			// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
-			it("accepts valid access token", () => {});
+			it("rejects malformed access token", async () => {
+				const res = await params.app.request(params.path, {
+					headers: { Authorization: "Bearer malformed_token" },
+				});
+				expect(res.status).toBe(401);
+			});
 
-			it("rejects expired access token", () => {});
+			it("rejects expired access token", async () => {
+				const accessToken = await getAccessToken(params);
+				// トークンの有効期限は 1h だが余裕をもって 1h1m 後にする
+				vi.advanceTimersByTime(61 * 60 * 1000);
+				const res = await params.app.request(params.path, {
+					headers: { Authorization: `Bearer ${accessToken}` },
+				});
+				expect(res.status).toBe(401);
+			});
 
-			it("rejects access token with insufficient scope", () => {});
+			it("rejects access token with insufficient scope", async () => {
+				if (params.clientScopes.length === 0) {
+					// スコープがない場合はスキップ
+					return;
+				}
+
+				const accessToken = await getAccessToken({
+					...params,
+					// 必要なスコープ以外を付与
+					clientScopes: Object.values(SCOPE_IDS).filter(
+						(scope) => !params.clientScopes.includes(scope),
+					),
+				});
+				const res = await params.app.request(params.path, {
+					headers: { Authorization: `Bearer ${accessToken}` },
+				});
+				expect(res.status).toBe(403);
+			});
 		});
 	});
 };
