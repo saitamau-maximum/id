@@ -608,44 +608,225 @@ describe("OAuth 2.0 spec", () => {
 
 		describe("Access Token Request", () => {
 			// 4.1.3 - Access Token Request
-			it("returns error if grant_type is missing [MUST]", () => {
+			it("returns error if grant_type is missing [MUST]", async () => {
 				// grant_type: REQUIRED.  Value MUST be set to "authorization_code"
-				expect(true).toBe(true);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+
+				const body = new FormData();
+				body.append("code", code);
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes.status).toBe(400);
 			});
 
-			it("returns error if code is missing [MUST]", () => {
+			it("returns error if code is missing [MUST]", async () => {
 				// code: REQUIRED.  The authorization code received from the authorization server.
-				expect(true).toBe(true);
+				const { dummyUserId, oauthClientId } = await doAuthFlow();
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes.status).toBe(400);
 			});
 
-			it("returns error if redirect_uri is missing [MUST]", () => {
+			it("returns error if redirect_uri is missing [MUST]", async () => {
 				// redirect_uri: REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section 4.1.1, and their values MUST be identical.
-				expect(true).toBe(true);
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					redirect_uri: DEFAULT_REDIRECT_URI,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: validUserCookie } },
+				);
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				const code = callbackUrl.searchParams.get("code");
+				assert.isNotNull(code);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes.status).toBe(400);
 			});
 
-			it("returns error if redirect_uri is not same [MUST]", () => {
+			it("returns error if redirect_uri is not same [MUST]", async () => {
 				// redirect_uri: REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section 4.1.1, and their values MUST be identical.
-				expect(true).toBe(true);
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					redirect_uri: DEFAULT_REDIRECT_URI,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: validUserCookie } },
+				);
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				const code = callbackUrl.searchParams.get("code");
+				assert.isNotNull(code);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+				body.append("redirect_uri", `${DEFAULT_REDIRECT_URI}/different`);
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes.status).toBe(400);
 			});
 
 			describe("Client Authentication", () => {
-				it("supports Authorization Header field [MUST]", () => {
+				it("supports Authorization Header field [MUST]", async () => {
 					// 2.3.1 - Client Password
 					// The authorization server MUST support the HTTP Basic authentication scheme for authenticating clients that were issued a client password.
-					expect(true).toBe(true);
+					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+					const oauthClientSecret =
+						await oauthExternalRepository.generateClientSecret(
+							oauthClientId,
+							dummyUserId,
+						);
+
+					const body = new FormData();
+					body.append("grant_type", "authorization_code");
+					body.append("code", code);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+						headers: {
+							Authorization: getClientAuthHeader(
+								oauthClientId,
+								oauthClientSecret,
+							),
+						},
+					});
+					expect(tokenRes.status).toBe(200);
 				});
 
-				it("supports including client credentials in the request-body [MAY]", () => {
+				it("supports including client credentials in the request-body [MAY]", async () => {
 					// 2.3.1 - Client Password
 					// Alternatively, the authorization server MAY support including the client credentials in the request-body using the following parameters: client_id, client_secret
-					expect(true).toBe(true);
+					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+					const oauthClientSecret =
+						await oauthExternalRepository.generateClientSecret(
+							oauthClientId,
+							dummyUserId,
+						);
+
+					const body = new FormData();
+					body.append("grant_type", "authorization_code");
+					body.append("code", code);
+					body.append("client_id", oauthClientId);
+					body.append("client_secret", oauthClientSecret);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+					});
+					expect(tokenRes.status).toBe(200);
 				});
 			});
 
-			it("ensures the authorization code was issued to the authenticated client [MUST]", () => {
+			it("ensures the authorization code was issued to the authenticated client [MUST]", async () => {
 				// The authorization server MUST:
 				// ensure that the authorization code was issued to the authenticated confidential client
-				expect(true).toBe(true);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+				const differentClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const differentClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						differentClientId,
+						dummyUserId,
+					);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+				body.append("client_id", differentClientId);
+				body.append("client_secret", differentClientSecret);
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+				});
+				expect(tokenRes.status).toBe(401);
 			});
 		});
 	});
