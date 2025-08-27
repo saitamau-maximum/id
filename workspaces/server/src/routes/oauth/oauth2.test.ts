@@ -3,29 +3,76 @@
 
 import { env } from "cloudflare:test";
 import { Hono } from "hono";
+import { generateSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
+import { sign } from "hono/jwt";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { oauthRoute } from ".";
+import { COOKIE_NAME } from "../../constants/cookie";
+import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
+import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
+const JWT_EXPIRATION = 300; // 5 minutes
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
 	let oauthExternalRepository: CloudflareOAuthExternalRepository;
+	let userRepository: CloudflareUserRepository;
+	let validUserCookie: string;
+	let registerOAuthClient: (
+		scopes: ScopeId[],
+		callbackUrls: string[],
+	) => Promise<string>;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		vi.useFakeTimers();
 
 		app = new Hono<HonoEnv>();
 		oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
+		userRepository = new CloudflareUserRepository(env.DB);
+
+		// ユーザーが存在しないと OAuth App を登録できないのでユーザー作成
+		const userId = await userRepository.createUser({});
+		// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
+		await userRepository.registerUser(userId, {});
+
+		const now = Math.floor(Date.now() / 1000);
+		const jwt = await sign(
+			{
+				userId,
+				iat: now,
+				exp: now + JWT_EXPIRATION,
+			},
+			env.SECRET,
+		);
+
+		validUserCookie = (
+			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
+		).split(";")[0]; // "key=value; Path=/; ..." になっているので key=value だけ取り出す
+
+		registerOAuthClient = async (scopes: ScopeId[], callbackUrls: string[]) => {
+			const clientId = crypto.randomUUID();
+			await oauthExternalRepository.registerClient(
+				clientId,
+				userId,
+				"Dummy App",
+				"Dummy App Description",
+				scopes,
+				callbackUrls,
+				null,
+			);
+			return clientId;
+		};
 
 		// 環境変数とリポジトリを注入するミドルウェア
 		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
 			c.env = env;
 			c.set("OAuthExternalRepository", oauthExternalRepository);
+			c.set("UserRepository", userRepository);
 			await next();
 		});
 
@@ -40,10 +87,36 @@ describe("OAuth 2.0 spec", () => {
 		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
-			// console.log(await oauthExternalRepository.getClients());
-			// const res = await app.request(AUTHORIZATION_ENDPOINT);
-			// console.log(await res.text());
-			expect(true).toBe(true);
+
+			const oauthClientId = await registerOAuthClient(
+				[SCOPE_IDS.READ_BASIC_INFO],
+				["https://idp.test/oauth/callback"],
+			);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+
+			// 未ログインならログインページにリダイレクトされる
+			const res1 = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+			);
+			expect(res1.status).toBe(302);
+			const redirectUrl = res1.headers.get("Location") || "";
+			expect(redirectUrl).contains(`${env.CLIENT_ORIGIN}/login`);
+
+			// ログイン済みなら認可画面へ
+			const res2 = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+			const resText = await res2.text();
+			expect(res2.status).toBe(200);
+			expect(resText).contains("Dummy App");
 		});
 
 		it("supports the HTTP GET method [MUST]", () => {
