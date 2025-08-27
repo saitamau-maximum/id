@@ -14,7 +14,7 @@ import {
 	vi,
 } from "vitest";
 import { oauthRoute } from ".";
-import { SCOPE_IDS } from "../../constants/scope";
+import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
@@ -23,8 +23,7 @@ import {
 	DEFAULT_REDIRECT_URI,
 	TOKEN_ENDPOINT,
 	authorize,
-	generateUserId,
-	getUserSessionCookie,
+	oauthTestsCommonSetup,
 	registerOAuthClient,
 } from "../../tests/oauth/utils";
 import type { TokenResponse } from "./accessToken";
@@ -34,6 +33,15 @@ describe("OAuth 2.0 spec", () => {
 
 	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
 	const userRepository = new CloudflareUserRepository(env.DB);
+
+	// wrapper
+	const setup = (scopes: ScopeId[], callbackUrls: string[]) =>
+		oauthTestsCommonSetup(
+			oauthExternalRepository,
+			userRepository,
+			scopes,
+			callbackUrls,
+		);
 
 	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
 		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
@@ -46,43 +54,36 @@ describe("OAuth 2.0 spec", () => {
 	 * 3. Redirect URI に返ってくる
 	 */
 	const doAuthFlow = async () => {
-		const dummyUserId = await generateUserId(userRepository);
-		const validUserCookie = await getUserSessionCookie(dummyUserId);
-		const oauthClientId = await registerOAuthClient(
-			oauthExternalRepository,
-			dummyUserId,
+		const { userId, cookie, clientId } = await setup(
 			[SCOPE_IDS.READ_BASIC_INFO],
 			[DEFAULT_REDIRECT_URI],
 		);
 		const params = new URLSearchParams({
 			response_type: "code",
-			client_id: oauthClientId,
+			client_id: clientId,
 		});
 		const res = await app.request(
 			`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-			{ headers: { Cookie: validUserCookie } },
+			{ headers: { Cookie: cookie } },
 		);
 
 		expect(res.status).toBe(200);
 		const resText = await res.text();
-		const callbackUrl = await authorize(app, resText, validUserCookie);
+		const callbackUrl = await authorize(app, resText, cookie);
 		const code = callbackUrl.searchParams.get("code");
 		assert.isNotNull(code);
 
 		return {
-			dummyUserId,
-			oauthClientId,
+			userId,
+			clientId,
 			code,
 		};
 	};
 
 	const doAccessTokenRequest = async () => {
-		const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+		const { userId, clientId, code } = await doAuthFlow();
 		const oauthClientSecret =
-			await oauthExternalRepository.generateClientSecret(
-				oauthClientId,
-				dummyUserId,
-			);
+			await oauthExternalRepository.generateClientSecret(clientId, userId);
 		const body = new FormData();
 		body.append("grant_type", "authorization_code");
 		body.append("code", code);
@@ -90,7 +91,7 @@ describe("OAuth 2.0 spec", () => {
 			method: "POST",
 			body,
 			headers: {
-				Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 			},
 		});
 		return tokenRes;
@@ -120,17 +121,13 @@ describe("OAuth 2.0 spec", () => {
 		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
-			const dummyUserId = await generateUserId(userRepository);
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				oauthExternalRepository,
-				dummyUserId,
+			const { userId, cookie, clientId } = await setup(
 				[SCOPE_IDS.READ_BASIC_INFO],
 				[DEFAULT_REDIRECT_URI],
 			);
 			const params = new URLSearchParams({
 				response_type: "code",
-				client_id: oauthClientId,
+				client_id: clientId,
 			});
 
 			// 未ログインならログインページにリダイレクトされる
@@ -144,7 +141,7 @@ describe("OAuth 2.0 spec", () => {
 			// ログイン済みなら認可画面へ
 			const res2 = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
+				{ headers: { Cookie: cookie } },
 			);
 			const resText = await res2.text();
 			expect(res2.status).toBe(200);
@@ -170,18 +167,14 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the response_type is missing [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
-				const params = new URLSearchParams({ client_id: oauthClientId });
+				const params = new URLSearchParams({ client_id: clientId });
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(302);
 				const redirectUrl = res.headers.get("Location") || "";
@@ -191,21 +184,17 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error for unsupported response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "foobar",
-					client_id: oauthClientId,
+					client_id: clientId,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(302);
 				const redirectUrl = res.headers.get("Location") || "";
@@ -217,35 +206,31 @@ describe("OAuth 2.0 spec", () => {
 				// Extension response types MAY contain a space-delimited (%x20) list of values, where the order of values does not matter
 				const nonce = "random-nonce";
 
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
-					// OpenID にしないと token id_token が使えない
+				// OpenID にしないと token id_token が使えない
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.OPENID],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const params1 = new URLSearchParams({
 					response_type: "id_token token",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: DEFAULT_REDIRECT_URI,
 					nonce,
 				});
 				const params2 = new URLSearchParams({
 					response_type: "token id_token",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: DEFAULT_REDIRECT_URI,
 					nonce,
 				});
 
 				const res1 = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params1.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				const res2 = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params2.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 
 				// text までチェックすると <input type="hidden" name="response_type" value=""> の値が違うので落ちる
@@ -262,22 +247,18 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri is not an absolute URI [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The redirection endpoint URI MUST be an absolute URI as defined by [RFC3986] Section 4.3.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: "/invalid",
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -285,22 +266,18 @@ describe("OAuth 2.0 spec", () => {
 			it("returns error if the redirect_uri includes a fragment component [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The endpoint URI MUST NOT include a fragment component
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: `${DEFAULT_REDIRECT_URI}#fragment`,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -308,21 +285,17 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if no redirection URI was pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// ... if not redirection URI has been registered, the client MUST include a redirection URI
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -330,21 +303,17 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if multiple redirection URIs were pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// It multiple redirection URIs have been registered..., the client MUST include a redirection URI
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[`${DEFAULT_REDIRECT_URI}1`, `${DEFAULT_REDIRECT_URI}2`],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -352,22 +321,18 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri does not match the pre-registered value [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[`${DEFAULT_REDIRECT_URI}1`],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: `${DEFAULT_REDIRECT_URI}2`,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -376,21 +341,17 @@ describe("OAuth 2.0 spec", () => {
 		it("processes the request when omitting the scope parameter [MUST]", async () => {
 			// 3.3 - Access Token Scope
 			// If the client omits the scope parameter when requesting authorization, the authorization server MUST either process the request using a pre-defined default value or fail the request indicating an invalid scope.
-			const dummyUserId = await generateUserId(userRepository);
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				oauthExternalRepository,
-				dummyUserId,
+			const { userId, cookie, clientId } = await setup(
 				[SCOPE_IDS.READ_BASIC_INFO],
 				[DEFAULT_REDIRECT_URI],
 			);
 			const params = new URLSearchParams({
 				response_type: "code",
-				client_id: oauthClientId,
+				client_id: clientId,
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
+				{ headers: { Cookie: cookie } },
 			);
 			expect(res.status).toBe(200);
 		});
@@ -413,33 +374,31 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.1 - Authorization Request
 			it("returns error if client_id is missing [MUST]", async () => {
 				// client_id: REQUIRED.  The client identifier as described in Section 2.2.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const { cookie } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
 				const params = new URLSearchParams({ response_type: "code" });
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(400);
 			});
 
 			it("accepts response_type=code [MUST]", async () => {
 				// response_type: REQUIRED.  Value MUST be set to "code"
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(200);
 			});
@@ -449,26 +408,22 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.2 - Authorization Response
 			it("returns authorization code [MUST]", async () => {
 				// code: REQUIRED
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, validUserCookie);
+				const callbackUrl = await authorize(app, resText, cookie);
 				expect(callbackUrl.origin + callbackUrl.pathname).toBe(
 					DEFAULT_REDIRECT_URI,
 				);
@@ -477,12 +432,9 @@ describe("OAuth 2.0 spec", () => {
 
 			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const { userId, clientId, code } = await doAuthFlow();
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 
 				// 一応 11 分進める
 				vi.advanceTimersByTime(11 * 60 * 1000);
@@ -494,10 +446,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes.status).toBe(401);
@@ -506,12 +455,9 @@ describe("OAuth 2.0 spec", () => {
 			it("expires code after single use [MUST]", async () => {
 				// The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
 				// If an authorization code is used more than once, the authorization server MUST deny the request
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const { userId, clientId, code } = await doAuthFlow();
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 
 				const body = new FormData();
 				body.append("grant_type", "authorization_code");
@@ -521,10 +467,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes1.status).toBe(200);
@@ -533,10 +476,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes2.status).toBe(401);
@@ -546,27 +486,23 @@ describe("OAuth 2.0 spec", () => {
 				// state: REQUIRED if the "state" parameter was present in the client authorization request.  The exact value received from the client.
 				const state = "random-state";
 
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					state,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, validUserCookie);
+				const callbackUrl = await authorize(app, resText, cookie);
 				const returnedState = callbackUrl.searchParams.get("state");
 				expect(returnedState).toBe(state);
 			});
@@ -576,12 +512,9 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.3 - Access Token Request
 			it("returns error if grant_type is missing [MUST]", async () => {
 				// grant_type: REQUIRED.  Value MUST be set to "authorization_code"
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const { userId, clientId, code } = await doAuthFlow();
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 
 				const body = new FormData();
 				body.append("code", code);
@@ -589,10 +522,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes.status).toBe(400);
@@ -600,12 +530,9 @@ describe("OAuth 2.0 spec", () => {
 
 			it("returns error if code is missing [MUST]", async () => {
 				// code: REQUIRED.  The authorization code received from the authorization server.
-				const { dummyUserId, oauthClientId } = await doAuthFlow();
+				const { userId, clientId } = await doAuthFlow();
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 
 				const body = new FormData();
 				body.append("grant_type", "authorization_code");
@@ -613,10 +540,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes.status).toBe(400);
@@ -624,31 +548,24 @@ describe("OAuth 2.0 spec", () => {
 
 			it("returns error if redirect_uri is missing [MUST]", async () => {
 				// redirect_uri: REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section 4.1.1, and their values MUST be identical.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: DEFAULT_REDIRECT_URI,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, validUserCookie);
+				const callbackUrl = await authorize(app, resText, cookie);
 				const code = callbackUrl.searchParams.get("code");
 				assert.isNotNull(code);
 
@@ -659,10 +576,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes.status).toBe(400);
@@ -670,31 +584,24 @@ describe("OAuth 2.0 spec", () => {
 
 			it("returns error if redirect_uri is not same [MUST]", async () => {
 				// redirect_uri: REQUIRED, if the "redirect_uri" parameter was included in the authorization request as described in Section 4.1.1, and their values MUST be identical.
-				const dummyUserId = await generateUserId(userRepository);
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					dummyUserId,
+				const { userId, cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 				const params = new URLSearchParams({
 					response_type: "code",
-					client_id: oauthClientId,
+					client_id: clientId,
 					redirect_uri: DEFAULT_REDIRECT_URI,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
+					{ headers: { Cookie: cookie } },
 				);
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, validUserCookie);
+				const callbackUrl = await authorize(app, resText, cookie);
 				const code = callbackUrl.searchParams.get("code");
 				assert.isNotNull(code);
 
@@ -706,10 +613,7 @@ describe("OAuth 2.0 spec", () => {
 					method: "POST",
 					body,
 					headers: {
-						Authorization: getClientAuthHeader(
-							oauthClientId,
-							oauthClientSecret,
-						),
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 					},
 				});
 				expect(tokenRes.status).toBe(400);
@@ -719,11 +623,11 @@ describe("OAuth 2.0 spec", () => {
 				it("supports Authorization Header field [MUST]", async () => {
 					// 2.3.1 - Client Password
 					// The authorization server MUST support the HTTP Basic authentication scheme for authenticating clients that were issued a client password.
-					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+					const { userId, clientId, code } = await doAuthFlow();
 					const oauthClientSecret =
 						await oauthExternalRepository.generateClientSecret(
-							oauthClientId,
-							dummyUserId,
+							clientId,
+							userId,
 						);
 
 					const body = new FormData();
@@ -733,10 +637,7 @@ describe("OAuth 2.0 spec", () => {
 						method: "POST",
 						body,
 						headers: {
-							Authorization: getClientAuthHeader(
-								oauthClientId,
-								oauthClientSecret,
-							),
+							Authorization: getClientAuthHeader(clientId, oauthClientSecret),
 						},
 					});
 					expect(tokenRes.status).toBe(200);
@@ -745,17 +646,17 @@ describe("OAuth 2.0 spec", () => {
 				it("supports including client credentials in the request-body [MAY]", async () => {
 					// 2.3.1 - Client Password
 					// Alternatively, the authorization server MAY support including the client credentials in the request-body using the following parameters: client_id, client_secret
-					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+					const { userId, clientId, code } = await doAuthFlow();
 					const oauthClientSecret =
 						await oauthExternalRepository.generateClientSecret(
-							oauthClientId,
-							dummyUserId,
+							clientId,
+							userId,
 						);
 
 					const body = new FormData();
 					body.append("grant_type", "authorization_code");
 					body.append("code", code);
-					body.append("client_id", oauthClientId);
+					body.append("client_id", clientId);
 					body.append("client_secret", oauthClientSecret);
 					const tokenRes = await app.request(TOKEN_ENDPOINT, {
 						method: "POST",
@@ -768,22 +669,19 @@ describe("OAuth 2.0 spec", () => {
 			it("ensures the authorization code was issued to the authenticated client [MUST]", async () => {
 				// The authorization server MUST:
 				// ensure that the authorization code was issued to the authenticated confidential client
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+				const { userId, clientId, code } = await doAuthFlow();
 				const oauthClientSecret =
-					await oauthExternalRepository.generateClientSecret(
-						oauthClientId,
-						dummyUserId,
-					);
+					await oauthExternalRepository.generateClientSecret(clientId, userId);
 				const differentClientId = await registerOAuthClient(
 					oauthExternalRepository,
-					dummyUserId,
+					userId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
 				const differentClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						differentClientId,
-						dummyUserId,
+						userId,
 					);
 
 				const body = new FormData();

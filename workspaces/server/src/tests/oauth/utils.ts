@@ -14,29 +14,6 @@ export const TOKEN_ENDPOINT = "/oauth/access-token";
 export const JWT_EXPIRATION = 300; // 5 minutes for test
 export const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 
-export const generateUserId = async (userRepository: IUserRepository) => {
-	// ユーザーが存在しないと OAuth App を登録できないのでユーザー作成
-	const dummyUserId = await userRepository.createUser({});
-	// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
-	await userRepository.registerUser(dummyUserId, {});
-	return dummyUserId;
-};
-
-export const getUserSessionCookie = async (userId: string) => {
-	const now = Math.floor(Date.now() / 1000);
-	const jwt = await sign(
-		{
-			userId,
-			iat: now,
-			exp: now + JWT_EXPIRATION,
-		},
-		env.SECRET,
-	);
-	return (
-		await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
-	).split(";")[0]; // "key=value; Path=/; ..." になっているので key=value だけ取り出す
-};
-
 export const registerOAuthClient = async (
 	oauthExternalRepository: IOAuthExternalRepository,
 	userId: string,
@@ -54,6 +31,44 @@ export const registerOAuthClient = async (
 		null,
 	);
 	return clientId;
+};
+
+export const oauthTestsCommonSetup = async (
+	oauthExternalRepository: IOAuthExternalRepository,
+	userRepository: IUserRepository,
+	scopes: ScopeId[],
+	callbackUrls: string[],
+) => {
+	// ユーザー作成
+	// ユーザーが存在しないと OAuth App を登録できない
+	const userId = await userRepository.createUser({});
+	// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
+	await userRepository.registerUser(userId, {});
+
+	// Cookie 生成
+	const now = Math.floor(Date.now() / 1000);
+	const jwt = await sign(
+		{
+			userId,
+			iat: now,
+			exp: now + JWT_EXPIRATION,
+		},
+		env.SECRET,
+	);
+	// "key=value; Path=/; ..." になっているので key=value だけ取り出す
+	const cookie = (
+		await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
+	).split(";")[0];
+
+	// OAuth Client 登録
+	const clientId = await registerOAuthClient(
+		oauthExternalRepository,
+		userId,
+		scopes,
+		callbackUrls,
+	);
+
+	return { userId, cookie, clientId };
 };
 
 /**

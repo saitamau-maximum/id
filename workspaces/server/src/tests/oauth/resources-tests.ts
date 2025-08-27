@@ -10,9 +10,7 @@ import {
 	DEFAULT_REDIRECT_URI,
 	TOKEN_ENDPOINT,
 	authorize,
-	generateUserId,
-	getUserSessionCookie,
-	registerOAuthClient,
+	oauthTestsCommonSetup,
 } from "./utils";
 
 export interface ResourcesOAuth2TestParams {
@@ -29,11 +27,9 @@ export const getAccessToken = async ({
 	clientScopes,
 	app,
 }: Omit<ResourcesOAuth2TestParams, "path">) => {
-	const dummyUserId = await generateUserId(userRepository);
-	const validUserCookie = await getUserSessionCookie(dummyUserId);
-	const oauthClientId = await registerOAuthClient(
+	const { userId, cookie, clientId } = await oauthTestsCommonSetup(
 		oauthExternalRepository,
-		dummyUserId,
+		userRepository,
 		clientScopes,
 		[DEFAULT_REDIRECT_URI],
 	);
@@ -41,26 +37,26 @@ export const getAccessToken = async ({
 	// Authorization Request
 	const param = new URLSearchParams({
 		response_type: "code",
-		client_id: oauthClientId,
+		client_id: clientId,
 	});
 	const authRes = await app.request(
 		`${AUTHORIZATION_ENDPOINT}?${param.toString()}`,
-		{ headers: { Cookie: validUserCookie } },
+		{ headers: { Cookie: cookie } },
 	);
 	const authResText = await authRes.text();
-	const callbackUrl = await authorize(app, authResText, validUserCookie);
+	const callbackUrl = await authorize(app, authResText, cookie);
 	const code = callbackUrl.searchParams.get("code");
 	assert.isNotNull(code);
 
 	// Access Token Request
 	const oauthClientSecret = await oauthExternalRepository.generateClientSecret(
-		oauthClientId,
-		dummyUserId,
+		clientId,
+		userId,
 	);
 	const tokenParams = new URLSearchParams({
 		grant_type: "authorization_code",
 		code,
-		client_id: oauthClientId,
+		client_id: clientId,
 		client_secret: oauthClientSecret,
 	});
 	const tokenRes = await app.request(TOKEN_ENDPOINT, {
