@@ -541,20 +541,157 @@ describe("OAuth 2.0 spec", () => {
 				expect(callbackUrl.searchParams.has("code")).toBe(true);
 			});
 
-			it("expires code after 10 minutes [RECOMMENDED]", () => {
+			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
-				expect(true).toBe(true);
+				const redirectUri = "https://idp.test/oauth/callback";
+
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[redirectUri],
+				);
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				const code = callbackUrl.searchParams.get("code");
+				assert.isNotNull(code);
+
+				// 一応 11 分進める
+				vi.advanceTimersByTime(11 * 60 * 1000);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+				const tokenRes = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes.status).toBe(401);
 			});
 
-			it("expires code after single use [MUST]", () => {
+			it("expires code after single use [MUST]", async () => {
 				// The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
 				// If an authorization code is used more than once, the authorization server MUST deny the request
-				expect(true).toBe(true);
+
+				const redirectUri = "https://idp.test/oauth/callback";
+
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[redirectUri],
+				);
+				const oauthClientSecret =
+					await oauthExternalRepository.generateClientSecret(
+						oauthClientId,
+						dummyUserId,
+					);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				const code = callbackUrl.searchParams.get("code");
+				assert.isNotNull(code);
+
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+
+				const tokenRes1 = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes1.status).toBe(200);
+
+				const tokenRes2 = await app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(
+							oauthClientId,
+							oauthClientSecret,
+						),
+					},
+				});
+				expect(tokenRes2.status).toBe(401);
 			});
 
-			it("returns state if provided in the request [MUST]", () => {
+			it("returns state if provided in the request [MUST]", async () => {
 				// state: REQUIRED if the "state" parameter was present in the client authorization request.  The exact value received from the client.
-				expect(true).toBe(true);
+				const redirectUri = "https://idp.test/oauth/callback";
+				const state = "random-state";
+
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[redirectUri],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					state,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				const returnedState = callbackUrl.searchParams.get("state");
+				expect(returnedState).toBe(state);
 			});
 		});
 
