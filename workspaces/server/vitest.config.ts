@@ -29,6 +29,8 @@ export default defineWorkersConfig(async () => {
 			},
 			poolOptions: {
 				workers: {
+					// Failed to pop isolated storage stack frame が出てくるので singleWorker, sharedStorage にする
+					// ref: https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#isolated-storage
 					singleWorker: true,
 					isolatedStorage: false,
 					wrangler: { configPath: "./wrangler.toml" },

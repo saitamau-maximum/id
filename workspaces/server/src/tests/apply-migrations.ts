@@ -2,6 +2,7 @@
 
 import { applyD1Migrations, env } from "cloudflare:test";
 
+// ここでしか TEST_MIGRATIONS を使わないので export しない
 declare module "cloudflare:test" {
 	interface ProvidedEnv extends Env {
 		TEST_MIGRATIONS: D1Migration[];
