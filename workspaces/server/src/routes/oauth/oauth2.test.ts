@@ -687,13 +687,21 @@ describe("OAuth 2.0 spec", () => {
 				const body = new FormData();
 				body.append("grant_type", "authorization_code");
 				body.append("code", code);
-				body.append("client_id", differentClientId);
-				body.append("client_secret", differentClientSecret);
-				const tokenRes = await app.request(TOKEN_ENDPOINT, {
-					method: "POST",
-					body,
-				});
-				expect(tokenRes.status).toBe(401);
+
+				// 正しい組み合わせ以外全探索
+				for (const [id, sec] of [
+					[clientId, differentClientSecret],
+					[differentClientId, oauthClientSecret],
+					[differentClientId, differentClientSecret],
+				]) {
+					body.set("client_id", id);
+					body.set("client_secret", sec);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+					});
+					expect(tokenRes.status).toBe(401);
+				}
 			});
 		});
 	});
