@@ -6,13 +6,22 @@ import { Hono } from "hono";
 import { generateSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { sign } from "hono/jwt";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+	assert,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from "vitest";
 import { oauthRoute } from ".";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
+import type { TokenResponse } from "./accessToken";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
@@ -67,6 +76,34 @@ describe("OAuth 2.0 spec", () => {
 
 	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
 		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
+	};
+
+	/**
+	 * 認可画面で「承認する」を押してリダイレクトされるまでの処理を模擬する
+	 * @param html - Authorization Endpoint のレスポンス HTML
+	 * @returns リダイレクト先 URL (redirect_uri)
+	 */
+	const authorize = async (html: string, cookie: string): Promise<URL> => {
+		const postTo = html.match(/<form .*? action="(.*?)"/)?.[1];
+		const inputs = Object.fromEntries(
+			[...html.matchAll(/<input .*? name="(.*?)" value="(.*?)"/g)].map((m) => [
+				m[1],
+				m[2],
+			]),
+		);
+		inputs.authorized = "1"; // 承認する
+		const res = await app.request(postTo || "", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Cookie: cookie,
+			},
+			body: new URLSearchParams(inputs).toString(),
+		});
+		expect(res.status).toBe(302);
+		const redirectUrl = res.headers.get("Location");
+		assert.isNotNull(redirectUrl);
+		return new URL(redirectUrl);
 	};
 
 	beforeEach(async () => {
@@ -473,9 +510,35 @@ describe("OAuth 2.0 spec", () => {
 
 		describe("Authorization Response", () => {
 			// 4.1.2 - Authorization Response
-			it("returns authorization code [MUST]", () => {
+			it("returns authorization code [MUST]", async () => {
 				// code: REQUIRED
-				expect(true).toBe(true);
+				const redirectUri = "https://idp.test/oauth/callback";
+
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[redirectUri],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+
+				expect(res.status).toBe(200);
+				const resText = await res.text();
+				const callbackUrl = await authorize(resText, validUserCookie);
+				expect(callbackUrl.origin + callbackUrl.pathname).toBe(redirectUri);
+				expect(callbackUrl.searchParams.has("code")).toBe(true);
 			});
 
 			it("expires code after 10 minutes [RECOMMENDED]", () => {
@@ -543,37 +606,347 @@ describe("OAuth 2.0 spec", () => {
 		// 5 - Issuing an Access Token
 
 		// 5.1 - Successful Response
-		it("returns 200 OK [MUST]", () => {
-			expect(true).toBe(true);
+		it("returns 200 OK [MUST]", async () => {
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			expect(tokenRes.status).toBe(200);
 		});
 
-		it("returns access_token [MUST]", () => {
+		it("returns access_token [MUST]", async () => {
 			// access_token: REQUIRED.  The access token issued by the authorization server.
-			expect(true).toBe(true);
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			const tokenResJson = await tokenRes.json<TokenResponse>();
+			expect(tokenResJson).toHaveProperty("access_token");
+			expect(tokenResJson.access_token).toBeTypeOf("string");
 		});
 
-		it("returns token_type [MUST]", () => {
+		it("returns token_type [MUST]", async () => {
 			// token_type: REQUIRED.  The type of the token issued as described in Section 7.1.  Value is case insensitive.
-			expect(true).toBe(true);
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			const tokenResJson = await tokenRes.json<TokenResponse>();
+			expect(tokenResJson).toHaveProperty("token_type");
+			expect(tokenResJson.token_type).toMatch(/bearer/i); // case insensitive
 		});
 
-		it("returns expires_in [RECOMMENDED]", () => {
+		it("returns expires_in [RECOMMENDED]", async () => {
 			// expires_in: RECOMMENDED.  The lifetime in seconds of the access token.
-			expect(true).toBe(true);
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			const tokenResJson = await tokenRes.json<TokenResponse>();
+			expect(tokenResJson).toHaveProperty("expires_in");
+			expect(tokenResJson.expires_in).toBeTypeOf("number");
 		});
 
-		it("returns scope [OPTIONAL]", () => {
-			expect(true).toBe(true);
+		it("returns scope [OPTIONAL]", async () => {
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			const tokenResJson = await tokenRes.json<TokenResponse>();
+			expect(tokenResJson).toHaveProperty("scope");
+			expect(tokenResJson.scope).toBeTypeOf("string");
 		});
 
-		it("returns with application/json Content-Type [MUST]", () => {
+		it("returns with application/json Content-Type [MUST]", async () => {
 			//  The parameters are included in the entity-body of the HTTP response using the "application/json" media type as defined by [RFC4627].
-			expect(true).toBe(true);
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			expect(tokenRes.headers.get("Content-Type")).toBe("application/json");
 		});
 
-		it("returns with no-cache headers [MUST]", () => {
+		it("returns with no-cache headers [MUST]", async () => {
 			// The authorization server MUST include the HTTP "Cache-Control" response header field [RFC2616] with a value of "no-store" in any response containing tokens, credentials, or other sensitive information, as well as the "Pragma" response header field [RFC2616] with a value of "no-cache".
-			expect(true).toBe(true);
+			const redirectUri = "https://idp.test/oauth/callback";
+
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				[redirectUri],
+			);
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(
+					oauthClientId,
+					dummyUserId,
+				);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+
+			expect(res.status).toBe(200);
+			const resText = await res.text();
+			const callbackUrl = await authorize(resText, validUserCookie);
+			const code = callbackUrl.searchParams.get("code");
+			assert.isNotNull(code);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+				},
+			});
+			expect(tokenRes.headers.get("Cache-Control")).toBe("no-store");
+			expect(tokenRes.headers.get("Pragma")).toBe("no-cache");
 		});
 	});
 
