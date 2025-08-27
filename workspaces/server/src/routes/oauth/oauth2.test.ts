@@ -20,26 +20,19 @@ const JWT_EXPIRATION = 300; // 5 minutes
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
-	let oauthExternalRepository: CloudflareOAuthExternalRepository;
-	let userRepository: CloudflareUserRepository;
-	let validUserCookie: string;
-	let registerOAuthClient: (
-		scopes: ScopeId[],
-		callbackUrls: string[],
-	) => Promise<string>;
 
-	beforeEach(async () => {
-		vi.useFakeTimers();
+	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
+	const userRepository = new CloudflareUserRepository(env.DB);
 
-		app = new Hono<HonoEnv>();
-		oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
-		userRepository = new CloudflareUserRepository(env.DB);
-
+	const generateUserId = async () => {
 		// ユーザーが存在しないと OAuth App を登録できないのでユーザー作成
-		const userId = await userRepository.createUser({});
+		const dummyUserId = await userRepository.createUser({});
 		// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
-		await userRepository.registerUser(userId, {});
+		await userRepository.registerUser(dummyUserId, {});
+		return dummyUserId;
+	};
 
+	const getUserSessionCookie = async (userId: string) => {
 		const now = Math.floor(Date.now() / 1000);
 		const jwt = await sign(
 			{
@@ -49,24 +42,37 @@ describe("OAuth 2.0 spec", () => {
 			},
 			env.SECRET,
 		);
-
-		validUserCookie = (
+		return (
 			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
 		).split(";")[0]; // "key=value; Path=/; ..." になっているので key=value だけ取り出す
+	};
 
-		registerOAuthClient = async (scopes: ScopeId[], callbackUrls: string[]) => {
-			const clientId = crypto.randomUUID();
-			await oauthExternalRepository.registerClient(
-				clientId,
-				userId,
-				"Dummy App",
-				"Dummy App Description",
-				scopes,
-				callbackUrls,
-				null,
-			);
-			return clientId;
-		};
+	const registerOAuthClient = async (
+		userId: string,
+		scopes: ScopeId[],
+		callbackUrls: string[],
+	) => {
+		const clientId = crypto.randomUUID();
+		await oauthExternalRepository.registerClient(
+			clientId,
+			userId,
+			"Dummy App",
+			"Dummy App Description",
+			scopes,
+			callbackUrls,
+			null,
+		);
+		return clientId;
+	};
+
+	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
+		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
+	};
+
+	beforeEach(async () => {
+		vi.useFakeTimers();
+
+		app = new Hono<HonoEnv>();
 
 		// 環境変数とリポジトリを注入するミドルウェア
 		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
@@ -88,7 +94,10 @@ describe("OAuth 2.0 spec", () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
 
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
 				["https://idp.test/oauth/callback"],
 			);
@@ -138,7 +147,10 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the response_type is missing [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					["https://idp.test/oauth/callback"],
 				);
@@ -163,7 +175,10 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error for unsupported response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					["https://idp.test/oauth/callback"],
 				);
@@ -185,13 +200,16 @@ describe("OAuth 2.0 spec", () => {
 				expect(redirectUrl).contains("error=unsupported_response_type");
 			});
 
-			it("does not matter the order of space-delimited response_type values [MUST]", async () => {
+			it("does not care the order of space-delimited response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// Extension response types MAY contain a space-delimited (%x20) list of values, where the order of values does not matter
 				const redirectUri = "https://idp.test/oauth/callback";
 				const nonce = "random-nonce";
 
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					// OpenID にしないと token id_token が使えない
 					[SCOPE_IDS.OPENID],
 					[redirectUri],
@@ -240,7 +258,10 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri is not an absolute URI [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The redirection endpoint URI MUST be an absolute URI as defined by [RFC3986] Section 4.3.
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -263,7 +284,10 @@ describe("OAuth 2.0 spec", () => {
 			it("returns error if the redirect_uri includes a fragment component [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The endpoint URI MUST NOT include a fragment component
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -286,7 +310,10 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if no redirection URI was pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// ... if not redirection URI has been registered, the client MUST include a redirection URI
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -308,7 +335,10 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if multiple redirection URIs were pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// It multiple redirection URIs have been registered..., the client MUST include a redirection URI
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[
 						"https://idp.test/oauth/callback1",
@@ -333,7 +363,10 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri does not match the pre-registered value [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
 					["https://idp.test/oauth/callback1"],
 				);
