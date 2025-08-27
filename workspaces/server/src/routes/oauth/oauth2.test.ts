@@ -121,7 +121,7 @@ describe("OAuth 2.0 spec", () => {
 		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
-			const { userId, cookie, clientId } = await setup(
+			const { cookie, clientId } = await setup(
 				[SCOPE_IDS.READ_BASIC_INFO],
 				[DEFAULT_REDIRECT_URI],
 			);
@@ -167,7 +167,7 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the response_type is missing [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
@@ -184,7 +184,7 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error for unsupported response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
@@ -207,7 +207,7 @@ describe("OAuth 2.0 spec", () => {
 				const nonce = "random-nonce";
 
 				// OpenID にしないと token id_token が使えない
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.OPENID],
 					[DEFAULT_REDIRECT_URI],
 				);
@@ -247,7 +247,7 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri is not an absolute URI [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The redirection endpoint URI MUST be an absolute URI as defined by [RFC3986] Section 4.3.
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -266,7 +266,7 @@ describe("OAuth 2.0 spec", () => {
 			it("returns error if the redirect_uri includes a fragment component [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The endpoint URI MUST NOT include a fragment component
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -285,7 +285,7 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if no redirection URI was pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// ... if not redirection URI has been registered, the client MUST include a redirection URI
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[],
 				);
@@ -303,7 +303,7 @@ describe("OAuth 2.0 spec", () => {
 			it("requires the redirect_uri if multiple redirection URIs were pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// It multiple redirection URIs have been registered..., the client MUST include a redirection URI
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[`${DEFAULT_REDIRECT_URI}1`, `${DEFAULT_REDIRECT_URI}2`],
 				);
@@ -321,7 +321,7 @@ describe("OAuth 2.0 spec", () => {
 			it("returns an error if the redirect_uri does not match the pre-registered value [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[`${DEFAULT_REDIRECT_URI}1`],
 				);
@@ -341,7 +341,7 @@ describe("OAuth 2.0 spec", () => {
 		it("processes the request when omitting the scope parameter [MUST]", async () => {
 			// 3.3 - Access Token Scope
 			// If the client omits the scope parameter when requesting authorization, the authorization server MUST either process the request using a pre-defined default value or fail the request indicating an invalid scope.
-			const { userId, cookie, clientId } = await setup(
+			const { cookie, clientId } = await setup(
 				[SCOPE_IDS.READ_BASIC_INFO],
 				[DEFAULT_REDIRECT_URI],
 			);
@@ -388,7 +388,7 @@ describe("OAuth 2.0 spec", () => {
 
 			it("accepts response_type=code [MUST]", async () => {
 				// response_type: REQUIRED.  Value MUST be set to "code"
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
@@ -408,7 +408,7 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.2 - Authorization Response
 			it("returns authorization code [MUST]", async () => {
 				// code: REQUIRED
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
@@ -486,7 +486,7 @@ describe("OAuth 2.0 spec", () => {
 				// state: REQUIRED if the "state" parameter was present in the client authorization request.  The exact value received from the client.
 				const state = "random-state";
 
-				const { userId, cookie, clientId } = await setup(
+				const { cookie, clientId } = await setup(
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
