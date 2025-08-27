@@ -74,6 +74,8 @@ const route = app
 				}
 
 				// Redirect URI のクエリパラメータ部分は変わることを許容する
+				// ref: 3.1.2.2 - Registration Requirements
+				// ... allowing the client to dynamically vary only the query component of the redirection URI when requesting authorization.
 				const normalizedUri = new URL(redirectUri);
 				normalizedUri.search = "";
 
