@@ -131,7 +131,6 @@ describe("OAuth 2.0 spec", () => {
 		it("verifies the identity of the resource owner [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST first verify the identity of the resource owner.
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
@@ -155,11 +154,7 @@ describe("OAuth 2.0 spec", () => {
 			// ログイン済みなら認可画面へ
 			const res2 = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 			const resText = await res2.text();
 			expect(res2.status).toBe(200);
@@ -192,18 +187,10 @@ describe("OAuth 2.0 spec", () => {
 					[SCOPE_IDS.READ_BASIC_INFO],
 					[DEFAULT_REDIRECT_URI],
 				);
-				const params = new URLSearchParams({
-					// response_type: "code",
-					client_id: oauthClientId,
-				});
-
+				const params = new URLSearchParams({ client_id: oauthClientId });
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(302);
 				const redirectUrl = res.headers.get("Location") || "";
@@ -224,14 +211,9 @@ describe("OAuth 2.0 spec", () => {
 					response_type: "foobar",
 					client_id: oauthClientId,
 				});
-
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(302);
 				const redirectUrl = res.headers.get("Location") || "";
@@ -266,19 +248,11 @@ describe("OAuth 2.0 spec", () => {
 
 				const res1 = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params1.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				const res2 = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params2.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 
 				// text までチェックすると <input type="hidden" name="response_type" value=""> の値が違うので落ちる
@@ -309,11 +283,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -335,11 +305,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -360,11 +326,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -385,11 +347,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -411,11 +369,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -437,11 +391,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 			expect(res.status).toBe(200);
 		});
@@ -466,16 +416,10 @@ describe("OAuth 2.0 spec", () => {
 				// client_id: REQUIRED.  The client identifier as described in Section 2.2.
 				const dummyUserId = await generateUserId();
 				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const params = new URLSearchParams({
-					response_type: "code",
-				});
+				const params = new URLSearchParams({ response_type: "code" });
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(400);
 			});
@@ -495,11 +439,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 				expect(res.status).toBe(200);
 			});
@@ -522,11 +462,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 
 				expect(res.status).toBe(200);
@@ -558,11 +494,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 
 				expect(res.status).toBe(200);
@@ -611,11 +543,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 
 				expect(res.status).toBe(200);
@@ -671,11 +599,7 @@ describe("OAuth 2.0 spec", () => {
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{
-						headers: {
-							Cookie: validUserCookie,
-						},
-					},
+					{ headers: { Cookie: validUserCookie } },
 				);
 
 				expect(res.status).toBe(200);
@@ -753,11 +677,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -799,11 +719,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -847,11 +763,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -895,11 +807,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -942,11 +850,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -990,11 +894,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
@@ -1036,11 +936,7 @@ describe("OAuth 2.0 spec", () => {
 			});
 			const res = await app.request(
 				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{
-					headers: {
-						Cookie: validUserCookie,
-					},
-				},
+				{ headers: { Cookie: validUserCookie } },
 			);
 
 			expect(res.status).toBe(200);
