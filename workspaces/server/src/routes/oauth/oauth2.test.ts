@@ -26,6 +26,7 @@ import type { TokenResponse } from "./accessToken";
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
 const JWT_EXPIRATION = 300; // 5 minutes
+const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
@@ -136,7 +137,7 @@ describe("OAuth 2.0 spec", () => {
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				["https://idp.test/oauth/callback"],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const params = new URLSearchParams({
 				response_type: "code",
@@ -189,7 +190,7 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					["https://idp.test/oauth/callback"],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					// response_type: "code",
@@ -217,7 +218,7 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					["https://idp.test/oauth/callback"],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "foobar",
@@ -240,7 +241,6 @@ describe("OAuth 2.0 spec", () => {
 			it("does not care the order of space-delimited response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// Extension response types MAY contain a space-delimited (%x20) list of values, where the order of values does not matter
-				const redirectUri = "https://idp.test/oauth/callback";
 				const nonce = "random-nonce";
 
 				const dummyUserId = await generateUserId();
@@ -249,18 +249,18 @@ describe("OAuth 2.0 spec", () => {
 					dummyUserId,
 					// OpenID にしないと token id_token が使えない
 					[SCOPE_IDS.OPENID],
-					[redirectUri],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params1 = new URLSearchParams({
 					response_type: "id_token token",
 					client_id: oauthClientId,
-					redirect_uri: redirectUri,
+					redirect_uri: DEFAULT_REDIRECT_URI,
 					nonce,
 				});
 				const params2 = new URLSearchParams({
 					response_type: "token id_token",
 					client_id: oauthClientId,
-					redirect_uri: redirectUri,
+					redirect_uri: DEFAULT_REDIRECT_URI,
 					nonce,
 				});
 
@@ -331,7 +331,7 @@ describe("OAuth 2.0 spec", () => {
 				const params = new URLSearchParams({
 					response_type: "code",
 					client_id: oauthClientId,
-					redirect_uri: "https://idp.test/oauth/callback#fragment",
+					redirect_uri: `${DEFAULT_REDIRECT_URI}#fragment`,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
@@ -377,10 +377,7 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					[
-						"https://idp.test/oauth/callback1",
-						"https://idp.test/oauth/callback2",
-					],
+					[`${DEFAULT_REDIRECT_URI}1`, `${DEFAULT_REDIRECT_URI}2`],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
@@ -405,12 +402,12 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					["https://idp.test/oauth/callback1"],
+					[`${DEFAULT_REDIRECT_URI}1`],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
 					client_id: oauthClientId,
-					redirect_uri: "https://idp.test/oauth/callback2",
+					redirect_uri: `${DEFAULT_REDIRECT_URI}2`,
 				});
 				const res = await app.request(
 					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
@@ -432,7 +429,7 @@ describe("OAuth 2.0 spec", () => {
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				["https://idp.test/oauth/callback"],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const params = new URLSearchParams({
 				response_type: "code",
@@ -490,7 +487,7 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					["https://idp.test/oauth/callback"],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
@@ -512,14 +509,12 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.2 - Authorization Response
 			it("returns authorization code [MUST]", async () => {
 				// code: REQUIRED
-				const redirectUri = "https://idp.test/oauth/callback";
-
 				const dummyUserId = await generateUserId();
 				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					[redirectUri],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
@@ -537,20 +532,20 @@ describe("OAuth 2.0 spec", () => {
 				expect(res.status).toBe(200);
 				const resText = await res.text();
 				const callbackUrl = await authorize(resText, validUserCookie);
-				expect(callbackUrl.origin + callbackUrl.pathname).toBe(redirectUri);
+				expect(callbackUrl.origin + callbackUrl.pathname).toBe(
+					DEFAULT_REDIRECT_URI,
+				);
 				expect(callbackUrl.searchParams.has("code")).toBe(true);
 			});
 
 			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
-				const redirectUri = "https://idp.test/oauth/callback";
-
 				const dummyUserId = await generateUserId();
 				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					[redirectUri],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
@@ -598,15 +593,12 @@ describe("OAuth 2.0 spec", () => {
 			it("expires code after single use [MUST]", async () => {
 				// The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
 				// If an authorization code is used more than once, the authorization server MUST deny the request
-
-				const redirectUri = "https://idp.test/oauth/callback";
-
 				const dummyUserId = await generateUserId();
 				const validUserCookie = await getUserSessionCookie(dummyUserId);
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					[redirectUri],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
@@ -663,7 +655,6 @@ describe("OAuth 2.0 spec", () => {
 
 			it("returns state if provided in the request [MUST]", async () => {
 				// state: REQUIRED if the "state" parameter was present in the client authorization request.  The exact value received from the client.
-				const redirectUri = "https://idp.test/oauth/callback";
 				const state = "random-state";
 
 				const dummyUserId = await generateUserId();
@@ -671,7 +662,7 @@ describe("OAuth 2.0 spec", () => {
 				const oauthClientId = await registerOAuthClient(
 					dummyUserId,
 					[SCOPE_IDS.READ_BASIC_INFO],
-					[redirectUri],
+					[DEFAULT_REDIRECT_URI],
 				);
 				const params = new URLSearchParams({
 					response_type: "code",
@@ -744,14 +735,12 @@ describe("OAuth 2.0 spec", () => {
 
 		// 5.1 - Successful Response
 		it("returns 200 OK [MUST]", async () => {
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -792,14 +781,12 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns access_token [MUST]", async () => {
 			// access_token: REQUIRED.  The access token issued by the authorization server.
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -842,14 +829,12 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns token_type [MUST]", async () => {
 			// token_type: REQUIRED.  The type of the token issued as described in Section 7.1.  Value is case insensitive.
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -892,14 +877,12 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns expires_in [RECOMMENDED]", async () => {
 			// expires_in: RECOMMENDED.  The lifetime in seconds of the access token.
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -941,14 +924,12 @@ describe("OAuth 2.0 spec", () => {
 		});
 
 		it("returns scope [OPTIONAL]", async () => {
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -990,15 +971,13 @@ describe("OAuth 2.0 spec", () => {
 		});
 
 		it("returns with application/json Content-Type [MUST]", async () => {
-			//  The parameters are included in the entity-body of the HTTP response using the "application/json" media type as defined by [RFC4627].
-			const redirectUri = "https://idp.test/oauth/callback";
-
+			// The parameters are included in the entity-body of the HTTP response using the "application/json" media type as defined by [RFC4627].
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
@@ -1039,14 +1018,12 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns with no-cache headers [MUST]", async () => {
 			// The authorization server MUST include the HTTP "Cache-Control" response header field [RFC2616] with a value of "no-store" in any response containing tokens, credentials, or other sensitive information, as well as the "Pragma" response header field [RFC2616] with a value of "no-cache".
-			const redirectUri = "https://idp.test/oauth/callback";
-
 			const dummyUserId = await generateUserId();
 			const validUserCookie = await getUserSessionCookie(dummyUserId);
 			const oauthClientId = await registerOAuthClient(
 				dummyUserId,
 				[SCOPE_IDS.READ_BASIC_INFO],
-				[redirectUri],
+				[DEFAULT_REDIRECT_URI],
 			);
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
