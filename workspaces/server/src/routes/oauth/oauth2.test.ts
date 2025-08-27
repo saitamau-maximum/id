@@ -119,17 +119,19 @@ describe("OAuth 2.0 spec", () => {
 			expect(resText).contains("Dummy App");
 		});
 
-		it("supports the HTTP GET method [MUST]", () => {
+		it("supports the HTTP GET method [MUST]", async () => {
 			// 3.1 - Authorization Endpoint
 			// The authorization server MUST support the use of the HTTP "GET" method [RFC2616] for the authorization endpoint
-			expect(true).toBe(true);
+			const res = await app.request(AUTHORIZATION_ENDPOINT, { method: "GET" });
+			expect(res.status).not.toBe(405);
 		});
 
-		// it("supports the HTTP POST method [MAY]", () => {
+		// it("supports the HTTP POST method [MAY]", async () => {
 		// 	// 3.1 - Authorization Endpoint
 		// 	// The authorization server ... MAY support the use of the "POST" method as well.
-		//  // 未対応
-		// 	expect(true).toBe(true);
+		// 	// 未対応
+		// 	const res = await app.request(AUTHORIZATION_ENDPOINT, { method: "POST" });
+		// 	expect(res.status).not.toBe(405);
 		// });
 
 		describe("Response Type", () => {
