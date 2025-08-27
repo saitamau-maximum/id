@@ -27,7 +27,7 @@
 		"@octokit/auth-app": "^7.2.0",
 		"discord-api-types": "^0.38.1",
 		"drizzle-orm": "^0.41.0",
-		"hono": "^4.7.5",
+		"hono": "^4.9.4",
 		"octokit": "^4.1.2",
 		"valibot": "^1.0.0",
 		"wasm-image-optimization": "^1.2.28"
