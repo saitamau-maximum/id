@@ -135,22 +135,101 @@ describe("OAuth 2.0 spec", () => {
 		// });
 
 		describe("Response Type", () => {
-			it("returns an error if the response_type is missing [MUST]", () => {
+			it("returns an error if the response_type is missing [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					["https://idp.test/oauth/callback"],
+				);
+				const params = new URLSearchParams({
+					// response_type: "code",
+					client_id: oauthClientId,
+				});
+
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(302);
+				const redirectUrl = res.headers.get("Location") || "";
+				expect(redirectUrl).contains("error=invalid_request");
 			});
 
-			it("returns an error for unsupported response_type values [MUST]", () => {
+			it("returns an error for unsupported response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// If an authorization request is missing the "response_type" parameter, or if the response type is not understood, the authorization server MUST return an error response as described in Section 4.1.2.1.
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					["https://idp.test/oauth/callback"],
+				);
+				const params = new URLSearchParams({
+					response_type: "foobar",
+					client_id: oauthClientId,
+				});
+
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(302);
+				const redirectUrl = res.headers.get("Location") || "";
+				expect(redirectUrl).contains("error=unsupported_response_type");
 			});
 
-			it("does not matter the order of space-delimited response_type values [MUST]", () => {
+			it("does not matter the order of space-delimited response_type values [MUST]", async () => {
 				// 3.1.1 - Response Type
 				// Extension response types MAY contain a space-delimited (%x20) list of values, where the order of values does not matter
-				expect(true).toBe(true);
+				const redirectUri = "https://idp.test/oauth/callback";
+				const nonce = "random-nonce";
+
+				const oauthClientId = await registerOAuthClient(
+					// OpenID にしないと token id_token が使えない
+					[SCOPE_IDS.OPENID],
+					[redirectUri],
+				);
+				const params1 = new URLSearchParams({
+					response_type: "id_token token",
+					client_id: oauthClientId,
+					redirect_uri: redirectUri,
+					nonce,
+				});
+				const params2 = new URLSearchParams({
+					response_type: "token id_token",
+					client_id: oauthClientId,
+					redirect_uri: redirectUri,
+					nonce,
+				});
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params1.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				const res2 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params2.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+
+				// text までチェックすると <input type="hidden" name="response_type" value=""> の値が違うので落ちる
+				// 簡易的に status と statusText のみチェック
+				expect(res1.status).toBe(res2.status);
+				expect(res1.statusText).toBe(res2.statusText);
 			});
 		});
 
