@@ -237,34 +237,120 @@ describe("OAuth 2.0 spec", () => {
 			// 3.1.2.4 - Invalid Endpoint
 			// ... MUST NOT automatically redirect the user-agent to the invalid redirection URI
 
-			it("returns an error if the redirect_uri is not an absolute URI [MUST]", () => {
+			it("returns an error if the redirect_uri is not an absolute URI [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The redirection endpoint URI MUST be an absolute URI as defined by [RFC3986] Section 4.3.
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					redirect_uri: "/invalid",
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
 			});
 
-			it("returns error if the redirect_uri includes a fragment component [MUST]", () => {
+			it("returns error if the redirect_uri includes a fragment component [MUST]", async () => {
 				// 3.1.2 - Redirection Endpoint
 				// The endpoint URI MUST NOT include a fragment component
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					redirect_uri: "https://idp.test/oauth/callback#fragment",
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
 			});
 
-			it("requires the redirect_uri if no redirection URI was pre-registered [MUST]", () => {
+			it("requires the redirect_uri if no redirection URI was pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// ... if not redirection URI has been registered, the client MUST include a redirection URI
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
 			});
 
-			it("requires the redirect_uri if multiple redirection URIs were pre-registered [MUST]", () => {
+			it("requires the redirect_uri if multiple redirection URIs were pre-registered [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// It multiple redirection URIs have been registered..., the client MUST include a redirection URI
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[
+						"https://idp.test/oauth/callback1",
+						"https://idp.test/oauth/callback2",
+					],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
 			});
 
-			it("returns an error if the redirect_uri does not match the pre-registered value [MUST]", () => {
+			it("returns an error if the redirect_uri does not match the pre-registered value [MUST]", async () => {
 				// 3.1.2.3 - Dynamic Configuration
 				// When a redirection URI is included in an authorization request, the authorization server MUST compare and match the value received against at least one of the registered redirection URIs
-				expect(true).toBe(true);
+				const oauthClientId = await registerOAuthClient(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					["https://idp.test/oauth/callback1"],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+					redirect_uri: "https://idp.test/oauth/callback2",
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
 			});
 		});
 	});
