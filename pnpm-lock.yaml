@@ -45,8 +45,8 @@ importers:
         specifier: ^4.4.9
         version: 4.4.9
       hono:
-        specifier: ^4.7.5
-        version: 4.7.5
+        specifier: ^4.9.4
+        version: 4.9.4
       isbot:
         specifier: ^5.1.25
         version: 5.1.25
@@ -3436,10 +3436,6 @@ packages:
 
   hast-util-whitespace@3.0.0:
     resolution: {integrity: sha512-88JUN06ipLwsnv+dVn+OIYOvAuvBMy/Qoi6O7mQHxdPXpjy+Cd6xRkWwux7DKO+4sYILtLBRIKgsdpS2gQc7qw==}
-
-  hono@4.7.5:
-    resolution: {integrity: sha512-fDOK5W2C1vZACsgLONigdZTRZxuBqFtcKh7bUQ5cVSbwI2RWjloJDcgFOVzbQrlI6pCmhlTsVYZ7zpLj4m4qMQ==}
-    engines: {node: '>=16.9.0'}
 
   hono@4.9.4:
     resolution: {integrity: sha512-61hl6MF6ojTl/8QSRu5ran6GXt+6zsngIUN95KzF5v5UjiX/xnrLR358BNRawwIRO49JwUqJqQe3Rb2v559R8Q==}
@@ -8524,8 +8520,6 @@ snapshots:
   hast-util-whitespace@3.0.0:
     dependencies:
       '@types/hast': 3.0.4
-
-  hono@4.7.5: {}
 
   hono@4.9.4: {}
 
