@@ -107,6 +107,42 @@ describe("OAuth 2.0 spec", () => {
 		return new URL(redirectUrl);
 	};
 
+	/**
+	 * Authorization Code Grant の code 取得までを実行する
+	 * 1. ユーザー作成 / OAuth App 登録
+	 * 2. Authorization Endpoint にリクエストし、認可する
+	 * 3. Redirect URI に返ってくる
+	 */
+	const doAuthFlow = async () => {
+		const dummyUserId = await generateUserId();
+		const validUserCookie = await getUserSessionCookie(dummyUserId);
+		const oauthClientId = await registerOAuthClient(
+			dummyUserId,
+			[SCOPE_IDS.READ_BASIC_INFO],
+			[DEFAULT_REDIRECT_URI],
+		);
+		const params = new URLSearchParams({
+			response_type: "code",
+			client_id: oauthClientId,
+		});
+		const res = await app.request(
+			`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+			{ headers: { Cookie: validUserCookie } },
+		);
+
+		expect(res.status).toBe(200);
+		const resText = await res.text();
+		const callbackUrl = await authorize(resText, validUserCookie);
+		const code = callbackUrl.searchParams.get("code");
+		assert.isNotNull(code);
+
+		return {
+			dummyUserId,
+			oauthClientId,
+			code,
+		};
+	};
+
 	beforeEach(async () => {
 		vi.useFakeTimers();
 
@@ -476,32 +512,12 @@ describe("OAuth 2.0 spec", () => {
 
 			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
-				const dummyUserId = await generateUserId();
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					dummyUserId,
-					[SCOPE_IDS.READ_BASIC_INFO],
-					[DEFAULT_REDIRECT_URI],
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
 						dummyUserId,
 					);
-				const params = new URLSearchParams({
-					response_type: "code",
-					client_id: oauthClientId,
-				});
-				const res = await app.request(
-					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
-				);
-
-				expect(res.status).toBe(200);
-				const resText = await res.text();
-				const callbackUrl = await authorize(resText, validUserCookie);
-				const code = callbackUrl.searchParams.get("code");
-				assert.isNotNull(code);
 
 				// 一応 11 分進める
 				vi.advanceTimersByTime(11 * 60 * 1000);
@@ -525,32 +541,12 @@ describe("OAuth 2.0 spec", () => {
 			it("expires code after single use [MUST]", async () => {
 				// The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
 				// If an authorization code is used more than once, the authorization server MUST deny the request
-				const dummyUserId = await generateUserId();
-				const validUserCookie = await getUserSessionCookie(dummyUserId);
-				const oauthClientId = await registerOAuthClient(
-					dummyUserId,
-					[SCOPE_IDS.READ_BASIC_INFO],
-					[DEFAULT_REDIRECT_URI],
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
 						dummyUserId,
 					);
-				const params = new URLSearchParams({
-					response_type: "code",
-					client_id: oauthClientId,
-				});
-				const res = await app.request(
-					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-					{ headers: { Cookie: validUserCookie } },
-				);
-
-				expect(res.status).toBe(200);
-				const resText = await res.text();
-				const callbackUrl = await authorize(resText, validUserCookie);
-				const code = callbackUrl.searchParams.get("code");
-				assert.isNotNull(code);
 
 				const body = new FormData();
 				body.append("grant_type", "authorization_code");
@@ -657,35 +653,13 @@ describe("OAuth 2.0 spec", () => {
 	describe("Issuing an Access Token", () => {
 		// 5 - Issuing an Access Token
 
-		// 5.1 - Successful Response
-		it("returns 200 OK [MUST]", async () => {
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
+		const doAccessTokenRequest = async () => {
+			const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 			const oauthClientSecret =
 				await oauthExternalRepository.generateClientSecret(
 					oauthClientId,
 					dummyUserId,
 				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
 			const body = new FormData();
 			body.append("grant_type", "authorization_code");
 			body.append("code", code);
@@ -696,267 +670,57 @@ describe("OAuth 2.0 spec", () => {
 					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
 				},
 			});
-			expect(tokenRes.status).toBe(200);
+			return tokenRes;
+		};
+
+		// 5.1 - Successful Response
+		it("returns 200 OK [MUST]", async () => {
+			const res = await doAccessTokenRequest();
+			expect(res.status).toBe(200);
 		});
 
 		it("returns access_token [MUST]", async () => {
 			// access_token: REQUIRED.  The access token issued by the authorization server.
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			const tokenResJson = await tokenRes.json<TokenResponse>();
-			expect(tokenResJson).toHaveProperty("access_token");
-			expect(tokenResJson.access_token).toBeTypeOf("string");
+			const res = await doAccessTokenRequest();
+			const json = await res.json<TokenResponse>();
+			expect(json).toHaveProperty("access_token");
+			expect(json.access_token).toBeTypeOf("string");
 		});
 
 		it("returns token_type [MUST]", async () => {
 			// token_type: REQUIRED.  The type of the token issued as described in Section 7.1.  Value is case insensitive.
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			const tokenResJson = await tokenRes.json<TokenResponse>();
-			expect(tokenResJson).toHaveProperty("token_type");
-			expect(tokenResJson.token_type).toMatch(/bearer/i); // case insensitive
+			const res = await doAccessTokenRequest();
+			const json = await res.json<TokenResponse>();
+			expect(json).toHaveProperty("token_type");
+			expect(json.token_type).toMatch(/bearer/i); // case insensitive
 		});
 
 		it("returns expires_in [RECOMMENDED]", async () => {
 			// expires_in: RECOMMENDED.  The lifetime in seconds of the access token.
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			const tokenResJson = await tokenRes.json<TokenResponse>();
-			expect(tokenResJson).toHaveProperty("expires_in");
-			expect(tokenResJson.expires_in).toBeTypeOf("number");
+			const res = await doAccessTokenRequest();
+			const json = await res.json<TokenResponse>();
+			expect(json).toHaveProperty("expires_in");
+			expect(json.expires_in).toBeTypeOf("number");
 		});
 
 		it("returns scope [OPTIONAL]", async () => {
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			const tokenResJson = await tokenRes.json<TokenResponse>();
-			expect(tokenResJson).toHaveProperty("scope");
-			expect(tokenResJson.scope).toBeTypeOf("string");
+			const res = await doAccessTokenRequest();
+			const json = await res.json<TokenResponse>();
+			expect(json).toHaveProperty("scope");
+			expect(json.scope).toBeTypeOf("string");
 		});
 
 		it("returns with application/json Content-Type [MUST]", async () => {
 			// The parameters are included in the entity-body of the HTTP response using the "application/json" media type as defined by [RFC4627].
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			expect(tokenRes.headers.get("Content-Type")).toBe("application/json");
+			const res = await doAccessTokenRequest();
+			expect(res.headers.get("Content-Type")).toBe("application/json");
 		});
 
 		it("returns with no-cache headers [MUST]", async () => {
 			// The authorization server MUST include the HTTP "Cache-Control" response header field [RFC2616] with a value of "no-store" in any response containing tokens, credentials, or other sensitive information, as well as the "Pragma" response header field [RFC2616] with a value of "no-cache".
-			const dummyUserId = await generateUserId();
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				dummyUserId,
-				[SCOPE_IDS.READ_BASIC_INFO],
-				[DEFAULT_REDIRECT_URI],
-			);
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const params = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const res = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-
-			expect(res.status).toBe(200);
-			const resText = await res.text();
-			const callbackUrl = await authorize(resText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-				},
-			});
-			expect(tokenRes.headers.get("Cache-Control")).toBe("no-store");
-			expect(tokenRes.headers.get("Pragma")).toBe("no-cache");
+			const res = await doAccessTokenRequest();
+			expect(res.headers.get("Cache-Control")).toBe("no-store");
+			expect(res.headers.get("Pragma")).toBe("no-cache");
 		});
 	});
 
