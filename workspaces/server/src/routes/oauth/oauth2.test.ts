@@ -19,25 +19,82 @@ import type { HonoEnv } from "../../factory";
 import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
 import {
+	AUTHORIZATION_ENDPOINT,
+	DEFAULT_REDIRECT_URI,
+	TOKEN_ENDPOINT,
 	authorize,
-	doAccessTokenRequest,
-	doAuthFlow,
 	generateUserId,
-	getClientAuthHeader,
 	getUserSessionCookie,
 	registerOAuthClient,
 } from "../../tests/oauth/utils";
 import type { TokenResponse } from "./accessToken";
-
-const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
-const TOKEN_ENDPOINT = "/oauth/access-token";
-const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
 
 	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
 	const userRepository = new CloudflareUserRepository(env.DB);
+
+	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
+		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
+	};
+
+	/**
+	 * Authorization Code Grant の code 取得までを実行する
+	 * 1. ユーザー作成 / OAuth App 登録
+	 * 2. Authorization Endpoint にリクエストし、認可する
+	 * 3. Redirect URI に返ってくる
+	 */
+	const doAuthFlow = async () => {
+		const dummyUserId = await generateUserId(userRepository);
+		const validUserCookie = await getUserSessionCookie(dummyUserId);
+		const oauthClientId = await registerOAuthClient(
+			oauthExternalRepository,
+			dummyUserId,
+			[SCOPE_IDS.READ_BASIC_INFO],
+			[DEFAULT_REDIRECT_URI],
+		);
+		const params = new URLSearchParams({
+			response_type: "code",
+			client_id: oauthClientId,
+		});
+		const res = await app.request(
+			`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+			{ headers: { Cookie: validUserCookie } },
+		);
+
+		expect(res.status).toBe(200);
+		const resText = await res.text();
+		const callbackUrl = await authorize(app, resText, validUserCookie);
+		const code = callbackUrl.searchParams.get("code");
+		assert.isNotNull(code);
+
+		return {
+			dummyUserId,
+			oauthClientId,
+			code,
+		};
+	};
+
+	const doAccessTokenRequest = async () => {
+		const { dummyUserId, oauthClientId, code } = await doAuthFlow();
+		const oauthClientSecret =
+			await oauthExternalRepository.generateClientSecret(
+				oauthClientId,
+				dummyUserId,
+			);
+		const body = new FormData();
+		body.append("grant_type", "authorization_code");
+		body.append("code", code);
+		const tokenRes = await app.request(TOKEN_ENDPOINT, {
+			method: "POST",
+			body,
+			headers: {
+				Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
+			},
+		});
+		return tokenRes;
+	};
 
 	beforeEach(async () => {
 		vi.useFakeTimers();
@@ -420,11 +477,7 @@ describe("OAuth 2.0 spec", () => {
 
 			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-					app,
-					userRepository,
-					oauthExternalRepository,
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
@@ -453,11 +506,7 @@ describe("OAuth 2.0 spec", () => {
 			it("expires code after single use [MUST]", async () => {
 				// The authorization code MUST expire shortly after it is issued to mitigate the risk of leaks.
 				// If an authorization code is used more than once, the authorization server MUST deny the request
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-					app,
-					userRepository,
-					oauthExternalRepository,
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
@@ -527,11 +576,7 @@ describe("OAuth 2.0 spec", () => {
 			// 4.1.3 - Access Token Request
 			it("returns error if grant_type is missing [MUST]", async () => {
 				// grant_type: REQUIRED.  Value MUST be set to "authorization_code"
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-					app,
-					userRepository,
-					oauthExternalRepository,
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
@@ -555,11 +600,7 @@ describe("OAuth 2.0 spec", () => {
 
 			it("returns error if code is missing [MUST]", async () => {
 				// code: REQUIRED.  The authorization code received from the authorization server.
-				const { dummyUserId, oauthClientId } = await doAuthFlow(
-					app,
-					userRepository,
-					oauthExternalRepository,
-				);
+				const { dummyUserId, oauthClientId } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
@@ -678,11 +719,7 @@ describe("OAuth 2.0 spec", () => {
 				it("supports Authorization Header field [MUST]", async () => {
 					// 2.3.1 - Client Password
 					// The authorization server MUST support the HTTP Basic authentication scheme for authenticating clients that were issued a client password.
-					const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-						app,
-						userRepository,
-						oauthExternalRepository,
-					);
+					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 					const oauthClientSecret =
 						await oauthExternalRepository.generateClientSecret(
 							oauthClientId,
@@ -708,11 +745,7 @@ describe("OAuth 2.0 spec", () => {
 				it("supports including client credentials in the request-body [MAY]", async () => {
 					// 2.3.1 - Client Password
 					// Alternatively, the authorization server MAY support including the client credentials in the request-body using the following parameters: client_id, client_secret
-					const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-						app,
-						userRepository,
-						oauthExternalRepository,
-					);
+					const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 					const oauthClientSecret =
 						await oauthExternalRepository.generateClientSecret(
 							oauthClientId,
@@ -735,11 +768,7 @@ describe("OAuth 2.0 spec", () => {
 			it("ensures the authorization code was issued to the authenticated client [MUST]", async () => {
 				// The authorization server MUST:
 				// ensure that the authorization code was issued to the authenticated confidential client
-				const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-					app,
-					userRepository,
-					oauthExternalRepository,
-				);
+				const { dummyUserId, oauthClientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						oauthClientId,
@@ -776,21 +805,13 @@ describe("OAuth 2.0 spec", () => {
 
 		// 5.1 - Successful Response
 		it("returns 200 OK [MUST]", async () => {
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			expect(res.status).toBe(200);
 		});
 
 		it("returns access_token [MUST]", async () => {
 			// access_token: REQUIRED.  The access token issued by the authorization server.
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			const json = await res.json<TokenResponse>();
 			expect(json).toHaveProperty("access_token");
 			expect(json.access_token).toBeTypeOf("string");
@@ -798,11 +819,7 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns token_type [MUST]", async () => {
 			// token_type: REQUIRED.  The type of the token issued as described in Section 7.1.  Value is case insensitive.
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			const json = await res.json<TokenResponse>();
 			expect(json).toHaveProperty("token_type");
 			expect(json.token_type).toMatch(/bearer/i); // case insensitive
@@ -810,22 +827,14 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns expires_in [RECOMMENDED]", async () => {
 			// expires_in: RECOMMENDED.  The lifetime in seconds of the access token.
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			const json = await res.json<TokenResponse>();
 			expect(json).toHaveProperty("expires_in");
 			expect(json.expires_in).toBeTypeOf("number");
 		});
 
 		it("returns scope [OPTIONAL]", async () => {
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			const json = await res.json<TokenResponse>();
 			expect(json).toHaveProperty("scope");
 			expect(json.scope).toBeTypeOf("string");
@@ -833,35 +842,15 @@ describe("OAuth 2.0 spec", () => {
 
 		it("returns with application/json Content-Type [MUST]", async () => {
 			// The parameters are included in the entity-body of the HTTP response using the "application/json" media type as defined by [RFC4627].
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			expect(res.headers.get("Content-Type")).toBe("application/json");
 		});
 
 		it("returns with no-cache headers [MUST]", async () => {
 			// The authorization server MUST include the HTTP "Cache-Control" response header field [RFC2616] with a value of "no-store" in any response containing tokens, credentials, or other sensitive information, as well as the "Pragma" response header field [RFC2616] with a value of "no-cache".
-			const res = await doAccessTokenRequest(
-				app,
-				userRepository,
-				oauthExternalRepository,
-			);
+			const res = await doAccessTokenRequest();
 			expect(res.headers.get("Cache-Control")).toBe("no-store");
 			expect(res.headers.get("Pragma")).toBe("no-cache");
-		});
-	});
-
-	describe("Accessing Protected Resources", () => {
-		// 7 - Accessing Protected Resources
-		it("accepts access token in Authorization header", () => {
-			expect(true).toBe(true);
-		});
-
-		it("validates the access token [MUST]", () => {
-			// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
-			expect(true).toBe(true);
 		});
 	});
 });

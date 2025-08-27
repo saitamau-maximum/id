@@ -4,15 +4,15 @@ import { generateSignedCookie } from "hono/cookie";
 import { sign } from "hono/jwt";
 import { assert, expect } from "vitest";
 import { COOKIE_NAME } from "../../constants/cookie";
-import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
+import type { ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import type { IOAuthExternalRepository } from "../../repository/oauth-external";
 import type { IUserRepository } from "../../repository/user";
 
-const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
-const TOKEN_ENDPOINT = "/oauth/access-token";
-const JWT_EXPIRATION = 300; // 5 minutes for test
-const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
+export const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
+export const TOKEN_ENDPOINT = "/oauth/access-token";
+export const JWT_EXPIRATION = 300; // 5 minutes for test
+export const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 
 export const generateUserId = async (userRepository: IUserRepository) => {
 	// ユーザーが存在しないと OAuth App を登録できないのでユーザー作成
@@ -56,10 +56,6 @@ export const registerOAuthClient = async (
 	return clientId;
 };
 
-export const getClientAuthHeader = (clientId: string, clientSecret: string) => {
-	return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
-};
-
 /**
  * 認可画面で「承認する」を押してリダイレクトされるまでの処理を模擬する
  * @param html - Authorization Endpoint のレスポンス HTML
@@ -90,72 +86,4 @@ export const authorize = async (
 	const redirectUrl = res.headers.get("Location");
 	assert.isNotNull(redirectUrl);
 	return new URL(redirectUrl);
-};
-
-/**
- * Authorization Code Grant の code 取得までを実行する
- * 1. ユーザー作成 / OAuth App 登録
- * 2. Authorization Endpoint にリクエストし、認可する
- * 3. Redirect URI に返ってくる
- */
-export const doAuthFlow = async (
-	app: Hono<HonoEnv>,
-	userRepository: IUserRepository,
-	oauthExternalRepository: IOAuthExternalRepository,
-) => {
-	const dummyUserId = await generateUserId(userRepository);
-	const validUserCookie = await getUserSessionCookie(dummyUserId);
-	const oauthClientId = await registerOAuthClient(
-		oauthExternalRepository,
-		dummyUserId,
-		[SCOPE_IDS.READ_BASIC_INFO],
-		[DEFAULT_REDIRECT_URI],
-	);
-	const params = new URLSearchParams({
-		response_type: "code",
-		client_id: oauthClientId,
-	});
-	const res = await app.request(
-		`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-		{ headers: { Cookie: validUserCookie } },
-	);
-
-	expect(res.status).toBe(200);
-	const resText = await res.text();
-	const callbackUrl = await authorize(app, resText, validUserCookie);
-	const code = callbackUrl.searchParams.get("code");
-	assert.isNotNull(code);
-
-	return {
-		dummyUserId,
-		oauthClientId,
-		code,
-	};
-};
-
-export const doAccessTokenRequest = async (
-	app: Hono<HonoEnv>,
-	userRepository: IUserRepository,
-	oauthExternalRepository: IOAuthExternalRepository,
-) => {
-	const { dummyUserId, oauthClientId, code } = await doAuthFlow(
-		app,
-		userRepository,
-		oauthExternalRepository,
-	);
-	const oauthClientSecret = await oauthExternalRepository.generateClientSecret(
-		oauthClientId,
-		dummyUserId,
-	);
-	const body = new FormData();
-	body.append("grant_type", "authorization_code");
-	body.append("code", code);
-	const tokenRes = await app.request(TOKEN_ENDPOINT, {
-		method: "POST",
-		body,
-		headers: {
-			Authorization: getClientAuthHeader(oauthClientId, oauthClientSecret),
-		},
-	});
-	return tokenRes;
 };
