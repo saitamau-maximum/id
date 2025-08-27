@@ -122,8 +122,10 @@ const route = app
 			}
 			if (
 				responseType !== "code" &&
+				responseType !== "id_token" &&
+				// 順番は不問 (OAuth 2.0 仕様)
 				responseType !== "id_token token" &&
-				responseType !== "id_token"
+				responseType !== "token id_token"
 			) {
 				return errorRedirect(
 					"unsupported_response_type",
