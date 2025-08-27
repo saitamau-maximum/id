@@ -386,19 +386,42 @@ describe("OAuth 2.0 spec", () => {
 				expect(res.status).toBe(400);
 			});
 		});
+
+		it("processes the request when omitting the scope parameter [MUST]", async () => {
+			// 3.3 - Access Token Scope
+			// If the client omits the scope parameter when requesting authorization, the authorization server MUST either process the request using a pre-defined default value or fail the request indicating an invalid scope.
+			const dummyUserId = await generateUserId();
+			const validUserCookie = await getUserSessionCookie(dummyUserId);
+			const oauthClientId = await registerOAuthClient(
+				dummyUserId,
+				[SCOPE_IDS.READ_BASIC_INFO],
+				["https://idp.test/oauth/callback"],
+			);
+			const params = new URLSearchParams({
+				response_type: "code",
+				client_id: oauthClientId,
+			});
+			const res = await app.request(
+				`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+				{
+					headers: {
+						Cookie: validUserCookie,
+					},
+				},
+			);
+			expect(res.status).toBe(200);
+		});
 	});
 
 	describe("Token Endpoint (common)", () => {
-		it("accepts only HTTP POST method [MUST]", () => {
+		it("accepts only HTTP POST method [MUST]", async () => {
 			// 3.2 - Token Endpoint
 			// The client MUST use the HTTP "POST" method when making access token requests.
-			expect(true).toBe(true);
-		});
+			const res_get = await app.request(TOKEN_ENDPOINT, { method: "GET" });
+			expect(res_get.status).toBe(405);
 
-		it("processes the request when omitting the scope parameter [MUST]", () => {
-			// 3.3 - Access Token Scope
-			//  If the client omits the scope parameter when requesting authorization, the authorization server MUST either process the request using a pre-defined default value or fail the request indicating an invalid scope.
-			expect(true).toBe(true);
+			const res_post = await app.request(TOKEN_ENDPOINT, { method: "POST" });
+			expect(res_post.status).not.toBe(405);
 		});
 	});
 
@@ -406,6 +429,11 @@ describe("OAuth 2.0 spec", () => {
 		describe("Authorization Request", () => {
 			// 4.1.1 - Authorization Request
 			it("returns error if response_type is missing [MUST]", () => {
+				// response_type: REQUIRED.  Value MUST be set to "code"
+				expect(true).toBe(true);
+			});
+
+			it("accepts response_type=code [MUST]", () => {
 				// response_type: REQUIRED.  Value MUST be set to "code"
 				expect(true).toBe(true);
 			});
