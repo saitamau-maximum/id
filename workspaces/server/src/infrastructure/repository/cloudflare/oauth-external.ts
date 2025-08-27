@@ -196,18 +196,26 @@ export class CloudflareOAuthExternalRepository
 				clientId,
 				userId,
 			}),
-			this.client.insert(schema.oauthClientCallbacks).values(
-				callbackUrls.map((callbackUrl) => ({
-					clientId,
-					callbackUrl,
-				})),
-			),
-			this.client.insert(schema.oauthClientScopes).values(
-				scopeIds.map((scopeId) => ({
-					clientId,
-					scopeId,
-				})),
-			),
+			...(callbackUrls.length > 0
+				? [
+						this.client.insert(schema.oauthClientCallbacks).values(
+							callbackUrls.map((callbackUrl) => ({
+								clientId,
+								callbackUrl,
+							})),
+						),
+					]
+				: []),
+			...(scopeIds.length > 0
+				? [
+						this.client.insert(schema.oauthClientScopes).values(
+							scopeIds.map((scopeId) => ({
+								clientId,
+								scopeId,
+							})),
+						),
+					]
+				: []),
 		]);
 
 		if (!res.every((r) => r.success))
