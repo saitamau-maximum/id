@@ -1,5 +1,5 @@
 import type { Hono } from "hono";
-import { assert, describe, it } from "vitest";
+import { assert, describe, expect, it } from "vitest";
 import type { ScopeId } from "../../constants/scope";
 import type { HonoEnv } from "../../factory";
 import type { IOAuthExternalRepository } from "../../repository/oauth-external";
@@ -15,64 +15,71 @@ import {
 	registerOAuthClient,
 } from "./utils";
 
-export const resourcesOAuth2Test = ({
-	oauthExternalRepository,
-	userRepository,
-	clientScopes,
-	app,
-}: {
+export interface ResourcesOAuth2TestParams {
 	oauthExternalRepository: IOAuthExternalRepository;
 	userRepository: IUserRepository;
 	clientScopes: ScopeId[];
 	app: Hono<HonoEnv>;
-}) => {
-	describe("OAuth 2.0 spec - Accessing Protected Resources", () => {
-		const getAccessToken = async () => {
-			const dummyUserId = await generateUserId(userRepository);
-			const validUserCookie = await getUserSessionCookie(dummyUserId);
-			const oauthClientId = await registerOAuthClient(
-				oauthExternalRepository,
-				dummyUserId,
-				clientScopes,
-				[DEFAULT_REDIRECT_URI],
-			);
+	path: string;
+}
 
-			// Authorization Request
-			const param = new URLSearchParams({
-				response_type: "code",
-				client_id: oauthClientId,
-			});
-			const authRes = await app.request(
-				`${AUTHORIZATION_ENDPOINT}?${param.toString()}`,
-				{ headers: { Cookie: validUserCookie } },
-			);
-			const authResText = await authRes.text();
-			const callbackUrl = await authorize(app, authResText, validUserCookie);
-			const code = callbackUrl.searchParams.get("code");
-			assert.isNotNull(code);
+export const getAccessToken = async ({
+	oauthExternalRepository,
+	userRepository,
+	clientScopes,
+	app,
+}: Omit<ResourcesOAuth2TestParams, "path">) => {
+	const dummyUserId = await generateUserId(userRepository);
+	const validUserCookie = await getUserSessionCookie(dummyUserId);
+	const oauthClientId = await registerOAuthClient(
+		oauthExternalRepository,
+		dummyUserId,
+		clientScopes,
+		[DEFAULT_REDIRECT_URI],
+	);
 
-			// Access Token Request
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(
-					oauthClientId,
-					dummyUserId,
-				);
-			const tokenParams = new URLSearchParams({
-				grant_type: "authorization_code",
-				code,
-				redirect_uri: DEFAULT_REDIRECT_URI,
-				client_id: oauthClientId,
-				client_secret: oauthClientSecret,
-			});
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body: tokenParams,
-			});
-			const tokenResJson = await tokenRes.json<TokenResponse>();
-			return tokenResJson.access_token;
-		};
+	// Authorization Request
+	const param = new URLSearchParams({
+		response_type: "code",
+		client_id: oauthClientId,
+	});
+	const authRes = await app.request(
+		`${AUTHORIZATION_ENDPOINT}?${param.toString()}`,
+		{ headers: { Cookie: validUserCookie } },
+	);
+	const authResText = await authRes.text();
+	const callbackUrl = await authorize(app, authResText, validUserCookie);
+	const code = callbackUrl.searchParams.get("code");
+	assert.isNotNull(code);
 
-		it("accepts access token in Authorization header", () => {});
+	// Access Token Request
+	const oauthClientSecret = await oauthExternalRepository.generateClientSecret(
+		oauthClientId,
+		dummyUserId,
+	);
+	const tokenParams = new URLSearchParams({
+		grant_type: "authorization_code",
+		code,
+		client_id: oauthClientId,
+		client_secret: oauthClientSecret,
+	});
+	const tokenRes = await app.request(TOKEN_ENDPOINT, {
+		method: "POST",
+		body: tokenParams,
+	});
+	const tokenResJson = await tokenRes.json<TokenResponse>();
+	return tokenResJson.access_token;
+};
+
+export const resourcesOAuth2Test = (params: ResourcesOAuth2TestParams) => {
+	describe("OAuth 2.0 spec", () => {
+		it("accepts access token in Authorization header", async () => {
+			const accessToken = await getAccessToken(params);
+			const res = await params.app.request(params.path, {
+				headers: { Authorization: `Bearer ${accessToken}` },
+			});
+			expect(res.ok).toBe(true);
+		});
 
 		describe("Access Token Validation [MUST]", () => {
 			// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
