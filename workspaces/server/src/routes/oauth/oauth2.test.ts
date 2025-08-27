@@ -428,19 +428,46 @@ describe("OAuth 2.0 spec", () => {
 	describe("Authorization Code Grant", () => {
 		describe("Authorization Request", () => {
 			// 4.1.1 - Authorization Request
-			it("returns error if response_type is missing [MUST]", () => {
-				// response_type: REQUIRED.  Value MUST be set to "code"
-				expect(true).toBe(true);
-			});
-
-			it("accepts response_type=code [MUST]", () => {
-				// response_type: REQUIRED.  Value MUST be set to "code"
-				expect(true).toBe(true);
-			});
-
-			it("returns error if client_id is missing [MUST]", () => {
+			it("returns error if client_id is missing [MUST]", async () => {
 				// client_id: REQUIRED.  The client identifier as described in Section 2.2.
-				expect(true).toBe(true);
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const params = new URLSearchParams({
+					response_type: "code",
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(400);
+			});
+
+			it("accepts response_type=code [MUST]", async () => {
+				// response_type: REQUIRED.  Value MUST be set to "code"
+				const dummyUserId = await generateUserId();
+				const validUserCookie = await getUserSessionCookie(dummyUserId);
+				const oauthClientId = await registerOAuthClient(
+					dummyUserId,
+					[SCOPE_IDS.READ_BASIC_INFO],
+					["https://idp.test/oauth/callback"],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: oauthClientId,
+				});
+				const res = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{
+						headers: {
+							Cookie: validUserCookie,
+						},
+					},
+				);
+				expect(res.status).toBe(200);
 			});
 		});
 
