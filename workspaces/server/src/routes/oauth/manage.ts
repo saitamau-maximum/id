@@ -63,8 +63,11 @@ const registerSchema = v.object({
 				v.url(),
 				v.custom((input) => {
 					if (typeof input !== "string") return false;
+					// 絶対 URL であること
+					if (!URL.canParse(input)) return false;
+					// fragment component を含まないこと
 					const url = new URL(input);
-					return url.search === "";
+					return url.hash === "";
 				}),
 			),
 		),
