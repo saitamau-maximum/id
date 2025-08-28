@@ -3,7 +3,9 @@
 
 import { env } from "cloudflare:test";
 import { Hono } from "hono";
+import { generateSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
+import { sign } from "hono/jwt";
 import {
 	assert,
 	afterEach,
@@ -13,20 +15,18 @@ import {
 	it,
 	vi,
 } from "vitest";
+import { COOKIE_NAME } from "../constants/cookie";
 import { SCOPE_IDS, type ScopeId } from "../constants/scope";
 import type { HonoEnv } from "../factory";
 import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
 import { oauthRoute } from "../routes/oauth";
 import type { TokenResponse } from "../routes/oauth/accessToken";
-import {
-	AUTHORIZATION_ENDPOINT,
-	DEFAULT_REDIRECT_URI,
-	TOKEN_ENDPOINT,
-	authorize,
-	oauthTestsCommonSetup,
-	registerOAuthClient,
-} from "./oauth/utils";
+
+const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
+const TOKEN_ENDPOINT = "/oauth/access-token";
+const JWT_EXPIRATION = 300; // 5 minutes for test
+const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
@@ -34,17 +34,77 @@ describe("OAuth 2.0 spec", () => {
 	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
 	const userRepository = new CloudflareUserRepository(env.DB);
 
-	// wrapper
-	const setup = (scopes: ScopeId[], callbackUrls: string[]) =>
-		oauthTestsCommonSetup(
-			oauthExternalRepository,
-			userRepository,
-			scopes,
-			callbackUrls,
+	const setup = async (scopes?: ScopeId[], callbackUrls?: string[]) => {
+		// ユーザー作成
+		// ユーザーが存在しないと OAuth App を登録できない
+		const userId = await userRepository.createUser({});
+		// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
+		await userRepository.registerUser(userId, {});
+
+		// Cookie 生成
+		const now = Math.floor(Date.now() / 1000);
+		const jwt = await sign(
+			{
+				userId,
+				iat: now,
+				exp: now + JWT_EXPIRATION,
+			},
+			env.SECRET,
 		);
+		// "key=value; Path=/; ..." になっているので key=value だけ取り出す
+		const cookie = (
+			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
+		).split(";")[0];
+
+		// OAuth Client 登録
+		const clientId = crypto.randomUUID();
+		await oauthExternalRepository.registerClient(
+			clientId,
+			userId,
+			"Dummy App",
+			"Dummy App Description",
+			scopes ?? [SCOPE_IDS.READ_BASIC_INFO],
+			callbackUrls ?? [DEFAULT_REDIRECT_URI],
+			null,
+		);
+
+		return { userId, cookie, clientId };
+	};
 
 	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
 		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
+	};
+
+	/**
+	 * 認可画面で「承認する」を押してリダイレクトされるまでの処理を模擬する
+	 * @param html - Authorization Endpoint のレスポンス HTML
+	 * @returns リダイレクト先 URL (redirect_uri)
+	 */
+	const authorize = async (
+		app: Hono<HonoEnv>,
+		html: string,
+		cookie: string,
+	): Promise<URL> => {
+		const postTo = html.match(/<form .*? action="(.*?)"/)?.[1];
+		const inputs = Object.fromEntries(
+			[...html.matchAll(/<input .*? name="(.*?)" value="(.*?)"/g)].map((m) => [
+				m[1],
+				m[2],
+			]),
+		);
+		inputs.authorized = "1"; // 承認する
+		const res = await app.request(postTo || "", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded",
+				Cookie: cookie,
+			},
+			body: new URLSearchParams(inputs).toString(),
+		});
+		expect(res.status).toBe(302);
+		const redirectUrl = res.headers.get("Location");
+		assert.isNotNull(redirectUrl);
+		return new URL(redirectUrl);
 	};
 
 	/**
@@ -53,11 +113,8 @@ describe("OAuth 2.0 spec", () => {
 	 * 2. Authorization Endpoint にリクエストし、認可する
 	 * 3. Redirect URI に返ってくる
 	 */
-	const doAuthFlow = async () => {
-		const { userId, cookie, clientId } = await setup(
-			[SCOPE_IDS.READ_BASIC_INFO],
-			[DEFAULT_REDIRECT_URI],
-		);
+	const doAuthFlow = async (scopes?: ScopeId[], redirectUris?: string[]) => {
+		const { userId, cookie, clientId } = await setup(scopes, redirectUris);
 		const params = new URLSearchParams({
 			response_type: "code",
 			client_id: clientId,
@@ -80,8 +137,11 @@ describe("OAuth 2.0 spec", () => {
 		};
 	};
 
-	const doAccessTokenRequest = async () => {
-		const { userId, clientId, code } = await doAuthFlow();
+	const doAccessTokenRequest = async (
+		scopes?: ScopeId[],
+		redirectUris?: string[],
+	) => {
+		const { userId, clientId, code } = await doAuthFlow(scopes, redirectUris);
 		const oauthClientSecret =
 			await oauthExternalRepository.generateClientSecret(clientId, userId);
 		const body = new FormData();
@@ -696,12 +756,7 @@ describe("OAuth 2.0 spec", () => {
 				const { userId, clientId, code } = await doAuthFlow();
 				const oauthClientSecret =
 					await oauthExternalRepository.generateClientSecret(clientId, userId);
-				const differentClientId = await registerOAuthClient(
-					oauthExternalRepository,
-					userId,
-					[SCOPE_IDS.READ_BASIC_INFO],
-					[DEFAULT_REDIRECT_URI],
-				);
+				const { clientId: differentClientId } = await setup();
 				const differentClientSecret =
 					await oauthExternalRepository.generateClientSecret(
 						differentClientId,
@@ -784,37 +839,40 @@ describe("OAuth 2.0 spec", () => {
 		});
 	});
 
-	describe.each(["/oauth/resources/authuser", [SCOPE_IDS.READ_BASIC_INFO]])(
+	describe.each([
+		["/oauth/resources/authuser", [SCOPE_IDS.READ_BASIC_INFO]],
+	] as [string, ScopeId[]][])(
 		"Resource Owner Endpoints (%s)",
 		(path, scopes) => {
 			it("accepts access token in Authorization header", async () => {
-				// const accessToken = await getAccessToken(params);
-				// const res = await params.app.request(params.path, {
-				// 	headers: { Authorization: `Bearer ${accessToken}` },
-				// });
-				// expect(res.ok).toBe(true);
-				expect(true).toBe(true);
+				const { access_token } = await doAccessTokenRequest(scopes).then(
+					(res) => res.json<TokenResponse>(),
+				);
+				const res = await app.request(path, {
+					headers: { Authorization: `Bearer ${access_token}` },
+				});
+				expect(res.ok).toBe(true);
 			});
 
 			describe("Access Token Validation [MUST]", () => {
 				// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
 				it("rejects malformed access token", async () => {
-					// const res = await params.app.request(params.path, {
-					// 	headers: { Authorization: "Bearer malformed_token" },
-					// });
-					// expect(res.status).toBe(401);
-					expect(true).toBe(true);
+					const res = await app.request(path, {
+						headers: { Authorization: "Bearer malformed_token" },
+					});
+					expect(res.status).toBe(401);
 				});
 
 				it("rejects expired access token", async () => {
-					// const accessToken = await getAccessToken(params);
+					const { access_token } = await doAccessTokenRequest(scopes).then(
+						(res) => res.json<TokenResponse>(),
+					);
 					// // トークンの有効期限は 1h だが余裕をもって 1h1m 後にする
-					// vi.advanceTimersByTime(61 * 60 * 1000);
-					// const res = await params.app.request(params.path, {
-					// 	headers: { Authorization: `Bearer ${accessToken}` },
-					// });
-					// expect(res.status).toBe(401);
-					expect(true).toBe(true);
+					vi.advanceTimersByTime(61 * 60 * 1000);
+					const res = await app.request(path, {
+						headers: { Authorization: `Bearer ${access_token}` },
+					});
+					expect(res.status).toBe(401);
 				});
 
 				it("rejects access token with insufficient scope", async () => {
@@ -822,20 +880,17 @@ describe("OAuth 2.0 spec", () => {
 						// スコープがない場合はスキップ
 						return;
 					}
-
-					// const accessToken = await getAccessToken({
-					// 	...params,
-					// 	// 必要なスコープ以外を付与
-					// 	clientScopes: Object.values(SCOPE_IDS).filter(
-					// 		(scope) => !params.clientScopes.includes(scope),
-					// 	),
-					// });
-					// const res = await params.app.request(params.path, {
-					// 	headers: { Authorization: `Bearer ${accessToken}` },
-					// });
-					// expect(res.status).toBe(403);
-
-					expect(true).toBe(true);
+					// 必要なスコープ以外を付与
+					const incorrectScopes = Object.values(SCOPE_IDS).filter(
+						(scope) => !scopes.includes(scope),
+					);
+					const { access_token } = await doAccessTokenRequest(
+						incorrectScopes,
+					).then((res) => res.json<TokenResponse>());
+					const res = await app.request(path, {
+						headers: { Authorization: `Bearer ${access_token}` },
+					});
+					expect(res.status).toBe(403);
 				});
 			});
 		},
