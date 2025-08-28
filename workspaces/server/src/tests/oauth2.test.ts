@@ -13,11 +13,12 @@ import {
 	it,
 	vi,
 } from "vitest";
-import { oauthRoute } from ".";
-import { SCOPE_IDS, type ScopeId } from "../../constants/scope";
-import type { HonoEnv } from "../../factory";
-import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
-import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
+import { SCOPE_IDS, type ScopeId } from "../constants/scope";
+import type { HonoEnv } from "../factory";
+import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
+import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
+import { oauthRoute } from "../routes/oauth";
+import type { TokenResponse } from "../routes/oauth/accessToken";
 import {
 	AUTHORIZATION_ENDPOINT,
 	DEFAULT_REDIRECT_URI,
@@ -25,8 +26,7 @@ import {
 	authorize,
 	oauthTestsCommonSetup,
 	registerOAuthClient,
-} from "../../tests/oauth/utils";
-import type { TokenResponse } from "./accessToken";
+} from "./oauth/utils";
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;

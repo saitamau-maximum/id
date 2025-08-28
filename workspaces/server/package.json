@@ -14,7 +14,8 @@
 		"seed": "NODE_NO_WARNINGS=1 tsx ./src/db/seed/main.ts",
 		"fix": "biome check --write ./src",
 		"check": "biome check ./src",
-		"test": "vitest"
+		"test:unit": "vitest --config ./vitest.config.ts",
+		"test:integration": "vitest --config ./vitest.integration.config.ts"
 	},
 	"exports": {
 		"./shared/*": {
