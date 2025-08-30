@@ -65,6 +65,7 @@ const route = app
 				}
 
 				// DB 内に登録されているものを callback として扱う
+				// 絶対 URL であること・ Fragment 部分を含まないことは登録時にチェック済みである前提
 				redirectTo = client.callbackUrls[0];
 			} else {
 				// 絶対 URL かチェック
@@ -73,8 +74,18 @@ const route = app
 				}
 
 				// Redirect URI のクエリパラメータ部分は変わることを許容する
+				// ref: 3.1.2.2 - Registration Requirements
+				// ... allowing the client to dynamically vary only the query component of the redirection URI when requesting authorization.
 				const normalizedUri = new URL(redirectUri);
 				normalizedUri.search = "";
+
+				// Redirect URI には Fragment 部分を含めてはいけない (仕様上 MUST NOT)
+				if (normalizedUri.hash !== "") {
+					return c.text(
+						"Bad Request: redirect_uri must not include fragment",
+						400,
+					);
+				}
 
 				const registeredUri = client.callbackUrls.find(
 					(callbackUrl) => callbackUrl === normalizedUri.toString(),
@@ -122,8 +133,10 @@ const route = app
 			}
 			if (
 				responseType !== "code" &&
+				responseType !== "id_token" &&
+				// 順番は不問 (OAuth 2.0 仕様)
 				responseType !== "id_token token" &&
-				responseType !== "id_token"
+				responseType !== "token id_token"
 			) {
 				return errorRedirect(
 					"unsupported_response_type",

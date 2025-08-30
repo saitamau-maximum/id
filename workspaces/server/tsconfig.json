@@ -1,23 +1,18 @@
 {
-  "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "outDir": "dist",
-    "rootDir": "src",
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": [
-      "ESNext"
-    ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx"
-  },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "worker-configuration.d.ts"
-  ],
+	"compilerOptions": {
+		"composite": true,
+		"declaration": true,
+		"outDir": "dist",
+		"rootDir": "src",
+		"target": "ESNext",
+		"module": "ESNext",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"skipLibCheck": true,
+		"lib": ["ESNext"],
+		"jsx": "react-jsx",
+		"jsxImportSource": "hono/jsx",
+		"types": ["@cloudflare/vitest-pool-workers"]
+	},
+	"include": ["src/**/*.ts", "src/**/*.tsx", "worker-configuration.d.ts"]
 }
