@@ -63,9 +63,6 @@ jobs:
         run: mv .dev.vars.test .dev.vars
         working-directory: workspaces/server
 
-      - name: Build
-        run: pnpm -C workspaces/server build
-
       - name: Unit Test
         run: pnpm -C workspaces/server test:unit
 
@@ -96,9 +93,6 @@ jobs:
       - name: Generate .dev.vars file
         run: mv .dev.vars.test .dev.vars
         working-directory: workspaces/server
-
-      - name: Build
-        run: pnpm -C workspaces/server build
 
       - name: Integration Test
         run: pnpm -C workspaces/server test:integration
