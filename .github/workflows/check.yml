@@ -62,6 +62,7 @@ jobs:
       - name: Generate .dev.vars file
         run: |
           cp .dev.vars.example .dev.vars
+          # テスト用なので適当に環境変数を埋める
           sed -i -e 's/SECRET=""/SECRET="test"/g' .dev.vars
         working-directory: workspaces/server
 
@@ -98,7 +99,8 @@ jobs:
       - name: Generate .dev.vars file
         run: |
           cp .dev.vars.example .dev.vars
-          sed -i -e 's/SECRET=""/SECRET="test"/g'
+          # テスト用なので適当に環境変数を埋める
+          sed -i -e 's/SECRET=""/SECRET="test"/g' .dev.vars
         working-directory: workspaces/server
 
       - name: Build
