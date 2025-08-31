@@ -1,0 +1,33 @@
+# 共通のセットアップ
+# - Checkout, pnpm setup, Node.js setup, 依存関係のインストールを行う
+# - 他のワークフローから呼び出して使う
+
+name: Setup
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        required: true
+        type: string
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node ${{ inputs['node-version'] }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ inputs['node-version'] }}
+          cache: pnpm
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --prefer-offline
