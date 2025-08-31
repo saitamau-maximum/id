@@ -29,5 +29,37 @@ jobs:
       - name: Build
         run: pnpm -C workspaces/server build
 
-      - name: check
+      - name: Check
         run: pnpm check
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build
+        run: pnpm -C workspaces/server build
+
+      - name: Unit Test
+        run: pnpm -C workspaces/server test:unit
+
+      - name: Integration Test
+        run: pnpm -C workspaces/server test:integration
