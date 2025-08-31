@@ -60,10 +60,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Generate .dev.vars file
-        run: |
-          cp .dev.vars.example .dev.vars
-          # テスト用なので適当に環境変数を埋める
-          sed -i -e 's/SECRET=""/SECRET="test"/g' .dev.vars
+        run: mv .dev.vars.test .dev.vars
         working-directory: workspaces/server
 
       - name: Build
@@ -97,10 +94,7 @@ jobs:
         run: pnpm install --frozen-lockfile --prefer-offline
 
       - name: Generate .dev.vars file
-        run: |
-          cp .dev.vars.example .dev.vars
-          # テスト用なので適当に環境変数を埋める
-          sed -i -e 's/SECRET=""/SECRET="test"/g' .dev.vars
+        run: mv .dev.vars.test .dev.vars
         working-directory: workspaces/server
 
       - name: Build
