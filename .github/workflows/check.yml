@@ -56,6 +56,12 @@ jobs:
         shell: bash
         run: pnpm install --frozen-lockfile --prefer-offline
 
+      - name: Generate .dev.vars file
+        run: |
+          cp .dev.vars.example .dev.vars
+          sed -i -e 's/SECRET=""/SECRET="test"/g' .dev.vars
+        working-directory: workspaces/server
+
       - name: Build
         run: pnpm -C workspaces/server build
 
@@ -85,6 +91,12 @@ jobs:
       - name: Install dependencies
         shell: bash
         run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate .dev.vars file
+        run: |
+          cp .dev.vars.example .dev.vars
+          sed -i -e 's/SECRET=""/SECRET="test"/g'
+        working-directory: workspaces/server
 
       - name: Build
         run: pnpm -C workspaces/server build
