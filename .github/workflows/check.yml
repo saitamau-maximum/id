@@ -2,6 +2,9 @@ name: Check
 
 on: pull_request
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -29,5 +32,67 @@ jobs:
       - name: Build
         run: pnpm -C workspaces/server build
 
-      - name: check
+      - name: Check
         run: pnpm check
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: [check]
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate .dev.vars file
+        run: mv .dev.vars.test .dev.vars
+        working-directory: workspaces/server
+
+      - name: Unit Test
+        run: pnpm -C workspaces/server test:unit
+
+  integration-test:
+    runs-on: ubuntu-latest
+    needs: [check]
+    strategy:
+      matrix:
+        node-version: [22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Generate .dev.vars file
+        run: mv .dev.vars.test .dev.vars
+        working-directory: workspaces/server
+
+      - name: Integration Test
+        run: pnpm -C workspaces/server test:integration
