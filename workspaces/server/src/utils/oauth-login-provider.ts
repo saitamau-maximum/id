@@ -12,6 +12,7 @@ import type { Factory } from "hono/factory";
 import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
+import { ROLE_IDS } from "../constants/role";
 import {
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
@@ -286,6 +287,36 @@ export abstract class OAuthLoginProvider {
 
 					// 最終ログイン日時を更新
 					await c.var.UserRepository.updateLastLoginAt(foundUserId);
+
+					// 既存ユーザーであっても、招待コードがあれば適用して仮登録状態に戻す
+					if (this.acceptsInvitation()) {
+						const invitationId = await getSignedCookie(
+							c,
+							c.env.SECRET,
+							COOKIE_NAME.INVITATION_ID,
+						);
+						deleteCookie(c, COOKIE_NAME.INVITATION_ID);
+
+						if (typeof invitationId === "string") {
+							try {
+								await validateInvitation(c.var.InviteRepository, invitationId);
+								await c.var.InviteRepository.reduceInviteUsage(invitationId);
+								// 既にメンバーのユーザーには適用しない
+								const roleIds =
+									await c.var.UserRepository.fetchRolesByUserId(foundUserId);
+								if (!roleIds.includes(ROLE_IDS.MEMBER)) {
+									await c.var.UserRepository.applyInvitationToExistingUser(
+										foundUserId,
+										invitationId,
+									);
+								}
+							} catch (e) {
+								return c.text((e as Error).message, 400);
+							}
+
+							// 招待適用後は認証フローを続行し、フロント側で仮登録として扱ってもらう
+						}
+					}
 				} catch {
 					// ユーザーが存在しない場合
 
