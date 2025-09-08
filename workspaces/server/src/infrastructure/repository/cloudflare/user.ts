@@ -68,6 +68,20 @@ export class CloudflareUserRepository implements IUserRepository {
 		return this.createUserInternal(payload, invitationId);
 	}
 
+	async applyInvitationToExistingUser(
+		userId: string,
+		invitationId: string,
+	): Promise<void> {
+		const res = await this.client
+			.update(schema.users)
+			.set({ invitationId })
+			.where(eq(schema.users.id, userId));
+
+		if (!res.success) {
+			throw new Error("Failed to apply invitation to existing user");
+		}
+	}
+
 	async fetchUserProfileById(
 		userId: string,
 	): Promise<WithOAuthConnections<WithCertifications<User>>> {

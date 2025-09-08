@@ -6,6 +6,7 @@ export const createMockUserRepository = (): IUserRepository => {
 		fetchRolesByUserId: vi.fn(),
 		createUser: vi.fn(),
 		createTemporaryUser: vi.fn(),
+		applyInvitationToExistingUser: vi.fn(),
 		fetchUserProfileById: vi.fn(),
 		fetchAllUsers: vi.fn(),
 		fetchApprovedUsers: vi.fn(),

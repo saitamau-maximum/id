@@ -77,6 +77,10 @@ export interface IUserRepository {
 		invitationId: string,
 		payload: Partial<Profile>,
 	) => Promise<string>;
+	applyInvitationToExistingUser: (
+		userId: string,
+		invitationId: string,
+	) => Promise<void>;
 	fetchUserProfileById: (
 		userId: string,
 	) => Promise<WithOAuthConnections<WithCertifications<User>>>;
