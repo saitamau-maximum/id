@@ -2,6 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../factory";
 import { adminOnlyMiddleware } from "../middleware/auth";
+import { noCacheMiddleware } from "../middleware/cache";
 import { validateInvitation } from "../service/invite";
 
 const app = factory.createApp();
@@ -30,30 +31,32 @@ const protectedRoute = app
 		const invites = await InviteRepository.getAllInvites();
 		return c.json(invites);
 	})
-	.post("/", vValidator("json", createInviteSchema), async (c) => {
-		const { expiresAt, remainingUse, title } = c.req.valid("json");
+	.post(
+		"/",
+		noCacheMiddleware,
+		vValidator("json", createInviteSchema),
+		async (c) => {
+			const { expiresAt, remainingUse, title } = c.req.valid("json");
 
-		// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
-		if (!expiresAt && !remainingUse) {
-			return c.body(null, 400);
-		}
+			// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
+			if (!expiresAt && !remainingUse) {
+				return c.body(null, 400);
+			}
 
-		const createdAt = new Date();
-		const issuedByUserId = c.get("jwtPayload").userId;
+			const createdAt = new Date();
+			const issuedByUserId = c.get("jwtPayload").userId;
 
-		c.header("Cache-Control", "no-store");
-		c.header("Pragma", "no-cache");
-
-		// DB に格納して返す
-		const id = await c.var.InviteRepository.createInvite({
-			title: title,
-			expiresAt: expiresAt ? new Date(expiresAt) : null,
-			remainingUse: remainingUse ?? null,
-			createdAt,
-			issuedByUserId,
-		});
-		return c.json({ id }, 201);
-	})
+			// DB に格納して返す
+			const id = await c.var.InviteRepository.createInvite({
+				title: title,
+				expiresAt: expiresAt ? new Date(expiresAt) : null,
+				remainingUse: remainingUse ?? null,
+				createdAt,
+				issuedByUserId,
+			});
+			return c.json({ id }, 201);
+		},
+	)
 	.delete("/:id", async (c) => {
 		const id = c.req.param("id");
 		const { InviteRepository } = c.var;
