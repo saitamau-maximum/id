@@ -1,4 +1,5 @@
 import { factory } from "../../factory";
+import { noCacheMiddleware } from "../../middleware/cache";
 import { derivePublicKey, importKey } from "../../utils/oauth/key";
 import { oauthAccessTokenRoute } from "./accessToken";
 import { oauthAuthorizeRoute } from "./authorize";
@@ -11,13 +12,7 @@ import { oauthVerifyTokenRoute } from "./verifyToken";
 const app = factory.createApp();
 
 const route = app
-	.use(async (c, next) => {
-		await next();
-		// それぞれで設定して漏れがあると怖いので、ここで一括設定
-		c.header("Cache-Control", "no-store");
-		c.header("Pragma", "no-cache");
-		c.header("Expires", "0");
-	})
+	.use(noCacheMiddleware)
 	.route("/authorize", oauthAuthorizeRoute)
 	.route("/callback", oauthCallbackRoute)
 	.route("/access-token", oauthAccessTokenRoute)

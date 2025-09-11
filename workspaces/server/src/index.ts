@@ -38,6 +38,11 @@ const app = factory.createApp();
 export const route = app
 	.use(logger())
 	.use(async (c, next) => {
+		// 基本的には個人に紐づく情報を扱っているので public キャッシュさせない (各 route 側で上書き可能)
+		c.header("Cache-Control", "private");
+		await next();
+	})
+	.use(async (c, next) => {
 		const octokit = new Octokit({
 			authStrategy: createAppAuth,
 			auth: {
