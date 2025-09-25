@@ -150,10 +150,8 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const discordLogin = new DiscordLoginProvider(factory);
-
 const route = app
-	.get("/", ...discordLogin.loginHandlers())
-	.get("/callback", ...discordLogin.callbackHandlers());
+	.get("/", ...new DiscordLoginProvider(factory).loginHandlers())
+	.get("/callback", ...new DiscordLoginProvider(factory).callbackHandlers());
 
 export { route as authLoginDiscordRoute };
