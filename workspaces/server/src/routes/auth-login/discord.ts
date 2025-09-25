@@ -150,10 +150,9 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const discordLogin = new DiscordLoginProvider(factory);
-
+// const githubLogin = new GitHubLoginProvider(factory); とかして 1 インスタンスだけ使うようにすると複数リクエストが同時に来たときに状態が競合する可能性があるので、毎回 new する
 const route = app
-	.get("/", ...discordLogin.loginHandlers())
-	.get("/callback", ...discordLogin.callbackHandlers());
+	.get("/", ...new DiscordLoginProvider(factory).loginHandlers())
+	.get("/callback", ...new DiscordLoginProvider(factory).callbackHandlers());
 
 export { route as authLoginDiscordRoute };

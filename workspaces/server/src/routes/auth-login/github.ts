@@ -120,10 +120,9 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-const githubLogin = new GitHubLoginProvider(factory);
-
+// const githubLogin = new GitHubLoginProvider(factory); とかして 1 インスタンスだけ使うようにすると複数リクエストが同時に来たときに状態が競合する可能性があるので、毎回 new する
 const route = app
-	.get("/", ...githubLogin.loginHandlers())
-	.get("/callback", ...githubLogin.callbackHandlers());
+	.get("/", ...new GitHubLoginProvider(factory).loginHandlers())
+	.get("/callback", ...new GitHubLoginProvider(factory).callbackHandlers());
 
 export { route as authLoginGithubRoute };
