@@ -15,5 +15,6 @@ export const createMockCertificationRepository =
 			deleteCertification: vi.fn(),
 			existsUserCertification: vi.fn(),
 			deleteUserCertification: vi.fn(),
+			getCertificationsSummary: vi.fn(),
 		};
 	};
