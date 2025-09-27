@@ -27,6 +27,12 @@ export interface ICertificationUpdateRequest {
 	description: string;
 }
 
+export interface ICertificationSummary {
+	id: string;
+	title: string;
+	numberOfHolders: number;
+}
+
 export interface ICertificationRepository {
 	getAllCertifications: () => Promise<ICertification[]>;
 	requestCertification: (params: ICertificationRequest) => Promise<void>;
@@ -49,4 +55,5 @@ export interface ICertificationRepository {
 	deleteUserCertification: (
 		params: Omit<ICertificationRequest, "certifiedIn">,
 	) => Promise<void>;
+	getCertificationsSummary: () => Promise<ICertificationSummary[]>;
 }
