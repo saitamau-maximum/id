@@ -160,7 +160,9 @@ export class CloudflareCertificationRepository
 				id: schema.certifications.id,
 				title: schema.certifications.title,
 				// count + where でやると「登録はされているが取得はしていない資格」「まだ承認された人がいない資格」の場合に
-				// 0 件とならず、そもそも資格が存在しない扱いになってしまうため生 sql で対応
+				// 0 人とならず、そもそも資格が存在しない扱いになってしまうため生 sql で対応
+				// If you use count + where, certifications that are registered but not yet obtained, or certifications with no approved holders,
+				// will not be counted as "0 people" but will be treated as if the certification does not exist at all, so we use raw SQL here.
 				numberOfHolders: sql<number>`COUNT(CASE WHEN ${schema.userCertifications.isApproved} = TRUE THEN 1 END)`,
 			})
 			.from(schema.certifications)
