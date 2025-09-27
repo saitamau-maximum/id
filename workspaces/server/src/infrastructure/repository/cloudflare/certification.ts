@@ -1,4 +1,4 @@
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
@@ -6,6 +6,7 @@ import type {
 	ICertificationRepository,
 	ICertificationRequest,
 	ICertificationRequestWithUser,
+	ICertificationSummary,
 	ICertificationUpdateRequest,
 } from "../../../repository/certification";
 
@@ -151,5 +152,24 @@ export class CloudflareCertificationRepository
 					eq(schema.userCertifications.certificationId, params.certificationId),
 				),
 			);
+	}
+
+	async getCertificationsSummary(): Promise<ICertificationSummary[]> {
+		const res = await this.client
+			.select({
+				id: schema.certifications.id,
+				title: schema.certifications.title,
+				// count + where でやると「登録はされているが取得はしていない資格」「まだ承認された人がいない資格」の場合に
+				// 0 件とならず、そもそも資格が存在しない扱いになってしまうため生 sql で対応
+				numberOfHolders: sql<number>`COUNT(CASE WHEN ${schema.userCertifications.isApproved} = TRUE THEN 1 END)`,
+			})
+			.from(schema.certifications)
+			.leftJoin(
+				schema.userCertifications,
+				eq(schema.certifications.id, schema.userCertifications.certificationId),
+			)
+			.groupBy(schema.certifications.id);
+
+		return res;
 	}
 }
