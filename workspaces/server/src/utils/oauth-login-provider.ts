@@ -57,9 +57,15 @@ export abstract class OAuthLoginProvider {
 		state: v.pipe(v.string(), v.nonEmpty()),
 	});
 
+	static readonly LOGIN_ORIGIN_SCHEMA = v.union([
+		v.literal("login"),
+		v.literal("settings"),
+	]);
+
 	static readonly LOGIN_REQUEST_QUERY_SCHEMA = v.object({
 		continue_to: v.string(),
 		invitation_id: v.optional(v.string()),
+		from: OAuthLoginProvider.LOGIN_ORIGIN_SCHEMA,
 	});
 
 	// ----- protected members ----- //
@@ -104,7 +110,11 @@ export abstract class OAuthLoginProvider {
 				this.honoVariables = c.var;
 				this.origin = new URL(c.req.url).origin;
 
-				const { continue_to, invitation_id } = c.req.valid("query");
+				const {
+					continue_to,
+					invitation_id,
+					from: login_origin,
+				} = c.req.valid("query");
 
 				if (invitation_id) {
 					if (!this.acceptsInvitation()) {
@@ -132,11 +142,17 @@ export abstract class OAuthLoginProvider {
 					);
 				}
 
-				// continue_to を Cookie に保存
+				// continue_to と login_origin を Cookie に保存
 				setCookie(
 					c,
 					COOKIE_NAME.CONTINUE_TO,
 					continue_to ?? "/",
+					OAuthLoginProvider.COOKIE_OPTIONS,
+				);
+				setCookie(
+					c,
+					COOKIE_NAME.LOGIN_ORIGIN,
+					login_origin,
 					OAuthLoginProvider.COOKIE_OPTIONS,
 				);
 
@@ -188,6 +204,17 @@ export abstract class OAuthLoginProvider {
 					return c.text("state mismatch", 400);
 				}
 
+				// login origin check
+				const { success: isValidLoginOrigin, output: loginOrigin } =
+					v.safeParse(
+						OAuthLoginProvider.LOGIN_ORIGIN_SCHEMA,
+						getCookie(c, COOKIE_NAME.LOGIN_ORIGIN),
+					);
+				deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN);
+				if (!isValidLoginOrigin) {
+					return c.text("bad login origin", 400);
+				}
+
 				// access token を取得
 				try {
 					await this.getAccessToken(code);
@@ -231,8 +258,12 @@ export abstract class OAuthLoginProvider {
 					}
 				}
 
-				// もしログインしている場合には、 Settings からの OAuth Conn 作成/更新リクエストとみなす
-				if (loggedInUserId) {
+				// Settings からの OAuth Conn 作成/更新リクエスト
+				if (loginOrigin === "settings") {
+					if (!loggedInUserId) {
+						return c.text("not logged in", 401);
+					}
+
 					let providerUserId: string | null = null;
 					try {
 						providerUserId = await this.getProviderUserId();
@@ -267,6 +298,8 @@ export abstract class OAuthLoginProvider {
 
 					return c.redirect(continueToUrl.toString(), 302);
 				}
+
+				// loginOrigin === "login": 通常のログインフロー
 
 				// もし未ログイン状態の場合、ユーザーが存在するかチェック
 				let foundUserId: string | null = null;

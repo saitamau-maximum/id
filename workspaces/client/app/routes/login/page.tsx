@@ -25,6 +25,7 @@ export default function Login() {
 	const continueToURL =
 		searchParams.get("continue_to") ?? `${window.location.origin}/verify`;
 	loginSearchParams.set("continue_to", continueToURL);
+	loginSearchParams.set("from", "login");
 
 	// もし招待コードがあれば使う
 	if (invitationCode) loginSearchParams.set("invitation_id", invitationCode);

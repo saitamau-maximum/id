@@ -55,6 +55,7 @@ export const OAuthConnRow = ({
 	const loginSearchParams = new URLSearchParams();
 	const continueToURL = window.location.href;
 	loginSearchParams.set("continue_to", continueToURL);
+	loginSearchParams.set("from", "settings");
 
 	const { mutate } = useDeleteOAuthConnection();
 
