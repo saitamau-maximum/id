@@ -44,12 +44,18 @@ import type { Awaitable } from "./types";
 export abstract class OAuthLoginProvider {
 	// ----- static readonly ----- //
 	static readonly JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+	static readonly FLOW_COOKIE_MAX_AGE = 60 * 15; // 15 minutes
 
-	static readonly COOKIE_OPTIONS = {
+	static readonly SESSION_COOKIE_OPTIONS = {
 		path: "/",
 		secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
 		sameSite: "lax", // "strict" にすると callback で読み取れなくなる
 		httpOnly: true,
+	} as const;
+
+	static readonly FLOW_COOKIE_OPTIONS = {
+		...OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
+		maxAge: OAuthLoginProvider.FLOW_COOKIE_MAX_AGE,
 	} as const;
 
 	static readonly CALLBACK_REQUEST_QUERY_SCHEMA = v.object({
@@ -138,7 +144,7 @@ export abstract class OAuthLoginProvider {
 						COOKIE_NAME.INVITATION_ID,
 						invitation_id,
 						c.env.SECRET,
-						OAuthLoginProvider.COOKIE_OPTIONS,
+						OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 					);
 				}
 
@@ -147,13 +153,13 @@ export abstract class OAuthLoginProvider {
 					c,
 					COOKIE_NAME.CONTINUE_TO,
 					continue_to ?? "/",
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 				);
 				setCookie(
 					c,
 					COOKIE_NAME.LOGIN_ORIGIN,
 					login_origin,
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 				);
 
 				// state を設定
@@ -165,7 +171,7 @@ export abstract class OAuthLoginProvider {
 					COOKIE_NAME.OAUTH_SESSION_STATE,
 					state,
 					c.env.SECRET,
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 				);
 
 				const authorizationUrl = this.getAuthorizationUrl();
@@ -425,7 +431,7 @@ export abstract class OAuthLoginProvider {
 					COOKIE_NAME.LOGIN_STATE,
 					jwt,
 					c.env.SECRET,
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
 				);
 
 				const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
