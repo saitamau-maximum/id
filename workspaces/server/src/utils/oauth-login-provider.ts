@@ -50,7 +50,6 @@ export abstract class OAuthLoginProvider {
 		secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
 		sameSite: "lax", // "strict" にすると callback で読み取れなくなる
 		httpOnly: true,
-		maxAge: OAuthLoginProvider.JWT_EXPIRATION,
 	} as const;
 
 	static readonly CALLBACK_REQUEST_QUERY_SCHEMA = v.object({
@@ -134,7 +133,12 @@ export abstract class OAuthLoginProvider {
 				}
 
 				// continue_to を Cookie に保存
-				setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+				setCookie(
+					c,
+					COOKIE_NAME.CONTINUE_TO,
+					continue_to ?? "/",
+					OAuthLoginProvider.COOKIE_OPTIONS,
+				);
 
 				// state を設定
 				const state = binaryToBase64(
