@@ -133,7 +133,7 @@ export const Sidebar = () => {
 	const navigate = useNavigate();
 
 	const handleLogout = useCallback(() => {
-		localStorage.removeItem(JWT_STORAGE_KEY);
+		sessionStorage.removeItem(JWT_STORAGE_KEY);
 		refetch();
 		window.location.href = `${env("SERVER_HOST")}/auth/logout`;
 	}, [refetch]);

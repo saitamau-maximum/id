@@ -21,7 +21,7 @@ export default function Verify() {
 				});
 				if (res.ok) {
 					const payload = await res.json();
-					localStorage.setItem(JWT_STORAGE_KEY, payload.jwt);
+					sessionStorage.setItem(JWT_STORAGE_KEY, payload.jwt);
 					navigate("/");
 				}
 			} catch {

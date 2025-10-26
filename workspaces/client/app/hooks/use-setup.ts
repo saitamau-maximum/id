@@ -15,7 +15,7 @@ export const useSetup = () => {
 			const { needsReauth, ...msg } = TOAST_MESSAGES[toastId];
 			if (needsReauth) {
 				// 再ログインが必要な場合は、認証情報を削除する
-				localStorage.removeItem(JWT_STORAGE_KEY);
+				sessionStorage.removeItem(JWT_STORAGE_KEY);
 			}
 			if (msg) pushToast(msg);
 		}

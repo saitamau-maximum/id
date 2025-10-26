@@ -44,13 +44,18 @@ import type { Awaitable } from "./types";
 export abstract class OAuthLoginProvider {
 	// ----- static readonly ----- //
 	static readonly JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+	static readonly FLOW_COOKIE_MAX_AGE = 60 * 15; // 15 minutes
 
-	static readonly COOKIE_OPTIONS = {
+	static readonly SESSION_COOKIE_OPTIONS = {
 		path: "/",
 		secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
 		sameSite: "lax", // "strict" にすると callback で読み取れなくなる
 		httpOnly: true,
-		maxAge: OAuthLoginProvider.JWT_EXPIRATION,
+	} as const;
+
+	static readonly FLOW_COOKIE_OPTIONS = {
+		...OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
+		maxAge: OAuthLoginProvider.FLOW_COOKIE_MAX_AGE,
 	} as const;
 
 	static readonly CALLBACK_REQUEST_QUERY_SCHEMA = v.object({
@@ -58,9 +63,15 @@ export abstract class OAuthLoginProvider {
 		state: v.pipe(v.string(), v.nonEmpty()),
 	});
 
+	static readonly LOGIN_ORIGIN_SCHEMA = v.union([
+		v.literal("login"),
+		v.literal("settings"),
+	]);
+
 	static readonly LOGIN_REQUEST_QUERY_SCHEMA = v.object({
 		continue_to: v.string(),
 		invitation_id: v.optional(v.string()),
+		from: OAuthLoginProvider.LOGIN_ORIGIN_SCHEMA,
 	});
 
 	// ----- protected members ----- //
@@ -105,7 +116,11 @@ export abstract class OAuthLoginProvider {
 				this.honoVariables = c.var;
 				this.origin = new URL(c.req.url).origin;
 
-				const { continue_to, invitation_id } = c.req.valid("query");
+				const {
+					continue_to,
+					invitation_id,
+					from: login_origin,
+				} = c.req.valid("query");
 
 				if (invitation_id) {
 					if (!this.acceptsInvitation()) {
@@ -129,12 +144,23 @@ export abstract class OAuthLoginProvider {
 						COOKIE_NAME.INVITATION_ID,
 						invitation_id,
 						c.env.SECRET,
-						OAuthLoginProvider.COOKIE_OPTIONS,
+						OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 					);
 				}
 
-				// continue_to を Cookie に保存
-				setCookie(c, COOKIE_NAME.CONTINUE_TO, continue_to ?? "/");
+				// continue_to と login_origin を Cookie に保存
+				setCookie(
+					c,
+					COOKIE_NAME.CONTINUE_TO,
+					continue_to ?? "/",
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+				);
+				setCookie(
+					c,
+					COOKIE_NAME.LOGIN_ORIGIN,
+					login_origin,
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+				);
 
 				// state を設定
 				const state = binaryToBase64(
@@ -145,7 +171,7 @@ export abstract class OAuthLoginProvider {
 					COOKIE_NAME.OAUTH_SESSION_STATE,
 					state,
 					c.env.SECRET,
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
 				);
 
 				const authorizationUrl = this.getAuthorizationUrl();
@@ -173,15 +199,38 @@ export abstract class OAuthLoginProvider {
 				const { code, state } = c.req.valid("query");
 				const requestUrl = new URL(c.req.url);
 
-				// state check
+				// ここでしか使われない Cookie を取得し、削除する (早期リターンしても Cookie が残らないようにするため)
+				// loginState はほかでも使われるので対象外
 				const storedState = await getSignedCookie(
 					c,
 					c.env.SECRET,
 					COOKIE_NAME.OAUTH_SESSION_STATE,
 				);
+				const loginOriginCookie = getCookie(c, COOKIE_NAME.LOGIN_ORIGIN);
+				const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
+				const invitationId = await getSignedCookie(
+					c,
+					c.env.SECRET,
+					COOKIE_NAME.INVITATION_ID,
+				);
 				deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
+				deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN);
+				deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
+				deleteCookie(c, COOKIE_NAME.INVITATION_ID);
+
+				// state check
 				if (state !== storedState) {
 					return c.text("state mismatch", 400);
+				}
+
+				// login origin check
+				const { success: isValidLoginOrigin, output: loginOrigin } =
+					v.safeParse(
+						OAuthLoginProvider.LOGIN_ORIGIN_SCHEMA,
+						loginOriginCookie,
+					);
+				if (!isValidLoginOrigin) {
+					return c.text("bad login origin", 400);
 				}
 
 				// access token を取得
@@ -192,8 +241,6 @@ export abstract class OAuthLoginProvider {
 				}
 
 				// ContinueTo の validate
-				const continueTo = getCookie(c, COOKIE_NAME.CONTINUE_TO);
-				deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
 				if (continueTo === undefined) {
 					return c.text("Bad Request", 400);
 				}
@@ -227,8 +274,12 @@ export abstract class OAuthLoginProvider {
 					}
 				}
 
-				// もしログインしている場合には、 Settings からの OAuth Conn 作成/更新リクエストとみなす
-				if (loggedInUserId) {
+				// Settings からの OAuth Conn 作成/更新リクエスト
+				if (loginOrigin === "settings") {
+					if (!loggedInUserId) {
+						return c.text("not logged in", 401);
+					}
+
 					let providerUserId: string | null = null;
 					try {
 						providerUserId = await this.getProviderUserId();
@@ -238,7 +289,7 @@ export abstract class OAuthLoginProvider {
 
 					const doesExistConn =
 						await c.var.OAuthInternalRepository.fetchUserIdByProviderInfo(
-							await this.getProviderUserId(),
+							providerUserId,
 							this.getProviderId(),
 						)
 							.then(() => true)
@@ -247,7 +298,7 @@ export abstract class OAuthLoginProvider {
 					const payload: OAuthConnection = {
 						userId: loggedInUserId,
 						providerId: this.getProviderId(),
-						providerUserId: await this.getProviderUserId(),
+						providerUserId,
 						refreshToken: await this.getRefreshToken(),
 						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
 						...(await this.getOAuthConnectionUserPayload()),
@@ -263,6 +314,8 @@ export abstract class OAuthLoginProvider {
 
 					return c.redirect(continueToUrl.toString(), 302);
 				}
+
+				// loginOrigin === "login": 通常のログインフロー
 
 				// もし未ログイン状態の場合、ユーザーが存在するかチェック
 				let foundUserId: string | null = null;
@@ -290,13 +343,6 @@ export abstract class OAuthLoginProvider {
 
 					// 既存ユーザーであっても、招待コードがあれば適用して仮登録状態に戻す
 					if (this.acceptsInvitation()) {
-						const invitationId = await getSignedCookie(
-							c,
-							c.env.SECRET,
-							COOKIE_NAME.INVITATION_ID,
-						);
-						deleteCookie(c, COOKIE_NAME.INVITATION_ID);
-
 						if (typeof invitationId === "string") {
 							try {
 								await validateInvitation(c.var.InviteRepository, invitationId);
@@ -322,13 +368,6 @@ export abstract class OAuthLoginProvider {
 
 					// 招待経由かチェックする
 					if (this.acceptsInvitation()) {
-						const invitationId = await getSignedCookie(
-							c,
-							c.env.SECRET,
-							COOKIE_NAME.INVITATION_ID,
-						);
-						deleteCookie(c, COOKIE_NAME.INVITATION_ID);
-
 						if (typeof invitationId === "string") {
 							// 招待コードの署名検証に成功しているので、コードを検証
 							try {
@@ -392,7 +431,7 @@ export abstract class OAuthLoginProvider {
 					COOKIE_NAME.LOGIN_STATE,
 					jwt,
 					c.env.SECRET,
-					OAuthLoginProvider.COOKIE_OPTIONS,
+					OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
 				);
 
 				const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
