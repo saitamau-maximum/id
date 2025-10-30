@@ -20,6 +20,7 @@ import {
 	ToastHashFn,
 } from "../constants/toast";
 import type { HonoEnv } from "../factory";
+import { noCacheMiddleware } from "../middleware/cache";
 import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
@@ -110,6 +111,7 @@ export abstract class OAuthLoginProvider {
 	// ----- public methods ----- //
 	public loginHandlers() {
 		return this.factory.createHandlers(
+			noCacheMiddleware,
 			vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
 			async (c) => {
 				this.env = c.env;
@@ -190,6 +192,7 @@ export abstract class OAuthLoginProvider {
 
 	public callbackHandlers() {
 		return this.factory.createHandlers(
+			noCacheMiddleware,
 			vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
 			async (c) => {
 				this.env = c.env;
