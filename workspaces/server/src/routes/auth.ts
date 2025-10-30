@@ -19,18 +19,23 @@ const route = app
 		deleteCookie(c, COOKIE_NAME.LOGIN_STATE);
 		return c.redirect(`${c.env.CLIENT_ORIGIN}/login`, 302);
 	})
-	.get("/verify", vValidator("query", verifyRequestQuerySchema), async (c) => {
-		const { SessionRepository } = c.var;
-		const { ott } = c.req.valid("query");
+	.get(
+		"/verify",
+		noCacheMiddleware,
+		vValidator("query", verifyRequestQuerySchema),
+		async (c) => {
+			const { SessionRepository } = c.var;
+			const { ott } = c.req.valid("query");
 
-		const jwt = await SessionRepository.verifyOneTimeToken(ott);
+			const jwt = await SessionRepository.verifyOneTimeToken(ott);
 
-		if (!jwt) {
-			return c.body(null, 400);
-		}
+			if (!jwt) {
+				return c.body(null, 400);
+			}
 
-		return c.json({ jwt });
-	})
+			return c.json({ jwt });
+		},
+	)
 	.get("/me", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");
 		const { UserRepository } = c.var;
