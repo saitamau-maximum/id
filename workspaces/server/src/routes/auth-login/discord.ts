@@ -55,11 +55,11 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return this.user;
 	}
 
-	acceptsInvitation() {
+	override acceptsInvitation() {
 		return false;
 	}
 
-	getAuthorizationUrl() {
+	override getAuthorizationUrl() {
 		// ref: https://discord.com/developers/docs/topics/oauth2
 		const url = new URL(OAuth2Routes.authorizationURL);
 		url.searchParams.set(
@@ -70,29 +70,29 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return url;
 	}
 
-	getClientId() {
+	override getClientId() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.DISCORD_OAUTH_ID;
 	}
 
-	getClientSecret() {
+	override getClientSecret() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.DISCORD_OAUTH_SECRET;
 	}
 
-	getCallbackUrl() {
+	override getCallbackUrl() {
 		if (!this.origin) throw new Error("Origin is not set");
 		return `${this.origin}/auth/login/discord/callback`;
 	}
 
-	async getAccessToken(code: string) {
+	override async getAccessToken(code: string) {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
 		return this.accessTokenResponse.access_token;
 	}
 
-	getAccessTokenExpiresAt() {
+	override getAccessTokenExpiresAt() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		const unixMs =
@@ -100,28 +100,28 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 		return new Date(unixMs);
 	}
 
-	getRefreshToken() {
+	override getRefreshToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		return this.accessTokenResponse.refresh_token;
 	}
 
-	getRefreshTokenExpiresAt() {
+	override getRefreshTokenExpiresAt() {
 		// Discord では Refresh Token の有効期限はないっぽい？
 		return null;
 	}
 
-	getProviderId() {
+	override getProviderId() {
 		return OAUTH_PROVIDER_IDS.DISCORD;
 	}
 
-	async getProviderUserId() {
+	override async getProviderUserId() {
 		const user = await this.getDiscordUser();
 		if (!user) throw new Error("Discord user is not available");
 		return user.id;
 	}
 
-	async getOAuthConnectionUserPayload() {
+	override async getOAuthConnectionUserPayload() {
 		const discordUser = await this.getDiscordUser();
 
 		return {

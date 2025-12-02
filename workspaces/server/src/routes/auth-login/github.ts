@@ -53,11 +53,11 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return this.user;
 	}
 
-	acceptsInvitation() {
+	override acceptsInvitation() {
 		return true;
 	}
 
-	getAuthorizationUrl() {
+	override getAuthorizationUrl() {
 		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 		const url = new URL("https://github.com/login/oauth/authorize");
 		url.searchParams.set("scope", "read:user");
@@ -65,45 +65,45 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return url;
 	}
 
-	getClientId() {
+	override getClientId() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_ID;
 	}
 
-	getClientSecret() {
+	override getClientSecret() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_SECRET;
 	}
 
-	getCallbackUrl() {
+	override getCallbackUrl() {
 		if (!this.origin) throw new Error("Origin is not set");
 		return `${this.origin}/auth/login/github/callback`;
 	}
 
-	async getAccessToken(code: string) {
+	override async getAccessToken(code: string) {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
 		return this.accessTokenResponse.access_token;
 	}
 
-	getAccessTokenExpiresAt() {
+	override getAccessTokenExpiresAt() {
 		// GitHub では Access Token の有効期限はないっぽい？
 		return null;
 	}
 
-	getRefreshToken() {
+	override getRefreshToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
 		return this.accessTokenResponse.access_token;
 	}
 
-	getRefreshTokenExpiresAt() {
+	override getRefreshTokenExpiresAt() {
 		return null;
 	}
 
-	getProviderId(): number {
+	override getProviderId(): number {
 		return OAUTH_PROVIDER_IDS.GITHUB;
 	}
 
