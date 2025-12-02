@@ -1,3 +1,4 @@
+import { vValidator } from "@hono/valibot-validator";
 import {
 	type APIUser,
 	CDNRoutes,
@@ -10,6 +11,7 @@ import {
 } from "discord-api-types/v10";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
+import { noCacheMiddleware } from "../../middleware/cache";
 import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
@@ -151,7 +153,24 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 }
 
 const route = app
-	.get("/", ...new DiscordLoginProvider(factory).loginHandlers())
-	.get("/callback", ...new DiscordLoginProvider(factory).callbackHandlers());
+	.get(
+		"/",
+		noCacheMiddleware,
+		vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
+		(c) => {
+			return new DiscordLoginProvider().loginHandlers(c, c.req.valid("query"));
+		},
+	)
+	.get(
+		"/callback",
+		noCacheMiddleware,
+		vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
+		(c) => {
+			return new DiscordLoginProvider().callbackHandlers(
+				c,
+				c.req.valid("query"),
+			);
+		},
+	);
 
 export { route as authLoginDiscordRoute };
