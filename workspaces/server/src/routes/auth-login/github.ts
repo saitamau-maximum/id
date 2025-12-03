@@ -1,7 +1,9 @@
+import { vValidator } from "@hono/valibot-validator";
 import type { Endpoints } from "@octokit/types";
 import { Octokit } from "octokit";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
+import { noCacheMiddleware } from "../../middleware/cache";
 import { OAuthLoginProvider } from "../../utils/oauth-login-provider";
 
 const app = factory.createApp();
@@ -51,11 +53,11 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return this.user;
 	}
 
-	acceptsInvitation() {
+	override acceptsInvitation() {
 		return true;
 	}
 
-	getAuthorizationUrl() {
+	override getAuthorizationUrl() {
 		// ref: https://docs.github.com/ja/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps
 		const url = new URL("https://github.com/login/oauth/authorize");
 		url.searchParams.set("scope", "read:user");
@@ -63,45 +65,45 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return url;
 	}
 
-	getClientId() {
+	override getClientId() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_ID;
 	}
 
-	getClientSecret() {
+	override getClientSecret() {
 		if (!this.env) throw new Error("Environment is not set");
 		return this.env.GITHUB_OAUTH_SECRET;
 	}
 
-	getCallbackUrl() {
+	override getCallbackUrl() {
 		if (!this.origin) throw new Error("Origin is not set");
 		return `${this.origin}/auth/login/github/callback`;
 	}
 
-	async getAccessToken(code: string) {
+	override async getAccessToken(code: string) {
 		await this.makeAccessTokenRequest(code);
 		if (!this.accessTokenResponse)
 			throw new Error("Failed to fetch access token");
 		return this.accessTokenResponse.access_token;
 	}
 
-	getAccessTokenExpiresAt() {
+	override getAccessTokenExpiresAt() {
 		// GitHub では Access Token の有効期限はないっぽい？
 		return null;
 	}
 
-	getRefreshToken() {
+	override getRefreshToken() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
 		// GitHub では OAuth Access Token は Revoke しない限り無期限に使える？っぽいので Refresh Token として保管する
 		return this.accessTokenResponse.access_token;
 	}
 
-	getRefreshTokenExpiresAt() {
+	override getRefreshTokenExpiresAt() {
 		return null;
 	}
 
-	getProviderId(): number {
+	override getProviderId(): number {
 		return OAUTH_PROVIDER_IDS.GITHUB;
 	}
 
@@ -120,9 +122,26 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 	}
 }
 
-// const githubLogin = new GitHubLoginProvider(factory); とかして 1 インスタンスだけ使うようにすると複数リクエストが同時に来たときに状態が競合する可能性があるので、毎回 new する
 const route = app
-	.get("/", ...new GitHubLoginProvider(factory).loginHandlers())
-	.get("/callback", ...new GitHubLoginProvider(factory).callbackHandlers());
+	.get(
+		"/",
+		noCacheMiddleware,
+		vValidator("query", OAuthLoginProvider.LOGIN_REQUEST_QUERY_SCHEMA),
+		(c) => {
+			// ...new GitHubLoginProvider().loginHandlers とすると状態が競合する可能性があるので毎回 new する
+			return new GitHubLoginProvider().loginHandlers(c, c.req.valid("query"));
+		},
+	)
+	.get(
+		"/callback",
+		noCacheMiddleware,
+		vValidator("query", OAuthLoginProvider.CALLBACK_REQUEST_QUERY_SCHEMA),
+		(c) => {
+			return new GitHubLoginProvider().callbackHandlers(
+				c,
+				c.req.valid("query"),
+			);
+		},
+	);
 
 export { route as authLoginGithubRoute };
