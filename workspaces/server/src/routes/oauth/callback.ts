@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
+import { SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
@@ -177,6 +178,10 @@ const route = app
 						res.append("token_type", "Bearer");
 						res.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
 					}
+
+					const userInfo =
+						await c.var.UserRepository.fetchUserProfileById(userId);
+
 					const id_token = await generateIdToken({
 						clientId: client_id,
 						userId,
@@ -185,7 +190,19 @@ const route = app
 						nonce: oidc_nonce,
 						accessToken,
 						privateKey: c.env.PRIVKEY_FOR_OAUTH,
+						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
+							? {
+									name: userInfo.displayName,
+									picture: userInfo.profileImageURL,
+								}
+							: {}),
+						...(scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
+							? {
+									email: userInfo.email,
+								}
+							: {}),
 					});
+
 					res.append("id_token", id_token);
 					if (state) res.append("state", state);
 
