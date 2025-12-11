@@ -206,7 +206,7 @@ const route = app
 					// 必要最低限の情報は含める
 					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
 						? {
-								name: userInfo.displayName,
+								name: userInfo.realName,
 								picture: userInfo.profileImageURL,
 							}
 						: {}),

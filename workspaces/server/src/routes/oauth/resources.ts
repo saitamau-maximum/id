@@ -70,15 +70,14 @@ const route = app
 			);
 		if (tokenInfo.scopes.some((scope) => scope.id === SCOPE_IDS.PROFILE)) {
 			if (tokenInfo.user.profile.realName) {
+				userInfo.name = tokenInfo.user.profile.realName;
 				const [familyName, givenName] =
 					tokenInfo.user.profile.realName.split(" ");
 				userInfo.given_name = givenName;
 				userInfo.family_name = familyName;
 			}
-			if (tokenInfo.user.profile.displayName) {
-				userInfo.name = tokenInfo.user.profile.displayName;
+			if (tokenInfo.user.profile.displayName)
 				userInfo.nickname = tokenInfo.user.profile.displayName;
-			}
 			if (tokenInfo.user.profile.displayId) {
 				userInfo.preferred_username = tokenInfo.user.profile.displayId;
 				// userInfo.profile = `https://id.maximum.vc/public/${tokenInfo.user.profile.displayId}`;  // TODO: public profile ができたら
