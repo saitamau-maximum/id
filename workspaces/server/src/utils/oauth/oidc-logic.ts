@@ -12,6 +12,10 @@ interface OidcIdTokenPayload {
 	nonce?: string;
 	// acr, amr, azp は使わないので省略
 	at_hash: string;
+	// 必要最低限のフィールドは id_token に含める
+	name?: string;
+	picture?: string;
+	email?: string;
 }
 
 interface Param {
@@ -23,6 +27,10 @@ interface Param {
 	accessToken: string;
 	privateKey: string;
 	keyId?: string;
+	// 必要最低限のフィールドは id_token に含める
+	name?: string;
+	picture?: string;
+	email?: string;
 }
 
 const signJWT = async (
@@ -79,6 +87,9 @@ export const generateIdToken = async ({
 	nonce,
 	accessToken,
 	privateKey,
+	name,
+	picture,
+	email,
 }: Param) => {
 	const {
 		key,
@@ -99,6 +110,9 @@ export const generateIdToken = async ({
 	};
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
+	if (name) payload.name = name;
+	if (picture) payload.picture = picture;
+	if (email) payload.email = email;
 
 	const idToken = await signJWT(payload, key, kid);
 
