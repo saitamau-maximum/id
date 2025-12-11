@@ -190,6 +190,7 @@ const route = app
 						nonce: oidc_nonce,
 						accessToken,
 						privateKey: c.env.PRIVKEY_FOR_OAUTH,
+						// 必要最低限の情報は含める
 						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
 							? {
 									name: userInfo.displayName,
