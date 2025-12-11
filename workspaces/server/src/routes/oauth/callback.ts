@@ -19,7 +19,12 @@ const app = factory.createApp();
 const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
-	response_type: v.picklist(["code", "id_token token", "id_token"] as const),
+	response_type: v.picklist([
+		"code",
+		"id_token token",
+		"token id_token",
+		"id_token",
+	] as const),
 	response_mode: v.optional(v.picklist(["query", "fragment"] as const)),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
@@ -159,9 +164,14 @@ const route = app
 						redirectTo.searchParams.append("code", code);
 						return c.redirect(redirectTo.href, 302);
 					}
+
 					// OpenID Connect Implicit Flow
 					const res = new URLSearchParams();
-					if (response_type === "id_token token") {
+					if (
+						// 順不同なので
+						response_type === "id_token token" ||
+						response_type === "token id_token"
+					) {
 						// Access Token も返す
 						res.append("access_token", accessToken);
 						res.append("token_type", "Bearer");
