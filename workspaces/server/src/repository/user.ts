@@ -20,6 +20,9 @@ export type Profile = {
 	email: string;
 	studentId: string;
 	grade: string;
+	faculty?: string;
+	department?: string;
+	laboratory?: string;
 	bio: string;
 	socialLinks: string[];
 	updatedAt: Date;

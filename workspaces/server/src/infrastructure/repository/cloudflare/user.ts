@@ -174,6 +174,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			faculty: payload.faculty,
+			department: payload.department,
+			laboratory: payload.laboratory,
 			updatedAt: new Date(),
 		};
 
@@ -218,6 +221,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: payload.email,
 			studentId: payload.studentId,
 			grade: payload.grade,
+			faculty: payload.faculty,
+			department: payload.department,
+			laboratory: payload.laboratory,
 			bio: payload.bio,
 			updatedAt: new Date(),
 		};

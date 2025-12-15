@@ -6,7 +6,15 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { GRADE, OUTSIDE_GRADE } from "~/constant";
+import {
+	FACULTY,
+	FacultyOfEducation,
+	FacultyOfEngineering,
+	FacultyOfLiberalArts,
+	FacultyOfScience,
+	GRADE,
+	OUTSIDE_GRADE,
+} from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
@@ -20,6 +28,9 @@ const RegisterFormSchema = v.object({
 	academicEmail: v.optional(UserSchemas.AcademicEmail),
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
+	faculty: v.optional(v.string()),
+	department: v.optional(v.string()),
+	laboratory: v.optional(v.string()),
 });
 
 type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
@@ -52,6 +63,9 @@ export const RegisterForm = () => {
 	const onSubmit = useCallback(
 		(data: FormInputValues) => {
 			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
+			const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
+				data.grade,
+			);
 			if (!isOutsideMember && !data.academicEmail) {
 				setError("academicEmail", {
 					message: "学籍番号と大学のメールアドレスは必須です",
@@ -64,12 +78,31 @@ export const RegisterForm = () => {
 				});
 				return;
 			}
+			// M, D以上は研究室必須
+			if (isGraduateStudent && !data.laboratory) {
+				setError("laboratory", {
+					message: "研究室を入力してください",
+				});
+				return;
+			}
 			mutate(data);
 		},
 		[mutate, setError],
 	);
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+	const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
+		watch("grade"),
+	);
+	const selectedFaculty = watch("faculty");
+
+	const departmentsByFaculty: Record<string, string[]> = {
+		教養学部: FacultyOfLiberalArts[0]?.identifier ?? [],
+		経済学部: [],
+		教育学部: FacultyOfEducation[0]?.identifier ?? [],
+		理学部: FacultyOfScience[0]?.identifier ?? [],
+		工学部: FacultyOfEngineering[0]?.identifier ?? [],
+	};
 
 	return (
 		<form
@@ -133,6 +166,69 @@ export const RegisterForm = () => {
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
+
+			{!isOutsideMember && !isGraduateStudent && (
+				<Form.FieldSet>
+					<Fragment>
+						<Form.LabelText>学部</Form.LabelText>
+						<Form.RadioGroup>
+							{FACULTY[0].identifier.map((identifier) => (
+								<Form.Radio
+									key={identifier}
+									value={identifier}
+									label={identifier}
+									{...register("faculty")}
+								/>
+							))}
+						</Form.RadioGroup>
+						<ErrorDisplay error={errors.faculty?.message} />
+
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<Form.RadioGroup>
+										{(departmentsByFaculty[selectedFaculty] ?? []).map(
+											(dept) => (
+												<Form.Radio
+													key={dept}
+													value={dept}
+													label={dept}
+													{...register("department")}
+												/>
+											),
+										)}
+									</Form.RadioGroup>
+									<ErrorDisplay error={errors.department?.message} />
+								</Fragment>
+							)}
+					</Fragment>
+
+					<Form.Field.TextInput
+						label="研究室（任意）"
+						error={errors.laboratory?.message}
+						placeholder="例: 田中研究室"
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+				</Form.FieldSet>
+			)}
+
+			{isGraduateStudent && (
+				<Form.FieldSet>
+					<Form.Field.TextInput
+						label="研究室"
+						error={errors.laboratory?.message}
+						placeholder="例: 田中研究室"
+						required
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+				</Form.FieldSet>
+			)}
 
 			<Form.Field.TextInput
 				label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"

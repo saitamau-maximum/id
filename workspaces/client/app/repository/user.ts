@@ -10,6 +10,9 @@ export interface UserRegisterParams {
 	email: string;
 	studentId?: string;
 	grade: string;
+	faculty?: string;
+	department?: string;
+	laboratory?: string;
 }
 
 export interface ProfileUpdateParams {
@@ -21,6 +24,9 @@ export interface ProfileUpdateParams {
 	email: string;
 	studentId?: string;
 	grade: string;
+	faculty?: string;
+	department?: string;
+	laboratory?: string;
 	bio: string;
 	socialLinks: string[];
 }
@@ -57,6 +63,9 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
+		faculty,
+		department,
+		laboratory,
 	}: UserRegisterParams) {
 		const res = await client.user.register.$post({
 			json: {
@@ -68,6 +77,9 @@ export class UserRepositoryImpl implements IUserRepository {
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
 			},
 		});
 		if (!res.ok) {
@@ -84,6 +96,9 @@ export class UserRepositoryImpl implements IUserRepository {
 		email,
 		studentId,
 		grade,
+		faculty,
+		department,
+		laboratory,
 		bio,
 		socialLinks,
 	}: ProfileUpdateParams) {
@@ -97,6 +112,9 @@ export class UserRepositoryImpl implements IUserRepository {
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
 				bio,
 				socialLinks,
 			},
