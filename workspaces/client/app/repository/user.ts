@@ -13,6 +13,8 @@ export interface UserRegisterParams {
 	faculty?: string;
 	department?: string;
 	laboratory?: string;
+	graduateSchool?: string;
+	specialization?: string;
 }
 
 export interface ProfileUpdateParams {
@@ -27,6 +29,8 @@ export interface ProfileUpdateParams {
 	faculty?: string;
 	department?: string;
 	laboratory?: string;
+	graduateSchool?: string;
+	specialization?: string;
 	bio: string;
 	socialLinks: string[];
 }
@@ -66,6 +70,8 @@ export class UserRepositoryImpl implements IUserRepository {
 		faculty,
 		department,
 		laboratory,
+		graduateSchool,
+		specialization,
 	}: UserRegisterParams) {
 		const res = await client.user.register.$post({
 			json: {
@@ -80,6 +86,8 @@ export class UserRepositoryImpl implements IUserRepository {
 				faculty,
 				department,
 				laboratory,
+				graduateSchool,
+				specialization,
 			},
 		});
 		if (!res.ok) {
@@ -99,6 +107,8 @@ export class UserRepositoryImpl implements IUserRepository {
 		faculty,
 		department,
 		laboratory,
+		graduateSchool,
+		specialization,
 		bio,
 		socialLinks,
 	}: ProfileUpdateParams) {
@@ -115,6 +125,8 @@ export class UserRepositoryImpl implements IUserRepository {
 				faculty,
 				department,
 				laboratory,
+				graduateSchool,
+				specialization,
 				bio,
 				socialLinks,
 			},

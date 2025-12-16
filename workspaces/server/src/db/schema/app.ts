@@ -73,6 +73,8 @@ export const userProfiles = sqliteTable(
 		faculty: text("faculty"),
 		department: text("department"),
 		laboratory: text("laboratory"),
+		graduateSchool: text("graduate_school"),
+		specialization: text("specialization"),
 		bio: text("bio"),
 		updatedAt: integer("updated_at", { mode: "timestamp" }),
 	},

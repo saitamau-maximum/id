@@ -50,6 +50,8 @@ const UpdateFormSchema = v.object({
 	faculty: v.optional(v.string()),
 	department: v.optional(v.string()),
 	laboratory: v.optional(v.string()),
+	graduateSchool: v.optional(v.string()),
+	specialization: v.optional(v.string()),
 	bio: UserSchemas.Bio,
 	socialLinks: UserSchemas.SocialLinks,
 });
@@ -114,6 +116,8 @@ export const ProfileUpdateForm = () => {
 			faculty: user?.faculty,
 			department: user?.department,
 			laboratory: user?.laboratory,
+			graduateSchool: user?.graduateSchool,
+			specialization: user?.specialization,
 			bio: user?.bio,
 			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
@@ -289,14 +293,31 @@ export const ProfileUpdateForm = () => {
 				</Form.FieldSet>
 			)}
 
-			{/* M, D以上は研究室必須 */}
+			{/* M, D以上は研究科・専攻・研究室必須 */}
 			{isGraduateStudent && (
 				<Form.FieldSet>
+					<Form.Field.TextInput
+						label="研究科"
+						error={errors.graduateSchool?.message}
+						placeholder="例: 情報理工学研究科"
+						{...register("graduateSchool", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
+					<Form.Field.TextInput
+						label="専攻"
+						error={errors.specialization?.message}
+						placeholder="例: 情報惥報妲極専攻"
+						{...register("specialization", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
 					<Form.Field.TextInput
 						label="研究室"
 						error={errors.laboratory?.message}
 						placeholder="例: 田中研究室"
-						required
 						{...register("laboratory", {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}

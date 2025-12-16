@@ -23,6 +23,8 @@ export type Profile = {
 	faculty?: string;
 	department?: string;
 	laboratory?: string;
+	graduateSchool?: string;
+	specialization?: string;
 	bio: string;
 	socialLinks: string[];
 	updatedAt: Date;

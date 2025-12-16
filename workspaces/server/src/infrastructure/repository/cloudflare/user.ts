@@ -128,6 +128,11 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
+			faculty: user.profile.faculty ?? undefined,
+			department: user.profile.department ?? undefined,
+			laboratory: user.profile.laboratory ?? undefined,
+			graduateSchool: user.profile.graduateSchool ?? undefined,
+			specialization: user.profile.specialization ?? undefined,
 			bio: user.profile.bio ?? undefined,
 			socialLinks: user.socialLinks.map((link) => link.url),
 			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
@@ -177,6 +182,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			faculty: payload.faculty,
 			department: payload.department,
 			laboratory: payload.laboratory,
+			graduateSchool: payload.graduateSchool,
+			specialization: payload.specialization,
 			updatedAt: new Date(),
 		};
 
@@ -224,6 +231,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			faculty: payload.faculty,
 			department: payload.department,
 			laboratory: payload.laboratory,
+			graduateSchool: payload.graduateSchool,
+			specialization: payload.specialization,
 			bio: payload.bio,
 			updatedAt: new Date(),
 		};
