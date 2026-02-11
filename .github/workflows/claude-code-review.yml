@@ -18,13 +18,13 @@ jobs:
     # if: github.event.pull_request.draft == false && github.event.pull_request.user.type == 'User'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 1
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@v1
+        uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476 # v1.0.48
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
