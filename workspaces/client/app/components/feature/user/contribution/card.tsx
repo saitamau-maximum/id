@@ -42,8 +42,9 @@ export const ContributionCard = ({
 			})}
 		>
 			{latestWeeks.map((week) =>
-				// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-				week.map((day, i) => <RateCell key={i} rate={day.rate} />),
+				week.map((day) => (
+					<RateCell key={day.date?.toLocaleString()} rate={day.rate} />
+				)),
 			)}
 			{isLoading && (
 				<div
