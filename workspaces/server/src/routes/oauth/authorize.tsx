@@ -4,6 +4,7 @@ import { verify } from "hono/jwt";
 import { validator } from "hono/validator";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
+import { JWT_ALG } from "../../constants/jwt";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import {
 	PLEASE_RELOGIN_FOR_OAUTH,
@@ -280,7 +281,7 @@ const route = app
 					COOKIE_NAME.LOGIN_STATE,
 				);
 				if (jwt) {
-					const payload = await verify(jwt, c.env.SECRET).catch(
+					const payload = await verify(jwt, c.env.SECRET, JWT_ALG).catch(
 						() => undefined,
 					);
 					if (payload) return payload.iat;

@@ -2,6 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import { sign, verify } from "hono/jwt";
 import { type EventAttributes, createEvents } from "ics";
 import * as v from "valibot";
+import { JWT_ALG } from "../../constants/jwt";
 import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import { memberOnlyMiddleware } from "../../middleware/auth";
@@ -22,7 +23,7 @@ const route = app
 		const { userId } = c.get("jwtPayload");
 		// 毎回同じトークンを生成するのはあまり良くないので、ランダムな文字列を付与する
 		const randomString = Math.random().toString(36).slice(2);
-		const token = await sign({ userId, randomString }, c.env.SECRET);
+		const token = await sign({ userId, randomString }, c.env.SECRET, JWT_ALG);
 		const requestUrl = new URL(c.req.url);
 		return c.text(`${requestUrl.origin}/calendar/calendar.ics?token=${token}`);
 	})
@@ -30,7 +31,9 @@ const route = app
 		const { token } = c.req.valid("query");
 		const { UserRepository } = c.var;
 		try {
-			const payload = await verify(token, c.env.SECRET).catch(() => undefined);
+			const payload = await verify(token, c.env.SECRET, JWT_ALG).catch(
+				() => undefined,
+			);
 			if (!payload) {
 				return c.text("Unauthorized", 401);
 			}

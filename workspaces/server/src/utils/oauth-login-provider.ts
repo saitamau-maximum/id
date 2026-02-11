@@ -9,6 +9,7 @@ import {
 import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
+import { JWT_ALG } from "../constants/jwt";
 import { ROLE_IDS } from "../constants/role";
 import {
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
@@ -230,7 +231,7 @@ export abstract class OAuthLoginProvider {
 			COOKIE_NAME.LOGIN_STATE,
 		);
 		if (cookieJwt) {
-			const payload = await verify(cookieJwt, c.env.SECRET).catch(
+			const payload = await verify(cookieJwt, c.env.SECRET, JWT_ALG).catch(
 				() => undefined,
 			);
 			if (payload) {
@@ -388,6 +389,7 @@ export abstract class OAuthLoginProvider {
 				exp: now + OAuthLoginProvider.JWT_EXPIRATION,
 			},
 			c.env.SECRET,
+			JWT_ALG,
 		);
 
 		await setSignedCookie(

@@ -24,28 +24,28 @@
 		}
 	},
 	"dependencies": {
-		"@hono/valibot-validator": "^0.5.2",
-		"@octokit/auth-app": "^7.2.0",
-		"discord-api-types": "^0.38.1",
-		"drizzle-orm": "^0.41.0",
-		"hono": "^4.9.4",
-		"octokit": "^4.1.2",
-		"valibot": "^1.0.0",
-		"wasm-image-optimization": "^1.2.28"
+		"@hono/valibot-validator": "^0.6.1",
+		"@octokit/auth-app": "^8.2.0",
+		"discord-api-types": "^0.38.38",
+		"drizzle-orm": "^0.45.1",
+		"hono": "^4.11.9",
+		"octokit": "^5.0.5",
+		"valibot": "^1.2.0",
+		"wasm-image-optimization": "^1.4.5"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.66",
-		"@octokit/types": "^14.1.0",
+		"@cloudflare/vitest-pool-workers": "^0.12.11",
+		"@octokit/types": "^16.0.0",
 		"@types/minimist": "^1.2.5",
 		"@types/prompts": "^2.4.9",
-		"drizzle-kit": "^0.30.6",
+		"drizzle-kit": "^0.31.9",
 		"ics": "^3.8.1",
-		"miniflare": "^4.20250405.0",
+		"miniflare": "^4.20260210.0",
 		"minimist": "^1.2.8",
 		"prompts": "^2.4.2",
-		"tsx": "^4.19.3",
-		"typescript": "^5.8.3",
-		"vitest": "^3.2.0",
-		"wrangler": "^4.8.0"
+		"tsx": "^4.21.0",
+		"typescript": "^5.9.3",
+		"vitest": "^3.2.4",
+		"wrangler": "^4.64.0"
 	}
 }
