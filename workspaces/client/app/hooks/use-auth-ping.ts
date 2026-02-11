@@ -6,7 +6,10 @@ export function useAuthPing(enabled: boolean) {
 	const { authRepository } = useRepository();
 	return useQuery({
 		queryKey: authRepository.ping$$key(),
-		queryFn: () => authRepository.ping(),
+		queryFn: () => {
+			authRepository.ping();
+			return "ok"; // Query data cannot be undefined らしいので適当な文字列を返す
+		},
 		refetchInterval: AUTH_PING_INTERVAL,
 		refetchIntervalInBackground: true,
 		enabled,

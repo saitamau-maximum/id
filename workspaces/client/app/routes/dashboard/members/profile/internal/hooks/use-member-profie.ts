@@ -1,10 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 
-export function useMemberProfile(userDisplayId: string) {
+export function useMemberProfile(userDisplayId?: string) {
 	const { memberRepository } = useRepository();
 	return useQuery({
-		queryKey: memberRepository.getProfileByUserDisplayID$$key(userDisplayId),
-		queryFn: () => memberRepository.getProfileByUserDisplayID(userDisplayId),
+		enabled: userDisplayId !== undefined,
+		queryKey: memberRepository.getProfileByUserDisplayID$$key(
+			userDisplayId ?? "",
+		),
+		queryFn: () => {
+			// undefined の場合は実行されないはずだが型安全のためにチェック
+			if (!userDisplayId) throw new Error("userDisplayId is required");
+			return memberRepository.getProfileByUserDisplayID(userDisplayId);
+		},
 	});
 }
