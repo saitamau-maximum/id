@@ -42,7 +42,7 @@
 	"devDependencies": {
 		"@pandacss/dev": "^0.53.7",
 		"@react-router/dev": "^7.13.0",
-		"@types/node": "^22.19.11",
+		"@types/node": "^25.2.3",
 		"@types/react": "^19.2.13",
 		"@types/react-dom": "^19.2.3",
 		"typescript": "^5.9.3",
