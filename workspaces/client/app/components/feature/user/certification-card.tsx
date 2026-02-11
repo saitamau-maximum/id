@@ -58,9 +58,6 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 						onClick={() => {
 							onClick(certification);
 						}}
-						onKeyUp={() => {
-							onClick(certification);
-						}}
 						key={certification.id}
 					>
 						{!certification.isApproved && (
