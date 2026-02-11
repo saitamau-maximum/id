@@ -2,13 +2,11 @@ import type { FC, ReactNode } from "react";
 import { css } from "styled-system/css";
 
 interface LoginButtonProps {
-	disabled?: boolean;
 	children: ReactNode;
 	bgColor?: string;
 }
 
 export const LoginButtonLike: FC<LoginButtonProps> = ({
-	disabled,
 	children,
 	bgColor,
 }) => {

@@ -24,8 +24,8 @@ export const editUserRole = async (
 			message: "ユーザーのロールを選択してください",
 			choices: Object.entries(ROLE_BY_ID).map(([roleId, role]) => ({
 				title: role.name,
-				value: Number.parseInt(roleId),
-				selected: userRoleIds.has(Number.parseInt(roleId)),
+				value: Number.parseInt(roleId, 10),
+				selected: userRoleIds.has(Number.parseInt(roleId, 10)),
 			})),
 		},
 		{

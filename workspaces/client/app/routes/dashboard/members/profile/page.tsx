@@ -25,10 +25,6 @@ export default function Profile() {
 	}>();
 	const { deviceType } = useDeviceType();
 
-	if (!userDisplayId) {
-		return null;
-	}
-
 	const {
 		data: memberProfile,
 		isLoading: isMemberProfileLoading,
@@ -38,10 +34,10 @@ export default function Profile() {
 		useMemberContribution(userDisplayId);
 	const { data: discordInfo } = useDiscordInfo(userDisplayId);
 
+	if (!userDisplayId) return null;
+
 	// MemberProfile が読み込まれるまでは表示しない
-	if (isMemberProfileLoading) {
-		return null;
-	}
+	if (isMemberProfileLoading) return null;
 
 	if (isMemberProfileError || !memberProfile) {
 		return (

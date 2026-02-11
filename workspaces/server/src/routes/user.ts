@@ -3,8 +3,11 @@ import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
-import { ACADEMIC_EMAIL_DOMAIN } from "../constants/validation";
-import { BIO_MAX_LENGTH, RESERVED_WORDS } from "../constants/validation";
+import {
+	ACADEMIC_EMAIL_DOMAIN,
+	BIO_MAX_LENGTH,
+	RESERVED_WORDS,
+} from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 

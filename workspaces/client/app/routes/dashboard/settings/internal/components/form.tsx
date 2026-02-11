@@ -52,8 +52,7 @@ export const ProfileUpdateForm = () => {
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
 	const { data: certifications } = useCertifications();
-	const { mutate: deleteCertification, isPending: isPendingDeletion } =
-		useDeleteUserCertification();
+	const { mutate: deleteCertification } = useDeleteUserCertification();
 
 	const requestableCertifications = useMemo(() => {
 		const requestedIds = user?.certifications.map((c) => c.id) || [];
@@ -142,13 +141,6 @@ export const ProfileUpdateForm = () => {
 	const bioLength = bio?.length || 0;
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
-
-	const githubConn = user?.oauthConnections.find(
-		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
-	);
-	const discordConn = user?.oauthConnections.find(
-		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.DISCORD,
-	);
 
 	return (
 		<form

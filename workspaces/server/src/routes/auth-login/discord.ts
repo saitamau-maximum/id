@@ -95,8 +95,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 	override getAccessTokenExpiresAt() {
 		if (!this.accessTokenResponse)
 			throw new Error("Access token response is not available");
-		const unixMs =
-			new Date().valueOf() + this.accessTokenResponse.expires_in * 1000;
+		const unixMs = Date.now() + this.accessTokenResponse.expires_in * 1000;
 		return new Date(unixMs);
 	}
 

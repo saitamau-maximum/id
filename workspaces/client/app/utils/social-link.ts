@@ -18,7 +18,7 @@ export const detectSocialService = (
 	)?.[0];
 
 	if (socialService) {
-		return Number.parseInt(socialService) as ManuallyAddableSocialService;
+		return Number.parseInt(socialService, 10) as ManuallyAddableSocialService;
 	}
 	// SOCIAL_SERVICES_HOST_NAMESにない場合はOTHERを返す
 	return SOCIAL_SERVICES_IDS.OTHER;
