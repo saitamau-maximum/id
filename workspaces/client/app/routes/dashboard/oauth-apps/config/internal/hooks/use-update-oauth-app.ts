@@ -1,5 +1,4 @@
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
@@ -16,7 +15,6 @@ interface IMutationParams {
 export function useUpdateOAuthApp({ id }: { id: string }) {
 	const { oauthAppsRepository } = useRepository();
 	const { pushToast } = useToast();
-	const navigate = useNavigate();
 
 	return useMutation({
 		mutationFn: (payload: IMutationParams) =>

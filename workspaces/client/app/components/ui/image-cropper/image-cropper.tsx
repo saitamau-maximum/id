@@ -107,7 +107,7 @@ export const ImageCropper = ({
 				type: "image/png",
 			});
 			onCrop(file);
-		} catch (error) {
+		} catch (_error) {
 			alert("Something went wrong!");
 		}
 	}, [croppedImageUrl, filename, onCrop]);
