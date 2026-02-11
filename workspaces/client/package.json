@@ -4,9 +4,9 @@
 	"type": "module",
 	"scripts": {
 		"prepare": "react-router typegen && panda codegen",
-		"build": "cross-env NODE_ENV=production react-router build",
+		"build": "NODE_ENV=production react-router build",
 		"dev": "react-router dev",
-		"start": "cross-env NODE_ENV=production react-router-serve ./build/server/index.js",
+		"start": "NODE_ENV=production react-router-serve ./build/server/index.js",
 		"typecheck": "react-router typegen && tsc",
 		"fix": "biome check --write ./app",
 		"check": "biome check ./app && pnpm run typecheck"
@@ -45,7 +45,6 @@
 		"@types/node": "^22.19.11",
 		"@types/react": "^19.2.13",
 		"@types/react-dom": "^19.2.3",
-		"cross-env": "^7.0.3",
 		"typescript": "^5.9.3",
 		"vite": "^7.3.1",
 		"vite-tsconfig-paths": "^6.1.0"
