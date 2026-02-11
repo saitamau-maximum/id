@@ -151,7 +151,7 @@ const route = app
 						: null,
 				);
 				return c.text("OK");
-			} catch (e) {
+			} catch (_e) {
 				return c.text("Failed to register client", 500);
 			}
 		},
@@ -164,7 +164,7 @@ const route = app
 			const body = await OAuthAppStorageRepository.getAppIconURL(appId);
 			c.header("Content-Type", "image/webp");
 			return stream(c, (s) => s.pipe(body));
-		} catch (e) {
+		} catch (_e) {
 			return c.text("Not found", 404);
 		}
 	})
@@ -215,7 +215,7 @@ const route = app
 						: null,
 				);
 				return c.text("OK");
-			} catch (e) {
+			} catch (_e) {
 				return c.text("Failed to update client", 500);
 			}
 		},

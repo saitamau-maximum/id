@@ -46,7 +46,7 @@ const route = app
 			if (!user.roles.some((role) => role.id === ROLE_IDS.MEMBER)) {
 				return c.text("Forbidden", 403);
 			}
-		} catch (e) {
+		} catch (_e) {
 			return c.text("Unauthorized", 401);
 		}
 		const { CalendarRepository } = c.var;

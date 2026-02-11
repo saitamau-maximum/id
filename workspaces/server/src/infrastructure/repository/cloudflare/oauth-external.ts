@@ -471,7 +471,7 @@ export class CloudflareOAuthExternalRepository
 
 	async deleteExpiredAccessTokens() {
 		// 有効期限ジャストに使われるかもしれないので、念のため 1 日前のものを削除
-		const now = new Date().valueOf() - 1 * 24 * 60 * 60 * 1000;
+		const now = Date.now() - 1 * 24 * 60 * 60 * 1000;
 
 		// まず一覧を取得
 		const expiredTokenIds = (

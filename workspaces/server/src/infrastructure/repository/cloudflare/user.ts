@@ -242,7 +242,7 @@ export class CloudflareUserRepository implements IUserRepository {
 					);
 				}
 			}
-		} catch (err) {
+		} catch (_err) {
 			throw new Error("Failed to update user");
 		}
 	}
