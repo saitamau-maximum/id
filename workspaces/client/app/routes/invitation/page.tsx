@@ -1,7 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { type MetaFunction, useParams } from "react-router";
-import { useNavigate } from "react-router";
+import { type MetaFunction, useNavigate, useParams } from "react-router";
 import { useAuth } from "~/hooks/use-auth";
 import { useInvitation } from "~/hooks/use-invitation";
 import { useRepository } from "~/hooks/use-repository";

@@ -1,6 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
 import { sign, verify } from "hono/jwt";
-import { type EventAttributes, createEvents } from "ics";
+import { createEvents, type EventAttributes } from "ics";
 import * as v from "valibot";
 import { JWT_ALG } from "../../constants/jwt";
 import { ROLE_IDS } from "../../constants/role";

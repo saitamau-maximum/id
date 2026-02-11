@@ -250,7 +250,7 @@ export default function Register() {
 										onChange={handleSelectFile}
 										onClick={(e) => {
 											// valueを初期化して、同じファイルを選択してもonChangeが発火するようにする
-											// @ts-ignore
+											// @ts-expect-error
 											e.target.value = "";
 										}}
 									/>

@@ -9,9 +9,9 @@ import {
 import { Crop as RFCrop } from "react-feather";
 
 import ReactCrop, {
+	type Crop,
 	centerCrop,
 	makeAspectCrop,
-	type Crop,
 	type PixelCrop,
 } from "react-image-crop";
 

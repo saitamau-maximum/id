@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { type ScopeId, isScopeId } from "../../constants/scope";
+import { isScopeId, type ScopeId } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 

@@ -4,7 +4,7 @@ import {
 	FORBIDDEN_RESPONSE,
 	UNAUTHORIZED_RESPONSE,
 } from "../../constants/oauth-external";
-import { SCOPES_BY_ID, SCOPE_IDS } from "../../constants/scope";
+import { SCOPE_IDS, SCOPES_BY_ID } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
 import type { OidcUserInfo } from "../../utils/oauth/constant";
