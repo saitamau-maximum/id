@@ -41,9 +41,10 @@ export const ContributionCard = ({
 				overflow: "hidden",
 			})}
 		>
-			{latestWeeks.map((week) =>
-				week.map((day) => (
-					<RateCell key={day.date?.toLocaleString()} rate={day.rate} />
+			{latestWeeks.map((week, weekIndex) =>
+				week.map((day, dayIndex) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: 気にしない
+					<RateCell key={`${weekIndex}-${dayIndex}`} rate={day.rate} />
 				)),
 			)}
 			{isLoading && (
