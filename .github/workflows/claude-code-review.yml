@@ -1,8 +1,11 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  # なんか最近動かないのでいったんコメントアウトし、 workflow_dispatch を追加
+  # 動かすなら workflow_dispatch を削除して、 L7-8, L18 のコメントアウトを戻してください〜
+  workflow_dispatch:
+  # pull_request:
+  #   types: [opened, synchronize]
 
 jobs:
   claude-review:
@@ -12,16 +15,16 @@ jobs:
       pull-requests: read
       issues: read
       id-token: write
-    if: github.event.pull_request.draft == false && github.event.pull_request.user.type == 'User'
+    # if: github.event.pull_request.draft == false && github.event.pull_request.user.type == 'User'
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 1
 
       - name: Run Claude Code Review
         id: claude-review
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476 # v1.0.48
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -29,7 +32,7 @@ jobs:
           # model: "claude-opus-4-1-20250805"
 
           # Direct prompt for automated review (no @claude mention needed)
-          direct_prompt: |
+          prompt: |
             Please review this pull request and provide feedback on:
             - Code quality and best practices
             - Potential bugs or issues

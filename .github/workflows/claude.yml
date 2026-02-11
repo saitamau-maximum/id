@@ -1,22 +1,25 @@
 name: Claude Code
 
 on:
-  issue_comment:
-    types: [created]
-  pull_request_review_comment:
-    types: [created]
-  issues:
-    types: [opened, assigned]
-  pull_request_review:
-    types: [submitted]
+  # なんか最近動かないのでいったんコメントアウトし、 workflow_dispatch を追加
+  # 動かすなら workflow_dispatch を削除して、 L7-14, L18-22 のコメントアウトを戻してください〜
+  workflow_dispatch:
+  # issue_comment:
+  #   types: [created]
+  # pull_request_review_comment:
+  #   types: [created]
+  # issues:
+  #   types: [opened, assigned]
+  # pull_request_review:
+  #   types: [submitted]
 
 jobs:
   claude:
-    if: |
-      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
-      (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
-      (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
+    # if: |
+    #   (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+    #   (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude')) ||
+    #   (github.event_name == 'pull_request_review' && contains(github.event.review.body, '@claude')) ||
+    #   (github.event_name == 'issues' && (contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')))
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -26,13 +29,13 @@ jobs:
       actions: read # Required for Claude to read CI results on PRs
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 1
 
       - name: Run Claude Code
         id: claude
-        uses: anthropics/claude-code-action@beta
+        uses: anthropics/claude-code-action@23ed4cb53d6eacddbc22ec16652c98bcc54e0476 # v1.0.48
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
 
@@ -61,4 +64,3 @@ jobs:
           # Optional: Custom environment variables for Claude
           # claude_env: |
           #   NODE_ENV: test
-
