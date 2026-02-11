@@ -99,7 +99,7 @@ export const ProfileImageEditor = () => {
 					onChange={handleSelectFile}
 					onClick={(e) => {
 						// valueを初期化して、同じファイルを選択してもonChangeが発火するようにする
-						// @ts-expect-error
+						// @ts-expect-error - Property 'value' does not exist on type 'EventTarget'.
 						e.target.value = "";
 					}}
 				/>
