@@ -1,8 +1,11 @@
 name: Claude Code Review
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  # なんか最近動かないのでいったんコメントアウトし、 workflow_dispatch を追加
+  # 動かすなら workflow_dispatch を削除して、 L7-8, L18 のコメントアウトを戻してください〜
+  workflow_dispatch:
+  # pull_request:
+  #   types: [opened, synchronize]
 
 jobs:
   claude-review:
@@ -12,7 +15,7 @@ jobs:
       pull-requests: read
       issues: read
       id-token: write
-    if: github.event.pull_request.draft == false && github.event.pull_request.user.type == 'User'
+    # if: github.event.pull_request.draft == false && github.event.pull_request.user.type == 'User'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
