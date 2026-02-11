@@ -16,6 +16,7 @@ import {
 	vi,
 } from "vitest";
 import { COOKIE_NAME } from "../constants/cookie";
+import { JWT_ALG } from "../constants/jwt";
 import { SCOPE_IDS, type ScopeId } from "../constants/scope";
 import type { HonoEnv } from "../factory";
 import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
@@ -50,6 +51,7 @@ describe("OAuth 2.0 spec", () => {
 				exp: now + JWT_EXPIRATION,
 			},
 			env.SECRET,
+			JWT_ALG,
 		);
 		// "key=value; Path=/; ..." になっているので key=value だけ取り出す
 		const cookie = (

@@ -2,6 +2,7 @@ import { every } from "hono/combine";
 import { getSignedCookie } from "hono/cookie";
 import { jwt, verify } from "hono/jwt";
 import { COOKIE_NAME } from "../constants/cookie";
+import { JWT_ALG } from "../constants/jwt";
 import { ROLE_IDS } from "../constants/role";
 import {
 	PLEASE_LOGIN_FOR_OAUTH,
@@ -13,6 +14,7 @@ import { factory } from "../factory";
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
 	return jwt({
 		secret: c.env.SECRET,
+		alg: JWT_ALG,
 	})(c, next);
 });
 
@@ -20,7 +22,9 @@ export const cookieAuthMiddleware = factory.createMiddleware(
 	async (c, next) => {
 		const jwt = await getSignedCookie(c, c.env.SECRET, COOKIE_NAME.LOGIN_STATE);
 		if (jwt) {
-			const payload = await verify(jwt, c.env.SECRET).catch(() => undefined);
+			const payload = await verify(jwt, c.env.SECRET, JWT_ALG).catch(
+				() => undefined,
+			);
 			if (payload) {
 				c.set("jwtPayload", payload);
 				return next();
