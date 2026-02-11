@@ -26,6 +26,70 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 		return b.certifiedIn - a.certifiedIn;
 	});
 
+	if (onClick) {
+		return (
+			<div
+				className={css({
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "start",
+					flexWrap: "wrap",
+				})}
+			>
+				{sortedCertifications.map((certification) => (
+					<button
+						className={css({
+							display: "inline-flex",
+							padding: "token(spacing.1) token(spacing.2)",
+							lineHeight: 1,
+							border: "1px solid token(colors.gray.300)",
+							borderRadius: 14,
+							margin: "token(spacing.1)",
+							color: "gray.600",
+							gap: "token(spacing.1)",
+							alignItems: "center",
+							justifyContent: "center",
+							cursor: "pointer",
+							"&:hover": {
+								background: "gray.100",
+							},
+						})}
+						type="button"
+						onClick={() => {
+							onClick(certification);
+						}}
+						onKeyUp={() => {
+							onClick(certification);
+						}}
+						key={certification.id}
+					>
+						{!certification.isApproved && (
+							<AlertCircle size={16} aria-label="未承認" />
+						)}
+						<span
+							className={css({
+								fontSize: 14,
+								fontWeight: 500,
+								textWrap: "nowrap",
+							})}
+						>
+							{certification.title}
+						</span>
+						<span
+							className={css({
+								fontSize: 10,
+								fontWeight: 400,
+								lineHeight: "14px",
+							})}
+						>
+							{certification.certifiedIn}
+						</span>
+					</button>
+				))}
+			</div>
+		);
+	}
+
 	return (
 		<div
 			className={css({
@@ -48,21 +112,7 @@ export const CertificationCard = ({ certifications, onClick }: Props) => {
 						gap: "token(spacing.1)",
 						alignItems: "center",
 						justifyContent: "center",
-						...(onClick
-							? {
-									cursor: "pointer",
-									"&:hover": {
-										background: "gray.100",
-									},
-								}
-							: {}),
 					})}
-					onClick={() => {
-						if (onClick) onClick(certification);
-					}}
-					onKeyUp={() => {
-						if (onClick) onClick(certification);
-					}}
 					key={certification.id}
 				>
 					{!certification.isApproved && (
