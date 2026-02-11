@@ -1,14 +1,13 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
+	isRouteErrorResponse,
 	Link,
 	Links,
 	Meta,
 	Outlet,
 	Scripts,
 	ScrollRestoration,
-	isRouteErrorResponse,
 } from "react-router";
-
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { css } from "styled-system/css";
 import type { Route } from "./+types/root";
 import stylesheet from "./app.css?url";

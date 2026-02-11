@@ -7,7 +7,7 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { InvitationURLSchemas } from "~/schema/invitaiton";
+import { InvitationURLSchemas } from "~/schema/invitation";
 
 type Payload =
 	| {

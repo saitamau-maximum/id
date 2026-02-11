@@ -79,11 +79,7 @@ export const NonMemberUsersTable = () => {
 // ロールの数が多い場合、表示を制限する
 const ROLE_SLICE_LIMIT = 3;
 
-const UserTableRow = ({
-	user,
-}: {
-	user: User;
-}) => {
+const UserTableRow = ({ user }: { user: User }) => {
 	const { mutate: updateRole } = useUpdateRole(user.id);
 	const { mutate: confirmPayment } = useConfirmPayment(user.id);
 

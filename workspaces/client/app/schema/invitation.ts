@@ -9,7 +9,7 @@ export const InvitationURLSchemas = {
 	RemainingUse: v.nullable(
 		v.pipe(
 			v.string(),
-			v.transform((v) => Number.parseInt(v)),
+			v.transform((v) => Number.parseInt(v, 10)),
 			v.integer("使用可能回数は整数で入力してください"),
 			v.minValue(1, "使用可能回数は1以上で入力してください"),
 		),

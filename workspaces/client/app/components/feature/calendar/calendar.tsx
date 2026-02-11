@@ -129,6 +129,7 @@ export const Calendar = ({
 	}, [displayedCalendar]);
 
 	return (
+		// biome-ignore lint/a11y/useAriaPropsSupportedByRole: TODO: ちゃんとする
 		<div
 			className={css({
 				display: "flex",

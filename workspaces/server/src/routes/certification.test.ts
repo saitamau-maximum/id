@@ -89,7 +89,10 @@ describe("Certification Handler", () => {
 		it("should handle errors gracefully", async () => {
 			vi.mocked(
 				mockCertificationRepository.getAllCertifications,
-			).mockRejectedValue(new Error("Database error"));
+			).mockRejectedValue(
+				// Database error だけだと、テスト時にほんとにエラーが起きてるのか紛らわしいので
+				new Error("Database error [テスト用エラーであり正常です]"),
+			);
 			const response = await app.request("/certification/all");
 
 			expect(response.status).toBe(500);

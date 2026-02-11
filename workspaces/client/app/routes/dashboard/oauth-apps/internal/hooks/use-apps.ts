@@ -9,10 +9,15 @@ export const useAllApps = () => {
 	});
 };
 
-export const useApp = (appId: string) => {
+export const useApp = (appId?: string) => {
 	const { oauthAppsRepository } = useRepository();
 	return useQuery({
-		queryKey: oauthAppsRepository.getAppById$$key(appId),
-		queryFn: () => oauthAppsRepository.getAppById(appId),
+		enabled: appId !== undefined,
+		queryKey: oauthAppsRepository.getAppById$$key(appId ?? ""),
+		queryFn: () => {
+			// undefined の場合は実行されないはずだが型安全のためにチェック
+			if (!appId) throw new Error("appId is required");
+			return oauthAppsRepository.getAppById(appId);
+		},
 	});
 };

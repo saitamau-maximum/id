@@ -1,8 +1,7 @@
-import minimist from "minimist";
-import prompts from "prompts";
-
 import { drizzle } from "drizzle-orm/d1";
 import { Miniflare } from "miniflare";
+import minimist from "minimist";
+import prompts from "prompts";
 import * as schema from "../schema";
 import { editUserRole } from "./senario/edit-user-role";
 import { registerCalendarSeed } from "./senario/register-calendar";

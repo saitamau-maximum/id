@@ -46,7 +46,6 @@ const configSectionStyle = css({
 
 export default function Config() {
 	const { oauthAppId } = useParams<{ oauthAppId: string }>();
-	if (!oauthAppId) return null;
 
 	const { user } = useAuth();
 	const { data: oauthApp, isLoading: isLoadingApp } = useApp(oauthAppId);
@@ -64,6 +63,8 @@ export default function Config() {
 		});
 		setTimeout(() => setCopied(false), 3000);
 	}, [oauthApp, pushToast]);
+
+	if (!oauthAppId) return null;
 
 	if (!user) return null;
 	if (isLoadingApp) return <div>読み込み中...</div>;
