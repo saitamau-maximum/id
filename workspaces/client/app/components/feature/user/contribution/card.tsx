@@ -30,7 +30,7 @@ export const ContributionCard = ({
 		<div
 			className={css({
 				display: "grid",
-				gridTemplateColumns: "repeat((auto-fill, 1fr)",
+				gridTemplateColumns: "repeat(auto-fill, 1fr)",
 				gridTemplateRows: "repeat(7, 1fr)",
 				gridAutoFlow: "column",
 				gap: size === "sm" ? 1 : 2,
@@ -41,9 +41,11 @@ export const ContributionCard = ({
 				overflow: "hidden",
 			})}
 		>
-			{latestWeeks.map((week) =>
-				// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-				week.map((day, i) => <RateCell key={i} rate={day.rate} />),
+			{latestWeeks.map((week, weekIndex) =>
+				week.map((day, dayIndex) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: 気にしない
+					<RateCell key={`${weekIndex}-${dayIndex}`} rate={day.rate} />
+				)),
 			)}
 			{isLoading && (
 				<div

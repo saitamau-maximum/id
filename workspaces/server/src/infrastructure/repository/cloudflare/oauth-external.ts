@@ -1,11 +1,11 @@
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID } from "../../../constants/role";
-import { type Scope, getScopeById } from "../../../constants/scope";
+import { getScopeById, type Scope } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
+import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
-import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 
 // user table から基本的な情報を取得するためのやつ
 const USER_BASIC_INFO_COLUMNS_GETTER = {
@@ -272,19 +272,17 @@ export class CloudflareOAuthExternalRepository
 	async deleteClient(clientId: string) {
 		const res = await this.client.batch([
 			// clientId に紐づく token scopes を削除
-			this.client
-				.delete(schema.oauthTokenScopes)
-				.where(
-					inArray(
-						schema.oauthTokenScopes.tokenId,
-						// client.query ではなく .select にすることで、
-						// クエリを構築するだけにして取得処理は行わないようにする
-						this.client
-							.select({ tokenId: schema.oauthTokens.id })
-							.from(schema.oauthTokens)
-							.where(eq(schema.oauthTokens.clientId, clientId)),
-					),
+			this.client.delete(schema.oauthTokenScopes).where(
+				inArray(
+					schema.oauthTokenScopes.tokenId,
+					// client.query ではなく .select にすることで、
+					// クエリを構築するだけにして取得処理は行わないようにする
+					this.client
+						.select({ tokenId: schema.oauthTokens.id })
+						.from(schema.oauthTokens)
+						.where(eq(schema.oauthTokens.clientId, clientId)),
 				),
+			),
 			// そしたら依存関係が取り除かれるので、 token などを削除
 			this.client
 				.delete(schema.oauthTokens)
@@ -473,7 +471,7 @@ export class CloudflareOAuthExternalRepository
 
 	async deleteExpiredAccessTokens() {
 		// 有効期限ジャストに使われるかもしれないので、念のため 1 日前のものを削除
-		const now = new Date().valueOf() - 1 * 24 * 60 * 60 * 1000;
+		const now = Date.now() - 1 * 24 * 60 * 60 * 1000;
 
 		// まず一覧を取得
 		const expiredTokenIds = (

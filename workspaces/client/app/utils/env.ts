@@ -1,10 +1,10 @@
 import {
-	url,
 	type InferOutput,
 	object,
 	pipe,
 	safeParse,
 	string,
+	url,
 } from "valibot";
 
 const envSchema = object({

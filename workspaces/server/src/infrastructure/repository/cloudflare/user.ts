@@ -1,4 +1,4 @@
-import { type InferInsertModel, eq, isNotNull, isNull } from "drizzle-orm";
+import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
@@ -257,7 +257,7 @@ export class CloudflareUserRepository implements IUserRepository {
 					);
 				}
 			}
-		} catch (err) {
+		} catch (_err) {
 			throw new Error("Failed to update user");
 		}
 	}

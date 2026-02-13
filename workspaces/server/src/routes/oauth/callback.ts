@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
+import { SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
@@ -19,7 +20,12 @@ const app = factory.createApp();
 const callbackSchema = v.object({
 	// hidden fields
 	client_id: v.pipe(v.string(), v.nonEmpty()),
-	response_type: v.picklist(["code", "id_token token", "id_token"] as const),
+	response_type: v.picklist([
+		"code",
+		"id_token token",
+		"token id_token",
+		"id_token",
+	] as const),
 	response_mode: v.optional(v.picklist(["query", "fragment"] as const)),
 	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
 	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
@@ -159,14 +165,23 @@ const route = app
 						redirectTo.searchParams.append("code", code);
 						return c.redirect(redirectTo.href, 302);
 					}
+
 					// OpenID Connect Implicit Flow
 					const res = new URLSearchParams();
-					if (response_type === "id_token token") {
+					if (
+						// 順不同なので
+						response_type === "id_token token" ||
+						response_type === "token id_token"
+					) {
 						// Access Token も返す
 						res.append("access_token", accessToken);
 						res.append("token_type", "Bearer");
 						res.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
 					}
+
+					const userInfo =
+						await c.var.UserRepository.fetchUserProfileById(userId);
+
 					const id_token = await generateIdToken({
 						clientId: client_id,
 						userId,
@@ -175,7 +190,20 @@ const route = app
 						nonce: oidc_nonce,
 						accessToken,
 						privateKey: c.env.PRIVKEY_FOR_OAUTH,
+						// 必要最低限の情報は含める
+						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
+							? {
+									name: userInfo.realName,
+									picture: userInfo.profileImageURL,
+								}
+							: {}),
+						...(scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
+							? {
+									email: userInfo.email,
+								}
+							: {}),
 					});
+
 					res.append("id_token", id_token);
 					if (state) res.append("state", state);
 

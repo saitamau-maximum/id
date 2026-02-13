@@ -14,11 +14,11 @@
 		"deploy:prod": "pnpm -C workspaces/server run deploy:prod",
 		"prepare": "husky"
 	},
-	"packageManager": "pnpm@10.8.0+sha512.0e82714d1b5b43c74610193cb20734897c1d00de89d0e18420aebc5977fa13d780a9cb05734624e81ebd81cc876cd464794850641c48b9544326b5622ca29971",
+	"packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc",
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"husky": "^9.1.4",
-		"lint-staged": "^15.2.8"
+		"@biomejs/biome": "2.3.14",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.2.7"
 	},
 	"lint-staged": {
 		"*": [

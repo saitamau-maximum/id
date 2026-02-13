@@ -148,7 +148,8 @@ export const Sidebar = () => {
 				isOpen={isMenuOpen}
 				onToggle={() => setIsMenuOpen((prev) => !prev)}
 			/>
-			{/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
+			{/* biome-ignore lint/a11y/useKeyWithClickEvents: modal background なので */}
+			{/* biome-ignore lint/a11y/noStaticElementInteractions: modal background なので */}
 			<div
 				className={css({
 					position: "fixed",

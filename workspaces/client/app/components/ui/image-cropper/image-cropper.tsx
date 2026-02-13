@@ -9,9 +9,9 @@ import {
 import { Crop as RFCrop } from "react-feather";
 
 import ReactCrop, {
+	type Crop,
 	centerCrop,
 	makeAspectCrop,
-	type Crop,
 	type PixelCrop,
 } from "react-image-crop";
 
@@ -107,7 +107,7 @@ export const ImageCropper = ({
 				type: "image/png",
 			});
 			onCrop(file);
-		} catch (error) {
+		} catch (_error) {
 			alert("Something went wrong!");
 		}
 	}, [croppedImageUrl, filename, onCrop]);

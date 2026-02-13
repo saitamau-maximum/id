@@ -65,8 +65,7 @@ export const ProfileUpdateForm = () => {
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
 	const { data: certifications } = useCertifications();
-	const { mutate: deleteCertification, isPending: isPendingDeletion } =
-		useDeleteUserCertification();
+	const { mutate: deleteCertification } = useDeleteUserCertification();
 
 	const requestableCertifications = useMemo(() => {
 		const requestedIds = user?.certifications.map((c) => c.id) || [];
@@ -172,13 +171,6 @@ export const ProfileUpdateForm = () => {
 		理学部: FacultyOfScience[0]?.identifier ?? [],
 		工学部: FacultyOfEngineering[0]?.identifier ?? [],
 	};
-
-	const githubConn = user?.oauthConnections.find(
-		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
-	);
-	const discordConn = user?.oauthConnections.find(
-		(conn) => conn.providerId === OAUTH_PROVIDER_IDS.DISCORD,
-	);
 
 	return (
 		<form

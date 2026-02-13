@@ -1,5 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
+import { SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
@@ -189,7 +190,11 @@ const route = app
 				scope: tokenInfo.scopes.map((s) => s.name).join(" "),
 			};
 
-			if (tokenInfo.scopes.some((s) => s.name === "openid"))
+			if (tokenInfo.scopes.some((s) => s.id === SCOPE_IDS.OPENID)) {
+				const userInfo = await c.var.UserRepository.fetchUserProfileById(
+					tokenInfo.userId,
+				);
+
 				res.id_token = await generateIdToken({
 					clientId: tokenInfo.clientId,
 					userId: tokenInfo.userId,
@@ -198,7 +203,20 @@ const route = app
 					nonce: tokenInfo.oidcParams.nonce,
 					accessToken: tokenInfo.accessToken,
 					privateKey: c.env.PRIVKEY_FOR_OAUTH,
+					// 必要最低限の情報は含める
+					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
+						? {
+								name: userInfo.realName,
+								picture: userInfo.profileImageURL,
+							}
+						: {}),
+					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
+						? {
+								email: userInfo.email,
+							}
+						: {}),
 				});
+			}
 
 			return c.json(res, 200);
 		},
