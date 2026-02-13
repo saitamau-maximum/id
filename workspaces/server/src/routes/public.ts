@@ -41,7 +41,7 @@ const route = app
 			let key = "unknown";
 			if (user.grade?.startsWith("B")) {
 				// B1, B2, B3, B4 の場合: B1-TI みたいな形式にする
-				key = `${user.grade}-${user.studentId?.slice(2, 4)}`;
+				if (user.studentId) key = `${user.grade}-${user.studentId.slice(2, 4)}`;
 			} else if (user.grade?.startsWith("M") || user.grade?.startsWith("D")) {
 				// 学年だけ
 				key = user.grade;
