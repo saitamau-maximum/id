@@ -38,13 +38,15 @@ const route = app
 		const users = await c.var.UserRepository.fetchApprovedUsers();
 		const res: Record<string, number> = {};
 		for (const user of users) {
-			if (["B1", "B2", "B3", "B4"].includes(user.grade ?? "")) {
-				// B1-TI みたいな形式になる
-				const key = `${user.grade}-${user.studentId?.slice(2, 4)}` || "unknown";
-				res[key] = (res[key] || 0) + 1;
-			} else {
-				res[user.grade ?? "unknown"] = (res[user.grade ?? "unknown"] || 0) + 1;
+			let key = "unknown";
+			if (user.grade?.startsWith("B")) {
+				// B1, B2, B3, B4 の場合: B1-TI みたいな形式にする
+				key = `${user.grade}-${user.studentId?.slice(2, 4)}`;
+			} else if (user.grade?.startsWith("M") || user.grade?.startsWith("D")) {
+				// 学年だけ
+				key = user.grade;
 			}
+			res[key] = (res[key] || 0) + 1;
 		}
 		return c.json(res);
 	});
