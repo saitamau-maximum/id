@@ -20,6 +20,11 @@ export type User = {
 	email?: string;
 	studentId?: string;
 	grade?: string;
+	faculty?: string;
+	department?: string;
+	laboratory?: string;
+	graduateSchool?: string;
+	specialization?: string;
 	bio?: string;
 	socialLinks?: string[];
 	updatedAt?: Date;

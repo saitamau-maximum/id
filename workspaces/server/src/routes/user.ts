@@ -66,6 +66,11 @@ const ProfileSchema = v.object({
 		v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
 	),
 	grade: v.pipe(v.string(), v.nonEmpty()),
+	faculty: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	department: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	laboratory: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	graduateSchool: v.optional(v.pipe(v.string(), v.nonEmpty())),
+	specialization: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
 	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
 });
@@ -80,6 +85,11 @@ const registerSchema = v.pipe(
 		academicEmail: ProfileSchema.entries.academicEmail,
 		studentId: ProfileSchema.entries.studentId,
 		grade: ProfileSchema.entries.grade,
+		faculty: ProfileSchema.entries.faculty,
+		department: v.optional(v.pipe(v.string(), v.nonEmpty())),
+		laboratory: ProfileSchema.entries.laboratory,
+		graduateSchool: ProfileSchema.entries.graduateSchool,
+		specialization: ProfileSchema.entries.specialization,
 	}),
 	v.check(({ grade, academicEmail, studentId }) => {
 		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
@@ -102,6 +112,11 @@ const updateSchema = v.pipe(
 		academicEmail: ProfileSchema.entries.academicEmail,
 		studentId: ProfileSchema.entries.studentId,
 		grade: ProfileSchema.entries.grade,
+		faculty: ProfileSchema.entries.faculty,
+		department: v.optional(v.pipe(v.string(), v.nonEmpty())),
+		laboratory: ProfileSchema.entries.laboratory,
+		graduateSchool: ProfileSchema.entries.graduateSchool,
+		specialization: ProfileSchema.entries.specialization,
 		bio: ProfileSchema.entries.bio,
 		socialLinks: ProfileSchema.entries.socialLinks,
 	}),
@@ -138,6 +153,11 @@ const route = app
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
+				graduateSchool,
+				specialization,
 			} = c.req.valid("json");
 
 			const normalizedDisplayName = normalizeRealName(displayName);
@@ -153,6 +173,11 @@ const route = app
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
+				graduateSchool,
+				specialization,
 			});
 
 			return c.body(null, 201);
@@ -175,6 +200,11 @@ const route = app
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
+				graduateSchool,
+				specialization,
 				bio,
 				socialLinks,
 			} = c.req.valid("json");
@@ -192,6 +222,11 @@ const route = app
 				email,
 				studentId,
 				grade,
+				faculty,
+				department,
+				laboratory,
+				graduateSchool,
+				specialization,
 				bio,
 				socialLinks,
 			});

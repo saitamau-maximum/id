@@ -15,7 +15,15 @@ import { IconButton } from "~/components/ui/icon-button";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
 import { Table } from "~/components/ui/table";
-import { GRADE, OUTSIDE_GRADE } from "~/constant";
+import {
+	FACULTY,
+	FacultyOfEducation,
+	FacultyOfEngineering,
+	FacultyOfLiberalArts,
+	FacultyOfScience,
+	GRADE,
+	OUTSIDE_GRADE,
+} from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import type { UserCertification } from "~/types/certification";
@@ -39,6 +47,11 @@ const UpdateFormSchema = v.object({
 	academicEmail: v.optional(UserSchemas.AcademicEmail),
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
+	faculty: v.optional(v.string()),
+	department: v.optional(v.string()),
+	laboratory: v.optional(v.string()),
+	graduateSchool: v.optional(v.string()),
+	specialization: v.optional(v.string()),
 	bio: UserSchemas.Bio,
 	socialLinks: UserSchemas.SocialLinks,
 });
@@ -99,6 +112,11 @@ export const ProfileUpdateForm = () => {
 			academicEmail: user?.academicEmail,
 			studentId: user?.studentId,
 			grade: user?.grade,
+			faculty: user?.faculty,
+			department: user?.department,
+			laboratory: user?.laboratory,
+			graduateSchool: user?.graduateSchool,
+			specialization: user?.specialization,
 			bio: user?.bio,
 			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
@@ -141,6 +159,18 @@ export const ProfileUpdateForm = () => {
 	const bioLength = bio?.length || 0;
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+	const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
+		watch("grade"),
+	);
+	const selectedFaculty = watch("faculty");
+
+	const departmentsByFaculty: Record<string, string[]> = {
+		教養学部: FacultyOfLiberalArts[0]?.identifier ?? [],
+		経済学部: [],
+		教育学部: FacultyOfEducation[0]?.identifier ?? [],
+		理学部: FacultyOfScience[0]?.identifier ?? [],
+		工学部: FacultyOfEngineering[0]?.identifier ?? [],
+	};
 
 	return (
 		<form
@@ -204,6 +234,99 @@ export const ProfileUpdateForm = () => {
 				</div>
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
+
+			{/* 所属情報: B1-B4は学部・学科、M, D以上は研究室必須 */}
+			{!isOutsideMember && !isGraduateStudent && (
+				<Form.FieldSet>
+					<div
+						className={css({
+							display: "grid",
+							gap: "token(spacing.2) token(spacing.4)",
+							gridTemplateColumns: "auto 1fr",
+							alignItems: "start",
+							mdDown: {
+								gridTemplateColumns: "1fr !important",
+							},
+						})}
+					>
+						<Form.LabelText>学部</Form.LabelText>
+						<div>
+							<Form.RadioGroup>
+								{FACULTY[0].identifier.map((identifier) => (
+									<Form.Radio
+										key={identifier}
+										value={identifier}
+										label={identifier}
+										{...register("faculty")}
+									/>
+								))}
+							</Form.RadioGroup>
+							<ErrorDisplay error={errors.faculty?.message} />
+						</div>
+
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<div>
+										<Form.RadioGroup>
+											{(departmentsByFaculty[selectedFaculty] ?? []).map(
+												(dept) => (
+													<Form.Radio
+														key={dept}
+														value={dept}
+														label={dept}
+														{...register("department")}
+													/>
+												),
+											)}
+										</Form.RadioGroup>
+										<ErrorDisplay error={errors.department?.message} />
+									</div>
+								</Fragment>
+							)}
+					</div>
+
+					<Form.Field.TextInput
+						label="研究室（任意）"
+						error={errors.laboratory?.message}
+						placeholder="田中研究室"
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+				</Form.FieldSet>
+			)}
+
+			{/* M, D以上は研究科・専攻・研究室必須 */}
+			{isGraduateStudent && (
+				<Form.FieldSet>
+					<Form.Field.TextInput
+						label="研究科"
+						error={errors.graduateSchool?.message}
+						placeholder="情報理工学研究科"
+						{...register("graduateSchool", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
+					<Form.Field.TextInput
+						label="専攻"
+						error={errors.specialization?.message}
+						placeholder="情報理工学専攻"
+					/>
+
+					<Form.Field.TextInput
+						label="研究室"
+						error={errors.laboratory?.message}
+						placeholder="田中研究室"
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+				</Form.FieldSet>
+			)}
 
 			<Form.Field.TextInput
 				label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"
