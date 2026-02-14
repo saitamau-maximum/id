@@ -33,6 +33,22 @@ const route = app
 		return c.json(
 			await c.var.CertificationRepository.getCertificationsSummary(),
 		);
+	})
+	.get("/affiliations-summary", async (c) => {
+		const users = await c.var.UserRepository.fetchApprovedUsers();
+		const res: Record<string, number> = {};
+		for (const user of users) {
+			let key = "unknown";
+			if (user.grade?.startsWith("B")) {
+				// B1, B2, B3, B4 の場合: B1-TI みたいな形式にする
+				if (user.studentId) key = `${user.grade}-${user.studentId.slice(2, 4)}`;
+			} else if (user.grade?.startsWith("M") || user.grade?.startsWith("D")) {
+				// 学年だけ
+				key = user.grade;
+			}
+			res[key] = (res[key] || 0) + 1;
+		}
+		return c.json(res);
 	});
 
 export { route as publicRoute };
