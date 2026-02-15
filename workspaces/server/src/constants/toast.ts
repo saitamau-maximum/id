@@ -2,7 +2,7 @@
 
 // client/app/components/ui/toast/toast-item.tsx にあわせる
 interface ToastItem {
-	type: "error" | "success";
+	type: "error" | "success" | "info";
 	title: string;
 	description?: string;
 	to?: string;
@@ -49,11 +49,18 @@ export const PLEASE_RELOGIN_FOR_OAUTH: ToastItem = {
 	needsReauth: true,
 } as const;
 
+export const DEV_NEW_USER_CREATED_WO_INVITATION: ToastItem = {
+	type: "info",
+	title: "ユーザーが作成されました",
+	description: "(開発環境のみ) 招待コードなしでユーザーが作成されました。",
+} as const;
+
 const TOAST_ITEMS = [
 	PLEASE_LOGIN_FOR_OAUTH,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	PLEASE_RELOGIN_FOR_OAUTH,
+	DEV_NEW_USER_CREATED_WO_INVITATION,
 ];
 
 // ハッシュ衝突チェック
