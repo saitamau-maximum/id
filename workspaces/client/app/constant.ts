@@ -16,7 +16,7 @@ export const FACULTY = [
 
 export const FacultyOfLiberalArts = [
 	{
-		lable: "教養学部",
+		label: "教養学部",
 		identifier: [
 			"グローバル・ガバナンス専修課程",
 			"現代社会専修課程",
@@ -46,7 +46,13 @@ export const FacultyOfEducation = [
 export const FacultyOfScience = [
 	{
 		label: "理学部",
-		identifier: ["数学科", "物理学科", "基礎科学科", "分子生物学科"],
+		identifier: [
+			"数学科",
+			"物理学科",
+			"基礎科学科",
+			"分子生物学科",
+			"生体制御学科",
+		],
 	},
 ];
 
