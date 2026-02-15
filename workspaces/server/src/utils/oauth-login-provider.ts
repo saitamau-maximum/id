@@ -216,7 +216,7 @@ export abstract class OAuthLoginProvider {
 		const continueToUrl = new URL(continueTo);
 		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 		if (
-			(c.env.ENV as string) === "production" &&
+			c.env.ENV === "production" &&
 			continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
 			continueToUrl.origin !== requestUrl.origin
 		) {
@@ -354,6 +354,22 @@ export abstract class OAuthLoginProvider {
 							profileImageURL: userPayload.profileImageUrl ?? undefined,
 						},
 					);
+					await c.var.OAuthInternalRepository.createOAuthConnection({
+						userId: foundUserId,
+						providerId: this.getProviderId(),
+						providerUserId: await this.getProviderUserId(),
+						refreshToken: await this.getRefreshToken(),
+						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
+						...(await this.getOAuthConnectionUserPayload()),
+					});
+				} else if (c.env.ENV === "development") {
+					// DB を新しく作った場合、ユーザーも招待コードも存在せずログインできない状態に陥ってしまうため、招待コードが提供されていなくてもユーザーを作成する
+					const userPayload = await this.getOAuthConnectionUserPayload();
+					foundUserId = await c.var.UserRepository.createUser({
+						email: userPayload.email ?? undefined,
+						displayName: userPayload.name ?? undefined,
+						profileImageURL: userPayload.profileImageUrl ?? undefined,
+					});
 					await c.var.OAuthInternalRepository.createOAuthConnection({
 						userId: foundUserId,
 						providerId: this.getProviderId(),
