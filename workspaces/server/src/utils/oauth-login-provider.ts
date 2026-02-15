@@ -12,6 +12,7 @@ import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
 import { ROLE_IDS } from "../constants/role";
 import {
+	DEV_NEW_USER_CREATED_WO_INVITATION,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	TOAST_SEARCHPARAM,
@@ -378,6 +379,11 @@ export abstract class OAuthLoginProvider {
 						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
 						...(await this.getOAuthConnectionUserPayload()),
 					});
+					// 開発環境でユーザーが作成されたことを伝えるため、Toast を表示させる
+					continueToUrl.searchParams.set(
+						TOAST_SEARCHPARAM,
+						ToastHashFn(DEV_NEW_USER_CREATED_WO_INVITATION),
+					);
 				} else {
 					// ここに到達する = 招待コードが提供されていないのにユーザーが存在しない場合
 					return c.redirect("https://maximum.vc/join", 302);
