@@ -96,7 +96,13 @@ export default function Login() {
 					</p>
 				)}
 			</p>
-			<div className={css({ display: "flex", gap: 4 })}>
+			<div
+				className={css({
+					display: "flex",
+					gap: 4,
+					mdDown: { flexDirection: "column" },
+				})}
+			>
 				<a
 					href={`${env("SERVER_HOST")}/auth/login/github?${loginSearchParams.toString()}`}
 				>
