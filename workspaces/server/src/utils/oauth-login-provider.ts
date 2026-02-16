@@ -12,6 +12,7 @@ import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
 import { ROLE_IDS } from "../constants/role";
 import {
+	DEV_NEW_USER_CREATED_WO_INVITATION,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	TOAST_SEARCHPARAM,
@@ -216,7 +217,7 @@ export abstract class OAuthLoginProvider {
 		const continueToUrl = new URL(continueTo);
 		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 		if (
-			(c.env.ENV as string) === "production" &&
+			c.env.ENV === "production" &&
 			continueToUrl.origin !== c.env.CLIENT_ORIGIN &&
 			continueToUrl.origin !== requestUrl.origin
 		) {
@@ -362,6 +363,27 @@ export abstract class OAuthLoginProvider {
 						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
 						...(await this.getOAuthConnectionUserPayload()),
 					});
+				} else if (c.env.ENV === "development") {
+					// DB を新しく作った場合、ユーザーも招待コードも存在せずログインできない状態に陥ってしまうため、招待コードが提供されていなくてもユーザーを作成する
+					const userPayload = await this.getOAuthConnectionUserPayload();
+					foundUserId = await c.var.UserRepository.createUser({
+						email: userPayload.email ?? undefined,
+						displayName: userPayload.name ?? undefined,
+						profileImageURL: userPayload.profileImageUrl ?? undefined,
+					});
+					await c.var.OAuthInternalRepository.createOAuthConnection({
+						userId: foundUserId,
+						providerId: this.getProviderId(),
+						providerUserId: await this.getProviderUserId(),
+						refreshToken: await this.getRefreshToken(),
+						refreshTokenExpiresAt: await this.getRefreshTokenExpiresAt(),
+						...(await this.getOAuthConnectionUserPayload()),
+					});
+					// 開発環境でユーザーが作成されたことを伝えるため、Toast を表示させる
+					continueToUrl.searchParams.set(
+						TOAST_SEARCHPARAM,
+						ToastHashFn(DEV_NEW_USER_CREATED_WO_INVITATION),
+					);
 				} else {
 					// ここに到達する = 招待コードが提供されていないのにユーザーが存在しない場合
 					return c.redirect("https://maximum.vc/join", 302);
