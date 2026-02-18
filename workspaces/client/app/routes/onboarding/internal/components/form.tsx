@@ -6,7 +6,15 @@ import * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { GRADE, OUTSIDE_GRADE } from "~/constant";
+import {
+	FACULTY,
+	FacultyOfEducation,
+	FacultyOfEngineering,
+	FacultyOfLiberalArts,
+	FacultyOfScience,
+	GRADE,
+	OUTSIDE_GRADE,
+} from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
@@ -22,9 +30,9 @@ const RegisterFormSchema = v.object({
 	grade: UserSchemas.Grade,
 	faculty: UserSchemas.Faculty,
 	department: UserSchemas.Department,
-	laboratory: v.optional(UserSchemas.Laboratory),
-	graduateSchool: v.optional(UserSchemas.GraduateSchool),
-	specialization: v.optional(UserSchemas.Specialization),
+	laboratory: UserSchemas.Laboratory,
+	graduateSchool: UserSchemas.GraduateSchool,
+	specialization: UserSchemas.Specialization,
 });
 
 type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
@@ -93,6 +101,15 @@ export const RegisterForm = () => {
 	const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
 		watch("grade"),
 	);
+	const selectedFaculty = watch("faculty");
+
+	const departmentsByFaculty: Record<string, string[]> = {
+		教養学部: FacultyOfLiberalArts[0]?.identifier ?? [],
+		経済学部: [],
+		教育学部: FacultyOfEducation[0]?.identifier ?? [],
+		理学部: FacultyOfScience[0]?.identifier ?? [],
+		工学部: FacultyOfEngineering[0]?.identifier ?? [],
+	};
 
 	return (
 		<form
@@ -157,54 +174,120 @@ export const RegisterForm = () => {
 				<ErrorDisplay error={errors.grade?.message} />
 			</Form.FieldSet>
 
-			{!isGraduateStudent && (
+			{!isOutsideMember && !isGraduateStudent && (
 				<Form.FieldSet>
-					<Form.Field.TextInput
-						label="学部"
-						error={errors.faculty?.message}
-						placeholder={isOutsideMember ? "（例）工学部" : "工学部"}
-						required
-						{...register("faculty")}
-					/>
+					<div
+						className={css({
+							display: "grid",
+							gap: "token(spacing.2) token(spacing.4)",
+							gridTemplateColumns: "auto 1fr",
+							alignItems: "start",
+							mdDown: {
+								gridTemplateColumns: "1fr !important",
+							},
+						})}
+					>
+						<Form.LabelText>学部</Form.LabelText>
+						<div>
+							<Form.RadioGroup>
+								{FACULTY[0].identifier.map((identifier) => (
+									<Form.Radio
+										key={identifier}
+										value={identifier}
+										label={identifier}
+										{...register("faculty")}
+									/>
+								))}
+							</Form.RadioGroup>
+							<ErrorDisplay error={errors.faculty?.message} />
+						</div>
+
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<div>
+										<Form.RadioGroup>
+											{(departmentsByFaculty[selectedFaculty] ?? []).map(
+												(dept) => (
+													<Form.Radio
+														key={dept}
+														value={dept}
+														label={dept}
+														{...register("department")}
+													/>
+												),
+											)}
+										</Form.RadioGroup>
+										<ErrorDisplay error={errors.department?.message} />
+									</div>
+								</Fragment>
+							)}
+					</div>
 
 					<Form.Field.TextInput
-						label="学科"
-						error={errors.department?.message}
-						placeholder={isOutsideMember ? "（例）情報工学科" : "情報工学科"}
-						required
-						{...register("department")}
+						label="研究室（任意）"
+						error={errors.laboratory?.message}
+						placeholder="田中研究室"
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
 					/>
-
-					{!isOutsideMember && (
-						<Form.Field.TextInput
-							label="研究室（任意）"
-							error={errors.laboratory?.message}
-							placeholder="田中研究室"
-							{...register("laboratory", {
-								setValueAs: (value) => (!value ? undefined : value),
-							})}
-						/>
-					)}
 				</Form.FieldSet>
 			)}
 
 			{isGraduateStudent && (
 				<Form.FieldSet>
-					<Form.Field.TextInput
-						label="学部"
-						error={errors.faculty?.message}
-						placeholder="工学部"
-						required
-						{...register("faculty")}
-					/>
+					<div
+						className={css({
+							display: "grid",
+							gap: "token(spacing.2) token(spacing.4)",
+							gridTemplateColumns: "auto 1fr",
+							alignItems: "start",
+							mdDown: {
+								gridTemplateColumns: "1fr !important",
+							},
+						})}
+					>
+						<Form.LabelText>学部</Form.LabelText>
+						<div>
+							<Form.RadioGroup>
+								{FACULTY[0].identifier.map((identifier) => (
+									<Form.Radio
+										key={identifier}
+										value={identifier}
+										label={identifier}
+										{...register("faculty")}
+									/>
+								))}
+							</Form.RadioGroup>
+							<ErrorDisplay error={errors.faculty?.message} />
+						</div>
 
-					<Form.Field.TextInput
-						label="学科"
-						error={errors.department?.message}
-						placeholder="情報工学科"
-						required
-						{...register("department")}
-					/>
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<div>
+										<Form.RadioGroup>
+											{(departmentsByFaculty[selectedFaculty] ?? []).map(
+												(dept) => (
+													<Form.Radio
+														key={dept}
+														value={dept}
+														label={dept}
+														{...register("department")}
+													/>
+												),
+											)}
+										</Form.RadioGroup>
+										<ErrorDisplay error={errors.department?.message} />
+									</div>
+								</Fragment>
+							)}
+					</div>
 
 					<Form.Field.TextInput
 						label="研究室"
