@@ -30,9 +30,9 @@ const RegisterFormSchema = v.object({
 	grade: UserSchemas.Grade,
 	faculty: UserSchemas.Faculty,
 	department: UserSchemas.Department,
-	laboratory: UserSchemas.Laboratory,
-	graduateSchool: UserSchemas.GraduateSchool,
-	specialization: UserSchemas.Specialization,
+	laboratory: v.optional(UserSchemas.Laboratory),
+	graduateSchool: v.optional(UserSchemas.GraduateSchool),
+	specialization: v.optional(UserSchemas.Specialization),
 });
 
 type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
