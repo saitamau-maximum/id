@@ -17,10 +17,10 @@ import { Switch } from "~/components/ui/switch";
 import { Table } from "~/components/ui/table";
 import {
 	FACULTY,
-	FacultyOfEducation,
-	FacultyOfEngineering,
-	FacultyOfLiberalArts,
-	FacultyOfScience,
+	FACULTY_OF_EDUCATION,
+	FACULTY_OF_ENGINEERING,
+	FACULTY_OF_LIBERAL_ARTS,
+	FACULTY_OF_SCIENCE,
 	GRADE,
 	GRADUATE_GRADE,
 	OUTSIDE_GRADE,
@@ -172,11 +172,11 @@ export const ProfileUpdateForm = () => {
 	const selectedFaculty = watch("faculty");
 
 	const departmentsByFaculty: Record<string, string[]> = {
-		教養学部: FacultyOfLiberalArts[0]?.identifier ?? [],
+		教養学部: FACULTY_OF_LIBERAL_ARTS[0]?.identifier ?? [],
 		経済学部: [],
-		教育学部: FacultyOfEducation[0]?.identifier ?? [],
-		理学部: FacultyOfScience[0]?.identifier ?? [],
-		工学部: FacultyOfEngineering[0]?.identifier ?? [],
+		教育学部: FACULTY_OF_EDUCATION[0]?.identifier ?? [],
+		理学部: FACULTY_OF_SCIENCE[0]?.identifier ?? [],
+		工学部: FACULTY_OF_ENGINEERING[0]?.identifier ?? [],
 	};
 
 	return (
