@@ -339,7 +339,7 @@ export const RegisterForm = () => {
 					<Form.Field.TextInput
 						label="研究科"
 						error={errors.graduateSchool?.message}
-						placeholder="情報理工学研究科"
+						placeholder="理工学研究科"
 						required
 						{...register("graduateSchool", {
 							setValueAs: (value) => (!value ? undefined : value),
@@ -349,7 +349,7 @@ export const RegisterForm = () => {
 					<Form.Field.TextInput
 						label="専攻"
 						error={errors.specialization?.message}
-						placeholder="情報理工学専攻"
+						placeholder="数理電子情報専攻"
 						required
 						{...register("specialization", {
 							setValueAs: (value) => (!value ? undefined : value),
