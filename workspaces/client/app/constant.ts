@@ -14,7 +14,7 @@ export const FACULTY = [
 	},
 ];
 
-export const FacultyOfLiberalArts = [
+export const FACULTY_OF_LIBERAL_ARTS = [
 	{
 		label: "教養学部",
 		identifier: [
@@ -28,9 +28,9 @@ export const FacultyOfLiberalArts = [
 	},
 ];
 
-export const FacultyOfEconomics = [];
+export const FACULTY_OF_ECONOMICS = [];
 
-export const FacultyOfEducation = [
+export const FACULTY_OF_EDUCATION = [
 	{
 		label: "教育学部",
 		identifier: [
@@ -43,7 +43,7 @@ export const FacultyOfEducation = [
 	},
 ];
 
-export const FacultyOfScience = [
+export const FACULTY_OF_SCIENCE = [
 	{
 		label: "理学部",
 		identifier: [
@@ -56,7 +56,7 @@ export const FacultyOfScience = [
 	},
 ];
 
-export const FacultyOfEngineering = [
+export const FACULTY_OF_ENGINEERING = [
 	{
 		label: "工学部",
 		identifier: [
@@ -72,6 +72,8 @@ export const FacultyOfEngineering = [
 export const ACADEMIC_EMAIL_DOMAIN = "ms.saitama-u.ac.jp";
 
 export const OUTSIDE_GRADE = ["卒業生", "ゲスト"];
+
+export const GRADUATE_GRADE = ["M1", "M2", "D1", "D2", "D3"];
 
 export const RESERVED_WORDS = [
 	"maximum",
