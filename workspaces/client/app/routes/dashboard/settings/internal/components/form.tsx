@@ -22,6 +22,7 @@ import {
 	FacultyOfLiberalArts,
 	FacultyOfScience,
 	GRADE,
+	GRADUATE_GRADE,
 	OUTSIDE_GRADE,
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
@@ -133,6 +134,7 @@ export const ProfileUpdateForm = () => {
 	const onSubmit = useCallback(
 		(data: FormInputValues) => {
 			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
+			const isGraduateStudent = GRADUATE_GRADE.includes(data.grade);
 			if (!isOutsideMember && !data.academicEmail) {
 				setError("academicEmail", {
 					message: "学籍番号と大学のメールアドレスは必須です",
@@ -142,6 +144,13 @@ export const ProfileUpdateForm = () => {
 			if (!isOutsideMember && !data.studentId) {
 				setError("studentId", {
 					message: "学籍番号と大学のメールアドレスは必須です",
+				});
+				return;
+			}
+			// M, D以上は研究室必須
+			if (isGraduateStudent && !data.laboratory) {
+				setError("laboratory", {
+					message: "研究室を入力してください",
 				});
 				return;
 			}
@@ -159,9 +168,7 @@ export const ProfileUpdateForm = () => {
 	const bioLength = bio?.length || 0;
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
-	const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
-		watch("grade"),
-	);
+	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
 	const selectedFaculty = watch("faculty");
 
 	const departmentsByFaculty: Record<string, string[]> = {
@@ -296,16 +303,97 @@ export const ProfileUpdateForm = () => {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}
 					/>
+
+					<Form.Field.TextInput
+						label="学籍番号"
+						error={errors.studentId?.message}
+						placeholder="00XX000"
+						required
+						{...register("studentId", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
+					<Form.Field.TextInput
+						label="大学のメールアドレス"
+						error={errors.academicEmail?.message}
+						placeholder="student@ms.saitama-u.ac.jp"
+						required
+						type="email"
+						{...register("academicEmail", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
 				</Form.FieldSet>
 			)}
 
 			{/* M, D以上は研究科・専攻・研究室必須 */}
 			{isGraduateStudent && (
 				<Form.FieldSet>
+					<div
+						className={css({
+							display: "grid",
+							gap: "token(spacing.2) token(spacing.4)",
+							gridTemplateColumns: "auto 1fr",
+							alignItems: "start",
+							mdDown: {
+								gridTemplateColumns: "1fr !important",
+							},
+						})}
+					>
+						<Form.LabelText>学部</Form.LabelText>
+						<div>
+							<Form.RadioGroup>
+								{FACULTY[0].identifier.map((identifier) => (
+									<Form.Radio
+										key={identifier}
+										value={identifier}
+										label={identifier}
+										{...register("faculty")}
+									/>
+								))}
+							</Form.RadioGroup>
+							<ErrorDisplay error={errors.faculty?.message} />
+						</div>
+
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<div>
+										<Form.RadioGroup>
+											{(departmentsByFaculty[selectedFaculty] ?? []).map(
+												(dept) => (
+													<Form.Radio
+														key={dept}
+														value={dept}
+														label={dept}
+														{...register("department")}
+													/>
+												),
+											)}
+										</Form.RadioGroup>
+										<ErrorDisplay error={errors.department?.message} />
+									</div>
+								</Fragment>
+							)}
+					</div>
+
+					<Form.Field.TextInput
+						label="研究室"
+						error={errors.laboratory?.message}
+						placeholder="田中研究室"
+						required
+						{...register("laboratory", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
 					<Form.Field.TextInput
 						label="研究科"
 						error={errors.graduateSchool?.message}
-						placeholder="情報理工学研究科"
+						placeholder="理工学研究科"
 						{...register("graduateSchool", {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}
@@ -314,75 +402,33 @@ export const ProfileUpdateForm = () => {
 					<Form.Field.TextInput
 						label="専攻"
 						error={errors.specialization?.message}
-						placeholder="情報理工学専攻"
+						placeholder="数理電子情報専攻"
+						{...register("specialization", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
 					/>
 
 					<Form.Field.TextInput
-						label="研究室"
-						error={errors.laboratory?.message}
-						placeholder="田中研究室"
-						{...register("laboratory", {
+						label="学籍番号"
+						error={errors.studentId?.message}
+						placeholder="00XX000"
+						required
+						{...register("studentId", {
+							setValueAs: (value) => (!value ? undefined : value),
+						})}
+					/>
+
+					<Form.Field.TextInput
+						label="大学のメールアドレス"
+						error={errors.academicEmail?.message}
+						placeholder="student@ms.saitama-u.ac.jp"
+						required
+						type="email"
+						{...register("academicEmail", {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}
 					/>
 				</Form.FieldSet>
-			)}
-
-			<Form.Field.TextInput
-				label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"
-				error={errors.displayId?.message}
-				placeholder="maximum_taro"
-				required
-				{...register("displayId")}
-			/>
-
-			<Form.Field.TextInput
-				label="ユーザー名"
-				error={errors.displayName?.message}
-				placeholder="Maximum"
-				required
-				{...register("displayName")}
-			/>
-
-			<Form.Field.TextInput
-				label={`本名 ${isOutsideMember ? "" : "(学生証に記載のもの)"}`}
-				error={errors.realName?.message}
-				placeholder="山田 太郎"
-				required
-				{...register("realName")}
-			/>
-
-			<Form.Field.TextInput
-				label="本名 (カナ)"
-				error={errors.realNameKana?.message}
-				placeholder="ヤマダ タロウ"
-				required
-				{...register("realNameKana")}
-			/>
-
-			{!isOutsideMember && (
-				<Form.Field.TextInput
-					label="学籍番号"
-					error={errors.studentId?.message}
-					placeholder="00XX000"
-					required
-					{...register("studentId", {
-						setValueAs: (value) => (!value ? undefined : value),
-					})}
-				/>
-			)}
-
-			{!isOutsideMember && (
-				<Form.Field.TextInput
-					label="大学のメールアドレス"
-					error={errors.academicEmail?.message}
-					placeholder="student@ms.saitama-u.ac.jp"
-					required
-					type="email"
-					{...register("academicEmail", {
-						setValueAs: (value) => (!value ? undefined : value),
-					})}
-				/>
 			)}
 
 			<Form.Field.TextInput
