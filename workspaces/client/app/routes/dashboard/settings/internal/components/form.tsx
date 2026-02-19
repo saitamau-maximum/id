@@ -48,8 +48,8 @@ const UpdateFormSchema = v.object({
 	academicEmail: v.optional(UserSchemas.AcademicEmail),
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
-	faculty: v.optional(v.string()),
-	department: v.optional(v.string()),
+	faculty: UserSchemas.Faculty,
+	department: UserSchemas.Department,
 	laboratory: v.optional(v.string()),
 	graduateSchool: v.optional(v.string()),
 	specialization: v.optional(v.string()),
@@ -144,6 +144,13 @@ export const ProfileUpdateForm = () => {
 			if (!isOutsideMember && !data.studentId) {
 				setError("studentId", {
 					message: "学籍番号と大学のメールアドレスは必須です",
+				});
+				return;
+			}
+			// B1-B4は学科必須
+			if (!isOutsideMember && !isGraduateStudent && !data.department) {
+				setError("department", {
+					message: "学科を選択してください",
 				});
 				return;
 			}
@@ -284,7 +291,7 @@ export const ProfileUpdateForm = () => {
 														key={dept}
 														value={dept}
 														label={dept}
-														{...register("department")}
+														required
 													/>
 												),
 											)}
