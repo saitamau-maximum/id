@@ -147,6 +147,12 @@ export const ProfileUpdateForm = () => {
 				});
 				return;
 			}
+			if (!isOutsideMember && !data.grade) {
+				setError("grade", {
+					message: "学年を選択してください",
+				});
+				return;
+			}
 			// B1-B4は学科必須
 			if (!isOutsideMember && !isGraduateStudent && !data.department) {
 				setError("department", {
@@ -292,6 +298,7 @@ export const ProfileUpdateForm = () => {
 														value={dept}
 														label={dept}
 														required
+														{...register("department")}
 													/>
 												),
 											)}
@@ -337,56 +344,6 @@ export const ProfileUpdateForm = () => {
 			{/* M, D以上は研究科・専攻・研究室必須 */}
 			{isGraduateStudent && (
 				<Form.FieldSet>
-					<div
-						className={css({
-							display: "grid",
-							gap: "token(spacing.2) token(spacing.4)",
-							gridTemplateColumns: "auto 1fr",
-							alignItems: "start",
-							mdDown: {
-								gridTemplateColumns: "1fr !important",
-							},
-						})}
-					>
-						<Form.LabelText>学部</Form.LabelText>
-						<div>
-							<Form.RadioGroup>
-								{FACULTY[0].identifier.map((identifier) => (
-									<Form.Radio
-										key={identifier}
-										value={identifier}
-										label={identifier}
-										{...register("faculty")}
-									/>
-								))}
-							</Form.RadioGroup>
-							<ErrorDisplay error={errors.faculty?.message} />
-						</div>
-
-						{selectedFaculty &&
-							selectedFaculty !== "経済学部" &&
-							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
-								<Fragment>
-									<Form.LabelText>学科</Form.LabelText>
-									<div>
-										<Form.RadioGroup>
-											{(departmentsByFaculty[selectedFaculty] ?? []).map(
-												(dept) => (
-													<Form.Radio
-														key={dept}
-														value={dept}
-														label={dept}
-														{...register("department")}
-													/>
-												),
-											)}
-										</Form.RadioGroup>
-										<ErrorDisplay error={errors.department?.message} />
-									</div>
-								</Fragment>
-							)}
-					</div>
-
 					<Form.Field.TextInput
 						label="研究室"
 						error={errors.laboratory?.message}
