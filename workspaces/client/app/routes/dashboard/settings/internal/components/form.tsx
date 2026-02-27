@@ -48,8 +48,8 @@ const UpdateFormSchema = v.object({
 	academicEmail: v.optional(UserSchemas.AcademicEmail),
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
-	faculty: UserSchemas.Faculty,
-	department: UserSchemas.Department,
+	faculty: v.optional(UserSchemas.Faculty),
+	department: v.optional(UserSchemas.Department),
 	laboratory: v.optional(v.string()),
 	graduateSchool: v.optional(v.string()),
 	specialization: v.optional(v.string()),
@@ -131,6 +131,13 @@ export const ProfileUpdateForm = () => {
 		control,
 		name: "socialLinks",
 	});
+	const bio = watch("bio");
+	const bioLength = bio?.length || 0;
+
+	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
+	const selectedFaculty = watch("faculty");
+
 	const onSubmit = useCallback(
 		(data: FormInputValues) => {
 			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
@@ -153,17 +160,41 @@ export const ProfileUpdateForm = () => {
 				});
 				return;
 			}
-			// B1-B4は学科必須
-			if (!isOutsideMember && !isGraduateStudent && !data.department) {
+			// B1-D2は学部必須
+			if (!isOutsideMember && !data.faculty) {
+				setError("faculty", {
+					message: "学部を選択してください",
+				});
+				return;
+			}
+			// B1-D2の経済学部以外は学科必須
+			if (
+				!isOutsideMember &&
+				!isGraduateStudent &&
+				selectedFaculty !== "経済学部" &&
+				!data.department
+			) {
 				setError("department", {
 					message: "学科を選択してください",
 				});
 				return;
 			}
-			// M, D以上は研究室必須
+			// M, D以上は研究室・研究科・専攻必須
 			if (isGraduateStudent && !data.laboratory) {
 				setError("laboratory", {
 					message: "研究室を入力してください",
+				});
+				return;
+			}
+			if (isGraduateStudent && !data.graduateSchool) {
+				setError("graduateSchool", {
+					message: "研究科を入力してください",
+				});
+				return;
+			}
+			if (isGraduateStudent && !data.specialization) {
+				setError("specialization", {
+					message: "専攻を入力してください",
 				});
 				return;
 			}
@@ -174,15 +205,8 @@ export const ProfileUpdateForm = () => {
 			};
 			mutate(payload);
 		},
-		[mutate, setError],
+		[mutate, setError, selectedFaculty],
 	);
-
-	const bio = watch("bio");
-	const bioLength = bio?.length || 0;
-
-	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
-	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
-	const selectedFaculty = watch("faculty");
 
 	const departmentsByFaculty: Record<string, string[]> = {
 		教養学部: FACULTY_OF_LIBERAL_ARTS[0]?.identifier ?? [],
@@ -277,12 +301,13 @@ export const ProfileUpdateForm = () => {
 										key={identifier}
 										value={identifier}
 										label={identifier}
+										required
 										{...register("faculty")}
 									/>
 								))}
 							</Form.RadioGroup>
-							<ErrorDisplay error={errors.faculty?.message} />
 						</div>
+						<ErrorDisplay error={errors.faculty?.message} />
 
 						{selectedFaculty &&
 							selectedFaculty !== "経済学部" &&
@@ -303,8 +328,8 @@ export const ProfileUpdateForm = () => {
 												),
 											)}
 										</Form.RadioGroup>
-										<ErrorDisplay error={errors.department?.message} />
 									</div>
+									<ErrorDisplay error={errors.department?.message} />
 								</Fragment>
 							)}
 					</div>
@@ -341,9 +366,61 @@ export const ProfileUpdateForm = () => {
 				</Form.FieldSet>
 			)}
 
-			{/* M, D以上は研究科・専攻・研究室必須 */}
+			{/* M, D以上は学部・学科・研究室・研究科・専攻・学籍番号・大学メール必須 */}
 			{isGraduateStudent && (
 				<Form.FieldSet>
+					<div
+						className={css({
+							display: "grid",
+							gap: "token(spacing.2) token(spacing.4)",
+							gridTemplateColumns: "auto 1fr",
+							alignItems: "start",
+							mdDown: {
+								gridTemplateColumns: "1fr !important",
+							},
+						})}
+					>
+						<Form.LabelText>学部</Form.LabelText>
+						<div>
+							<Form.RadioGroup>
+								{FACULTY[0].identifier.map((identifier) => (
+									<Form.Radio
+										key={identifier}
+										value={identifier}
+										label={identifier}
+										required
+										{...register("faculty")}
+									/>
+								))}
+							</Form.RadioGroup>
+							<ErrorDisplay error={errors.faculty?.message} />
+						</div>
+
+						{selectedFaculty &&
+							selectedFaculty !== "経済学部" &&
+							(departmentsByFaculty[selectedFaculty] ?? []).length > 0 && (
+								<Fragment>
+									<Form.LabelText>学科</Form.LabelText>
+									<div>
+										<Form.RadioGroup>
+											{(departmentsByFaculty[selectedFaculty] ?? []).map(
+												(dept) => (
+													<Form.Radio
+														key={dept}
+														value={dept}
+														label={dept}
+														required
+														{...register("department")}
+													/>
+												),
+											)}
+										</Form.RadioGroup>
+										<ErrorDisplay error={errors.department?.message} />
+									</div>
+								</Fragment>
+							)}
+					</div>
+
 					<Form.Field.TextInput
 						label="研究室"
 						error={errors.laboratory?.message}
@@ -358,6 +435,7 @@ export const ProfileUpdateForm = () => {
 						label="研究科"
 						error={errors.graduateSchool?.message}
 						placeholder="理工学研究科"
+						required
 						{...register("graduateSchool", {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}
@@ -367,6 +445,7 @@ export const ProfileUpdateForm = () => {
 						label="専攻"
 						error={errors.specialization?.message}
 						placeholder="数理電子情報専攻"
+						required
 						{...register("specialization", {
 							setValueAs: (value) => (!value ? undefined : value),
 						})}

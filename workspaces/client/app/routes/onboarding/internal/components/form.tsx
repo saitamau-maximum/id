@@ -29,8 +29,8 @@ const RegisterFormSchema = v.object({
 	academicEmail: v.optional(UserSchemas.AcademicEmail),
 	studentId: v.optional(UserSchemas.StudentId),
 	grade: UserSchemas.Grade,
-	faculty: UserSchemas.Faculty,
-	department: UserSchemas.Department,
+	faculty: v.optional(UserSchemas.Faculty),
+	department: v.optional(UserSchemas.Department),
 	laboratory: v.optional(UserSchemas.Laboratory),
 	graduateSchool: v.optional(UserSchemas.GraduateSchool),
 	specialization: v.optional(UserSchemas.Specialization),
@@ -68,12 +68,14 @@ export const RegisterForm = () => {
 		},
 	});
 
+	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
+	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
+	const selectedFaculty = watch("faculty");
+
 	const onSubmit = useCallback(
 		(data: FormInputValues) => {
 			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
-			const isGraduateStudent = ["M1", "M2", "D1", "D2", "D3"].includes(
-				data.grade,
-			);
+			const isGraduateStudent = GRADUATE_GRADE.includes(data.grade);
 			if (!isOutsideMember && !data.academicEmail) {
 				setError("academicEmail", {
 					message: "学籍番号と大学のメールアドレスは必須です",
@@ -86,6 +88,24 @@ export const RegisterForm = () => {
 				});
 				return;
 			}
+			if (!isOutsideMember && !data.faculty) {
+				setError("faculty", {
+					message: "学部を選択してください",
+				});
+				return;
+			}
+			// B1-B4の経済学部以外は学科必須
+			if (
+				!isOutsideMember &&
+				!isGraduateStudent &&
+				selectedFaculty !== "経済学部" &&
+				!data.department
+			) {
+				setError("department", {
+					message: "学科を選択してください",
+				});
+				return;
+			}
 			// M, D以上は研究室必須
 			if (isGraduateStudent && !data.laboratory) {
 				setError("laboratory", {
@@ -95,12 +115,8 @@ export const RegisterForm = () => {
 			}
 			mutate(data);
 		},
-		[mutate, setError],
+		[mutate, setError, selectedFaculty],
 	);
-
-	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
-	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
-	const selectedFaculty = watch("faculty");
 
 	const departmentsByFaculty: Record<string, string[]> = {
 		教養学部: FACULTY_OF_LIBERAL_ARTS[0]?.identifier ?? [],
@@ -216,6 +232,7 @@ export const RegisterForm = () => {
 											key={identifier}
 											value={identifier}
 											label={identifier}
+											required
 											{...register("faculty")}
 										/>
 									))}
@@ -238,6 +255,7 @@ export const RegisterForm = () => {
 														key={dept}
 														value={dept}
 														label={dept}
+														required
 														{...register("department")}
 													/>
 												),
@@ -292,6 +310,7 @@ export const RegisterForm = () => {
 											key={identifier}
 											value={identifier}
 											label={identifier}
+											required
 											{...register("faculty")}
 										/>
 									))}
@@ -314,6 +333,7 @@ export const RegisterForm = () => {
 														key={dept}
 														value={dept}
 														label={dept}
+														required
 														{...register("department")}
 													/>
 												),
