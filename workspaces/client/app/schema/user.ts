@@ -98,4 +98,26 @@ export const UserSchemas = {
 		),
 		v.maxLength(5),
 	),
+	Faculty: v.pipe(
+		v.string(),
+		v.nonEmpty("学部を入力してください"),
+		v.maxLength(32, "学部は32文字以下で入力してください"),
+	),
+	Department: v.pipe(
+		v.string(),
+		v.nonEmpty("学科を入力してください"),
+		v.maxLength(32, "学科は32文字以下で入力してください"),
+	),
+	Laboratory: v.pipe(
+		v.string(),
+		v.maxLength(16, "研究室は16文字以下で入力してください"),
+	),
+	GraduateSchool: v.pipe(
+		v.string(),
+		v.maxLength(64, "研究科は64文字以下で入力してください"),
+	),
+	Specialization: v.pipe(
+		v.string(),
+		v.maxLength(64, "専攻は64文字以下で入力してください"),
+	),
 };

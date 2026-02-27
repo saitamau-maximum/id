@@ -12,6 +12,7 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 			className={css({
 				display: "flex",
 				alignItems: "center",
+				position: "relative",
 				borderRadius: 6,
 				padding: "token(spacing.1) token(spacing.2)",
 				borderWidth: 1,
@@ -43,6 +44,8 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 						height: 1,
 						overflow: "hidden",
 						position: "absolute",
+						top: 0,
+						left: 0,
 						whiteSpace: "nowrap",
 						width: 1,
 					}),
