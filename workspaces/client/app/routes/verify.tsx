@@ -11,8 +11,8 @@ export default function Verify() {
 	const [param] = useSearchParams();
 	const navigate = useNavigate();
 
-	const getJwt = useCallback(
-		async (ott: string) => {
+	const verifyAndRedirect = useCallback(
+		async (ott: string, redirectTo: string) => {
 			try {
 				const res = await client.auth.verify.$get({
 					query: {
@@ -22,7 +22,7 @@ export default function Verify() {
 				if (res.ok) {
 					const payload = await res.json();
 					sessionStorage.setItem(JWT_STORAGE_KEY, payload.jwt);
-					navigate("/");
+					navigate(redirectTo);
 				}
 			} catch {
 				navigate("/login"); // retry
@@ -33,7 +33,18 @@ export default function Verify() {
 
 	useEffect(() => {
 		const ott = param.get("ott");
-		if (ott) getJwt(ott);
+		const rawRedirectTo = param.get("redirect_to") ?? "/";
+		// オープンリダイレクト防止: 同一オリジンのURLだけ許可し、相対パスへ正規化
+		const redirectTo = (() => {
+			try {
+				const parsed = new URL(rawRedirectTo, window.location.origin);
+				if (parsed.origin !== window.location.origin) return "/";
+				return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+			} catch {
+				return "/";
+			}
+		})();
+		if (ott) verifyAndRedirect(ott, redirectTo);
 		else navigate("/login");
-	}, [param, getJwt, navigate]);
+	}, [param, verifyAndRedirect, navigate]);
 }

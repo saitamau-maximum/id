@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Outlet, useNavigate } from "react-router";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { css, cx } from "styled-system/css";
 import { cq } from "styled-system/patterns";
 import { useAuth } from "~/hooks/use-auth";
@@ -10,6 +10,7 @@ import { Sidebar } from "./internal/components/sidebar";
 
 export default function Dashboard() {
 	const navigate = useNavigate();
+	const location = useLocation();
 	const { isLoading, isAuthorized, isInitialized, isProvisional, isMember } =
 		useAuth();
 	const { pushToast } = useToast();
@@ -23,7 +24,8 @@ export default function Dashboard() {
 
 		// 認証されていない場合はログイン画面へ
 		if (!isAuthorized) {
-			navigate("/login");
+			const redirectTo = location.pathname + location.search;
+			navigate(`/login?redirect_to=${encodeURIComponent(redirectTo)}`);
 			return;
 		}
 
@@ -59,6 +61,7 @@ export default function Dashboard() {
 		isProvisional,
 		isMember,
 		navigate,
+		location,
 		pushToast,
 		setInvitationCode,
 	]);
