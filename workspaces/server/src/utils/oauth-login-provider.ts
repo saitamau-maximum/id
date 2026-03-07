@@ -26,7 +26,7 @@ import type { Awaitable } from "./types";
 
 export abstract class OAuthLoginProvider {
 	// ----- static readonly ----- //
-	static readonly JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+	static readonly JWT_EXPIRATION = 60 * 60 * 24; // 1 day
 	static readonly FLOW_COOKIE_MAX_AGE = 60 * 15; // 15 minutes
 
 	static readonly CALLBACK_REQUEST_QUERY_SCHEMA = v.object({
@@ -79,6 +79,7 @@ export abstract class OAuthLoginProvider {
 			secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
 			sameSite: "lax", // "strict" にすると callback で読み取れなくなる
 			httpOnly: true,
+			maxAge: OAuthLoginProvider.JWT_EXPIRATION,
 		} as const;
 
 		if (env === "production") {
