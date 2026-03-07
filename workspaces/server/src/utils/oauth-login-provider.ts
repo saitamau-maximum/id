@@ -77,8 +77,11 @@ export abstract class OAuthLoginProvider {
 	private static getSessionCookieOptions(env: Env["ENV"]) {
 		return {
 			path: "/",
-			secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
-			sameSite: "lax", // "strict" にすると callback で読み取れなくなる
+			// localhost は特別扱いされるので、常に true にしても問題ない
+			secure: true,
+			// "strict" にすると callback で読み取れなくなるので lax にする
+			// preview の場合、 pages.dev から api-preview.id.maximum.vc に Cookie を送る必要があるため、 "none" にする
+			sameSite: env === "preview" ? "none" : "lax",
 			httpOnly: true,
 			maxAge: OAuthLoginProvider.JWT_EXPIRATION,
 			domain: getCookieDomain(env),

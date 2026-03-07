@@ -33,8 +33,11 @@ export default function Login() {
 	if (invitationCode) loginSearchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
-		if (shouldProceed) navigate(redirectTo ?? "/");
-	}, [shouldProceed, navigate, redirectTo]);
+		if (shouldProceed) {
+			if (window.location.origin !== verifyURL.origin) navigate("/");
+			else navigate(verifyURL.pathname + verifyURL.search + verifyURL.hash);
+		}
+	}, [shouldProceed, navigate, verifyURL]);
 
 	if (isLoading || shouldProceed) {
 		return null;
