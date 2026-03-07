@@ -442,14 +442,6 @@ export abstract class OAuthLoginProvider {
 			OAuthLoginProvider.getSessionCookieOptions(c.env.ENV),
 		);
 
-		const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
-		await c.var.SessionRepository.storeOneTimeToken(
-			ott,
-			jwt,
-			OAuthLoginProvider.JWT_EXPIRATION,
-		);
-		continueToUrl.searchParams.set("ott", ott);
-
 		return c.redirect(continueToUrl.toString(), 302);
 	}
 }

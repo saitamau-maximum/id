@@ -13,7 +13,6 @@ import { CloudflareLocationRepository } from "./infrastructure/repository/cloudf
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
-import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
@@ -53,11 +52,7 @@ export const route = app
 		});
 
 		// ----- IdP Core ----- //
-		// ユーザー・セッション
-		c.set(
-			"SessionRepository",
-			new CloudflareSessionRepository(c.env.IDP_SESSION),
-		);
+		// ユーザー
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
 		// Storage
 		c.set(

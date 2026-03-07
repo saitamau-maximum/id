@@ -11,12 +11,6 @@ GITHUB_APP_INSTALLID = "41674415"
 ENV = "development"
 CLIENT_ORIGIN = "http://localhost:5173"
 
-# IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく
-
-[[kv_namespaces]]
-binding = "IDP_SESSION"
-id = "dev"              # dev なので仮の ID を指定
-
 [[kv_namespaces]]
 binding = "CACHE"
 id = "dev"        # dev なので仮の ID を指定
@@ -64,10 +58,6 @@ database_name = "idp-db-preview"
 migrations_dir = "drizzle"
 
 [[env.preview.kv_namespaces]]
-binding = "IDP_SESSION"
-id = "8566bd47321c43cab679ab65bb60e38b"
-
-[[env.preview.kv_namespaces]]
 binding = "CACHE"
 id = "8566bd47321c43cab679ab65bb60e38b"
 
@@ -106,10 +96,6 @@ database_id = "7b42a115-ebac-47c9-9388-759082eb0d22"
 binding = "DB"
 database_name = "idp-db"
 migrations_dir = "drizzle"
-
-[[env.production.kv_namespaces]]
-binding = "IDP_SESSION"
-id = "0cd11121be304250a5246b2c1a5e185d"
 
 [[env.production.kv_namespaces]]
 binding = "CACHE"
