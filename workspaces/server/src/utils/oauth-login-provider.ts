@@ -21,6 +21,7 @@ import {
 import type { HonoEnv } from "../factory";
 import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
+import { getCookieDomain, getDeleteCookieOptions } from "./cookie";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
 import type { Awaitable } from "./types";
 
@@ -74,29 +75,14 @@ export abstract class OAuthLoginProvider {
 
 	// ----- private methods ----- //
 	private static getSessionCookieOptions(env: Env["ENV"]) {
-		const defaultOptions = {
+		return {
 			path: "/",
 			secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
 			sameSite: "lax", // "strict" にすると callback で読み取れなくなる
 			httpOnly: true,
 			maxAge: OAuthLoginProvider.JWT_EXPIRATION,
+			domain: getCookieDomain(env),
 		} as const;
-
-		if (env === "production") {
-			return {
-				...defaultOptions,
-				domain: "api.id.maximum.vc",
-			} as const;
-		}
-		if (env === "preview") {
-			return {
-				...defaultOptions,
-				domain: "api-preview.id.maximum.vc",
-				// pages.dev から api-preview.id.maximum.vc に Cookie を共有させるために sameSite を "none" にする
-				sameSite: "none",
-			} as const;
-		}
-		return defaultOptions;
 	}
 
 	private static getFlowCookieOptions(env: Env["ENV"]) {
@@ -203,10 +189,11 @@ export abstract class OAuthLoginProvider {
 			c.env.SECRET,
 			COOKIE_NAME.INVITATION_ID,
 		);
-		deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
-		deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN);
-		deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
-		deleteCookie(c, COOKIE_NAME.INVITATION_ID);
+		const deleteOptions = getDeleteCookieOptions(c.env.ENV);
+		deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.CONTINUE_TO, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.INVITATION_ID, deleteOptions);
 
 		// state check
 		if (state !== storedState) {
