@@ -13,6 +13,7 @@ import {
 } from "../../constants/toast";
 import { factory, type HonoEnv } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
+import { getDeleteCookieOptions } from "../../utils/cookie";
 import { generateAuthToken } from "../../utils/oauth/auth-token";
 import { importKey } from "../../utils/oauth/key";
 import { _Authorize } from "./_templates/authorize";
@@ -290,7 +291,11 @@ const route = app
 			})();
 			const forceRelogin = () => {
 				// Server 側でも再ログインを強制したいので、 cookie を削除する
-				deleteCookie(c, COOKIE_NAME.LOGIN_STATE);
+				deleteCookie(
+					c,
+					COOKIE_NAME.LOGIN_STATE,
+					getDeleteCookieOptions(c.env.ENV),
+				);
 
 				// ref: middleware/auth.ts
 				const requestUrl = new URL(c.req.url);

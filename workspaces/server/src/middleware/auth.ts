@@ -12,14 +12,20 @@ import {
 import { factory } from "../factory";
 
 export const authMiddleware = factory.createMiddleware(async (c, next) => {
+	// 認証に失敗したら 401 を返す
 	return jwt({
 		secret: c.env.SECRET,
 		alg: JWT_ALG,
+		cookie: {
+			key: COOKIE_NAME.LOGIN_STATE,
+			secret: c.env.SECRET,
+		},
 	})(c, next);
 });
 
 export const cookieAuthMiddleware = factory.createMiddleware(
 	async (c, next) => {
+		// 認証に失敗したら /login にリダイレクトする
 		const jwt = await getSignedCookie(c, c.env.SECRET, COOKIE_NAME.LOGIN_STATE);
 		if (jwt) {
 			const payload = await verify(jwt, c.env.SECRET, JWT_ALG).catch(

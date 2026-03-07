@@ -6,11 +6,10 @@ interface ToastItem {
 	title: string;
 	description?: string;
 	to?: string;
-	needsReauth?: boolean;
 }
 
 export const ToastHashFn = (item: ToastItem): string => {
-	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}--${item.needsReauth || ""}`;
+	const key = `${item.type}--${item.title}--${item.description || ""}--${item.to || ""}`;
 	let hash = 0;
 	for (let i = 0; i < key.length; i++) {
 		hash = (hash << 5) - hash + key.charCodeAt(i);
@@ -46,7 +45,6 @@ export const PLEASE_RELOGIN_FOR_OAUTH: ToastItem = {
 	title: "再ログインしてください",
 	description:
 		"この OAuth アプリケーションを利用するためには再ログインが必要です",
-	needsReauth: true,
 } as const;
 
 export const DEV_NEW_USER_CREATED_WO_INVITATION: ToastItem = {
@@ -73,4 +71,4 @@ if (new Set(TOAST_HASHES).size !== TOAST_HASHES.length) {
 
 export const TOAST_MESSAGES = Object.fromEntries(
 	TOAST_ITEMS.map((item) => [ToastHashFn(item), item]),
-) as Record<string, ToastItem>;
+) as Record<string, ToastItem | undefined>;

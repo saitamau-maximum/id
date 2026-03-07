@@ -21,25 +21,14 @@ import {
 import type { HonoEnv } from "../factory";
 import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
+import { getCookieDomain, getDeleteCookieOptions } from "./cookie";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
 import type { Awaitable } from "./types";
 
 export abstract class OAuthLoginProvider {
 	// ----- static readonly ----- //
-	static readonly JWT_EXPIRATION = 60 * 60 * 24 * 7; // 1 week
+	static readonly JWT_EXPIRATION = 60 * 60 * 24; // 1 day
 	static readonly FLOW_COOKIE_MAX_AGE = 60 * 15; // 15 minutes
-
-	static readonly SESSION_COOKIE_OPTIONS = {
-		path: "/",
-		secure: true, // localhost は特別扱いされるので、常に true にしても問題ない
-		sameSite: "lax", // "strict" にすると callback で読み取れなくなる
-		httpOnly: true,
-	} as const;
-
-	static readonly FLOW_COOKIE_OPTIONS = {
-		...OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
-		maxAge: OAuthLoginProvider.FLOW_COOKIE_MAX_AGE,
-	} as const;
 
 	static readonly CALLBACK_REQUEST_QUERY_SCHEMA = v.object({
 		code: v.pipe(v.string(), v.nonEmpty()),
@@ -84,6 +73,28 @@ export abstract class OAuthLoginProvider {
 		Pick<OAuthConnection, "name" | "profileImageUrl" | "email">
 	>;
 
+	// ----- private methods ----- //
+	private static getSessionCookieOptions(env: Env["ENV"]) {
+		return {
+			path: "/",
+			// localhost は特別扱いされるので、常に true にしても問題ない
+			secure: true,
+			// "strict" にすると callback で読み取れなくなるので lax にする
+			// preview の場合、 pages.dev から api-preview.id.maximum.vc に Cookie を送る必要があるため、 "none" にする
+			sameSite: env === "preview" ? "none" : "lax",
+			httpOnly: true,
+			maxAge: OAuthLoginProvider.JWT_EXPIRATION,
+			domain: getCookieDomain(env),
+		} as const;
+	}
+
+	private static getFlowCookieOptions(env: Env["ENV"]) {
+		return {
+			...OAuthLoginProvider.getSessionCookieOptions(env),
+			maxAge: OAuthLoginProvider.FLOW_COOKIE_MAX_AGE,
+		} as const;
+	}
+
 	// ----- public methods ----- //
 	public async loginHandlers(
 		c: Context<HonoEnv>,
@@ -117,7 +128,7 @@ export abstract class OAuthLoginProvider {
 				COOKIE_NAME.INVITATION_ID,
 				invitation_id,
 				c.env.SECRET,
-				OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+				OAuthLoginProvider.getFlowCookieOptions(c.env.ENV),
 			);
 		}
 
@@ -126,13 +137,13 @@ export abstract class OAuthLoginProvider {
 			c,
 			COOKIE_NAME.CONTINUE_TO,
 			continue_to ?? "/",
-			OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+			OAuthLoginProvider.getFlowCookieOptions(c.env.ENV),
 		);
 		setCookie(
 			c,
 			COOKIE_NAME.LOGIN_ORIGIN,
 			login_origin,
-			OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+			OAuthLoginProvider.getFlowCookieOptions(c.env.ENV),
 		);
 
 		// state を設定
@@ -142,7 +153,7 @@ export abstract class OAuthLoginProvider {
 			COOKIE_NAME.OAUTH_SESSION_STATE,
 			state,
 			c.env.SECRET,
-			OAuthLoginProvider.FLOW_COOKIE_OPTIONS,
+			OAuthLoginProvider.getFlowCookieOptions(c.env.ENV),
 		);
 
 		const authorizationUrl = this.getAuthorizationUrl();
@@ -181,10 +192,11 @@ export abstract class OAuthLoginProvider {
 			c.env.SECRET,
 			COOKIE_NAME.INVITATION_ID,
 		);
-		deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE);
-		deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN);
-		deleteCookie(c, COOKIE_NAME.CONTINUE_TO);
-		deleteCookie(c, COOKIE_NAME.INVITATION_ID);
+		const deleteOptions = getDeleteCookieOptions(c.env.ENV);
+		deleteCookie(c, COOKIE_NAME.OAUTH_SESSION_STATE, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.LOGIN_ORIGIN, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.CONTINUE_TO, deleteOptions);
+		deleteCookie(c, COOKIE_NAME.INVITATION_ID, deleteOptions);
 
 		// state check
 		if (state !== storedState) {
@@ -215,6 +227,13 @@ export abstract class OAuthLoginProvider {
 			return c.text("Bad Request", 400);
 		}
 		const continueToUrl = new URL(continueTo);
+		// 一応最低限 http/https のみ許可するチェック
+		if (
+			continueToUrl.protocol !== "https:" &&
+			continueToUrl.protocol !== "http:"
+		) {
+			return c.text("Bad Request", 400);
+		}
 		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 		if (
 			c.env.ENV === "production" &&
@@ -419,16 +438,8 @@ export abstract class OAuthLoginProvider {
 			COOKIE_NAME.LOGIN_STATE,
 			jwt,
 			c.env.SECRET,
-			OAuthLoginProvider.SESSION_COOKIE_OPTIONS,
+			OAuthLoginProvider.getSessionCookieOptions(c.env.ENV),
 		);
-
-		const ott = crypto.getRandomValues(new Uint8Array(32)).join("");
-		await c.var.SessionRepository.storeOneTimeToken(
-			ott,
-			jwt,
-			OAuthLoginProvider.JWT_EXPIRATION,
-		);
-		continueToUrl.searchParams.set("ott", ott);
 
 		return c.redirect(continueToUrl.toString(), 302);
 	}

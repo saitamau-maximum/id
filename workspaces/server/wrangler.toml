@@ -6,17 +6,10 @@ compatibility_date = "2024-12-13"
 port = 8787
 
 [vars]
-ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 ENV = "development"
 CLIENT_ORIGIN = "http://localhost:5173"
-
-# IDP_SESSIONとCACHEを同じKVに指定するが、場合によってはセキュアリポジトリとキャッシャーを分ける可能性があるため別のバインドをしておく
-
-[[kv_namespaces]]
-binding = "IDP_SESSION"
-id = "dev"              # dev なので仮の ID を指定
 
 [[kv_namespaces]]
 binding = "CACHE"
@@ -45,7 +38,6 @@ head_sampling_rate = 1
 name = "idp-server-preview"
 
 [env.preview.vars]
-ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Ov23liW34LxmO5QdFO25"
@@ -64,10 +56,6 @@ database_id = "a6e54aed-340c-4495-9010-6e679c83bc45"
 binding = "DB"
 database_name = "idp-db-preview"
 migrations_dir = "drizzle"
-
-[[env.preview.kv_namespaces]]
-binding = "IDP_SESSION"
-id = "8566bd47321c43cab679ab65bb60e38b"
 
 [[env.preview.kv_namespaces]]
 binding = "CACHE"
@@ -90,7 +78,6 @@ head_sampling_rate = 1
 name = "idp-server"
 
 [env.production.vars]
-ALLOW_ORIGIN = "https://id.maximum.vc"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Ov23liTyEwcxd81RFZlI"
@@ -109,10 +96,6 @@ database_id = "7b42a115-ebac-47c9-9388-759082eb0d22"
 binding = "DB"
 database_name = "idp-db"
 migrations_dir = "drizzle"
-
-[[env.production.kv_namespaces]]
-binding = "IDP_SESSION"
-id = "0cd11121be304250a5246b2c1a5e185d"
 
 [[env.production.kv_namespaces]]
 binding = "CACHE"

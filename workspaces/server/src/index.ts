@@ -1,5 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
@@ -13,7 +14,6 @@ import { CloudflareLocationRepository } from "./infrastructure/repository/cloudf
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
 import { CloudflareOAuthExternalRepository } from "./infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/cloudflare/oauth-internal";
-import { CloudflareSessionRepository } from "./infrastructure/repository/cloudflare/session";
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
@@ -53,11 +53,7 @@ export const route = app
 		});
 
 		// ----- IdP Core ----- //
-		// ユーザー・セッション
-		c.set(
-			"SessionRepository",
-			new CloudflareSessionRepository(c.env.IDP_SESSION),
-		);
+		// ユーザー
 		c.set("UserRepository", new CloudflareUserRepository(c.env.DB));
 		// Storage
 		c.set(
@@ -115,7 +111,51 @@ export const route = app
 	})
 	.use((c, next) => {
 		return cors({
-			origin: c.env.ALLOW_ORIGIN,
+			// ctx の型が Context<any, any, {}> になってしまうため、 typeof c で対応
+			origin: (origin, ctx: typeof c) => {
+				// 本番環境ではクライアントが単一 (https://id.maximum.vc = CLIENT_ORIGIN) なので、それだけ許可する
+				if (ctx.env.ENV === "production") {
+					return ctx.env.CLIENT_ORIGIN;
+				}
+				// preview は軽くチェックする (https://*.id-131.pages.dev/ なら OK とする)
+				if (ctx.env.ENV === "preview") {
+					try {
+						const url = new URL(origin);
+						if (url.hostname.endsWith(".id-131.pages.dev")) return origin;
+					} catch {}
+					// 不正な場合許可しない
+					return "";
+				}
+				// dev はオウム返しして許可する
+				return origin;
+			},
+			credentials: true,
+		})(c, next);
+	})
+	.use((c, next) => {
+		// OAuth のフロー上、クロスサイトからのリクエストが来る可能性があるため、 OAuth 関連のルートは CSRF チェックから除外する
+		// csrf の secFetchSide オプションでテストしようとすると、 curl などで Origin が付与されていない場合即座に拒否されちゃうので、ここでパスベースで除外する
+		// ref: https://github.com/honojs/hono/blob/8217d9ece6f4d302e446b8dc353d1b3cbf51d92e/src/middleware/csrf/index.ts#L107-L110
+		if (c.req.path.startsWith("/oauth")) return next();
+
+		return csrf({
+			origin: (origin, ctx: typeof c) => {
+				if (ctx.env.ENV === "production") {
+					return origin === ctx.env.CLIENT_ORIGIN;
+				}
+				if (ctx.env.ENV === "preview") {
+					return origin.endsWith(".id-131.pages.dev");
+				}
+				return true;
+			},
+			secFetchSite: (secFetchSite, ctx: typeof c) => {
+				if (ctx.env.ENV === "preview") {
+					// preview では frontend と backend が異なるオリジンになるため、 secFetchSite が cross-site でも許可する
+					if (secFetchSite === "cross-site") return true;
+				}
+				// GET 以外は基本的に frontend からのリクエストであるはずなので、 secFetchSite が same-origin または same-site であれば許可する
+				return secFetchSite === "same-origin" || secFetchSite === "same-site";
+			},
 		})(c, next);
 	})
 	.route("/auth", authRoute)
