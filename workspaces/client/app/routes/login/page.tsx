@@ -37,7 +37,7 @@ export default function Login() {
 		if (shouldProceed) navigate(redirectTo ?? "/");
 	}, [shouldProceed, navigate, redirectTo]);
 
-	if (shouldProceed) {
+	if (isLoading || shouldProceed) {
 		return null;
 	}
 
