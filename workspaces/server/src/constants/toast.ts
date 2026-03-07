@@ -73,4 +73,4 @@ if (new Set(TOAST_HASHES).size !== TOAST_HASHES.length) {
 
 export const TOAST_MESSAGES = Object.fromEntries(
 	TOAST_ITEMS.map((item) => [ToastHashFn(item), item]),
-) as Record<string, ToastItem>;
+) as Record<string, ToastItem | undefined>;

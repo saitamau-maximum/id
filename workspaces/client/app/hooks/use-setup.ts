@@ -11,8 +11,8 @@ export const useSetup = () => {
 	useEffect(() => {
 		const toastId = searchParams.get(TOAST_SEARCHPARAM);
 		if (toastId) {
-			const { ...msg } = TOAST_MESSAGES[toastId];
-			if (msg) pushToast(msg);
+			const toastItem = TOAST_MESSAGES[toastId];
+			if (toastItem) pushToast(toastItem);
 		}
 	}, [searchParams, pushToast]);
 };
