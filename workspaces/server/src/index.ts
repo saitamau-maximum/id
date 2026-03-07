@@ -1,5 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
+import { csrf } from "hono/csrf";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
 import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
@@ -129,6 +130,26 @@ export const route = app
 				return origin;
 			},
 			credentials: true,
+		})(c, next);
+	})
+	.use((c, next) => {
+		// OAuth のフロー上、クロスサイトからのリクエストが来る可能性があるため、 OAuth 関連のルートは CSRF チェックから除外する
+		// csrf の secFetchSide オプションでテストしようとすると、 curl などで Origin が付与されていない場合即座に拒否されちゃうので、ここでパスベースで除外する
+		// ref: https://github.com/honojs/hono/blob/8217d9ece6f4d302e446b8dc353d1b3cbf51d92e/src/middleware/csrf/index.ts#L107-L110
+		if (c.req.path.startsWith("/oauth")) return next();
+
+		return csrf({
+			origin: (origin, ctx: typeof c) => {
+				if (ctx.env.ENV === "production") {
+					return origin === ctx.env.CLIENT_ORIGIN;
+				}
+				if (ctx.env.ENV === "preview") {
+					return origin.endsWith("id-131.pages.dev");
+				}
+				return true;
+			},
+			// GET 以外は基本的に frontend からのリクエストであるはずなので、 secFetchSite が same-origin または same-site であれば許可する
+			secFetchSite: ["same-origin", "same-site"],
 		})(c, next);
 	})
 	.route("/auth", authRoute)
