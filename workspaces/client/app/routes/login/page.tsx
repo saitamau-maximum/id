@@ -37,7 +37,14 @@ export default function Login() {
 			if (window.location.origin !== verifyURL.origin) navigate("/");
 			else navigate(verifyURL.pathname + verifyURL.search + verifyURL.hash);
 		}
-	}, [shouldProceed, navigate, verifyURL]);
+	}, [
+		shouldProceed,
+		navigate,
+		verifyURL.search,
+		verifyURL.origin,
+		verifyURL.pathname,
+		verifyURL.hash,
+	]);
 
 	if (isLoading || shouldProceed) {
 		return null;

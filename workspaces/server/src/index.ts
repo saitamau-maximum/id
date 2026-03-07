@@ -121,7 +121,7 @@ export const route = app
 				if (ctx.env.ENV === "preview") {
 					try {
 						const url = new URL(origin);
-						if (url.hostname.endsWith("id-131.pages.dev")) return origin;
+						if (url.hostname.endsWith(".id-131.pages.dev")) return origin;
 					} catch {}
 					// 不正な場合許可しない
 					return "";
@@ -144,7 +144,7 @@ export const route = app
 					return origin === ctx.env.CLIENT_ORIGIN;
 				}
 				if (ctx.env.ENV === "preview") {
-					return origin.endsWith("id-131.pages.dev");
+					return origin.endsWith(".id-131.pages.dev");
 				}
 				return true;
 			},
