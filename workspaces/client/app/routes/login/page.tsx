@@ -21,12 +21,11 @@ export default function Login() {
 
 	const loginSearchParams = new URLSearchParams();
 
-	// もし continue_to がクエリパラメータに指定されていたらそれを使う
-	const verifyURL = new URL("/verify", window.location.origin);
+	const verifyURL = new URL("/", window.location.origin);
 	const redirectTo = searchParams.get("redirect_to");
-	if (redirectTo) {
-		verifyURL.searchParams.set("redirect_to", redirectTo);
-	}
+	if (redirectTo) verifyURL.pathname = redirectTo;
+
+	// もし continue_to がクエリパラメータに指定されていたらそれを使う
 	const continueToURL = searchParams.get("continue_to") ?? verifyURL.toString();
 	loginSearchParams.set("continue_to", continueToURL);
 	loginSearchParams.set("from", "login");
@@ -35,10 +34,8 @@ export default function Login() {
 	if (invitationCode) loginSearchParams.set("invitation_id", invitationCode);
 
 	useEffect(() => {
-		if (shouldProceed) {
-			navigate("/");
-		}
-	}, [shouldProceed, navigate]);
+		if (shouldProceed) navigate(redirectTo ?? "/");
+	}, [shouldProceed, navigate, redirectTo]);
 
 	if (shouldProceed) {
 		return null;
