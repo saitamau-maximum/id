@@ -1,6 +1,5 @@
 import { useCallback, useEffect } from "react";
 import { type MetaFunction, useNavigate, useSearchParams } from "react-router";
-import { JWT_STORAGE_KEY } from "~/constant";
 import { client } from "~/utils/hono";
 
 export const meta: MetaFunction = () => {
@@ -19,11 +18,8 @@ export default function Verify() {
 						ott,
 					},
 				});
-				if (res.ok) {
-					const payload = await res.json();
-					sessionStorage.setItem(JWT_STORAGE_KEY, payload.jwt);
-					navigate(redirectTo);
-				}
+				if (res.ok) navigate(redirectTo);
+				else navigate("/login");
 			} catch {
 				navigate("/login"); // retry
 			}
