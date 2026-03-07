@@ -6,7 +6,6 @@ compatibility_date = "2024-12-13"
 port = 8787
 
 [vars]
-ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 ENV = "development"
@@ -45,7 +44,6 @@ head_sampling_rate = 1
 name = "idp-server-preview"
 
 [env.preview.vars]
-ALLOW_ORIGIN = "*"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Ov23liW34LxmO5QdFO25"
@@ -90,7 +88,6 @@ head_sampling_rate = 1
 name = "idp-server"
 
 [env.production.vars]
-ALLOW_ORIGIN = "https://id.maximum.vc"
 GITHUB_APP_ID = "387915"
 GITHUB_APP_INSTALLID = "41674415"
 GITHUB_OAUTH_ID = "Ov23liTyEwcxd81RFZlI"

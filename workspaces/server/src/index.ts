@@ -115,7 +115,25 @@ export const route = app
 	})
 	.use((c, next) => {
 		return cors({
-			origin: c.env.ALLOW_ORIGIN,
+			// ctx の型が Context<any, any, {}> になってしまうため、 typeof c で対応
+			origin: (origin, ctx: typeof c) => {
+				// 本番環境ではクライアントが単一 (https://id.maximum.vc = CLIENT_ORIGIN) なので、それだけ許可する
+				if (ctx.env.ENV === "production") {
+					return ctx.env.CLIENT_ORIGIN;
+				}
+				// preview は軽くチェックする (https://*.id-131.pages.dev/ なら OK とする)
+				if (ctx.env.ENV === "preview") {
+					try {
+						const url = new URL(origin);
+						if (url.hostname.endsWith("id-131.pages.dev")) return origin;
+					} catch {}
+					// 不正な場合許可しない
+					return "";
+				}
+				// dev はオウム返しして許可する
+				return origin;
+			},
+			credentials: true,
 		})(c, next);
 	})
 	.route("/auth", authRoute)
