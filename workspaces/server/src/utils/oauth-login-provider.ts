@@ -92,6 +92,8 @@ export abstract class OAuthLoginProvider {
 			return {
 				...defaultOptions,
 				domain: "api-preview.id.maximum.vc",
+				// pages.dev から api-preview.id.maximum.vc に Cookie を共有させるために sameSite を "none" にする
+				sameSite: "none",
 			} as const;
 		}
 		return defaultOptions;

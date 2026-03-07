@@ -21,9 +21,8 @@ export default function Login() {
 
 	const loginSearchParams = new URLSearchParams();
 
-	const verifyURL = new URL("/", window.location.origin);
 	const redirectTo = searchParams.get("redirect_to");
-	if (redirectTo) verifyURL.pathname = redirectTo;
+	const verifyURL = new URL(redirectTo ?? "/", window.location.origin);
 
 	// もし continue_to がクエリパラメータに指定されていたらそれを使う
 	const continueToURL = searchParams.get("continue_to") ?? verifyURL.toString();
