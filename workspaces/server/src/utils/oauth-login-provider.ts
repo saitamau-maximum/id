@@ -227,6 +227,13 @@ export abstract class OAuthLoginProvider {
 			return c.text("Bad Request", 400);
 		}
 		const continueToUrl = new URL(continueTo);
+		// 一応最低限 http/https のみ許可するチェック
+		if (
+			continueToUrl.protocol !== "https:" &&
+			continueToUrl.protocol !== "http:"
+		) {
+			return c.text("Bad Request", 400);
+		}
 		// 本番環境で、本番環境以外のクライアントURLにリダイレクトさせようとした場合はエラー
 		if (
 			c.env.ENV === "production" &&

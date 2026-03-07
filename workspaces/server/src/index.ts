@@ -148,8 +148,14 @@ export const route = app
 				}
 				return true;
 			},
-			// GET 以外は基本的に frontend からのリクエストであるはずなので、 secFetchSite が same-origin または same-site であれば許可する
-			secFetchSite: ["same-origin", "same-site"],
+			secFetchSite: (secFetchSite, ctx: typeof c) => {
+				if (ctx.env.ENV === "preview") {
+					// preview では frontend と backend が異なるオリジンになるため、 secFetchSite が cross-site でも許可する
+					if (secFetchSite === "cross-site") return true;
+				}
+				// GET 以外は基本的に frontend からのリクエストであるはずなので、 secFetchSite が same-origin または same-site であれば許可する
+				return secFetchSite === "same-origin" || secFetchSite === "same-site";
+			},
 		})(c, next);
 	})
 	.route("/auth", authRoute)
