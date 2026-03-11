@@ -35,6 +35,8 @@ export const TEAM_ROLE_IDS = {
 	GAME: 207,
 	/** インフラ */
 	INFRA: 208,
+	/** アニメーション */
+	ANIMATION: 209,
 } as const;
 
 export const ROLE_IDS = {
@@ -117,6 +119,11 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		id: ROLE_IDS.INFRA,
 		name: "インフラ",
 		color: "#008000",
+	},
+	[ROLE_IDS.ANIMATION]: {
+		id: ROLE_IDS.ANIMATION,
+		name: "アニメーション",
+		color: "#FF4500",
 	},
 	[ROLE_IDS.DEV]: {
 		id: ROLE_IDS.DEV,
