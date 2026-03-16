@@ -1,4 +1,8 @@
-import { OAUTH_PROVIDER_IDS, OAUTH_PROVIDERS } from "@idp/server/shared/oauth";
+import {
+	OAUTH_PROVIDER_IDS,
+	OAUTH_PROVIDERS,
+	type OAuthProviderId,
+} from "@idp/server/shared/oauth";
 import { useCallback } from "react";
 import { GitHub } from "react-feather";
 import { css } from "styled-system/css";
@@ -44,7 +48,7 @@ export const OAuthConnRow = ({
 	providerId,
 	conns,
 }: {
-	providerId: number;
+	providerId: OAuthProviderId;
 	conns: OAuthConnection[];
 }) => {
 	const conn = conns.find((conn) => conn.providerId === providerId);
