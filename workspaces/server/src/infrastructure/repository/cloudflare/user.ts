@@ -1,6 +1,6 @@
 import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import type { OAuthProviderId } from "../../../constants/oauth";
+import { toOAuthProviderId } from "../../../constants/oauth";
 import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
@@ -145,7 +145,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				isApproved: cert.isApproved,
 			})),
 			oauthConnections: user.oauthConnections.map((conn) => ({
-				providerId: conn.providerId as OAuthProviderId,
+				providerId: toOAuthProviderId(conn.providerId),
 				providerUserId: conn.providerUserId,
 				name: conn.name,
 				profileImageUrl: conn.profileImageUrl,
@@ -380,7 +380,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				isApproved: cert.isApproved,
 			})),
 			oauthConnections: user.user.oauthConnections.map((conn) => ({
-				providerId: conn.providerId as OAuthProviderId,
+				providerId: toOAuthProviderId(conn.providerId),
 				providerUserId: conn.providerUserId,
 				name: conn.name,
 				profileImageUrl: conn.profileImageUrl,

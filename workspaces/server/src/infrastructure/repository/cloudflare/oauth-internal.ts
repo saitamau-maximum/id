@@ -7,6 +7,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import {
 	OAUTH_PROVIDER_IDS,
 	type OAuthProviderId,
+	toOAuthProviderId,
 } from "../../../constants/oauth";
 import * as schema from "../../../db/schema";
 import type {
@@ -54,7 +55,7 @@ export class CloudflareOAuthInternalRepository
 		if (!user) throw new Error("User not found");
 		return user.oauthConnections.map((conn) => ({
 			...conn,
-			providerId: conn.providerId as OAuthProviderId,
+			providerId: toOAuthProviderId(conn.providerId),
 		}));
 	}
 
@@ -70,7 +71,7 @@ export class CloudflareOAuthInternalRepository
 		if (!userProfile) throw new Error("User not found");
 		return userProfile.oauthConnections.map((conn) => ({
 			...conn,
-			providerId: conn.providerId as OAuthProviderId,
+			providerId: toOAuthProviderId(conn.providerId),
 		}));
 	}
 
