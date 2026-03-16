@@ -4,7 +4,10 @@ import {
 } from "discord-api-types/v10";
 import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { OAUTH_PROVIDER_IDS } from "../../../constants/oauth";
+import {
+	OAUTH_PROVIDER_IDS,
+	type OAuthProviderId,
+} from "../../../constants/oauth";
 import * as schema from "../../../db/schema";
 import type {
 	IOAuthInternalRepository,
@@ -24,7 +27,7 @@ export class CloudflareOAuthInternalRepository
 
 	async fetchUserIdByProviderInfo(
 		providerUserId: string,
-		providerId: number,
+		providerId: OAuthProviderId,
 	): Promise<string> {
 		const res = await this.client.query.oauthConnections.findFirst({
 			where: (oauthConn, { eq, and }) =>
@@ -49,7 +52,10 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!user) throw new Error("User not found");
-		return user.oauthConnections;
+		return user.oauthConnections.map((conn) => ({
+			...conn,
+			providerId: conn.providerId as OAuthProviderId,
+		}));
 	}
 
 	async fetchOAuthConnectionsByUserDisplayId(
@@ -62,7 +68,10 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!userProfile) throw new Error("User not found");
-		return userProfile.oauthConnections;
+		return userProfile.oauthConnections.map((conn) => ({
+			...conn,
+			providerId: conn.providerId as OAuthProviderId,
+		}));
 	}
 
 	async createOAuthConnection(data: OAuthConnection): Promise<void> {
@@ -84,7 +93,7 @@ export class CloudflareOAuthInternalRepository
 
 	async deleteOAuthConnection(
 		userId: string,
-		providerId: number,
+		providerId: OAuthProviderId,
 	): Promise<void> {
 		await this.client
 			.delete(schema.oauthConnections)
@@ -98,7 +107,7 @@ export class CloudflareOAuthInternalRepository
 
 	async fetchAccessTokenByUserId(
 		userId: string,
-		providerId: number,
+		providerId: OAuthProviderId,
 	): Promise<string | null> {
 		const now = new Date();
 

@@ -103,7 +103,7 @@ class GitHubLoginProvider extends OAuthLoginProvider {
 		return null;
 	}
 
-	override getProviderId(): number {
+	override getProviderId() {
 		return OAUTH_PROVIDER_IDS.GITHUB;
 	}
 
