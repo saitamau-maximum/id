@@ -17,7 +17,7 @@ export default function Dashboard() {
 		isInitialized,
 		isProvisional,
 		isMember,
-		hasRequiredOAuthConnections,
+		lacksRequiredOAuthConnections,
 	} = useAuth();
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
@@ -62,7 +62,7 @@ export default function Dashboard() {
 		}
 
 		// もし必須 OAuth 連携がされていないものがあれば OAuth 連携画面へ
-		if (hasRequiredOAuthConnections) {
+		if (lacksRequiredOAuthConnections) {
 			navigate("/connect-required-oauth");
 			return;
 		}
@@ -76,7 +76,7 @@ export default function Dashboard() {
 		location,
 		pushToast,
 		setInvitationCode,
-		hasRequiredOAuthConnections,
+		lacksRequiredOAuthConnections,
 	]);
 
 	// リダイレクトされるべき場合は何も表示しない
@@ -86,7 +86,7 @@ export default function Dashboard() {
 		!isMember ||
 		!isInitialized ||
 		isProvisional ||
-		hasRequiredOAuthConnections
+		lacksRequiredOAuthConnections
 	)
 		return null;
 

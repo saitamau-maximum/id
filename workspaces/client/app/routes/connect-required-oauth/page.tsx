@@ -18,7 +18,7 @@ export const meta: MetaFunction = () => {
 };
 
 export default function ConnectRequiredOAuth() {
-	const { isLoading, user, hasRequiredOAuthConnections } = useAuth();
+	const { isLoading, user, lacksRequiredOAuthConnections } = useAuth();
 	const navigate = useNavigate();
 
 	const loginSearchParams = new URLSearchParams();
@@ -26,7 +26,7 @@ export default function ConnectRequiredOAuth() {
 	loginSearchParams.set("continue_to", continueToURL);
 	loginSearchParams.set("from", "settings");
 
-	const shouldProceed = !isLoading && hasRequiredOAuthConnections;
+	const shouldProceed = !isLoading && lacksRequiredOAuthConnections;
 
 	useEffect(() => {
 		if (!shouldProceed) navigate("/");
