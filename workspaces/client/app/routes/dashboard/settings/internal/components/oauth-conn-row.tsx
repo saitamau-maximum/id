@@ -1,7 +1,4 @@
-import {
-	OAUTH_PROVIDER_IDS,
-	OAUTH_PROVIDER_NAMES,
-} from "@idp/server/shared/oauth";
+import { OAUTH_PROVIDER_IDS, OAUTH_PROVIDERS } from "@idp/server/shared/oauth";
 import { useCallback } from "react";
 import { GitHub } from "react-feather";
 import { css } from "styled-system/css";
@@ -62,7 +59,7 @@ export const OAuthConnRow = ({
 	const handleDelete = useCallback(async () => {
 		if (conn) {
 			const res = await ConfirmDialog.call({
-				title: `${OAUTH_PROVIDER_NAMES[providerId]} OAuth 連携の解除`,
+				title: `${OAUTH_PROVIDERS[providerId].name} OAuth 連携の解除`,
 				children: <DeleteConfirmation />,
 				danger: true,
 			});
@@ -92,7 +89,7 @@ export const OAuthConnRow = ({
 						{profileImageUrl && (
 							<img
 								src={profileImageUrl.toString()}
-								alt={OAUTH_PROVIDER_NAMES[providerId]}
+								alt={OAUTH_PROVIDERS[providerId].name}
 								width={16}
 								height={16}
 								className={css({
@@ -107,20 +104,20 @@ export const OAuthConnRow = ({
 				)}
 			</Table.Td>
 			<Table.Td>
-				{providerId === OAUTH_PROVIDER_IDS.GITHUB && (
+				{OAUTH_PROVIDERS[providerId].required && (
 					<span>連携の解除はできません</span>
 				)}
-				{providerId !== OAUTH_PROVIDER_IDS.GITHUB && !conn && (
+				{!OAUTH_PROVIDERS[providerId].required && !conn && (
 					<a
-						href={`${env("SERVER_HOST")}/auth/login/${OAUTH_PROVIDER_NAMES[providerId].toLowerCase()}?${loginSearchParams.toString()}`}
+						href={`${env("SERVER_HOST")}${OAUTH_PROVIDERS[providerId].loginPath}?${loginSearchParams.toString()}`}
 					>
 						<AnchorLike>連携する</AnchorLike>
 					</a>
 				)}
-				{providerId !== OAUTH_PROVIDER_IDS.GITHUB && conn && (
+				{!OAUTH_PROVIDERS[providerId].required && conn && (
 					<>
 						<a
-							href={`${env("SERVER_HOST")}/auth/login/${OAUTH_PROVIDER_NAMES[providerId].toLowerCase()}?${loginSearchParams.toString()}`}
+							href={`${env("SERVER_HOST")}${OAUTH_PROVIDERS[providerId].loginPath}?${loginSearchParams.toString()}`}
 						>
 							<AnchorLike>再連携する</AnchorLike>
 						</a>
