@@ -322,7 +322,11 @@ const route = app
 		const providerIdStr = c.req.param("providerId");
 
 		const providerId = Number.parseInt(providerIdStr, 10);
-		if (Number.isNaN(providerId) || !isValidOAuthProviderId(providerId)) {
+		if (
+			!/^\d+$/.test(providerIdStr) ||
+			Number.isNaN(providerId) ||
+			!isValidOAuthProviderId(providerId)
+		) {
 			return c.text("Invalid providerId", 400);
 		}
 
