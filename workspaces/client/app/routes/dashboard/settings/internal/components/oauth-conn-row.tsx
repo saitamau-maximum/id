@@ -1,48 +1,18 @@
 import {
-	OAUTH_PROVIDER_IDS,
 	OAUTH_PROVIDERS,
 	type OAuthProviderId,
 } from "@idp/server/shared/oauth";
 import { useCallback } from "react";
-import { GitHub } from "react-feather";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
+import { OAuthServiceProviderBadge } from "~/components/feature/oauth-internal/service-provider-badge";
+import { OAuthUserBadge } from "~/components/feature/oauth-internal/user-badge";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { Table } from "~/components/ui/table";
 import type { OAuthConnection } from "~/types/oauth-internal";
 import { env } from "~/utils/env";
 import { useDeleteOAuthConnection } from "../hooks/use-delete-oauth-connection";
-
-const ServiceTd = ({ providerId }: { providerId: number }) => {
-	const iconClassName = css({
-		display: "inline-block",
-		marginRight: 2,
-	});
-
-	switch (providerId) {
-		case OAUTH_PROVIDER_IDS.GITHUB:
-			return (
-				<Table.Td>
-					<GitHub size={16} className={iconClassName} />
-					GitHub
-				</Table.Td>
-			);
-		case OAUTH_PROVIDER_IDS.DISCORD:
-			return (
-				<Table.Td>
-					<img
-						src="/discord.svg"
-						alt="Discord logo"
-						width={16}
-						height={16}
-						className={iconClassName}
-					/>
-					Discord
-				</Table.Td>
-			);
-	}
-};
 
 export const OAuthConnRow = ({
 	providerId,
@@ -72,41 +42,12 @@ export const OAuthConnRow = ({
 		}
 	}, [conn, providerId, mutate]);
 
-	const profileImageUrl = conn?.profileImageUrl
-		? new URL(conn.profileImageUrl)
-		: null;
-
-	if (profileImageUrl) {
-		if (providerId === OAUTH_PROVIDER_IDS.GITHUB)
-			profileImageUrl.searchParams.set("s", "16");
-
-		if (providerId === OAUTH_PROVIDER_IDS.DISCORD)
-			profileImageUrl.searchParams.set("size", "16");
-	}
-
 	return (
 		<Table.Tr>
-			<ServiceTd providerId={providerId} />
 			<Table.Td>
-				{conn && (
-					<>
-						{profileImageUrl && (
-							<img
-								src={profileImageUrl.toString()}
-								alt={OAUTH_PROVIDERS[providerId].name}
-								width={16}
-								height={16}
-								className={css({
-									borderRadius: "full",
-									display: "inline-block",
-									marginRight: 2,
-								})}
-							/>
-						)}
-						<span>{conn.name}</span>
-					</>
-				)}
+				<OAuthServiceProviderBadge providerId={providerId} />
 			</Table.Td>
+			<Table.Td>{conn && <OAuthUserBadge conn={conn} />}</Table.Td>
 			<Table.Td>
 				{OAUTH_PROVIDERS[providerId].required && (
 					<span>連携の解除はできません</span>
