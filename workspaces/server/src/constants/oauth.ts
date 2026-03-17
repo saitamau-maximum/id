@@ -35,7 +35,7 @@ export const OAUTH_PROVIDERS = {
 	},
 	[OAUTH_PROVIDER_IDS.DISCORD]: {
 		name: "Discord",
-		required: false,
+		required: true,
 		loginPath: "/auth/login/discord",
 	},
 } satisfies Record<OAuthProviderId, OAuthProviderInfo>;
