@@ -29,8 +29,8 @@ export const TEAM_ROLE_IDS = {
 	AI: 204,
 	/** CTF */
 	CTF: 205,
-	/** モバイルアプリ */
-	MOBILE: 206,
+	/** アニメーション */
+	ANIMATION: 206,
 	/** ゲーム開発 */
 	GAME: 207,
 	/** インフラ */
@@ -103,9 +103,9 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		name: "CTF",
 		color: "#800080",
 	},
-	[ROLE_IDS.MOBILE]: {
-		id: ROLE_IDS.MOBILE,
-		name: "モバイルアプリ",
+	[ROLE_IDS.ANIMATION]: {
+		id: ROLE_IDS.ANIMATION,
+		name: "アニメーション",
 		color: "#1F0084",
 	},
 	[ROLE_IDS.GAME]: {
