@@ -11,8 +11,14 @@ import { Sidebar } from "./internal/components/sidebar";
 export default function Dashboard() {
 	const navigate = useNavigate();
 	const location = useLocation();
-	const { isLoading, isAuthorized, isInitialized, isProvisional, isMember } =
-		useAuth();
+	const {
+		isLoading,
+		isAuthorized,
+		isInitialized,
+		isProvisional,
+		isMember,
+		lacksRequiredOAuthConnections,
+	} = useAuth();
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
 
@@ -54,6 +60,12 @@ export default function Dashboard() {
 			navigate("/login");
 			return;
 		}
+
+		// もし必須 OAuth 連携がされていないものがあれば OAuth 連携画面へ
+		if (lacksRequiredOAuthConnections) {
+			navigate("/connect-required-oauth");
+			return;
+		}
 	}, [
 		isLoading,
 		isAuthorized,
@@ -64,6 +76,7 @@ export default function Dashboard() {
 		location,
 		pushToast,
 		setInvitationCode,
+		lacksRequiredOAuthConnections,
 	]);
 
 	// リダイレクトされるべき場合は何も表示しない
@@ -72,7 +85,8 @@ export default function Dashboard() {
 		!isAuthorized ||
 		!isMember ||
 		!isInitialized ||
-		isProvisional
+		isProvisional ||
+		lacksRequiredOAuthConnections
 	)
 		return null;
 

@@ -1,3 +1,4 @@
+import { REQUIRED_OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
 import { useQuery } from "@tanstack/react-query";
 import { ROLE_IDS } from "~/types/role";
 import { getFiscalYearStartDate } from "~/utils/date";
@@ -25,5 +26,10 @@ export function useAuth() {
 		isFiscalYearPaid:
 			data?.lastPaymentConfirmedAt &&
 			data?.lastPaymentConfirmedAt >= getFiscalYearStartDate(),
+		// 必須 OAuth なのに連携されていないものがあるか
+		lacksRequiredOAuthConnections: REQUIRED_OAUTH_PROVIDER_IDS.some(
+			(id) =>
+				!(data?.oauthConnections ?? []).some((conn) => conn.providerId === id),
+		),
 	};
 }

@@ -57,6 +57,7 @@ export default [
 		]),
 		...prefix("invitation", [route(":id", "routes/invitation/page.tsx")]),
 		route("payment-info", "routes/payment-info/page.tsx"),
+		route("connect-required-oauth", "routes/connect-required-oauth/page.tsx"),
 		route("onboarding", "routes/onboarding/page.tsx"),
 		route("login", "routes/login/page.tsx"),
 	]),

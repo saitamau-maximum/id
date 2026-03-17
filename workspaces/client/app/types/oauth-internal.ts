@@ -1,5 +1,7 @@
+import type { OAuthProviderId } from "@idp/server/shared/oauth";
+
 export type OAuthConnection = {
-	providerId: number;
+	providerId: OAuthProviderId;
 	providerUserId: string;
 	name: string | null;
 	profileImageUrl: string | null;

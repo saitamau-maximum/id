@@ -2,7 +2,11 @@ import { vValidator } from "@hono/valibot-validator";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import {
+	isValidOAuthProviderId,
+	OAUTH_PROVIDER_IDS,
+	REQUIRED_OAUTH_PROVIDER_IDS,
+} from "../constants/oauth";
 import {
 	ACADEMIC_EMAIL_DOMAIN,
 	BIO_MAX_LENGTH,
@@ -317,19 +321,17 @@ const route = app
 		const { OAuthInternalRepository } = c.var;
 		const providerIdStr = c.req.param("providerId");
 
+		const providerId = Number.parseInt(providerIdStr, 10);
 		if (
-			!Object.values(OAUTH_PROVIDER_IDS).map(String).includes(providerIdStr)
+			!/^\d+$/.test(providerIdStr) ||
+			Number.isNaN(providerId) ||
+			!isValidOAuthProviderId(providerId)
 		) {
 			return c.text("Invalid providerId", 400);
 		}
 
-		const providerId = Number.parseInt(providerIdStr, 10);
-		// Assert
-		if (
-			Number.isNaN(providerId) ||
-			!Object.values(OAUTH_PROVIDER_IDS).includes(providerId)
-		) {
-			return c.text("Invalid providerId", 400);
+		if (REQUIRED_OAUTH_PROVIDER_IDS.includes(providerId)) {
+			return c.text("Cannot delete required OAuth connection", 400);
 		}
 
 		await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
