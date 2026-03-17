@@ -14,6 +14,13 @@ export const isValidOAuthProviderId = (id: number): id is OAuthProviderId => {
 	return Object.values(OAUTH_PROVIDER_IDS).includes(id as any);
 };
 
+export const toOAuthProviderId = (id: number): OAuthProviderId => {
+	if (!isValidOAuthProviderId(id)) {
+		throw new Error(`Invalid OAuth Provider ID: ${id}`);
+	}
+	return id;
+};
+
 interface OAuthProviderInfo {
 	name: string;
 	required: boolean;
@@ -31,7 +38,7 @@ export const OAUTH_PROVIDERS = {
 		required: true,
 		loginPath: "/auth/login/discord",
 	},
-} as Record<OAuthProviderId, OAuthProviderInfo>;
+} satisfies Record<OAuthProviderId, OAuthProviderInfo>;
 
 export const REQUIRED_OAUTH_PROVIDER_IDS = Object.entries(OAUTH_PROVIDERS)
 	.filter(([, provider]) => provider.required)

@@ -1,6 +1,8 @@
+import type { OAuthProviderId } from "../constants/oauth";
+
 export type OAuthConnection = {
 	userId: string;
-	providerId: number;
+	providerId: OAuthProviderId;
 	providerUserId: string;
 	refreshToken: string | null;
 	refreshTokenExpiresAt: Date | null;
@@ -12,7 +14,7 @@ export type OAuthConnection = {
 export type IOAuthInternalRepository = {
 	fetchUserIdByProviderInfo: (
 		providerUserId: string,
-		providerId: number,
+		providerId: OAuthProviderId,
 	) => Promise<string>;
 	fetchOAuthConnectionsByUserId: (userId: string) => Promise<OAuthConnection[]>;
 	fetchOAuthConnectionsByUserDisplayId: (
@@ -20,9 +22,12 @@ export type IOAuthInternalRepository = {
 	) => Promise<OAuthConnection[]>;
 	createOAuthConnection: (data: OAuthConnection) => Promise<void>;
 	updateOAuthConnection: (data: OAuthConnection) => Promise<void>;
-	deleteOAuthConnection: (userId: string, providerId: number) => Promise<void>;
+	deleteOAuthConnection: (
+		userId: string,
+		providerId: OAuthProviderId,
+	) => Promise<void>;
 	fetchAccessTokenByUserId: (
 		userId: string,
-		providerId: number,
+		providerId: OAuthProviderId,
 	) => Promise<string | null>;
 };

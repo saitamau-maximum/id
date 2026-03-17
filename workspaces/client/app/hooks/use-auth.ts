@@ -27,8 +27,9 @@ export function useAuth() {
 			data?.lastPaymentConfirmedAt &&
 			data?.lastPaymentConfirmedAt >= getFiscalYearStartDate(),
 		// 必須 OAuth なのに連携されていないものがあるか
-		hasRequiredOAuthConnections: REQUIRED_OAUTH_PROVIDER_IDS.some(
-			(id) => !data?.oauthConnections.some((conn) => conn.providerId === id),
+		lacksRequiredOAuthConnections: REQUIRED_OAUTH_PROVIDER_IDS.some(
+			(id) =>
+				!(data?.oauthConnections ?? []).some((conn) => conn.providerId === id),
 		),
 	};
 }

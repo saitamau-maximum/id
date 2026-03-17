@@ -10,6 +10,7 @@ import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
+import type { OAuthProviderId } from "../constants/oauth";
 import { ROLE_IDS } from "../constants/role";
 import {
 	DEV_NEW_USER_CREATED_WO_INVITATION,
@@ -67,7 +68,7 @@ export abstract class OAuthLoginProvider {
 	abstract getAccessTokenExpiresAt(): Awaitable<Date | null>;
 	abstract getRefreshToken(): Awaitable<string>;
 	abstract getRefreshTokenExpiresAt(): Awaitable<Date | null>;
-	abstract getProviderId(): number;
+	abstract getProviderId(): OAuthProviderId;
 	abstract getProviderUserId(): Awaitable<string>;
 	abstract getOAuthConnectionUserPayload(): Awaitable<
 		Pick<OAuthConnection, "name" | "profileImageUrl" | "email">
