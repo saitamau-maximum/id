@@ -16,6 +16,7 @@ import type {
 export type PublicMember = {
 	id: string;
 	displayName: string;
+	profileImageURL: string;
 	bio: string;
 	socialLinks: string[];
 	roles: string[];
@@ -567,6 +568,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		return {
 			id: profile.user.id,
 			displayName: profile.displayName ?? "",
+			profileImageURL: profile.profileImageURL ?? "",
 			bio: profile.bio ?? "",
 			socialLinks: profile.user.socialLinks.map((link) => link.url),
 			roles: profile.user.roles
