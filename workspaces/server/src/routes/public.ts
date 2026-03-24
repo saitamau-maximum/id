@@ -24,6 +24,7 @@ const route = app
 			error: false,
 			id: member.id,
 			displayName: member.displayName,
+			profileImageURL: member.profileImageURL,
 			bio: member.bio,
 			socialLinks: member.socialLinks,
 			roles: member.roles,
