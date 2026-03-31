@@ -1,4 +1,5 @@
 import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
+import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
 import { Edit } from "react-feather";
 import { css } from "styled-system/css";
@@ -9,7 +10,6 @@ import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import type { User } from "~/types/user";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime, getFiscalYearStartDate } from "~/utils/date";
 import { useAllUsers } from "../hooks/use-all-user";
@@ -79,7 +79,11 @@ export const NonMemberUsersTable = () => {
 // ロールの数が多い場合、表示を制限する
 const ROLE_SLICE_LIMIT = 3;
 
-const UserTableRow = ({ user }: { user: User }) => {
+const UserTableRow = ({
+	user,
+}: {
+	user: Omit<User, "certifications" | "oauthConnections">;
+}) => {
 	const { mutate: updateRole } = useUpdateRole(user.id);
 	const { mutate: confirmPayment } = useConfirmPayment(user.id);
 

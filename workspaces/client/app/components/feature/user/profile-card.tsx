@@ -1,3 +1,4 @@
+import type { Member } from "@idp/schema/entity/member";
 import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
@@ -5,19 +6,21 @@ import { SocialIcon } from "~/components/ui/social-icon";
 import { SOCIAL_SERVICES_IDS } from "~/constant";
 import { useMarkdown } from "~/hooks/use-markdown";
 import type { DiscordInfo } from "~/types/discord-info";
-import type { OAuthConnection } from "~/types/oauth-internal";
-import type { Member } from "~/types/user";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications" | "initializedAt"> & {
+type Props = Omit<
+	Member,
+	| "certifications"
+	| "initializedAt"
+	| "isProvisional"
+	| "lastPaymentConfirmedAt"
+> & {
 	socialLinks?: string[];
 	initialized: boolean;
-	lastLoginAt?: Date | undefined;
 	discordInfo?: DiscordInfo;
-	oauthConnections?: OAuthConnection[];
 };
 
 export const ProfileCard: React.FC<Props> = ({

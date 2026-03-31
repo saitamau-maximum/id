@@ -1,7 +1,7 @@
 import { Line } from "react-chartjs-2";
 import { useDashboardInfo } from "../hooks/use-dashboard-info";
 import "chart.js/auto";
-import type { DashboardUser } from "~/types/user";
+import type { DashboardUser } from "@idp/schema/entity/user";
 
 const createMemberSegmentsByDate = (data: DashboardUser[], now: Date) => {
 	// 直近50日のユーザー登録数を日付ごとに集計する

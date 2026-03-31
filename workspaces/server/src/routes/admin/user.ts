@@ -1,5 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
+import { RoleId } from "@idp/schema/entity/role";
 import * as v from "valibot";
 import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
@@ -10,16 +10,9 @@ import {
 
 const app = factory.createApp();
 
-const UpdateRoleRequestSchema = v.pipe(
-	v.object({
-		roleIds: v.array(RoleId),
-	}),
-	// 存在しない Role ID が含まれていないか検証
-	v.check(
-		({ roleIds }) => roleIds.every((roleId) => ROLE_BY_ID[roleId]),
-		"Invalid Role ID",
-	),
-);
+const UpdateRoleRequestSchema = v.object({
+	roleIds: v.array(RoleId),
+});
 
 const route = app
 	.use(invitesMutableMiddleware)

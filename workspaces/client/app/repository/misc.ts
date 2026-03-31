@@ -1,4 +1,4 @@
-import type { DashboardUser } from "~/types/user";
+import type { DashboardUser } from "@idp/schema/entity/user";
 import { client } from "~/utils/hono";
 
 export interface IMiscRepository {
@@ -15,9 +15,7 @@ export class MiscRepositoryImpl implements IMiscRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
-			initializedAt: user.initializedAt
-				? new Date(user.initializedAt)
-				: undefined,
+			initializedAt: user.initializedAt ? new Date(user.initializedAt) : null,
 			lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
 		}));
 	}
