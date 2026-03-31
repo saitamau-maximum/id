@@ -34,55 +34,58 @@ const DEFAULT_USER_PROFILE_FOR_UPDATE = {
 	socialLinks: ["https://example.com"],
 };
 
-// [description, payload, flag][]
-const INVALID_PAYLOADS = [
-	["absent displayName", { displayName: undefined }, 3],
-	["empty displayName", { displayName: "" }, 3],
-	["absent realName", { realName: undefined }, 3],
-	["empty realName", { realName: "" }, 3],
-	["realName w/o spaces", { realName: "テストユーザー" }, 3],
-	["absent realNameKana", { realNameKana: undefined }, 3],
-	["empty realNameKana", { realNameKana: "" }, 3],
-	["realNameKana w/o spaces", { realNameKana: "てすとゆーざー" }, 3],
-	["absent displayId", { displayId: undefined }, 3],
-	["empty displayId", { displayId: "" }, 3],
-	["too short displayId", { displayId: "a" }, 3],
-	["too long displayId", { displayId: "a".repeat(17) }, 3],
-	["only underscores in displayId", { displayId: "_____" }, 3],
-	["uppercase displayId", { displayId: "ABC" }, 3],
-	["invalid characters in displayId", { displayId: "test-user!" }, 3],
-	["absent email", { email: undefined }, 3],
-	["empty email", { email: "" }, 3],
-	["invalid email", { email: "invalid-email" }, 3],
-	["absent academicEmail (non-guest)", { academicEmail: undefined }, 3],
-	["empty academicEmail", { academicEmail: "" }, 3],
-	["academicEmail in email field", { email: "invalid@ms.saitama-u.ac.jp" }, 3],
-	["normal email in academicEmail field", { academicEmail: "foo@bar.test" }, 3],
-	["absent studentId (non-guest)", { studentId: undefined }, 3],
-	["empty studentId", { studentId: "" }, 3],
-	["invalid studentId (1)", { studentId: "1234567" }, 3],
-	["invalid studentId (2)", { studentId: "1A34567" }, 3],
-	["too long bio", { bio: "a".repeat(301) }, 2],
+type ProfilePayloadTestcases = [string, Record<string, unknown>][];
+const INVALID_PAYLOADS_FOR_REGISTER = [] satisfies ProfilePayloadTestcases;
+const INVALID_PAYLOADS_FOR_UPDATE = [
+	["too long bio", { bio: "a".repeat(301) }],
 	[
 		"too many socialLinks",
 		{ socialLinks: new Array(6).fill("https://example.com") },
-		2,
 	],
-] satisfies [string, Record<string, unknown>, 1 | 2 | 3][];
+] satisfies ProfilePayloadTestcases;
+const INVALID_PAYLOADS_FOR_BOTH = [
+	["absent displayName", { displayName: undefined }],
+	["empty displayName", { displayName: "" }],
+	["absent realName", { realName: undefined }],
+	["empty realName", { realName: "" }],
+	["realName w/o spaces", { realName: "テストユーザー" }],
+	["absent realNameKana", { realNameKana: undefined }],
+	["empty realNameKana", { realNameKana: "" }],
+	["realNameKana w/o spaces", { realNameKana: "てすとゆーざー" }],
+	["absent displayId", { displayId: undefined }],
+	["empty displayId", { displayId: "" }],
+	["too short displayId", { displayId: "a" }],
+	["too long displayId", { displayId: "a".repeat(17) }],
+	["only underscores in displayId", { displayId: "_____" }],
+	["uppercase displayId", { displayId: "ABC" }],
+	["invalid characters in displayId", { displayId: "test-user!" }],
+	["absent email", { email: undefined }],
+	["empty email", { email: "" }],
+	["invalid email", { email: "invalid-email" }],
+	["absent academicEmail (non-guest)", { academicEmail: undefined }],
+	["empty academicEmail", { academicEmail: "" }],
+	["academicEmail in email field", { email: "invalid@ms.saitama-u.ac.jp" }],
+	["normal email in academicEmail field", { academicEmail: "foo@bar.test" }],
+	["absent studentId (non-guest)", { studentId: undefined }],
+	["empty studentId", { studentId: "" }],
+	["invalid studentId (1)", { studentId: "1234567" }],
+	["invalid studentId (2)", { studentId: "1A34567" }],
+] satisfies ProfilePayloadTestcases;
 
-const VALID_PAYLOADS = [
+const VALID_PAYLOADS_FOR_REGISTER = [] satisfies ProfilePayloadTestcases;
+const VALID_PAYLOADS_FOR_UPDATE = [
+	["no socialLinks", { socialLinks: [] }],
+] satisfies ProfilePayloadTestcases;
+const VALID_PAYLOADS_FOR_BOTH = [
 	[
 		"no academicEmail and studentId for Guest",
 		{ grade: "ゲスト", academicEmail: undefined, studentId: undefined },
-		3,
 	],
 	[
 		"no academicEmail and studentId for Graduate",
 		{ grade: "卒業生", academicEmail: undefined, studentId: undefined },
-		3,
 	],
-	["no socialLinks", { socialLinks: [] }, 2],
-] satisfies [string, Record<string, unknown>, 1 | 2 | 3][];
+] satisfies ProfilePayloadTestcases;
 
 const createJWT = async (userId: string) => {
 	return await sign({ userId: userId }, TEST_SECRET, JWT_ALG);
@@ -147,9 +150,10 @@ describe("User Handler", () => {
 			expect(response.status).toBe(401);
 		});
 
-		it.each(
-			INVALID_PAYLOADS.filter(([, , flag]) => flag & 1),
-		)("should return 400 for invalid input: %s", async (_description, invalidPayload, _flag) => {
+		it.each([
+			...INVALID_PAYLOADS_FOR_BOTH,
+			...INVALID_PAYLOADS_FOR_REGISTER,
+		])("should return 400 for invalid input: %s", async (_description, invalidPayload) => {
 			const token = await createJWT(TEST_USER_ID);
 
 			const response = await app.request("/user/register", {
@@ -167,9 +171,10 @@ describe("User Handler", () => {
 			expect(response.status).toBe(400);
 		});
 
-		it.each(
-			VALID_PAYLOADS.filter(([, , flag]) => flag & 1),
-		)("should return 201 for valid input: %s", async (_description, validPayload, _flag) => {
+		it.each([
+			...VALID_PAYLOADS_FOR_BOTH,
+			...VALID_PAYLOADS_FOR_REGISTER,
+		])("should return 201 for valid input: %s", async (_description, validPayload) => {
 			const token = await createJWT(TEST_USER_ID);
 
 			const response = await app.request("/user/register", {
@@ -246,9 +251,10 @@ describe("User Handler", () => {
 			expect(response.status).toBe(403);
 		});
 
-		it.each(
-			INVALID_PAYLOADS.filter(([, , flag]) => flag & 2),
-		)("should return 400 for invalid input: %s", async (_description, invalidPayload, _flag) => {
+		it.each([
+			...INVALID_PAYLOADS_FOR_BOTH,
+			...INVALID_PAYLOADS_FOR_UPDATE,
+		])("should return 400 for invalid input: %s", async (_description, invalidPayload) => {
 			const token = await createJWT(TEST_USER_ID);
 
 			const response = await app.request("/user/update", {
@@ -266,9 +272,10 @@ describe("User Handler", () => {
 			expect(response.status).toBe(400);
 		});
 
-		it.each(
-			VALID_PAYLOADS.filter(([, , flag]) => flag & 2),
-		)("should return 204 for valid input: %s", async (_description, validPayload, _flag) => {
+		it.each([
+			...VALID_PAYLOADS_FOR_BOTH,
+			...VALID_PAYLOADS_FOR_UPDATE,
+		])("should return 204 for valid input: %s", async (_description, validPayload) => {
 			const token = await createJWT(TEST_USER_ID);
 
 			const response = await app.request("/user/update", {
