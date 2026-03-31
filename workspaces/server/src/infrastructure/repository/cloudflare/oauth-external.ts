@@ -1,6 +1,7 @@
+import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { ROLE_BY_ID } from "../../../constants/role";
+import * as v from "valibot";
 import { getScopeById, type Scope } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
@@ -37,7 +38,10 @@ const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	displayId: user.profile.displayId ?? undefined,
 	displayName: user.profile.displayName ?? undefined,
 	profileImageURL: user.profile.profileImageURL ?? undefined,
-	roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+	roles: user.roles
+		.map((role) => role.roleId)
+		.filter((roleId) => v.is(RoleId, roleId))
+		.map((roleId) => ROLE_BY_ID[roleId]),
 });
 
 export class CloudflareOAuthExternalRepository
@@ -463,7 +467,10 @@ export class CloudflareOAuthExternalRepository
 					realNameKana: user.profile.realNameKana ?? undefined,
 					socialLinks: user.socialLinks.map((link) => link.url),
 				},
-				roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+				roles: user.roles
+					.map((role) => role.roleId)
+					.filter((roleId) => v.is(RoleId, roleId))
+					.map((roleId) => ROLE_BY_ID[roleId]),
 				socialLinks: undefined,
 			},
 		};

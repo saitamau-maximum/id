@@ -1,9 +1,9 @@
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { sign } from "hono/jwt";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { JWT_ALG } from "../constants/jwt";
-import { ROLE_IDS } from "../constants/role";
 import type { HonoEnv } from "../factory";
 import { createMockCertificationRepository } from "../mocks/repository/certification";
 import { createMockUserRepository } from "../mocks/repository/user";

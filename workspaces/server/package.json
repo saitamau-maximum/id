@@ -25,6 +25,7 @@
 	},
 	"dependencies": {
 		"@hono/valibot-validator": "^0.6.1",
+		"@idp/schema": "workspace:*",
 		"@octokit/auth-app": "^8.2.0",
 		"discord-api-types": "^0.38.38",
 		"drizzle-orm": "^0.45.1",

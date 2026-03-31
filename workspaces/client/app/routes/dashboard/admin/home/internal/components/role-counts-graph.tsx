@@ -1,12 +1,12 @@
 import { Bar } from "react-chartjs-2";
 import { useDashboardInfo } from "../hooks/use-dashboard-info";
 import "chart.js/auto";
-import { ROLE_BY_ID, ROLE_IDS } from "~/types/role";
+import { ROLE_BY_ID, ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
 
 export const RoleCountsGraph = () => {
 	const { data: info } = useDashboardInfo();
 
-	const roleCounts = new Map<number, number>(
+	const roleCounts = new Map<RoleId, number>(
 		Object.values(ROLE_IDS).map((roleId) => [roleId, 0]),
 	);
 	for (const user of info || []) {

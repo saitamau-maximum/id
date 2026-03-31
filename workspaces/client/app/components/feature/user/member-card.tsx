@@ -1,9 +1,17 @@
+import type { Member } from "@idp/schema/entity/member";
 import { Link } from "react-router";
 import { css } from "styled-system/css";
-import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications" | "initializedAt" | "bio"> & {
+type Props = Omit<
+	Member,
+	| "certifications"
+	| "initializedAt"
+	| "bio"
+	| "isProvisional"
+	| "lastPaymentConfirmedAt"
+	| "oauthConnections"
+> & {
 	initialized: boolean;
 	displayOnly?: boolean;
 };
