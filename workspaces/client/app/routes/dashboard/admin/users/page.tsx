@@ -1,7 +1,7 @@
+import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
-import { ROLE_BY_ID, ROLE_IDS } from "~/types/role";
 import {
 	MemberUsersTable,
 	NonMemberUsersTable,

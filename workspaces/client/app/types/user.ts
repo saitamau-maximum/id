@@ -1,6 +1,6 @@
+import type { Role } from "@idp/schema/entity/role";
 import type { UserCertification } from "./certification";
 import type { OAuthConnection } from "./oauth-internal";
-import type { Role } from "./role";
 
 /**
  * Userは公開情報と非公開情報を持つ。

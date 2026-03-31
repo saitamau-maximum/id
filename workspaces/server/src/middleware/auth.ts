@@ -1,9 +1,9 @@
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { every } from "hono/combine";
 import { getSignedCookie } from "hono/cookie";
 import { jwt, verify } from "hono/jwt";
 import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
-import { ROLE_IDS } from "../constants/role";
 import {
 	PLEASE_LOGIN_FOR_OAUTH,
 	TOAST_SEARCHPARAM,

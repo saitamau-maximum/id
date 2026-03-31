@@ -1,3 +1,4 @@
+import type { RoleId } from "@idp/schema/entity/role";
 import type { User } from "~/types/user";
 import { client } from "~/utils/hono";
 
@@ -47,7 +48,7 @@ export interface IUserRepository {
 	getContributions$$key: () => unknown[];
 	getAllUsers: () => Promise<User[]>;
 	getAllUsers$$key: () => unknown[];
-	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	updateUserRole: (userId: string, roleIds: RoleId[]) => Promise<void>;
 	updateUserProfileImage: (file: File) => Promise<void>;
 	getAllProvisionalUsers: () => Promise<User[]>;
 	getAllProvisionalUsers$$key: () => unknown[];
@@ -171,7 +172,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		return ["users"];
 	}
 
-	async updateUserRole(userId: string, roleIds: number[]) {
+	async updateUserRole(userId: string, roleIds: RoleId[]) {
 		const res = await client.admin.users[":userId"].role.$put({
 			param: {
 				userId,
