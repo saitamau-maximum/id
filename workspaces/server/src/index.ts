@@ -110,7 +110,8 @@ export const route = app
 		await next();
 	})
 	.use((c, next) => {
-		if (c.req.path.startsWith("/public")) {
+		if (c.req.path === "/public" || c.req.path.startsWith("/public/")) {
+			// /publicはすべての origin からのアクセスを許可
 			return cors({
 				origin: "*",
 			})(c, next);
