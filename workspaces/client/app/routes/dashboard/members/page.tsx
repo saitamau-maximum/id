@@ -52,7 +52,6 @@ export default function Members() {
 						displayId={user.displayId}
 						profileImageURL={user.profileImageURL}
 						grade={user.grade}
-						initialized={!!user.initializedAt}
 						roles={user.roles}
 					/>
 				))}

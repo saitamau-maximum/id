@@ -4,7 +4,6 @@ import type { Member } from "~/types/user";
 import { RoleBadge } from "./role-badge";
 
 type Props = Omit<Member, "certifications" | "initializedAt" | "bio"> & {
-	initialized: boolean;
 	displayOnly?: boolean;
 };
 
@@ -15,7 +14,6 @@ export const MemberCard: React.FC<Props> = ({
 	displayId,
 	profileImageURL,
 	grade,
-	initialized,
 	roles,
 	displayOnly = false,
 }) => {
@@ -126,23 +124,6 @@ export const MemberCard: React.FC<Props> = ({
 							)}
 						</div>
 					)}
-					{!initialized && (
-						<div
-							className={css({
-								backgroundColor: "blue.100",
-								borderWidth: 2,
-								borderStyle: "solid",
-								borderColor: "blue.300",
-								color: "blue.500",
-								padding: "0 token(spacing.2)",
-								borderRadius: 8,
-								fontSize: "sm",
-								whiteSpace: "nowrap",
-							})}
-						>
-							初期登録中
-						</div>
-					)}
 				</div>
 				<div
 					className={css({
@@ -200,7 +181,7 @@ export const MemberCard: React.FC<Props> = ({
 		</div>
 	);
 
-	if (!initialized || displayOnly) {
+	if (displayOnly) {
 		return Inner;
 	}
 
