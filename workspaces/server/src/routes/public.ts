@@ -27,7 +27,7 @@ const route = app
 			profileImageURL: member.profileImageURL,
 			bio: member.bio,
 			socialLinks: member.socialLinks,
-			roles: member.roles,
+			roles: member.roles.map((role) => role.name),
 		});
 	})
 	.get("/certifications", async (c) => {

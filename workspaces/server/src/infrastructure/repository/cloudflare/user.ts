@@ -1,26 +1,21 @@
+import type { Member, PublicMember } from "@idp/schema/entity/member";
+import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
+import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
 import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import * as v from "valibot";
 import { toOAuthProviderId } from "../../../constants/oauth";
-import { ROLE_BY_ID, ROLE_IDS } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import type {
-	DashboardUser,
+	CreateTemporaryUserPayload,
+	CreateUserPayload,
+	FetchApprovedUsersRes,
+	FetchMembersRes,
+	FetchProvisionalUsersRes,
 	IUserRepository,
-	Member,
-	Profile,
-	User,
-	WithCertifications,
-	WithOAuthConnections,
+	RegisterUserPayload,
+	UpdateUserPayload,
 } from "./../../../repository/user";
-
-export type PublicMember = {
-	id: string;
-	displayName: string;
-	profileImageURL: string;
-	bio: string;
-	socialLinks: string[];
-	roles: string[];
-};
 
 export class CloudflareUserRepository implements IUserRepository {
 	private client: DrizzleD1Database<typeof schema>;
@@ -30,7 +25,7 @@ export class CloudflareUserRepository implements IUserRepository {
 	}
 
 	private async createUserInternal(
-		payload: Partial<Profile>,
+		payload: Partial<UserProfile>,
 		invitationId?: string,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
@@ -59,13 +54,13 @@ export class CloudflareUserRepository implements IUserRepository {
 		throw new Error("Failed to create user");
 	}
 
-	async createUser(payload: Partial<Profile> = {}): Promise<string> {
+	async createUser(payload: CreateUserPayload = {}): Promise<string> {
 		return this.createUserInternal(payload);
 	}
 
 	async createTemporaryUser(
 		invitationId: string,
-		payload: Partial<Profile> = {},
+		payload: CreateTemporaryUserPayload = {},
 	): Promise<string> {
 		return this.createUserInternal(payload, invitationId);
 	}
@@ -84,9 +79,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchUserProfileById(
-		userId: string,
-	): Promise<WithOAuthConnections<WithCertifications<User>>> {
+	async fetchUserProfileById(userId: string): Promise<User> {
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
 			with: {
@@ -137,7 +130,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			specialization: user.profile.specialization ?? undefined,
 			bio: user.profile.bio ?? undefined,
 			socialLinks: user.socialLinks.map((link) => link.url),
-			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.roles
+				.map((role) => role.roleId) // 型ガードを通すために roleId のみを取り出す
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 			certifications: user.certifications.map((cert) => ({
 				id: cert.certification.id,
 				title: cert.certification.title,
@@ -155,7 +151,10 @@ export class CloudflareUserRepository implements IUserRepository {
 		};
 	}
 
-	async registerUser(userId: string, payload: Partial<Profile>): Promise<void> {
+	async registerUser(
+		userId: string,
+		payload: RegisterUserPayload,
+	): Promise<void> {
 		// userが登録済みかどうか確認
 		const user = await this.client.query.users.findFirst({
 			where: eq(schema.users.id, userId),
@@ -216,7 +215,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async updateUser(userId: string, payload: Partial<Profile>): Promise<void> {
+	async updateUser(userId: string, payload: UpdateUserPayload): Promise<void> {
 		const value: Omit<
 			InferInsertModel<typeof schema.userProfiles>,
 			"id" | "userId"
@@ -286,13 +285,16 @@ export class CloudflareUserRepository implements IUserRepository {
 			id: user.id,
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
-			lastLoginAt: user.lastLoginAt,
+			lastLoginAt: user.lastLoginAt ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.roles
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 		}));
 	}
 
-	async fetchMembers(): Promise<Member[]> {
+	async fetchMembers(): Promise<FetchMembersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
@@ -320,13 +322,14 @@ export class CloudflareUserRepository implements IUserRepository {
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: user.profile.grade ?? undefined,
 			bio: user.profile.bio ?? undefined,
-			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.roles
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 		}));
 	}
 
-	async fetchMemberByDisplayId(
-		displayId: string,
-	): Promise<WithOAuthConnections<WithCertifications<Member>>> {
+	async fetchMemberByDisplayId(displayId: string): Promise<Member> {
 		const user = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -371,7 +374,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			profileImageURL: user.profileImageURL ?? undefined,
 			grade: user.grade ?? undefined,
 			bio: user.bio ?? undefined,
-			roles: user.user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.user.roles
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 			socialLinks: user.user.socialLinks.map((link) => link.url),
 			certifications: user.user.certifications.map((cert) => ({
 				id: cert.certification.id,
@@ -389,15 +395,17 @@ export class CloudflareUserRepository implements IUserRepository {
 		};
 	}
 
-	async fetchRolesByUserId(userId: string): Promise<number[]> {
+	async fetchRolesByUserId(userId: string): Promise<RoleId[]> {
 		const roles = await this.client.query.userRoles.findMany({
 			where: eq(schema.userRoles.userId, userId),
 		});
 
-		return roles.map((role) => role.roleId);
+		return roles
+			.map((role) => role.roleId)
+			.filter((roleId) => v.is(RoleId, roleId));
 	}
 
-	async fetchApprovedUsers(): Promise<User[]> {
+	async fetchApprovedUsers(): Promise<FetchApprovedUsersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNull(schema.users.invitationId),
 			with: {
@@ -421,7 +429,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.roles
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 			bio: user.profile.bio ?? undefined,
 			updatedAt: user.profile.updatedAt ?? undefined,
 		}));
@@ -466,7 +477,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async fetchProvisionalUsers(): Promise<User[]> {
+	async fetchProvisionalUsers(): Promise<FetchProvisionalUsersRes> {
 		const users = await this.client.query.users.findMany({
 			where: isNotNull(schema.users.invitationId),
 			with: {
@@ -491,7 +502,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
 			grade: user.profile.grade ?? undefined,
-			roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+			roles: user.roles
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 			bio: user.profile.bio ?? undefined,
 			updatedAt: user.profile.updatedAt ?? undefined,
 			invitationTitle: user.invitation?.title ?? undefined,
@@ -548,9 +562,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			.where(eq(schema.users.id, userId));
 	}
 
-	async fetchPublicMemberByDisplayId(
-		displayId: string,
-	): Promise<PublicMember | null> {
+	async fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember> {
 		const profile = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -563,7 +575,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			},
 		});
 
-		if (!profile || !profile.user) return null;
+		if (!profile || !profile.user) {
+			throw new Error("User not found");
+		}
 
 		return {
 			id: profile.user.id,
@@ -572,8 +586,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			bio: profile.bio ?? "",
 			socialLinks: profile.user.socialLinks.map((link) => link.url),
 			roles: profile.user.roles
-				.map((ur) => ROLE_BY_ID[ur.roleId]?.name)
-				.filter((name): name is string => !!name),
+				.map((role) => role.roleId)
+				.filter((roleId) => v.is(RoleId, roleId))
+				.map((roleId) => ROLE_BY_ID[roleId]),
 		};
 	}
 }

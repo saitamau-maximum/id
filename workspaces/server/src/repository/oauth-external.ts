@@ -1,6 +1,6 @@
-import type { Role } from "../constants/role";
+import type { Role } from "@idp/schema/entity/role";
+import type { User, UserProfile } from "@idp/schema/entity/user";
 import type { Scope, ScopeId } from "../constants/scope";
-import type { Profile, User } from "./user";
 
 export type Client = {
 	id: string;
@@ -70,7 +70,7 @@ type GetTokenByCodeRes = Token & {
 type GetTokenByATRes = Token & {
 	client: Client;
 	scopes: Scope[];
-	user: Pick<User, "id"> & { profile: Partial<Profile>; roles: Role[] };
+	user: Pick<User, "id"> & { profile: Partial<UserProfile>; roles: Role[] };
 };
 
 export type IOAuthExternalRepository = {
