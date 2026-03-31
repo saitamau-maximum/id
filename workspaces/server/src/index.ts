@@ -110,6 +110,12 @@ export const route = app
 		await next();
 	})
 	.use((c, next) => {
+		if (c.req.path.startsWith("/public")) {
+			return cors({
+				origin: "*",
+			})(c, next);
+		}
+
 		return cors({
 			// ctx の型が Context<any, any, {}> になってしまうため、 typeof c で対応
 			origin: (origin, ctx: typeof c) => {
