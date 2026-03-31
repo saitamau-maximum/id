@@ -69,9 +69,7 @@ export const Role = v.object({
 
 export type Role = v.InferOutput<typeof Role>;
 
-export type RoleId = (typeof ROLE_IDS)[keyof typeof ROLE_IDS];
-
-export const ROLE_BY_ID: Record<number, Role> = {
+export const ROLE_BY_ID = {
 	[ROLE_IDS.ADMIN]: {
 		id: ROLE_IDS.ADMIN,
 		name: "Admin",
@@ -137,4 +135,4 @@ export const ROLE_BY_ID: Record<number, Role> = {
 		name: "開発",
 		color: "#0000FF",
 	},
-};
+} satisfies Record<RoleId, Role>;
