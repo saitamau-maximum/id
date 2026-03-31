@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
 import { sign } from "hono/jwt";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, test, vi } from "vitest";
 import { JWT_ALG } from "../constants/jwt";
 import { ROLE_IDS } from "../constants/role";
 import type { HonoEnv } from "../factory";
@@ -287,8 +287,8 @@ describe("User Handler", () => {
 		});
 	});
 
-	// TODO: GET /user/contributions
-	// TODO: PUT /user/profile-image
-	// TODO: DELETE /user/oauth-connection/:providerId
-	// TODO: GET /user/profile-image/:userId
+	test.todo("GET /user/contributions");
+	test.todo("PUT /user/profile-image");
+	test.todo("DELETE /user/oauth-connection/:providerId");
+	test.todo("GET /user/profile-image/:userId");
 });
