@@ -144,7 +144,7 @@ export const route = app
 		// public API は外部オリジンからの利用を許可するため、 /public も CSRF チェックから除外する
 		// csrf の secFetchSide オプションでテストしようとすると、 curl などで Origin が付与されていない場合即座に拒否されちゃうので、ここでパスベースで除外する
 		// ref: https://github.com/honojs/hono/blob/8217d9ece6f4d302e446b8dc353d1b3cbf51d92e/src/middleware/csrf/index.ts#L107-L110
-		if (c.req.path.startsWith("/oauth") || c.req.path.startsWith("/public/")) {
+		if (c.req.path.startsWith("/oauth/") || c.req.path.startsWith("/public/")) {
 			return next();
 		}
 
