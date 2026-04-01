@@ -5,7 +5,7 @@ import { validator } from "hono/validator";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { JWT_ALG } from "../../constants/jwt";
-import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
+import { OAUTH_SCOPE_REGEX } from "../../constants/oauth-external";
 import {
 	PLEASE_RELOGIN_FOR_OAUTH,
 	TOAST_SEARCHPARAM,
