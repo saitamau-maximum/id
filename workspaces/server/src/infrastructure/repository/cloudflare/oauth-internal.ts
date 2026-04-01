@@ -1,14 +1,13 @@
 import {
+	OAUTH_PROVIDER_IDS,
+	type OAuthProviderId,
+} from "@idp/schema/entity/oauth-provider";
+import {
 	OAuth2Routes,
 	type RESTPostOAuth2AccessTokenResult,
 } from "discord-api-types/v10";
 import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import {
-	OAUTH_PROVIDER_IDS,
-	type OAuthProviderId,
-	toOAuthProviderId,
-} from "../../../constants/oauth";
 import * as schema from "../../../db/schema";
 import type {
 	IOAuthInternalRepository,
@@ -55,7 +54,7 @@ export class CloudflareOAuthInternalRepository
 		if (!user) throw new Error("User not found");
 		return user.oauthConnections.map((conn) => ({
 			...conn,
-			providerId: toOAuthProviderId(conn.providerId),
+			providerId: conn.providerId as OAuthProviderId,
 		}));
 	}
 
@@ -71,7 +70,7 @@ export class CloudflareOAuthInternalRepository
 		if (!userProfile) throw new Error("User not found");
 		return userProfile.oauthConnections.map((conn) => ({
 			...conn,
-			providerId: toOAuthProviderId(conn.providerId),
+			providerId: conn.providerId as OAuthProviderId,
 		}));
 	}
 

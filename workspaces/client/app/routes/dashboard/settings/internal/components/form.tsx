@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";

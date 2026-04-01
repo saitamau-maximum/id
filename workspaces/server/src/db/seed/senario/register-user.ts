@@ -1,6 +1,6 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
-import { OAUTH_PROVIDER_IDS } from "../../../constants/oauth";
 import * as schema from "../../schema";
 
 export const DUMMY_USER_IDS = {

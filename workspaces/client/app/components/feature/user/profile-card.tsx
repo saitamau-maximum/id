@@ -1,5 +1,5 @@
 import type { Member } from "@idp/schema/entity/member";
-import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";

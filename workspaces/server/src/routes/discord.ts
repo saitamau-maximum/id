@@ -1,9 +1,9 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import {
 	OAuth2Routes,
 	OAuth2Scopes,
 	PermissionFlagsBits,
 } from "discord-api-types/v10";
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { cookieAuthMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 import type { DiscordAddGuildMemberResult } from "../repository/discord-bot";

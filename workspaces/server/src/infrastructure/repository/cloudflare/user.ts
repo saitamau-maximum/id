@@ -1,10 +1,10 @@
 import type { Member, PublicMember } from "@idp/schema/entity/member";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
 import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
 import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
 import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
-import { toOAuthProviderId } from "../../../constants/oauth";
 import * as schema from "../../../db/schema";
 import type {
 	CreateTemporaryUserPayload,
@@ -142,7 +142,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				isApproved: cert.isApproved,
 			})),
 			oauthConnections: user.oauthConnections.map((conn) => ({
-				providerId: toOAuthProviderId(conn.providerId),
+				providerId: conn.providerId as OAuthProviderId,
 				providerUserId: conn.providerUserId,
 				name: conn.name,
 				profileImageUrl: conn.profileImageUrl,
@@ -387,7 +387,7 @@ export class CloudflareUserRepository implements IUserRepository {
 				isApproved: cert.isApproved,
 			})),
 			oauthConnections: user.user.oauthConnections.map((conn) => ({
-				providerId: toOAuthProviderId(conn.providerId),
+				providerId: conn.providerId as OAuthProviderId,
 				providerUserId: conn.providerUserId,
 				name: conn.name,
 				profileImageUrl: conn.profileImageUrl,

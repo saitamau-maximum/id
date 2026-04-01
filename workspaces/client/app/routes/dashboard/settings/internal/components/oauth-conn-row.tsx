@@ -1,7 +1,7 @@
 import {
 	OAUTH_PROVIDERS,
 	type OAuthProviderId,
-} from "@idp/server/shared/oauth";
+} from "@idp/schema/entity/oauth-provider";
 import { useCallback } from "react";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";

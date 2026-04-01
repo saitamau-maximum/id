@@ -3,14 +3,14 @@ import {
 	UserProfileUpdateParams,
 	UserRegisterParams,
 } from "@idp/schema/api/user";
+import {
+	OAUTH_PROVIDER_IDS,
+	OAuthProviderId,
+	REQUIRED_OAUTH_PROVIDER_IDS,
+} from "@idp/schema/entity/oauth-provider";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import {
-	isValidOAuthProviderId,
-	OAUTH_PROVIDER_IDS,
-	REQUIRED_OAUTH_PROVIDER_IDS,
-} from "../constants/oauth";
 import { factory } from "../factory";
 import { authMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 
@@ -211,7 +211,7 @@ const route = app
 		if (
 			!/^\d+$/.test(providerIdStr) ||
 			Number.isNaN(providerId) ||
-			!isValidOAuthProviderId(providerId)
+			!v.is(OAuthProviderId, providerId)
 		) {
 			return c.text("Invalid providerId", 400);
 		}

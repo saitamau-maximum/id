@@ -1,4 +1,4 @@
-import type { OAuthProviderId } from "@idp/server/shared/oauth";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
 
 export type OAuthConnection = {
 	providerId: OAuthProviderId;

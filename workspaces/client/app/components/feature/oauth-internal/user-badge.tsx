@@ -1,4 +1,7 @@
-import { OAUTH_PROVIDER_IDS, OAUTH_PROVIDERS } from "@idp/server/shared/oauth";
+import {
+	OAUTH_PROVIDER_IDS,
+	OAUTH_PROVIDERS,
+} from "@idp/schema/entity/oauth-provider";
 import { css } from "styled-system/css";
 import type { OAuthConnection } from "~/types/oauth-internal";
 

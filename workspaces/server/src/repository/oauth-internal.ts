@@ -1,4 +1,4 @@
-import type { OAuthProviderId } from "../constants/oauth";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
 
 export type OAuthConnection = {
 	userId: string;

@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import { RoleId } from "@idp/schema/entity/role";
 import * as v from "valibot";
-import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import {
 	adminOnlyMiddleware,

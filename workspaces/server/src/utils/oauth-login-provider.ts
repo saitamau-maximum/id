@@ -1,3 +1,4 @@
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { Context } from "hono";
 import {
@@ -11,7 +12,6 @@ import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
-import type { OAuthProviderId } from "../constants/oauth";
 import {
 	DEV_NEW_USER_CREATED_WO_INVITATION,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,

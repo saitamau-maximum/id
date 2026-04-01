@@ -1,7 +1,7 @@
 import {
 	OAUTH_PROVIDER_IDS,
 	type OAuthProviderId,
-} from "@idp/server/shared/oauth";
+} from "@idp/schema/entity/oauth-provider";
 import { GitHub } from "react-feather";
 import { css } from "styled-system/css";
 
