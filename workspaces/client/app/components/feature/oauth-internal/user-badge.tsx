@@ -1,11 +1,15 @@
+import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-connection";
 import {
 	OAUTH_PROVIDER_IDS,
 	OAUTH_PROVIDERS,
 } from "@idp/schema/entity/oauth-provider";
 import { css } from "styled-system/css";
-import type { OAuthConnection } from "~/types/oauth-internal";
 
-export const OAuthUserBadge = ({ conn }: { conn: OAuthConnection }) => {
+export const OAuthUserBadge = ({
+	conn,
+}: {
+	conn: ExportableOAuthConnection;
+}) => {
 	const profileImageUrl = conn.profileImageUrl
 		? new URL(conn.profileImageUrl)
 		: null;

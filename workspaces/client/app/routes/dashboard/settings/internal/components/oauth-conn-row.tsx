@@ -1,3 +1,4 @@
+import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-connection";
 import {
 	OAUTH_PROVIDERS,
 	type OAuthProviderId,
@@ -10,7 +11,6 @@ import { OAuthUserBadge } from "~/components/feature/oauth-internal/user-badge";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { AnchorLike } from "~/components/ui/anchor-like";
 import { Table } from "~/components/ui/table";
-import type { OAuthConnection } from "~/types/oauth-internal";
 import { env } from "~/utils/env";
 import { useDeleteOAuthConnection } from "../hooks/use-delete-oauth-connection";
 
@@ -19,7 +19,7 @@ export const OAuthConnRow = ({
 	conns,
 }: {
 	providerId: OAuthProviderId;
-	conns: OAuthConnection[];
+	conns: ExportableOAuthConnection[];
 }) => {
 	const conn = conns.find((conn) => conn.providerId === providerId);
 
