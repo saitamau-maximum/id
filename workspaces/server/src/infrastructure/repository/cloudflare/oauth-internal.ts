@@ -1,3 +1,4 @@
+import type { OAuthConnection } from "@idp/schema/entity/oauth-connection";
 import {
 	OAUTH_PROVIDER_IDS,
 	type OAuthProviderId,
@@ -9,10 +10,7 @@ import {
 import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
-import type {
-	IOAuthInternalRepository,
-	OAuthConnection,
-} from "./../../../repository/oauth-internal";
+import type { IOAuthInternalRepository } from "./../../../repository/oauth-internal";
 
 export class CloudflareOAuthInternalRepository
 	implements IOAuthInternalRepository

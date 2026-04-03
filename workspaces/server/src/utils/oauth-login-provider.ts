@@ -1,3 +1,4 @@
+import type { OAuthConnection } from "@idp/schema/entity/oauth-connection";
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { Context } from "hono";
@@ -20,7 +21,6 @@ import {
 	ToastHashFn,
 } from "../constants/toast";
 import type { HonoEnv } from "../factory";
-import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
 import { getCookieDomain, getDeleteCookieOptions } from "./cookie";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";
