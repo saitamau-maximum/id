@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import * as v from "valibot";
 import { OAUTH_SCOPE_REGEX } from "../../constants/oauth-external";
-import { SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";

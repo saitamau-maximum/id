@@ -1,6 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
+import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import * as v from "valibot";
-import { SCOPE_IDS } from "../../constants/scope";
 import { factory } from "../../factory";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 

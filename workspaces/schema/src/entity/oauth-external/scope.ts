@@ -13,7 +13,7 @@ export const SCOPE_IDS = {
 } as const;
 
 // もしSCOPE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
-export const SCOPE_ID_VALUES = Object.values(SCOPE_IDS);
+const SCOPE_ID_VALUES = Object.values(SCOPE_IDS);
 if (new Set(SCOPE_ID_VALUES).size !== SCOPE_ID_VALUES.length) {
 	throw new Error("Scope IDは重複してはいけません");
 }

@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { scope } from "@idp/server/shared/scope";
+import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, Save, Trash, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -160,7 +160,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 					{() => (
 						<>
 							<Form.SelectGroup>
-								{Object.entries(scope.SCOPES_BY_ID).map(([id, scope]) => (
+								{Object.entries(SCOPES_BY_ID).map(([id, scope]) => (
 									<Form.Select
 										key={id}
 										value={id}

@@ -1,6 +1,6 @@
+import type { Scope, ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import type { Role } from "@idp/schema/entity/role";
 import type { User, UserProfile } from "@idp/schema/entity/user";
-import type { Scope, ScopeId } from "../constants/scope";
 
 export type Client = {
 	id: string;

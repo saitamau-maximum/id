@@ -1,8 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
+import { ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import { isScopeId, type ScopeId } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 
@@ -49,8 +49,8 @@ const registerSchema = v.object({
 		v.array(
 			v.pipe(
 				v.string(),
-				v.transform((input) => Number(input)),
-				v.custom<ScopeId>(isScopeId),
+				v.toNumber(),
+				v.custom<ScopeId>((input) => v.is(ScopeId, input)),
 			),
 		),
 	),

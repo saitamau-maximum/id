@@ -1,8 +1,12 @@
+import {
+	SCOPES_BY_ID,
+	type Scope,
+	ScopeId,
+} from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
-import { getScopeById, type Scope } from "../../../constants/scope";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
@@ -80,7 +84,10 @@ export class CloudflareOAuthExternalRepository
 		return {
 			...client,
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
-			scopes: scopes.map((clientScope) => getScopeById(clientScope.scopeId)),
+			scopes: scopes
+				.map((clientScope) => clientScope.scopeId) // 型ガードを通すため scopeId で map し filter する
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			managers: managers
 				.map((manager) => manager.user)
 				.map(USER_BASIC_INFO_TRANSFORMER),
@@ -384,7 +391,10 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			scopes: scopes
+				.map((scope) => scope.scopeId)
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			oidcParams: {
 				nonce: oidcNonce ?? undefined,
 				authTime: oidcAuthTime ?? undefined,
@@ -450,7 +460,10 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			scopes: scopes
+				.map((scope) => scope.scopeId)
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			user: {
 				...user,
 				profile: {

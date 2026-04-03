@@ -1,10 +1,13 @@
 // OAuth の Resource Owner としての役割を果たすルーティング
 
 import {
+	SCOPE_IDS,
+	SCOPES_BY_ID,
+} from "@idp/schema/entity/oauth-external/scope";
+import {
 	FORBIDDEN_RESPONSE,
 	UNAUTHORIZED_RESPONSE,
 } from "../../constants/oauth-external";
-import { SCOPE_IDS, SCOPES_BY_ID } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
 import type { OidcUserInfo } from "../../utils/oauth/constant";

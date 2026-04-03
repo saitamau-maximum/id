@@ -2,6 +2,10 @@
 // ref: https://datatracker.ietf.org/doc/html/rfc6749
 
 import { env } from "cloudflare:test";
+import {
+	SCOPE_IDS,
+	type ScopeId,
+} from "@idp/schema/entity/oauth-external/scope";
 import { Hono } from "hono";
 import { generateSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
@@ -17,7 +21,6 @@ import {
 } from "vitest";
 import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
-import { SCOPE_IDS, type ScopeId } from "../constants/scope";
 import type { HonoEnv } from "../factory";
 import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
