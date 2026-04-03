@@ -1,6 +1,6 @@
 import * as v from "valibot";
 import { MaxLines } from "../common/max-lines";
-import { Certification } from "./certification";
+import { UserCertification } from "./certification";
 import { ExportableOAuthConnection } from "./oauth-connection";
 import { Role } from "./role";
 
@@ -156,7 +156,7 @@ export const User = v.object({
 	lastPaymentConfirmedAt: v.nullable(v.date()),
 	lastLoginAt: v.optional(v.date()),
 	roles: v.array(Role),
-	certifications: v.array(Certification),
+	certifications: v.array(UserCertification),
 	oauthConnections: v.array(ExportableOAuthConnection),
 	...v.partial(UserProfile).entries,
 });
