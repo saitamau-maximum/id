@@ -1,5 +1,7 @@
+import { ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+import * as v from "valibot";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
 
@@ -19,16 +21,23 @@ export function useRegisterOAuthApp() {
 	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (payload: IMutationParams) => {
-			return oauthAppsRepository.registerApp({
+		mutationFn: async (payload: IMutationParams) => {
+			await oauthAppsRepository.registerApp({
 				...payload,
-				scopeIds: payload.scopeIds.map(Number),
+				scopeIds: payload.scopeIds
+					.map(Number)
+					.filter((scopeId) => v.is(ScopeId, scopeId)),
 				callbackUrls: payload.callbackUrls.map((url) =>
 					// URL に , が含まれるかもしれないのでエンコードする
 					encodeURIComponent(url.value),
 				),
 				icon: payload.icon,
 			});
+
+			return {
+				title: payload.name,
+				description: payload.description,
+			};
 		},
 		onSuccess: (data) => {
 			pushToast({

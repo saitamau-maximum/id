@@ -19,17 +19,8 @@ export interface IOAuthAppsRepository {
 		description: string,
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
-	registerApp: (params: OAuthAppRegisterParams) => Promise<{
-		title: string;
-		description: string;
-	}>;
-	updateApp: (
-		appId: string,
-		params: OAuthAppRegisterParams,
-	) => Promise<{
-		title: string;
-		description: string;
-	}>;
+	registerApp: (params: OAuthAppRegisterParams) => Promise<void>;
+	updateApp: (appId: string, params: OAuthAppRegisterParams) => Promise<void>;
 	deleteApp(appId: string): Promise<void>;
 }
 
@@ -124,11 +115,6 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
-
-		return {
-			title: name,
-			description,
-		};
 	}
 
 	async updateApp(
@@ -152,11 +138,6 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		});
 
 		if (!res.ok) throw new Error("Failed to update app");
-
-		return {
-			title: name,
-			description,
-		};
 	}
 
 	async deleteApp(appId: string) {
