@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { Contributions } from "../entity/contribution";
 import { UserProfile } from "../entity/user";
 
 export const UserRegisterParams = v.pipe(
@@ -62,14 +63,7 @@ export type UserProfileUpdateParams = v.InferOutput<
 >;
 
 export const UserGetContributionsResponse = v.object({
-	weeks: v.array(
-		v.array(
-			v.object({
-				date: v.string(),
-				rate: v.number(),
-			}),
-		),
-	),
+	weeks: Contributions,
 });
 export type UserGetContributionsResponse = v.InferOutput<
 	typeof UserGetContributionsResponse

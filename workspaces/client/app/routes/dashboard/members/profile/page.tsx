@@ -154,14 +154,7 @@ export default function Profile() {
 				>
 					<ContributionCard
 						isLoading={isMemberContributionLoading}
-						weeks={
-							memberContribution?.weeks.map((week) =>
-								week.map((day) => ({
-									...day,
-									date: new Date(day.date),
-								})),
-							) || []
-						}
+						weeks={memberContribution?.weeks || []}
 						clip={14}
 						size={deviceType === "sp" ? "sm" : "md"}
 					/>

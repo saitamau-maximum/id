@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { Contributions } from "../entity/contribution";
 import { Member } from "../entity/member";
 
 export const GetMembersResponse = v.array(
@@ -7,14 +8,7 @@ export const GetMembersResponse = v.array(
 export type GetMembersResponse = v.InferOutput<typeof GetMembersResponse>;
 
 export const GetMembersContributionByUserDisplayIDResponse = v.object({
-	weeks: v.array(
-		v.array(
-			v.object({
-				date: v.string(),
-				rate: v.number(),
-			}),
-		),
-	),
+	weeks: Contributions,
 });
 export type GetMembersContributionByUserDisplayIDResponse = v.InferOutput<
 	typeof GetMembersContributionByUserDisplayIDResponse

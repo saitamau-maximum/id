@@ -122,14 +122,7 @@ export default function Home() {
 					>
 						<ContributionCard
 							isLoading={isLoading}
-							weeks={
-								data?.weeks.map((week) =>
-									week.map((day) => ({
-										...day,
-										date: new Date(day.date),
-									})),
-								) || []
-							}
+							weeks={data?.weeks || []}
 							clip={14}
 							size={deviceType === "sp" ? "sm" : "md"}
 						/>
