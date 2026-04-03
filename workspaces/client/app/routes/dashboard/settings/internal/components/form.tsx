@@ -1,4 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import type { UserCertification } from "@idp/schema/entity/certification";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
@@ -27,7 +28,6 @@ import {
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
-import type { UserCertification } from "~/types/certification";
 import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,

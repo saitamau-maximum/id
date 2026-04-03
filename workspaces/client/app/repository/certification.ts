@@ -1,4 +1,4 @@
-import type { Certification } from "~/types/certification";
+import type { Certification } from "@idp/schema/entity/certification";
 import { client } from "~/utils/hono";
 
 export interface CertificationRequestParams {
