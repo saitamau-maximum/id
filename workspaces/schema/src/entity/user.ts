@@ -160,7 +160,6 @@ export const User = v.object({
 	oauthConnections: v.array(ExportableOAuthConnection),
 	...v.partial(UserProfile).entries,
 });
-
 export type User = v.InferOutput<typeof User>;
 
 export const DashboardUser = v.pick(User, [
@@ -171,5 +170,16 @@ export const DashboardUser = v.pick(User, [
 	"grade",
 	"roles",
 ]);
-
 export type DashboardUser = v.InferOutput<typeof DashboardUser>;
+
+/**
+ * あくまでもユーザー表示するだけのための軽めの情報
+ */
+export const UserBasicInfo = v.pick(User, [
+	"id",
+	"displayId",
+	"displayName",
+	"profileImageURL",
+	"roles",
+]);
+export type UserBasicInfo = v.InferOutput<typeof UserBasicInfo>;

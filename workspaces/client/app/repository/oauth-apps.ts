@@ -1,10 +1,10 @@
+import type { UserBasicInfo } from "@idp/schema/entity/user";
 import type {
 	OAuthClient,
 	OAuthClientCallback,
 	OAuthClientSecret,
 	OAuthScope,
 } from "~/types/oauth-external";
-import type { UserBasicInfo } from "~/types/user";
 import { client } from "~/utils/hono";
 
 type GetAppsRes = (OAuthClient & {
