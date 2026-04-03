@@ -1,4 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import type { Scope } from "@idp/schema/entity/oauth-external/scope";
 import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, Save, Trash, X } from "react-feather";
@@ -13,7 +14,6 @@ import { IconButton } from "~/components/ui/icon-button";
 import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { OAuthSchemas } from "~/schema/oauth";
-import type { OAuthScope } from "~/types/oauth-external";
 import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
 
@@ -55,7 +55,7 @@ interface Props {
 		description: string | null;
 		logoUrl: string | null;
 		ownerId: string;
-		scopes: OAuthScope[];
+		scopes: Scope[];
 		callbackUrls: string[];
 	};
 }

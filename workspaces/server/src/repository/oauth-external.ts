@@ -1,49 +1,12 @@
+import type {
+	Client,
+	ClientCallback,
+	ClientSecret,
+	ClientToken,
+} from "@idp/schema/entity/oauth-external/client";
 import type { Scope, ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import type { Role } from "@idp/schema/entity/role";
-import type { User, UserProfile } from "@idp/schema/entity/user";
-
-export type Client = {
-	id: string;
-	name: string;
-	description: string | null;
-	logoUrl: string | null;
-	ownerId: string;
-};
-
-export type ClientSecret = {
-	clientId: Client["id"];
-	secret: string;
-	description: string | null;
-	issuedBy: string;
-	issuedAt: Date;
-};
-
-export type ClientCallback = {
-	clientId: Client["id"];
-	callbackUrl: string;
-};
-
-export type ClientScope = {
-	clientId: Client["id"];
-	scopeId: Scope["id"];
-};
-
-export type Token = {
-	id: number;
-	clientId: Client["id"];
-	userId: string;
-	code: string;
-	codeExpiresAt: Date;
-	codeUsed: boolean;
-	redirectUri: string | null;
-	accessToken: string;
-	accessTokenExpiresAt: Date;
-};
-
-type UserBasicInfo = Pick<
-	User,
-	"id" | "displayId" | "displayName" | "profileImageURL" | "roles"
->;
+import type { User, UserBasicInfo, UserProfile } from "@idp/schema/entity/user";
 
 type GetClientsRes = Client & {
 	managers: UserBasicInfo[];
@@ -58,7 +21,7 @@ type GetClientByIdRes = Client & {
 	owner: UserBasicInfo;
 };
 
-type GetTokenByCodeRes = Token & {
+type GetTokenByCodeRes = ClientToken & {
 	client: Client & { secrets: ClientSecret[] };
 	scopes: Scope[];
 	oidcParams: {
@@ -67,7 +30,7 @@ type GetTokenByCodeRes = Token & {
 	};
 };
 
-type GetTokenByATRes = Token & {
+type GetTokenByATRes = ClientToken & {
 	client: Client;
 	scopes: Scope[];
 	user: Pick<User, "id"> & { profile: Partial<UserProfile>; roles: Role[] };

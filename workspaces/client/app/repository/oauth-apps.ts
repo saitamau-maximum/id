@@ -1,23 +1,23 @@
-import type { UserBasicInfo } from "@idp/schema/entity/user";
 import type {
-	OAuthClient,
-	OAuthClientCallback,
-	OAuthClientSecret,
-	OAuthScope,
-} from "~/types/oauth-external";
+	Client,
+	ClientCallback,
+	ExportableClientSecret,
+} from "@idp/schema/entity/oauth-external/client";
+import type { Scope } from "@idp/schema/entity/oauth-external/scope";
+import type { UserBasicInfo } from "@idp/schema/entity/user";
 import { client } from "~/utils/hono";
 
-type GetAppsRes = (OAuthClient & {
+type GetAppsRes = (Client & {
 	managers: UserBasicInfo[];
 	owner: UserBasicInfo;
 })[];
 
-type GetAppByIdRes = OAuthClient & {
-	callbackUrls: OAuthClientCallback["callbackUrl"][];
-	scopes: OAuthScope[];
+type GetAppByIdRes = Client & {
+	callbackUrls: ClientCallback["callbackUrl"][];
+	scopes: Scope[];
 	managers: UserBasicInfo[];
 	owner: UserBasicInfo;
-	secrets: OAuthClientSecret[];
+	secrets: ExportableClientSecret[];
 };
 
 export interface IRegisterAppParams {
@@ -77,7 +77,14 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch app");
 		}
-		return res.json();
+		const data = await res.json();
+		return {
+			...data,
+			secrets: data.secrets.map((secret) => ({
+				...secret,
+				issuedAt: new Date(secret.issuedAt),
+			})),
+		};
 	}
 
 	getAppById$$key(appId: string) {
