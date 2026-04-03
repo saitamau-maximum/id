@@ -2,11 +2,13 @@ import { css } from "styled-system/css";
 
 const RATE_COLORS = ["#ebedf0", "#9be9a8", "#40c463", "#30a14e", "#216e39"];
 
+export const CELL_SIZE = 16;
+
 export const RateCell = ({ rate }: { rate: number }) => (
 	<div
 		className={css({
-			width: "16px",
-			height: "16px",
+			width: `${CELL_SIZE}px`,
+			height: `${CELL_SIZE}px`,
 			borderRadius: 4,
 			transition: "background",
 		})}
