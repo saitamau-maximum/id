@@ -1,5 +1,5 @@
 import type { Member, PublicMember } from "@idp/schema/entity/member";
-import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
 import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
 import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";

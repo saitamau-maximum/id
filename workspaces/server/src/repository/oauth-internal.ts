@@ -1,5 +1,5 @@
-import type { OAuthConnection } from "@idp/schema/entity/oauth-connection";
-import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 
 export type IOAuthInternalRepository = {
 	fetchUserIdByProviderInfo: (

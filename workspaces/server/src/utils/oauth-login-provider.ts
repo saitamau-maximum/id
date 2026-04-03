@@ -1,5 +1,5 @@
-import type { OAuthConnection } from "@idp/schema/entity/oauth-connection";
-import type { OAuthProviderId } from "@idp/schema/entity/oauth-provider";
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { Context } from "hono";
 import {

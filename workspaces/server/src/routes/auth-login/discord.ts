@@ -1,5 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	type APIUser,
 	CDNRoutes,

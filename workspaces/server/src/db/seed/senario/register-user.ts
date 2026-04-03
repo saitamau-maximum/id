@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import * as schema from "../../schema";

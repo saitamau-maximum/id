@@ -1,8 +1,8 @@
-import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-connection";
+import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import {
 	OAUTH_PROVIDERS,
 	type OAuthProviderId,
-} from "@idp/schema/entity/oauth-provider";
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { useCallback } from "react";
 import { css } from "styled-system/css";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";

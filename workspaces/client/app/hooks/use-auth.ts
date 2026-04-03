@@ -1,4 +1,4 @@
-import { REQUIRED_OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-provider";
+import { REQUIRED_OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import { useQuery } from "@tanstack/react-query";
 import { getFiscalYearStartDate } from "~/utils/date";

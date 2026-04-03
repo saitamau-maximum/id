@@ -7,7 +7,7 @@ import {
 	OAUTH_PROVIDER_IDS,
 	OAuthProviderId,
 	REQUIRED_OAUTH_PROVIDER_IDS,
-} from "@idp/schema/entity/oauth-provider";
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";

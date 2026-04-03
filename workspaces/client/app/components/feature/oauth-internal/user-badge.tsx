@@ -1,8 +1,8 @@
-import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-connection";
+import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import {
 	OAUTH_PROVIDER_IDS,
 	OAUTH_PROVIDERS,
-} from "@idp/schema/entity/oauth-provider";
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { css } from "styled-system/css";
 
 export const OAuthUserBadge = ({

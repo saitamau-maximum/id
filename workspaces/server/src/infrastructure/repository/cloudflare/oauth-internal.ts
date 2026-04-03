@@ -1,8 +1,8 @@
-import type { OAuthConnection } from "@idp/schema/entity/oauth-connection";
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import {
 	OAUTH_PROVIDER_IDS,
 	type OAuthProviderId,
-} from "@idp/schema/entity/oauth-provider";
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	OAuth2Routes,
 	type RESTPostOAuth2AccessTokenResult,

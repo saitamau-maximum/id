@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import { MaxLines } from "../common/max-lines";
 import { UserCertification } from "./certification";
-import { ExportableOAuthConnection } from "./oauth-connection";
+import { ExportableOAuthConnection } from "./oauth-internal/oauth-connection";
 import { Role } from "./role";
 
 const RESERVED_DISPLAY_ID = [
