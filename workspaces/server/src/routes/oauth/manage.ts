@@ -1,5 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import { ScopeId } from "@idp/schema/entity/oauth-external/scope";
+import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
@@ -39,42 +39,6 @@ const verifyOAuthClientMiddleware = factory.createMiddleware(
 	},
 );
 
-const registerSchema = v.object({
-	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.string(),
-	// formなので配列はカンマ区切りの文字列として受け取る
-	scopeIds: v.pipe(
-		v.string(),
-		v.transform((input) => input.split(",")),
-		v.array(
-			v.pipe(
-				v.string(),
-				v.toNumber(),
-				v.custom<ScopeId>((input) => v.is(ScopeId, input)),
-			),
-		),
-	),
-	callbackUrls: v.pipe(
-		v.string(),
-		v.transform((input) => input.split(",").map(decodeURIComponent)),
-		v.array(
-			v.pipe(
-				v.string(),
-				v.url(),
-				v.custom((input) => {
-					if (typeof input !== "string") return false;
-					// 絶対 URL であること
-					if (!URL.canParse(input)) return false;
-					// fragment component を含まないこと
-					const url = new URL(input);
-					return url.hash === "";
-				}),
-			),
-		),
-	),
-	icon: v.optional(v.pipe(v.file(), v.maxSize(1024 * 1024 * 5))), // 5MiB
-});
-
 const managersSchema = v.object({
 	managerUserIds: v.array(v.pipe(v.string(), v.nonEmpty())),
 });
@@ -108,7 +72,7 @@ const route = app
 	.post(
 		"/register",
 		authMiddleware,
-		vValidator("form", registerSchema),
+		vValidator("form", OAuthAppRegisterParams),
 		async (c) => {
 			// 画像を含むので、multipart/form-data で受け取る
 			const { userId } = c.get("jwtPayload");
@@ -172,7 +136,7 @@ const route = app
 		"/:clientId",
 		authMiddleware,
 		verifyOAuthClientMiddleware,
-		vValidator("form", registerSchema),
+		vValidator("form", OAuthAppRegisterParams),
 		async (c) => {
 			const { clientId } = c.req.param();
 			const { name, description, scopeIds, callbackUrls, icon } =

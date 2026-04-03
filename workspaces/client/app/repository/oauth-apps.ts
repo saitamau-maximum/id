@@ -1,55 +1,31 @@
 import type {
-	Client,
-	ClientCallback,
-	ExportableClientSecret,
-} from "@idp/schema/entity/oauth-external/client";
-import type { Scope } from "@idp/schema/entity/oauth-external/scope";
-import type { UserBasicInfo } from "@idp/schema/entity/user";
+	OAuthAppGenerateSecretResponse,
+	OAuthAppGetClientByIdResponse,
+	OAuthAppGetListResponse,
+	OAuthAppRegisterParams,
+} from "@idp/schema/api/oauth/manage";
 import { client } from "~/utils/hono";
 
-type GetAppsRes = (Client & {
-	managers: UserBasicInfo[];
-	owner: UserBasicInfo;
-})[];
-
-type GetAppByIdRes = Client & {
-	callbackUrls: ClientCallback["callbackUrl"][];
-	scopes: Scope[];
-	managers: UserBasicInfo[];
-	owner: UserBasicInfo;
-	secrets: ExportableClientSecret[];
-};
-
-export interface IRegisterAppParams {
-	name: string;
-	description: string;
-	scopeIds: number[];
-	callbackUrls: string[];
-	icon?: File;
-}
-
 export interface IOAuthAppsRepository {
-	getApps: () => Promise<GetAppsRes>;
+	getApps: () => Promise<OAuthAppGetListResponse>;
 	getApps$$key: () => unknown[];
-	getAppById: (appId: string) => Promise<GetAppByIdRes>;
+	getAppById: (appId: string) => Promise<OAuthAppGetClientByIdResponse>;
 	getAppById$$key: (appId: string) => unknown[];
 	updateManagers: (appId: string, managerUserIds: string[]) => Promise<void>;
-	generateSecret: (
-		appId: string,
-	) => Promise<{ secret: string; secretHash: string }>;
+	generateSecret: (appId: string) => Promise<OAuthAppGenerateSecretResponse>;
 	updateSecretDescription: (
 		appId: string,
 		secretHash: string,
 		description: string,
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
-	registerApp: (params: IRegisterAppParams) => Promise<{
+	registerApp: (params: OAuthAppRegisterParams) => Promise<{
 		title: string;
 		description: string;
 	}>;
 	updateApp: (
 		appId: string,
-		params: IRegisterAppParams,
+		params: OAuthAppRegisterParams,
 	) => Promise<{
 		title: string;
 		description: string;
@@ -134,7 +110,7 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		scopeIds,
 		callbackUrls,
 		icon,
-	}: IRegisterAppParams) {
+	}: OAuthAppRegisterParams) {
 		const form: Parameters<
 			typeof client.oauth.manage.register.$post
 		>[0]["form"] = {
@@ -157,7 +133,7 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 	async updateApp(
 		appId: string,
-		{ name, description, scopeIds, callbackUrls, icon }: IRegisterAppParams,
+		{ name, description, scopeIds, callbackUrls, icon }: OAuthAppRegisterParams,
 	) {
 		const form: Parameters<
 			(typeof client.oauth.manage)[":clientId"]["$put"]
