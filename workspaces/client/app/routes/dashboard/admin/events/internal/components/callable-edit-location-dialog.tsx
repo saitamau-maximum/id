@@ -1,18 +1,16 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { CalendarLocationUpdateParams } from "@idp/schema/api/calendar/location";
+import type { Location } from "@idp/schema/entity/calendar/location";
+import { LOCATION_DESCRIPTION_MAX_LINES } from "@idp/schema/entity/calendar/location";
 import { useEffect } from "react";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { useLocationDetail } from "~/routes/dashboard/calendar/hooks/use-location-detail";
-import {
-	LOCATION_DESCRIPTION_MAX_LINES,
-	LocationSchemas,
-} from "~/schema/location";
-import type { Location } from "~/types/location";
 import { DescriptionFormField } from "./detail-form-field";
 
 interface Props {
@@ -22,19 +20,16 @@ interface Props {
 type Payload =
 	| {
 			type: "success";
-			payload: Omit<Location, "createdAt">;
+			payload: CalendarLocationUpdateParams;
 	  }
 	| {
 			type: "dismiss";
 	  };
 
-const UpdateFormSchema = v.object({
-	name: LocationSchemas.Name,
-	description: LocationSchemas.Description,
-});
-
-type UpdateFormInputValues = v.InferInput<typeof UpdateFormSchema>;
-type UpdateFormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
+type UpdateFormInputValues = v.InferInput<typeof CalendarLocationUpdateParams>;
+type UpdateFormOutputValues = v.InferOutput<
+	typeof CalendarLocationUpdateParams
+>;
 
 export const EditLocationDialog = createCallable<Props, Payload>(
 	({ call, locationId }) => {
@@ -47,7 +42,7 @@ export const EditLocationDialog = createCallable<Props, Payload>(
 			watch,
 			formState: { errors },
 		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
-			resolver: valibotResolver(UpdateFormSchema),
+			resolver: valibotResolver(CalendarLocationUpdateParams),
 			defaultValues: {
 				name: location?.name,
 				description: location?.description,

@@ -1,4 +1,4 @@
-import type { Location } from "./location";
+import type { Location } from "@idp/schema/entity/calendar/location";
 
 export interface CalendarEvent {
 	id: string;
