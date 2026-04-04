@@ -1,6 +1,8 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { UserProfileUpdateParams } from "@idp/schema/api/user";
 import type { UserCertification } from "@idp/schema/entity/certification";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
@@ -27,7 +29,6 @@ import {
 	OUTSIDE_GRADE,
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
 import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
@@ -39,24 +40,15 @@ import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
 import { OAuthConnRow } from "./oauth-conn-row";
 
+// react-hook-form で受け取る都合上、 array は { value: string } の形にする必要がある
 const UpdateFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
-	faculty: v.optional(UserSchemas.Faculty),
-	department: v.optional(UserSchemas.Department),
-	laboratory: v.optional(v.string()),
-	graduateSchool: v.optional(v.string()),
-	specialization: v.optional(v.string()),
-	bio: UserSchemas.Bio,
-	socialLinks: UserSchemas.SocialLinks,
+	...UserProfileUpdateParams.entries,
+	socialLinks: v.array(
+		v.object({
+			value: UserProfileUpdateParams.entries.socialLinks.item,
+		}),
+	),
 });
-
 type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
 type FormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
 

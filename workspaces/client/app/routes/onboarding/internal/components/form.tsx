@@ -1,8 +1,9 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { UserRegisterParams } from "@idp/schema/api/user";
 import { Fragment, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -17,27 +18,10 @@ import {
 	OUTSIDE_GRADE,
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
 
-const RegisterFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
-	faculty: v.optional(UserSchemas.Faculty),
-	department: v.optional(UserSchemas.Department),
-	laboratory: v.optional(UserSchemas.Laboratory),
-	graduateSchool: v.optional(UserSchemas.GraduateSchool),
-	specialization: v.optional(UserSchemas.Specialization),
-});
-
-type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
-type FormOutputValues = v.InferOutput<typeof RegisterFormSchema>;
+type FormInputValues = v.InferInput<typeof UserRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof UserRegisterParams>;
 
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
@@ -50,7 +34,7 @@ export const RegisterForm = () => {
 		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(RegisterFormSchema),
+		resolver: valibotResolver(UserRegisterParams),
 		defaultValues: {
 			displayName: user?.displayName,
 			realName: user?.realName,
