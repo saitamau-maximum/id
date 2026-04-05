@@ -18,7 +18,6 @@ const USER_BASIC_INFO_COLUMNS_GETTER = {
 		id: true,
 	},
 	with: {
-		roles: true,
 		profile: {
 			columns: {
 				displayId: true,
@@ -35,17 +34,12 @@ type UserBasicInfoRawData = {
 		displayName: string | null;
 		profileImageURL: string | null;
 	};
-	roles: { userId: string; roleId: number }[];
 };
 const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	id: user.id,
 	displayId: user.profile.displayId ?? undefined,
 	displayName: user.profile.displayName ?? undefined,
 	profileImageURL: user.profile.profileImageURL ?? undefined,
-	roles: user.roles
-		.map((role) => role.roleId)
-		.filter((roleId) => v.is(RoleId, roleId))
-		.map((roleId) => ROLE_BY_ID[roleId]),
 });
 
 export class CloudflareOAuthExternalRepository

@@ -13,6 +13,6 @@ export type Invite = v.InferOutput<typeof Invite>;
 
 export const InviteWithIssuer = v.object({
 	...Invite.entries,
-	issuedBy: v.omit(UserBasicInfo, ["roles"]),
+	issuedBy: UserBasicInfo,
 });
 export type InviteWithIssuer = v.InferOutput<typeof InviteWithIssuer>;

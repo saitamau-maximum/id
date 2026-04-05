@@ -180,6 +180,5 @@ export const UserBasicInfo = v.pick(User, [
 	"displayId",
 	"displayName",
 	"profileImageURL",
-	"roles",
 ]);
 export type UserBasicInfo = v.InferOutput<typeof UserBasicInfo>;
