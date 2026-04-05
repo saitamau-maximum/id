@@ -23,7 +23,7 @@ export default function Invitation() {
 	} = useCheckInvitation(id);
 
 	useEffect(() => {
-		// useAuth と useInvitation の初期化が終わるまで何もしない
+		// useAuth と useCheckInvitation の初期化が終わるまで何もしない
 		if (isLoading || isInvitationLoading) return;
 
 		// useParams の id が存在しない または 認証済み の場合は / にリダイレクト
