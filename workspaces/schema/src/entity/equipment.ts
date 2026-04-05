@@ -29,8 +29,10 @@ export const Equipment = v.object({
 });
 export type Equipment = v.InferOutput<typeof Equipment>;
 
-export const EquipmentWithOwner = v.object({
-	...Equipment.entries,
-	owner: UserBasicInfo,
-});
+export const EquipmentWithOwner = v.intersect([
+	Equipment,
+	v.object({
+		owner: UserBasicInfo,
+	}),
+]);
 export type EquipmentWithOwner = v.InferOutput<typeof EquipmentWithOwner>;

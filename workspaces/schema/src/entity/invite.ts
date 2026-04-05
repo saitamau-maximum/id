@@ -11,8 +11,10 @@ export const Invite = v.object({
 });
 export type Invite = v.InferOutput<typeof Invite>;
 
-export const InviteWithIssuer = v.object({
-	...Invite.entries,
-	issuedBy: UserBasicInfo,
-});
+export const InviteWithIssuer = v.intersect([
+	Invite,
+	v.object({
+		issuedBy: UserBasicInfo,
+	}),
+]);
 export type InviteWithIssuer = v.InferOutput<typeof InviteWithIssuer>;

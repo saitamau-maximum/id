@@ -26,11 +26,10 @@ export type ClientSecret = v.InferOutput<typeof ClientSecret>;
  * - secret は一部マスク済み (ref: server/src/routes/oauth/manage.ts)
  * - マスクすると一意に識別できない可能性があるので、 Hash も一緒に返している
  */
-export const ExportableClientSecret = v.object({
-	secretHash: v.string(),
-	...v.pick(ClientSecret, ["secret", "description", "issuedBy", "issuedAt"])
-		.entries,
-});
+export const ExportableClientSecret = v.intersect([
+	v.object({ secretHash: v.string() }),
+	v.pick(ClientSecret, ["secret", "description", "issuedBy", "issuedAt"]),
+]);
 export type ExportableClientSecret = v.InferOutput<
 	typeof ExportableClientSecret
 >;

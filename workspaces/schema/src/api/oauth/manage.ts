@@ -8,24 +8,28 @@ import { Scope, ScopeId } from "../../entity/oauth-external/scope";
 import { UserBasicInfo } from "../../entity/user";
 
 export const OAuthAppGetListResponse = v.array(
-	v.object({
-		...Client.entries,
-		managers: v.array(UserBasicInfo),
-		owner: UserBasicInfo,
-	}),
+	v.intersect([
+		Client,
+		v.object({
+			managers: v.array(UserBasicInfo),
+			owner: UserBasicInfo,
+		}),
+	]),
 );
 export type OAuthAppGetListResponse = v.InferOutput<
 	typeof OAuthAppGetListResponse
 >;
 
-export const OAuthAppGetClientByIdResponse = v.object({
-	...Client.entries,
-	callbackUrls: v.array(ClientCallback.entries.callbackUrl),
-	scopes: v.array(Scope),
-	managers: v.array(UserBasicInfo),
-	owner: UserBasicInfo,
-	secrets: v.array(ExportableClientSecret),
-});
+export const OAuthAppGetClientByIdResponse = v.intersect([
+	Client,
+	v.object({
+		callbackUrls: v.array(ClientCallback.entries.callbackUrl),
+		scopes: v.array(Scope),
+		managers: v.array(UserBasicInfo),
+		owner: UserBasicInfo,
+		secrets: v.array(ExportableClientSecret),
+	}),
+]);
 export type OAuthAppGetClientByIdResponse = v.InferOutput<
 	typeof OAuthAppGetClientByIdResponse
 >;
