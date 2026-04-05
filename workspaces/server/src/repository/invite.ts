@@ -1,27 +1,11 @@
-export interface InviteStructure {
-	id: string;
-	title: string;
-	expiresAt: Date | null;
-	remainingUse: number | null;
-	createdAt: Date;
-	issuedByUserId: string;
-}
+import type { Invite, InviteWithIssuer } from "@idp/schema/entity/invite";
 
-export type IssuerInfo = {
-	id: string;
-	displayId?: string;
-	displayName?: string;
-	profileImageURL?: string;
-};
-
-export type InviteWithUser = InviteStructure & {
-	issuedBy: IssuerInfo;
-};
+export type CreateInviteParams = Omit<Invite, "id" | "createdAt">;
 
 export interface IInviteRepository {
-	getAllInvites: () => Promise<InviteWithUser[]>;
-	createInvite: (params: Omit<InviteStructure, "id">) => Promise<string>;
-	getInviteById: (id: string) => Promise<InviteStructure>;
+	getAllInvites: () => Promise<InviteWithIssuer[]>;
+	createInvite: (params: CreateInviteParams) => Promise<string>;
+	getInviteById: (id: string) => Promise<Invite>;
 	reduceInviteUsage: (id: string) => Promise<void>;
 	deleteInvite: (id: string) => Promise<void>;
 }

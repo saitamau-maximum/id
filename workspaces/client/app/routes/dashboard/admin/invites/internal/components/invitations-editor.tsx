@@ -1,3 +1,4 @@
+import type { InviteWithIssuer } from "@idp/schema/entity/invite";
 import { type MouseEventHandler, useCallback } from "react";
 import { Plus, Trash } from "react-feather";
 import { css } from "styled-system/css";
@@ -8,7 +9,6 @@ import { InformationDialog } from "~/components/logic/callable/information";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import type { Invitation } from "~/types/invitation";
 import { formatDateTime } from "~/utils/date";
 import { useDeleteInvitation } from "../hooks/use-delete-invitation";
 import { useGenerateInvitation } from "../hooks/use-generate-invitation";
@@ -25,8 +25,8 @@ export const InvitationsEditor = () => {
 		if (res.type === "dismiss") return;
 		generateInvitation({
 			title: res.payload.title,
-			expiresAt: res.payload.expiresAt,
-			remainingUse: res.payload.remainingUse,
+			expiresAt: res.payload.expiresAt?.toISOString() ?? undefined,
+			remainingUse: res.payload.remainingUse ?? undefined,
 		});
 	}, [generateInvitation]);
 
@@ -90,10 +90,14 @@ export const InvitationsEditor = () => {
 	);
 };
 
-const InvitationTableRow = ({ invitation }: { invitation: Invitation }) => {
+const InvitationTableRow = ({
+	invitation,
+}: {
+	invitation: InviteWithIssuer;
+}) => {
 	const { mutate: deleteInvitation } = useDeleteInvitation();
 
-	const handleRowClick = useCallback(async (invitation: Invitation) => {
+	const handleRowClick = useCallback(async (invitation: InviteWithIssuer) => {
 		await InformationDialog.call({
 			title: "招待リンク",
 			children: (

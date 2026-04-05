@@ -1,31 +1,28 @@
-import type { Invitation } from "~/types/invitation";
+import type {
+	GetInvitesResponse,
+	InviteCreateParams,
+} from "@idp/schema/api/invite";
 import { client } from "~/utils/hono";
-
-export interface GenerateInvitationOptions {
-	title: string;
-	expiresAt: Date | null;
-	remainingUse: number | null;
-}
 
 export interface FetchInvitationParams {
 	invitationId: string;
 }
 
 export interface IInvitationRepository {
-	getInvitations: () => Promise<Invitation[]>;
+	getInvitations: () => Promise<GetInvitesResponse>;
 	getInvitations$$key: () => unknown[];
 	generateInvitation: ({
 		title,
 		expiresAt,
 		remainingUse,
-	}: GenerateInvitationOptions) => Promise<string>;
+	}: InviteCreateParams) => Promise<string>;
 	fetchInvitation: (params: FetchInvitationParams) => Promise<boolean>;
 	fetchInvitation$$key: (invitationId: string) => unknown[];
 	deleteInvitation: (id: string) => Promise<void>;
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
-	async getInvitations(): Promise<Invitation[]> {
+	async getInvitations(): Promise<GetInvitesResponse> {
 		const res = await client.invite.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch apps");
@@ -46,12 +43,12 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		title,
 		expiresAt,
 		remainingUse,
-	}: GenerateInvitationOptions): Promise<string> {
+	}: InviteCreateParams): Promise<string> {
 		const res = await client.invite.$post({
 			json: {
 				title,
-				expiresAt: expiresAt?.toISOString(),
-				remainingUse: remainingUse ?? undefined,
+				expiresAt,
+				remainingUse,
 			},
 		});
 		if (!res.ok) {
