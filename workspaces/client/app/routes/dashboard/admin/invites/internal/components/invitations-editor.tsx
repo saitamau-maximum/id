@@ -23,11 +23,7 @@ export const InvitationsEditor = () => {
 	const handleGenerateInvitation = useCallback(async () => {
 		const res = await GenerateInvitationURLDialog.call();
 		if (res.type === "dismiss") return;
-		generateInvitation({
-			title: res.payload.title,
-			expiresAt: res.payload.expiresAt?.toISOString() ?? undefined,
-			remainingUse: res.payload.remainingUse ?? undefined,
-		});
+		generateInvitation(res.payload);
 	}, [generateInvitation]);
 
 	return (

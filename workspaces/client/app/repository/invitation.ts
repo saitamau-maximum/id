@@ -47,7 +47,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		const res = await client.invite.$post({
 			json: {
 				title,
-				expiresAt,
+				expiresAt: expiresAt?.toISOString(),
 				remainingUse,
 			},
 		});
