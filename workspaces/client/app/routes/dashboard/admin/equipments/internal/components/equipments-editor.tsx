@@ -1,3 +1,4 @@
+import type { EquipmentWithOwner } from "@idp/schema/entity/equipment";
 import { useCallback } from "react";
 import { Edit, Plus, Trash } from "react-feather";
 import { css } from "styled-system/css";
@@ -7,7 +8,6 @@ import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import type { EquipmentWithOwner } from "~/types/equipment";
 import { formatDateTime } from "~/utils/date";
 import { useCreateEquipment } from "../hooks/use-create-equipments";
 import { useDeleteEquipment } from "../hooks/use-delete-equipments";

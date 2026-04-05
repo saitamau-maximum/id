@@ -1,35 +1,22 @@
-import type { Equipment, EquipmentWithOwner } from "~/types/equipment";
+import type {
+	CreateOrUpdateEquipmentParams,
+	GetEquipmentByIdResponse,
+	GetEquipmentsResponse,
+} from "@idp/schema/api/equipment";
+import type { Equipment } from "@idp/schema/entity/equipment";
 import { client } from "~/utils/hono";
 
-export interface EquipmentCreateParams {
-	name: string;
-	description?: string;
-	ownerId: string;
-}
-
-export interface EquipmentUpdateParams {
-	id: string;
-	name: string;
-	description?: string;
-	ownerId: string;
-	updatedAt: Date;
-}
-
 export interface IEquipmentRepository {
-	getAllEquipments: () => Promise<EquipmentWithOwner[]>;
+	getAllEquipments: () => Promise<GetEquipmentsResponse>;
 	getAllEquipments$$key: () => unknown[];
 	getEquipmentById: (
 		equipmentId: Equipment["id"],
-	) => Promise<EquipmentWithOwner>;
+	) => Promise<GetEquipmentByIdResponse>;
 	getEquipmentById$$key: (equipmentId: Equipment["id"]) => unknown[];
-	createEquipment: (
-		equipment: Pick<Equipment, "name" | "description" | "ownerId">,
-	) => Promise<void>;
+	createEquipment: (params: CreateOrUpdateEquipmentParams) => Promise<void>;
 	updateEquipment: (
-		equipment: Pick<
-			Equipment,
-			"id" | "name" | "description" | "ownerId" | "updatedAt"
-		>,
+		equipmentId: Equipment["id"],
+		params: CreateOrUpdateEquipmentParams,
 	) => Promise<void>;
 	deleteEquipment: (equipmentId: Equipment["id"]) => Promise<void>;
 }
@@ -72,17 +59,12 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		return ["equipments", equipmentId];
 	}
 
-	async createEquipment(equipment: {
-		name: string;
-		description?: string;
-		ownerId: string;
-	}) {
-		const description = equipment.description?.trim();
+	async createEquipment(params: CreateOrUpdateEquipmentParams) {
 		const res = await client.equipment.$post({
 			json: {
-				name: equipment.name,
-				description,
-				ownerId: equipment.ownerId,
+				name: params.name,
+				description: params.description?.trim(),
+				ownerId: params.ownerId,
 			},
 		});
 		if (!res.ok) {
@@ -90,22 +72,18 @@ export class EquipmentRepositoryImpl implements IEquipmentRepository {
 		}
 	}
 
-	async updateEquipment(equipment: {
-		id: string;
-		name: string;
-		description?: string;
-		ownerId: string;
-		updatedAt: Date;
-	}) {
-		const description = equipment.description?.trim();
+	async updateEquipment(
+		equipmentId: Equipment["id"],
+		params: CreateOrUpdateEquipmentParams,
+	) {
 		const res = await client.equipment[":id"].$put({
 			param: {
-				id: equipment.id,
+				id: equipmentId,
 			},
 			json: {
-				name: equipment.name,
-				description,
-				ownerId: equipment.ownerId,
+				name: params.name,
+				description: params.description?.trim(),
+				ownerId: params.ownerId,
 			},
 		});
 		if (!res.ok) {
