@@ -1,7 +1,7 @@
 import type { Contributions } from "@idp/schema/entity/contribution";
 import { useMemo } from "react";
 import { css } from "styled-system/css";
-import { RateCell } from "./rate-cell";
+import { CELL_SIZE, RateCell } from "./rate-cell";
 
 interface Props {
 	isLoading?: boolean;
@@ -30,7 +30,7 @@ export const ContributionCard = ({
 		<div
 			className={css({
 				display: "grid",
-				gridTemplateColumns: "repeat(auto-fill, 1fr)",
+				gridTemplateColumns: `repeat(auto-fill, minmax(${CELL_SIZE}px, 1fr))`,
 				gridTemplateRows: "repeat(7, 1fr)",
 				gridAutoFlow: "column",
 				gap: size === "sm" ? 1 : 2,

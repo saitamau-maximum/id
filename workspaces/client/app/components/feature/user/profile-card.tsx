@@ -19,7 +19,6 @@ type Props = Omit<
 	| "lastPaymentConfirmedAt"
 > & {
 	socialLinks?: string[];
-	initialized: boolean;
 	discordInfo?: DiscordInfo;
 };
 
@@ -29,7 +28,6 @@ export const ProfileCard: React.FC<Props> = ({
 	displayId,
 	profileImageURL,
 	grade,
-	initialized,
 	roles,
 	bio,
 	socialLinks,
@@ -154,22 +152,6 @@ export const ProfileCard: React.FC<Props> = ({
 							>
 								{grade}
 							</span>
-						)}
-						{!initialized && (
-							<div
-								className={css({
-									backgroundColor: "blue.100",
-									borderWidth: 2,
-									borderStyle: "solid",
-									borderColor: "blue.300",
-									color: "blue.500",
-									padding: "token(spacing.1) token(spacing.4)",
-									borderRadius: 8,
-									fontSize: "sm",
-								})}
-							>
-								初期登録中
-							</div>
 						)}
 					</div>
 					<div
