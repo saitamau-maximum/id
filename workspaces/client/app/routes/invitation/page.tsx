@@ -20,7 +20,7 @@ export default function Invitation() {
 
 	const mutation = useMutation({
 		mutationFn: async (id: string) => {
-			const isSucceeded = await invitationRepository.fetchInvitation(id);
+			const isSucceeded = await invitationRepository.existsInvitation(id);
 			return isSucceeded;
 		},
 		onSuccess: (isSucceeded, id) => {

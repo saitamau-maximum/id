@@ -15,8 +15,8 @@ export interface IInvitationRepository {
 		expiresAt,
 		remainingUse,
 	}: GenerateInvitationOptions) => Promise<string>;
-	fetchInvitation: (invitationId: string) => Promise<boolean>;
-	fetchInvitation$$key: (invitationId: string) => unknown[];
+	existsInvitation: (invitationId: string) => Promise<boolean>;
+	existsInvitation$$key: (invitationId: string) => unknown[];
 	deleteInvitation: (invitationId: string) => Promise<void>;
 }
 
@@ -57,7 +57,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		return data.id;
 	}
 
-	async fetchInvitation(invitationId: string): Promise<boolean> {
+	async existsInvitation(invitationId: string): Promise<boolean> {
 		const res = await client.invite[":id"].$get({
 			param: {
 				id: invitationId,
@@ -66,7 +66,7 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		return res.ok;
 	}
 
-	fetchInvitation$$key(invitationId: string): unknown[] {
+	existsInvitation$$key(invitationId: string): unknown[] {
 		return ["invitation", invitationId];
 	}
 
