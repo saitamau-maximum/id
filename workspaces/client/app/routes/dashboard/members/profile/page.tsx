@@ -74,7 +74,6 @@ export default function Profile() {
 		>
 			<div className={css({ width: "100%", maxWidth: "480px" })}>
 				<ProfileCard
-					id={memberProfile.id}
 					displayName={memberProfile.displayName}
 					realName={memberProfile.realName}
 					displayId={memberProfile.displayId}

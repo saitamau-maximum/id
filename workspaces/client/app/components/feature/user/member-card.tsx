@@ -3,15 +3,14 @@ import { Link } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<
-	Member,
-	| "certifications"
-	| "initializedAt"
-	| "bio"
-	| "isProvisional"
-	| "lastPaymentConfirmedAt"
-	| "oauthConnections"
-> & {
+type Props = {
+	id: Member["id"];
+	displayName: Member["displayName"];
+	realName: Member["realName"];
+	displayId: Member["displayId"];
+	profileImageURL: Member["profileImageURL"];
+	grade: Member["grade"];
+	roles: Member["roles"];
 	displayOnly?: boolean;
 };
 

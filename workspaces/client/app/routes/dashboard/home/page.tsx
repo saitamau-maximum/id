@@ -44,7 +44,6 @@ export default function Home() {
 			>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>
 					<ProfileCard
-						id={user.id}
 						displayName={user.displayName}
 						realName={user.realName}
 						displayId={user.displayId}

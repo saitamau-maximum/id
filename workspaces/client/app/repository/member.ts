@@ -27,12 +27,6 @@ export class MemberRepositoryImpl implements IMemberRepository {
 		const data = await res.json();
 		return data.map((member) => ({
 			...member,
-			initializedAt: member.initializedAt
-				? new Date(member.initializedAt)
-				: null,
-			lastPaymentConfirmedAt: member.lastPaymentConfirmedAt
-				? new Date(member.lastPaymentConfirmedAt)
-				: null,
 			lastLoginAt: member.lastLoginAt
 				? new Date(member.lastLoginAt)
 				: undefined,
@@ -78,10 +72,6 @@ export class MemberRepositoryImpl implements IMemberRepository {
 		const data = await res.json();
 		return {
 			...data,
-			initializedAt: data.initializedAt ? new Date(data.initializedAt) : null,
-			lastPaymentConfirmedAt: data.lastPaymentConfirmedAt
-				? new Date(data.lastPaymentConfirmedAt)
-				: null,
 			lastLoginAt: data.lastLoginAt ? new Date(data.lastLoginAt) : undefined,
 		};
 	}

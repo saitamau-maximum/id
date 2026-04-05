@@ -11,14 +11,17 @@ import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<
-	Member,
-	| "certifications"
-	| "initializedAt"
-	| "isProvisional"
-	| "lastPaymentConfirmedAt"
-> & {
-	socialLinks?: string[];
+type Props = {
+	displayName: Member["displayName"];
+	realName: Member["realName"];
+	displayId: Member["displayId"];
+	profileImageURL: Member["profileImageURL"];
+	grade: Member["grade"];
+	roles: Member["roles"];
+	bio: Member["bio"];
+	socialLinks: Member["socialLinks"];
+	lastLoginAt: Member["lastLoginAt"];
+	oauthConnections: Member["oauthConnections"];
 	discordInfo?: DiscordInfo;
 };
 

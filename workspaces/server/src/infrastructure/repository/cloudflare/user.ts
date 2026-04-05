@@ -311,9 +311,6 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return members.map((user) => ({
 			id: user.id,
-			initializedAt: user.initializedAt,
-			isProvisional: !!user.invitationId,
-			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			lastLoginAt: user.lastLoginAt ?? undefined,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
@@ -363,9 +360,6 @@ export class CloudflareUserRepository implements IUserRepository {
 
 		return {
 			id: user.user.id,
-			initializedAt: user.user.initializedAt,
-			isProvisional: !!user.user.invitationId,
-			lastPaymentConfirmedAt: user.user.lastPaymentConfirmedAt,
 			lastLoginAt: user.user.lastLoginAt ?? undefined,
 			displayName: user.displayName ?? undefined,
 			realName: user.realName ?? undefined,

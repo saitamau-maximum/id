@@ -8,9 +8,6 @@ import { User } from "./user";
  */
 export const Member = v.pick(User, [
 	"id",
-	"initializedAt",
-	"isProvisional",
-	"lastPaymentConfirmedAt",
 	"lastLoginAt",
 	"roles",
 	"displayName",
@@ -24,7 +21,6 @@ export const Member = v.pick(User, [
 	"certifications",
 	"oauthConnections",
 ]);
-
 export type Member = v.InferOutput<typeof Member>;
 
 /**
@@ -39,5 +35,4 @@ export const PublicMember = v.pick(Member, [
 	"socialLinks",
 	"roles",
 ]);
-
 export type PublicMember = v.InferOutput<typeof PublicMember>;
