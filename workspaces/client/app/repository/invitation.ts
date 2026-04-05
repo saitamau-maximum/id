@@ -7,10 +7,6 @@ export interface GenerateInvitationOptions {
 	remainingUse: number | null;
 }
 
-export interface FetchInvitationParams {
-	invitationId: string;
-}
-
 export interface IInvitationRepository {
 	getInvitations: () => Promise<Invitation[]>;
 	getInvitations$$key: () => unknown[];
@@ -19,9 +15,9 @@ export interface IInvitationRepository {
 		expiresAt,
 		remainingUse,
 	}: GenerateInvitationOptions) => Promise<string>;
-	fetchInvitation: (params: FetchInvitationParams) => Promise<boolean>;
+	fetchInvitation: (invitationId: string) => Promise<boolean>;
 	fetchInvitation$$key: (invitationId: string) => unknown[];
-	deleteInvitation: (id: string) => Promise<void>;
+	deleteInvitation: (invitationId: string) => Promise<void>;
 }
 
 export class InvitationRepositoryImpl implements IInvitationRepository {
@@ -61,10 +57,10 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		return data.id;
 	}
 
-	async fetchInvitation(params: FetchInvitationParams): Promise<boolean> {
+	async fetchInvitation(invitationId: string): Promise<boolean> {
 		const res = await client.invite[":id"].$get({
 			param: {
-				id: params.invitationId,
+				id: invitationId,
 			},
 		});
 		return res.ok;
@@ -74,10 +70,10 @@ export class InvitationRepositoryImpl implements IInvitationRepository {
 		return ["invitation", invitationId];
 	}
 
-	async deleteInvitation(id: string): Promise<void> {
+	async deleteInvitation(invitationId: string): Promise<void> {
 		const res = await client.invite[":id"].$delete({
 			param: {
-				id,
+				id: invitationId,
 			},
 		});
 		if (!res.ok) {
