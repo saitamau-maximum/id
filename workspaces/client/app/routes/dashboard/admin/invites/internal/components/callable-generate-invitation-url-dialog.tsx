@@ -1,35 +1,28 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import {
+	type InviteCreateParams,
+	InviteCreateParamsForForm,
+} from "@idp/schema/api/invite";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { InvitationURLSchemas } from "~/schema/invitation";
 
 type Payload =
 	| {
 			type: "success";
-			payload: {
-				expiresAt: Date | null;
-				remainingUse: number | null;
-				title: string;
-			};
+			payload: InviteCreateParams;
 	  }
 	| {
 			type: "dismiss";
 	  };
 
-const CreateFormSchema = v.object({
-	title: InvitationURLSchemas.Title,
-	expiresAt: InvitationURLSchemas.ExpiresAt,
-	remainingUse: InvitationURLSchemas.RemainingUse,
-});
-
-type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
-type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof InviteCreateParamsForForm>;
+type CreateFormOutputValues = v.InferOutput<typeof InviteCreateParamsForForm>;
 
 export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 	({ call }) => {
@@ -39,11 +32,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 			setError,
 			formState: { errors },
 		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-			resolver: valibotResolver(CreateFormSchema),
-			defaultValues: {
-				expiresAt: null,
-				remainingUse: null,
-			},
+			resolver: valibotResolver(InviteCreateParamsForForm),
 		});
 
 		const onSubmit = async (values: CreateFormOutputValues) => {
@@ -55,9 +44,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 			}
 			call.end({
 				type: "success",
-				payload: {
-					...values,
-				},
+				payload: values,
 			});
 		};
 
@@ -92,7 +79,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 						error={errors.remainingUse?.message}
 						{...register("remainingUse", {
 							setValueAs: (value) => {
-								if (value === "") return null;
+								if (value === "") return undefined;
 								return value;
 							},
 						})}
@@ -106,7 +93,7 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 									type="datetime-local"
 									{...register("expiresAt", {
 										setValueAs: (value) => {
-											if (value === "") return null;
+											if (value === "") return undefined;
 											return value;
 										},
 									})}
