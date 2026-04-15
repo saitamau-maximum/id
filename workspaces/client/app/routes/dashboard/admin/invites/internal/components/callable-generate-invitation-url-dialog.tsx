@@ -1,8 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import {
-	type InviteCreateParams,
-	InviteCreateParamsForForm,
-} from "@idp/schema/api/invite";
+import { InviteCreateParams } from "@idp/schema/api/invite";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -21,27 +18,20 @@ type Payload =
 			type: "dismiss";
 	  };
 
-type CreateFormInputValues = v.InferInput<typeof InviteCreateParamsForForm>;
-type CreateFormOutputValues = v.InferOutput<typeof InviteCreateParamsForForm>;
+type CreateFormInputValues = v.InferInput<typeof InviteCreateParams>;
+type CreateFormOutputValues = v.InferOutput<typeof InviteCreateParams>;
 
 export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 	({ call }) => {
 		const {
 			handleSubmit,
 			register,
-			setError,
 			formState: { errors },
 		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-			resolver: valibotResolver(InviteCreateParamsForForm),
+			resolver: valibotResolver(InviteCreateParams),
 		});
 
 		const onSubmit = async (values: CreateFormOutputValues) => {
-			if (!values.expiresAt && !values.remainingUse) {
-				setError("root", {
-					message: "使用可能回数または有効期限のいずれかは必須です",
-				});
-				return;
-			}
 			call.end({
 				type: "success",
 				payload: values,
@@ -80,7 +70,8 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 						{...register("remainingUse", {
 							setValueAs: (value) => {
 								if (value === "") return undefined;
-								return value;
+								// parseInt だと小数点以下が切り捨てられてしまうため、 Number で変換してから Valibot 側で整数バリデーションを行う
+								return Number(value);
 							},
 						})}
 					/>
