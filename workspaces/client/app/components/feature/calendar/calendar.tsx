@@ -1,13 +1,13 @@
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { useCallback, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "react-feather";
 import { css } from "styled-system/css";
-import type { CalendarEvent } from "~/types/event";
 import { CalendarCell } from "./calendar-cell";
 import type { TCalendarRow, TCalendarState } from "./types";
 
 interface Props {
 	label: string;
-	events: CalendarEvent[];
+	events: Event[];
 	onDateClick?: (date: Date) => void;
 	targetDate?: Date;
 	variant?: "sm" | "md";

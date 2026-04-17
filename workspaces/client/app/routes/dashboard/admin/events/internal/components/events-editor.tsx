@@ -1,3 +1,4 @@
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { useCallback, useState } from "react";
 import {
 	ChevronLeft,
@@ -15,7 +16,6 @@ import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { useCalendar } from "~/routes/dashboard/calendar/hooks/use-calendar";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
-import type { CalendarEvent } from "~/types/event";
 import { formatDuration, getFiscalYear } from "~/utils/date";
 import { useCreateEvent } from "../hooks/use-create-event";
 import { useDeleteEvent } from "../hooks/use-delete-event";
@@ -132,7 +132,7 @@ export const EventsEditor = () => {
 	);
 };
 
-const EventTableRow = ({ event }: { event: CalendarEvent }) => {
+const EventTableRow = ({ event }: { event: Event }) => {
 	const { mutate: createEvent } = useCreateEvent();
 	const { mutate: deleteEvent } = useDeleteEvent();
 	const { mutate: updateEvent } = useUpdateEvent();
@@ -151,7 +151,7 @@ const EventTableRow = ({ event }: { event: CalendarEvent }) => {
 	const handleEditEvent = useCallback(async () => {
 		const res = await EditEventDialog.call({ event });
 		if (res.type === "dismiss") return;
-		updateEvent(res.payload);
+		updateEvent({ eventId: event.id, event: res.payload });
 	}, [event, updateEvent]);
 
 	const handleDuplicateEvent = useCallback(async () => {

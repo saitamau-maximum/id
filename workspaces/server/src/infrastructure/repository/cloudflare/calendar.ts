@@ -1,10 +1,13 @@
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
 	CreateEventPayload,
-	ICalendarEvent,
+	GetAllEventsRes,
+	GetAllEventsWithLocationRes,
 	ICalendarRepository,
+	UpdateEventPayload,
 } from "../../../repository/calendar";
 
 export class CloudflareCalendarRepository implements ICalendarRepository {
@@ -14,7 +17,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async getAllEvents(): Promise<ICalendarEvent[]> {
+	async getAllEvents(): Promise<GetAllEventsRes> {
 		const res = await this.client.query.calendarEvents.findMany();
 		return res.map((event) => ({
 			...event,
@@ -25,7 +28,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		}));
 	}
 
-	async getAllEventsWithLocation(): Promise<ICalendarEvent[]> {
+	async getAllEventsWithLocation(): Promise<GetAllEventsWithLocationRes> {
 		const res = await this.client.query.calendarEvents.findMany({
 			with: {
 				location: true,
@@ -38,10 +41,16 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 			locationId: event.locationId ?? undefined,
 			startAt: new Date(event.startAt),
 			endAt: new Date(event.endAt),
+			location: event.location
+				? {
+						...event.location,
+						description: event.location.description ?? undefined,
+					}
+				: undefined,
 		}));
 	}
 
-	async getEventById(eventId: ICalendarEvent["id"]): Promise<ICalendarEvent> {
+	async getEventById(eventId: Event["id"]): Promise<Event> {
 		const res = await this.client.query.calendarEvents.findFirst({
 			where: eq(schema.calendarEvents.id, eventId),
 		});
@@ -67,7 +76,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 		await this.client.insert(schema.calendarEvents).values(newEvent);
 	}
 
-	async updateEvent(event: ICalendarEvent): Promise<void> {
+	async updateEvent(event: UpdateEventPayload): Promise<void> {
 		const updatedEvent = {
 			...event,
 			startAt: event.startAt.toISOString(),
@@ -79,7 +88,7 @@ export class CloudflareCalendarRepository implements ICalendarRepository {
 			.where(eq(schema.calendarEvents.id, event.id));
 	}
 
-	async deleteEvent(eventId: ICalendarEvent["id"]): Promise<void> {
+	async deleteEvent(eventId: Event["id"]): Promise<void> {
 		await this.client
 			.delete(schema.calendarEvents)
 			.where(eq(schema.calendarEvents.id, eventId));
