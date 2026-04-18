@@ -432,7 +432,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}));
 	}
 
-	async updateUserRole(userId: string, roleIds: number[]): Promise<void> {
+	async updateUserRole(userId: string, roleIds: RoleId[]): Promise<void> {
 		const res = await this.client
 			.delete(schema.userRoles)
 			.where(eq(schema.userRoles.userId, userId));
@@ -457,7 +457,7 @@ export class CloudflareUserRepository implements IUserRepository {
 		}
 	}
 
-	async addUserRole(userId: string, roleId: number): Promise<void> {
+	async addUserRole(userId: string, roleId: RoleId): Promise<void> {
 		const res = await this.client
 			.insert(schema.userRoles)
 			.values({
