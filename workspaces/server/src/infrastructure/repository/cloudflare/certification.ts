@@ -1,13 +1,18 @@
+import type { Certification } from "@idp/schema/entity/certification";
+import type { User } from "@idp/schema/entity/user";
 import { and, eq, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
-	ICertification,
+	CertificationRequestParams,
+	CreateCertificationParams,
+	DeleteUserCertificationParams,
+	ExistsUserCertificationParams,
+	GetAllCertificationRequestsRes,
+	GetAllCertificationsRes,
+	GetCertificationsSummaryRes,
 	ICertificationRepository,
-	ICertificationRequest,
-	ICertificationRequestWithUser,
-	ICertificationSummary,
-	ICertificationUpdateRequest,
+	UpdateCertificationParams,
 } from "../../../repository/certification";
 
 export class CloudflareCertificationRepository
@@ -19,12 +24,14 @@ export class CloudflareCertificationRepository
 		this.client = drizzle(db, { schema });
 	}
 
-	async getAllCertifications(): Promise<ICertification[]> {
+	async getAllCertifications(): Promise<GetAllCertificationsRes> {
 		const res = await this.client.query.certifications.findMany();
 		return res;
 	}
 
-	async requestCertification(params: ICertificationRequest): Promise<void> {
+	async requestCertification(
+		params: CertificationRequestParams,
+	): Promise<void> {
 		await this.client.insert(schema.userCertifications).values({
 			userId: params.userId,
 			certificationId: params.certificationId,
@@ -33,9 +40,7 @@ export class CloudflareCertificationRepository
 		});
 	}
 
-	async getAllCertificationRequests(): Promise<
-		ICertificationRequestWithUser[]
-	> {
+	async getAllCertificationRequests(): Promise<GetAllCertificationRequestsRes> {
 		const res = await this.client.query.userCertifications.findMany({
 			where: (cert, { eq }) => eq(cert.isApproved, false),
 			with: {
@@ -55,7 +60,9 @@ export class CloudflareCertificationRepository
 		return res.map((req) => ({
 			user: {
 				id: req.user.id,
-				...req.user.profile,
+				displayId: req.user.profile.displayId ?? undefined,
+				displayName: req.user.profile.displayName ?? undefined,
+				profileImageURL: req.user.profile.profileImageURL ?? undefined,
 			},
 			certificationId: req.certificationId,
 			certifiedIn: req.certifiedIn,
@@ -63,8 +70,8 @@ export class CloudflareCertificationRepository
 	}
 
 	async approveCertificationRequest(
-		userId: string,
-		certificationId: string,
+		userId: User["id"],
+		certificationId: Certification["id"],
 	): Promise<void> {
 		await this.client
 			.update(schema.userCertifications)
@@ -80,8 +87,8 @@ export class CloudflareCertificationRepository
 	}
 
 	async rejectCertificationRequest(
-		userId: string,
-		certificationId: string,
+		userId: User["id"],
+		certificationId: Certification["id"],
 	): Promise<void> {
 		await this.client
 			.delete(schema.userCertifications)
@@ -93,25 +100,25 @@ export class CloudflareCertificationRepository
 			);
 	}
 
-	async existsCertification(certificationId: string): Promise<boolean> {
+	async existsCertification(
+		certificationId: Certification["id"],
+	): Promise<boolean> {
 		const res = await this.client.query.certifications.findFirst({
 			where: eq(schema.certifications.id, certificationId),
 		});
 		return !!res;
 	}
 
-	async createCertification(params: Omit<ICertification, "id">): Promise<void> {
+	async createCertification(params: CreateCertificationParams): Promise<void> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.certifications).values({ ...params, id });
 	}
 
-	async updateCertification(
-		params: ICertificationUpdateRequest,
-	): Promise<void> {
+	async updateCertification(params: UpdateCertificationParams): Promise<void> {
 		await this.client
 			.update(schema.certifications)
 			.set({ description: params.description })
-			.where(eq(schema.certifications.id, params.certificationId));
+			.where(eq(schema.certifications.id, params.id));
 	}
 
 	async deleteCertification(certificationId: string): Promise<void> {
@@ -126,7 +133,7 @@ export class CloudflareCertificationRepository
 	}
 
 	async existsUserCertification(
-		params: Omit<ICertificationRequest, "certifiedIn">,
+		params: ExistsUserCertificationParams,
 	): Promise<boolean> {
 		const res = await this.client.query.userCertifications.findFirst({
 			where: and(
@@ -142,7 +149,7 @@ export class CloudflareCertificationRepository
 	}
 
 	async deleteUserCertification(
-		params: Omit<ICertificationRequest, "certifiedIn">,
+		params: DeleteUserCertificationParams,
 	): Promise<void> {
 		await this.client
 			.delete(schema.userCertifications)
@@ -154,15 +161,12 @@ export class CloudflareCertificationRepository
 			);
 	}
 
-	async getCertificationsSummary(): Promise<ICertificationSummary[]> {
+	async getCertificationsSummary(): Promise<GetCertificationsSummaryRes> {
 		const res = await this.client
 			.select({
 				id: schema.certifications.id,
 				title: schema.certifications.title,
-				// count + where でやると「登録はされているが取得はしていない資格」「まだ承認された人がいない資格」の場合に
-				// 0 人とならず、そもそも資格が存在しない扱いになってしまうため生 sql で対応
-				// If you use count + where, certifications that are registered but not yet obtained, or certifications with no approved holders,
-				// will not be counted as "0 people" but will be treated as if the certification does not exist at all, so we use raw SQL here.
+				// count + where でやると「登録はされているが取得されていない資格」「まだ承認された人がいない資格」の場合に 0 人とならず、そもそも資格が存在しない扱いになってしまうため生 sql で対応
 				numberOfHolders: sql<number>`COUNT(CASE WHEN ${schema.userCertifications.isApproved} = TRUE THEN 1 END)`,
 			})
 			.from(schema.certifications)

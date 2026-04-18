@@ -1,10 +1,10 @@
+import type { GetCertificationRequestsResponse } from "@idp/schema/api/certification";
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
 import { UserDisplay } from "~/components/feature/user/user-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import type { CertificationRequestWithUser } from "~/repository/certification";
 import { useCertificationRequests } from "../../../internal/hooks/use-certification-requests";
 import { useCertifications } from "../hooks/use-certifications";
 import { useReviewRequest } from "../hooks/use-review-request";
@@ -74,7 +74,7 @@ const CertificationRequestRow = ({
 	certificationRequest,
 }: {
 	certificationTitle: string;
-	certificationRequest: CertificationRequestWithUser;
+	certificationRequest: GetCertificationRequestsResponse[number];
 }) => {
 	const { mutate, isPending } = useReviewRequest();
 

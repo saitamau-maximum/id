@@ -1,7 +1,7 @@
+import type { CertificationReviewParams } from "@idp/schema/api/certification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { CertificationRequestReviewParams } from "~/repository/certification";
 
 export const useReviewRequest = () => {
 	const queryClient = useQueryClient();
@@ -9,7 +9,7 @@ export const useReviewRequest = () => {
 	const { pushToast } = useToast();
 
 	return useMutation({
-		mutationFn: (payload: CertificationRequestReviewParams) =>
+		mutationFn: (payload: CertificationReviewParams) =>
 			certificationRepository.reviewCertificationRequest(payload),
 		onSuccess: (_, payload) => {
 			pushToast({
@@ -24,7 +24,7 @@ export const useReviewRequest = () => {
 		onError: (_, payload) => {
 			pushToast({
 				type: "error",
-				title: `リクエストを${payload.isApproved ? "承認" : "却下"}しました`,
+				title: `リクエストを${payload.isApproved ? "承認" : "却下"}できませんでした`,
 				description: "もう一度お試しください",
 			});
 		},

@@ -1,3 +1,4 @@
+import type { Certification } from "@idp/schema/entity/certification";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
@@ -7,10 +8,7 @@ import { JWT_ALG } from "../constants/jwt";
 import type { HonoEnv } from "../factory";
 import { createMockCertificationRepository } from "../mocks/repository/certification";
 import { createMockUserRepository } from "../mocks/repository/user";
-import type {
-	ICertification,
-	ICertificationRepository,
-} from "../repository/certification";
+import type { ICertificationRepository } from "../repository/certification";
 import type { IUserRepository } from "../repository/user";
 import { certificationRoute } from "../routes/certification";
 
@@ -50,7 +48,7 @@ describe("Certification Handler", () => {
 
 	describe("GET /certification/all", () => {
 		it("should get all certifications", async () => {
-			const mockData: ICertification[] = [
+			const mockData: Certification[] = [
 				{
 					id: "1",
 					title: "Certification 1",
