@@ -7,10 +7,20 @@ const route = app
 		const userDisplayId = c.req.param("userDisplayId");
 		const { UserRepository } = c.var;
 
-		const member =
-			await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
+		try {
+			const member =
+				await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
 
-		if (!member) {
+			return c.json({
+				error: false,
+				id: member.id,
+				displayName: member.displayName,
+				profileImageURL: member.profileImageURL,
+				bio: member.bio,
+				socialLinks: member.socialLinks,
+				roles: member.roles.map((role) => role.name),
+			});
+		} catch {
 			return c.json(
 				{
 					error: true,
@@ -19,16 +29,6 @@ const route = app
 				404,
 			);
 		}
-
-		return c.json({
-			error: false,
-			id: member.id,
-			displayName: member.displayName,
-			profileImageURL: member.profileImageURL,
-			bio: member.bio,
-			socialLinks: member.socialLinks,
-			roles: member.roles.map((role) => role.name),
-		});
 	})
 	.get("/certifications", async (c) => {
 		return c.json(
