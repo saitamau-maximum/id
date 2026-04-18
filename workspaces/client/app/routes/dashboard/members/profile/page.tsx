@@ -152,7 +152,7 @@ export default function Profile() {
 				>
 					<ContributionCard
 						isLoading={isMemberContributionLoading}
-						weeks={memberContribution?.weeks || []}
+						weeks={memberContribution || []}
 						clip={14}
 						size={deviceType === "sp" ? "sm" : "md"}
 					/>

@@ -120,7 +120,7 @@ export default function Home() {
 					>
 						<ContributionCard
 							isLoading={isLoading}
-							weeks={data?.weeks || []}
+							weeks={data || []}
 							clip={14}
 							size={deviceType === "sp" ? "sm" : "md"}
 						/>

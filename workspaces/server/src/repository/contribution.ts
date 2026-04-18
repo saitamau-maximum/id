@@ -1,11 +1,5 @@
-export type Contribitions = {
-	weeks: {
-		date: Date;
-		/** The number of contributions made on the date. */
-		rate: number;
-	}[][];
-};
+import type { Contributions } from "@idp/schema/entity/contribution";
 
 export interface IContributionRepository {
-	getContributions: (username: string) => Promise<Contribitions>;
+	getContributions: (username: string) => Promise<Contributions>;
 }

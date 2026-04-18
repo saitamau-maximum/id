@@ -62,9 +62,7 @@ export type UserProfileUpdateParams = v.InferOutput<
 	typeof UserProfileUpdateParams
 >;
 
-export const UserGetContributionsResponse = v.object({
-	weeks: Contributions,
-});
+export const UserGetContributionsResponse = Contributions;
 export type UserGetContributionsResponse = v.InferOutput<
 	typeof UserGetContributionsResponse
 >;

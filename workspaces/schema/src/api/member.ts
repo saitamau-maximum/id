@@ -7,9 +7,7 @@ export const GetMembersResponse = v.array(
 );
 export type GetMembersResponse = v.InferOutput<typeof GetMembersResponse>;
 
-export const GetMembersContributionByUserDisplayIDResponse = v.object({
-	weeks: Contributions,
-});
+export const GetMembersContributionByUserDisplayIDResponse = Contributions;
 export type GetMembersContributionByUserDisplayIDResponse = v.InferOutput<
 	typeof GetMembersContributionByUserDisplayIDResponse
 >;
