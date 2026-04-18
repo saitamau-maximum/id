@@ -1,5 +1,5 @@
 import * as v from "valibot";
-import { User, UserBasicInfo } from "./user";
+import { UserBasicInfo } from "./user";
 
 /**
  * 資格・試験の情報
@@ -25,7 +25,7 @@ export type UserCertification = v.InferOutput<typeof UserCertification>;
  * ユーザーとしての資格・試験の Relation
  */
 export const UserCertificationRelation = v.object({
-	userId: User.entries.id,
+	userId: v.string(),
 	certificationId: Certification.entries.id,
 });
 export type UserCertificationRelation = v.InferOutput<
