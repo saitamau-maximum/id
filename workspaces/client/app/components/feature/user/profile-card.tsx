@@ -1,3 +1,4 @@
+import type { GetDiscordInfoResponse } from "@idp/schema/api/discord";
 import type { Member } from "@idp/schema/entity/member";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { css } from "styled-system/css";
@@ -5,7 +6,6 @@ import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { SOCIAL_SERVICES_IDS } from "~/constant";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { DiscordInfo } from "~/types/discord-info";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
@@ -22,7 +22,7 @@ type Props = {
 	socialLinks: Member["socialLinks"];
 	lastLoginAt: Member["lastLoginAt"];
 	oauthConnections: Member["oauthConnections"];
-	discordInfo?: DiscordInfo;
+	discordInfo?: GetDiscordInfoResponse;
 };
 
 export const ProfileCard: React.FC<Props> = ({
