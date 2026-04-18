@@ -88,7 +88,11 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 								id={id}
 								required
 								type="datetime-local"
-								{...register("startAt")}
+								{...register("startAt", {
+									// Valibot は ISOTimestamp 形式を期待しているので変換
+									setValueAs: (value) =>
+										value ? new Date(value).toISOString() : undefined,
+								})}
 							/>
 							<ErrorDisplay error={errors.startAt?.message} />
 						</>
@@ -102,7 +106,10 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 								id={id}
 								required
 								type="datetime-local"
-								{...register("endAt")}
+								{...register("endAt", {
+									setValueAs: (value) =>
+										value ? new Date(value).toISOString() : undefined,
+								})}
 							/>
 							<ErrorDisplay error={errors.endAt?.message} />
 						</>

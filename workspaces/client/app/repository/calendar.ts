@@ -4,7 +4,6 @@ import type {
 	UpdateEventParams,
 } from "@idp/schema/api/calendar/events";
 import type { Event } from "@idp/schema/entity/calendar/event";
-import { toHTMLDateTimePickerFormat } from "~/utils/date";
 import { client } from "~/utils/hono";
 
 export interface ICalendarRepository {
@@ -41,8 +40,8 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 			json: {
 				...event,
 				// schema で isoDateTime を受け付けるようにしているので
-				startAt: toHTMLDateTimePickerFormat(event.startAt),
-				endAt: toHTMLDateTimePickerFormat(event.endAt),
+				startAt: event.startAt.toISOString(),
+				endAt: event.endAt.toISOString(),
 			},
 		});
 		if (!res.ok) {
@@ -57,9 +56,8 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 			},
 			json: {
 				...params,
-				// schema で isoDateTime を受け付けるようにしているので
-				startAt: toHTMLDateTimePickerFormat(params.startAt),
-				endAt: toHTMLDateTimePickerFormat(params.endAt),
+				startAt: params.startAt.toISOString(),
+				endAt: params.endAt.toISOString(),
 			},
 		});
 		if (!res.ok) {

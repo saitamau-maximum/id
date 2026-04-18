@@ -30,8 +30,8 @@ export const Event = v.object({
 			),
 		),
 	),
-	startAt: v.pipe(v.string(), v.isoDateTime(), v.toDate()),
-	endAt: v.pipe(v.string(), v.isoDateTime(), v.toDate()),
+	startAt: v.pipe(v.string(), v.isoTimestamp(), v.toDate()),
+	endAt: v.pipe(v.string(), v.isoTimestamp(), v.toDate()),
 	locationId: v.optional(Location.entries.id),
 });
 export type Event = v.InferOutput<typeof Event>;
