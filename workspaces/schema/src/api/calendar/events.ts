@@ -14,7 +14,7 @@ export const CreateEventParams = v.pipe(
 export type CreateEventParams = v.InferOutput<typeof CreateEventParams>;
 
 export const UpdateEventParams = v.pipe(
-	v.omit(EventWithNotify, ["id", "userId"]),
+	v.omit(EventWithNotify, ["id"]),
 	v.forward(
 		v.check(
 			({ startAt, endAt }) => startAt < endAt,
