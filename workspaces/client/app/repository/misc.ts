@@ -1,13 +1,13 @@
-import type { DashboardUser } from "@idp/schema/entity/user";
+import type { GetDashboardInfoResponse } from "@idp/schema/api/admin/dashboard";
 import { client } from "~/utils/hono";
 
 export interface IMiscRepository {
-	getDashboardInfo: () => Promise<DashboardUser[]>;
+	getDashboardInfo: () => Promise<GetDashboardInfoResponse>;
 	getDashboardInfo$$key: () => unknown[];
 }
 
 export class MiscRepositoryImpl implements IMiscRepository {
-	async getDashboardInfo(): Promise<DashboardUser[]> {
+	async getDashboardInfo(): Promise<GetDashboardInfoResponse> {
 		const res = await client.admin.dashboard.info.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch dashboard info");
