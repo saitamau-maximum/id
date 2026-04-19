@@ -39,7 +39,6 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		const res = await client.calendar.events.$post({
 			json: {
 				...event,
-				// schema で isoDateTime を受け付けるようにしているので
 				startAt: event.startAt.toISOString(),
 				endAt: event.endAt.toISOString(),
 			},
