@@ -83,10 +83,9 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 									id={id}
 									type="datetime-local"
 									{...register("expiresAt", {
-										setValueAs: (value) => {
-											if (value === "") return undefined;
-											return value;
-										},
+										setValueAs: (value) =>
+											// Valibot は ISOTimestamp 形式を期待しているので変換
+											value ? new Date(value).toISOString() : undefined,
 									})}
 								/>
 								<ErrorDisplay error={errors.expiresAt?.message} />
