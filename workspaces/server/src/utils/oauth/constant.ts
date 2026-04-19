@@ -17,7 +17,7 @@ export const claimsSupported = [
 	"locale",
 	"email",
 	"email_verified",
-] as const satisfies (keyof OIDCUserInfo)[];
+] as const satisfies ReadonlyArray<keyof OIDCUserInfo>;
 
 export const iss = "https://api.id.maximum.vc" as const;
 
