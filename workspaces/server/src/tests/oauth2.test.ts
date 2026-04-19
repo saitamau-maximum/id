@@ -2,6 +2,7 @@
 // ref: https://datatracker.ietf.org/doc/html/rfc6749
 
 import { env } from "cloudflare:test";
+import type { AccessTokenResponse } from "@idp/schema/api/oauth/access-token";
 import {
 	SCOPE_IDS,
 	type ScopeId,
@@ -25,7 +26,6 @@ import type { HonoEnv } from "../factory";
 import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
 import { oauthRoute } from "../routes/oauth";
-import type { TokenResponse } from "../routes/oauth/accessToken";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
@@ -802,7 +802,7 @@ describe("OAuth 2.0 spec", () => {
 		it("returns access_token [MUST]", async () => {
 			// access_token: REQUIRED.  The access token issued by the authorization server.
 			const res = await doAccessTokenRequest();
-			const json = await res.json<TokenResponse>();
+			const json = await res.json<AccessTokenResponse>();
 			expect(json).toHaveProperty("access_token");
 			expect(json.access_token).toBeTypeOf("string");
 		});
@@ -810,7 +810,7 @@ describe("OAuth 2.0 spec", () => {
 		it("returns token_type [MUST]", async () => {
 			// token_type: REQUIRED.  The type of the token issued as described in Section 7.1.  Value is case insensitive.
 			const res = await doAccessTokenRequest();
-			const json = await res.json<TokenResponse>();
+			const json = await res.json<AccessTokenResponse>();
 			expect(json).toHaveProperty("token_type");
 			expect(json.token_type).toMatch(/bearer/i); // case insensitive
 		});
@@ -818,14 +818,14 @@ describe("OAuth 2.0 spec", () => {
 		it("returns expires_in [RECOMMENDED]", async () => {
 			// expires_in: RECOMMENDED.  The lifetime in seconds of the access token.
 			const res = await doAccessTokenRequest();
-			const json = await res.json<TokenResponse>();
+			const json = await res.json<AccessTokenResponse>();
 			expect(json).toHaveProperty("expires_in");
 			expect(json.expires_in).toBeTypeOf("number");
 		});
 
 		it("returns scope [OPTIONAL]", async () => {
 			const res = await doAccessTokenRequest();
-			const json = await res.json<TokenResponse>();
+			const json = await res.json<AccessTokenResponse>();
 			expect(json).toHaveProperty("scope");
 			expect(json.scope).toBeTypeOf("string");
 		});
@@ -852,7 +852,7 @@ describe("OAuth 2.0 spec", () => {
 	][])("Resource Owner Endpoints (%s)", (path, scopes) => {
 		it("accepts access token in Authorization header", async () => {
 			const { access_token } = await doAccessTokenRequest(scopes).then((res) =>
-				res.json<TokenResponse>(),
+				res.json<AccessTokenResponse>(),
 			);
 			const res = await app.request(path, {
 				headers: { Authorization: `Bearer ${access_token}` },
@@ -871,7 +871,7 @@ describe("OAuth 2.0 spec", () => {
 
 			it("rejects expired access token", async () => {
 				const { access_token } = await doAccessTokenRequest(scopes).then(
-					(res) => res.json<TokenResponse>(),
+					(res) => res.json<AccessTokenResponse>(),
 				);
 				// // トークンの有効期限は 1h だが余裕をもって 1h1m 後にする
 				vi.advanceTimersByTime(61 * 60 * 1000);
@@ -892,7 +892,7 @@ describe("OAuth 2.0 spec", () => {
 				);
 				const { access_token } = await doAccessTokenRequest(
 					incorrectScopes,
-				).then((res) => res.json<TokenResponse>());
+				).then((res) => res.json<AccessTokenResponse>());
 				const res = await app.request(path, {
 					headers: { Authorization: `Bearer ${access_token}` },
 				});

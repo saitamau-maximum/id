@@ -1,26 +1,13 @@
 import { vValidator } from "@hono/valibot-validator";
+import {
+	AccessTokenRequestParams,
+	type AccessTokenResponse,
+} from "@idp/schema/api/oauth/access-token";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
-import * as v from "valibot";
 import { factory } from "../../factory";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
-
-export interface TokenResponse {
-	access_token: string;
-	token_type: "bearer";
-	expires_in: number;
-	scope: string;
-	id_token?: string;
-}
-
-const requestBodySchema = v.object({
-	grant_type: v.pipe(v.string(), v.nonEmpty()),
-	code: v.pipe(v.string(), v.nonEmpty()),
-	redirect_uri: v.optional(v.pipe(v.string(), v.nonEmpty(), v.url())),
-	client_id: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	client_secret: v.optional(v.pipe(v.string(), v.nonEmpty())),
-});
 
 const app = factory.createApp();
 
@@ -30,7 +17,7 @@ const OAUTH_ERROR_URI =
 const route = app
 	.post(
 		"/",
-		vValidator("form", requestBodySchema, async (res, c) => {
+		vValidator("form", AccessTokenRequestParams, async (res, c) => {
 			if (!res.success)
 				return c.json(
 					{
@@ -183,7 +170,7 @@ const route = app
 			// token の残り時間を計算
 			const remMs = tokenInfo.accessTokenExpiresAt.getTime() - nowUnixMs;
 
-			const res: TokenResponse = {
+			const res: AccessTokenResponse = {
 				access_token: tokenInfo.accessToken,
 				token_type: "bearer",
 				expires_in: Math.floor(remMs / 1000),
@@ -218,7 +205,7 @@ const route = app
 				});
 			}
 
-			return c.json(res, 200);
+			return c.json<AccessTokenResponse>(res, 200);
 		},
 	)
 	.all("/", async (c) => {
