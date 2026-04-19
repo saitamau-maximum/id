@@ -1,3 +1,8 @@
+import type {
+	GetAffiliationsSummaryResponse,
+	GetCertificationsResponse,
+	GetPublicMemberResponse,
+} from "@idp/schema/api/public";
 import { factory } from "../factory";
 
 const app = factory.createApp();
@@ -11,7 +16,7 @@ const route = app
 			await UserRepository.fetchPublicMemberByDisplayId(userDisplayId);
 
 		if (!member) {
-			return c.json(
+			return c.json<GetPublicMemberResponse>(
 				{
 					error: true,
 					message: "Member not found",
@@ -20,7 +25,7 @@ const route = app
 			);
 		}
 
-		return c.json({
+		return c.json<GetPublicMemberResponse>({
 			error: false,
 			id: member.id,
 			displayName: member.displayName,
@@ -31,7 +36,7 @@ const route = app
 		});
 	})
 	.get("/certifications", async (c) => {
-		return c.json(
+		return c.json<GetCertificationsResponse>(
 			await c.var.CertificationRepository.getCertificationsSummary(),
 		);
 	})
@@ -49,7 +54,7 @@ const route = app
 			}
 			res[key] = (res[key] || 0) + 1;
 		}
-		return c.json(res);
+		return c.json<GetAffiliationsSummaryResponse>(res);
 	});
 
 export { route as publicRoute };
