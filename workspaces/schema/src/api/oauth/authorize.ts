@@ -1,5 +1,10 @@
 import * as v from "valibot";
-import { OAUTH_SCOPE_REGEX } from "../../constants/oauth-external/scope";
+import {
+	ALLOWED_PROMPT_VALUES,
+	ALLOWED_RESPONSE_MODES,
+	ALLOWED_RESPONSE_TYPES,
+	OAUTH_SCOPE_REGEX,
+} from "../../constants/oauth-external";
 import { ScopeIdStr } from "../../entity/oauth-external/scope";
 
 // IdP 内部では使われていないが、 OAuth Client が使うかもしれないので定義
@@ -20,12 +25,7 @@ export const OAuthAuthorizeRequestParams = v.object({
 		),
 	),
 	state: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	response_type: v.picklist([
-		"code",
-		"id_token",
-		"id_token token",
-		"token id_token",
-	]),
+	response_type: v.picklist(ALLOWED_RESPONSE_TYPES),
 	scope: v.optional(
 		v.pipe(
 			v.string(),
@@ -46,12 +46,10 @@ export const OAuthAuthorizeRequestParams = v.object({
 
 	// OIDC parameters
 	nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	prompt: v.optional(
-		v.picklist(["none", "login", "consent", "select_account"]),
-	),
+	prompt: v.optional(v.picklist(ALLOWED_PROMPT_VALUES)),
 	// クエリパラメータなので文字列として
 	max_age: v.optional(v.pipe(v.string(), v.digits())),
-	response_mode: v.optional(v.picklist(["query", "fragment"])),
+	response_mode: v.optional(v.picklist(ALLOWED_RESPONSE_MODES)),
 });
 export type OAuthAuthorizeRequestParams = v.InferOutput<
 	typeof OAuthAuthorizeRequestParams

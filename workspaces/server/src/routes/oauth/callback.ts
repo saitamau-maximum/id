@@ -1,7 +1,6 @@
 import { vValidator } from "@hono/valibot-validator";
-import { OAUTH_SCOPE_REGEX } from "@idp/schema/constants/oauth-external/scope";
+import { OAuthCallbackRequestParams } from "@idp/schema/api/oauth/callback";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
-import * as v from "valibot";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
@@ -17,34 +16,11 @@ const OAUTH_ERROR_URI =
 
 const app = factory.createApp();
 
-const callbackSchema = v.object({
-	// hidden fields
-	client_id: v.pipe(v.string(), v.nonEmpty()),
-	response_type: v.picklist([
-		"code",
-		"id_token token",
-		"token id_token",
-		"id_token",
-	] as const),
-	response_mode: v.optional(v.picklist(["query", "fragment"] as const)),
-	redirect_uri: v.optional(v.pipe(v.string(), v.url())),
-	scope: v.optional(v.pipe(v.string(), v.regex(OAUTH_SCOPE_REGEX))),
-	state: v.optional(v.string()),
-	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	oidc_auth_time: v.optional(v.pipe(v.string(), v.regex(/^\d+$/))),
-
-	// form で送られるので string になる
-	time: v.pipe(v.string(), v.nonEmpty(), v.digits()),
-	auth_token: v.pipe(v.string(), v.nonEmpty(), v.base64()),
-
-	authorized: v.union([v.literal("1"), v.literal("0")]),
-});
-
 const route = app
 	.post(
 		"/",
 		cookieAuthMiddleware,
-		vValidator("form", callbackSchema, (res, c) => {
+		vValidator("form", OAuthCallbackRequestParams, (res, c) => {
 			// TODO: いい感じのエラー画面を作るかも
 			if (!res.success) return c.text("Bad Request: invalid parameters", 400);
 		}),
@@ -57,15 +33,11 @@ const route = app
 				scope,
 				state,
 				oidc_nonce,
-				oidc_auth_time: _oidc_auth_time,
-				time: _time,
+				oidc_auth_time,
+				time,
 				auth_token,
 				authorized,
 			} = c.req.valid("form");
-			const time = Number.parseInt(_time, 10);
-			const oidc_auth_time = _oidc_auth_time
-				? Number.parseInt(_oidc_auth_time, 10)
-				: undefined;
 			const nowUnixMs = Date.now();
 
 			const { userId } = c.get("jwtPayload");

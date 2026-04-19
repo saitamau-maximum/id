@@ -1,4 +1,4 @@
-import { OAUTH_SCOPE_REGEX } from "@idp/schema/constants/oauth-external/scope";
+import { OAUTH_SCOPE_REGEX } from "@idp/schema/constants/oauth-external";
 import type { Context } from "hono";
 import { deleteCookie, getSignedCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
