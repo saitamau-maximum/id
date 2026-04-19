@@ -1,7 +1,7 @@
+import type { EquipmentWithOwner } from "@idp/schema/entity/equipment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { EquipmentWithOwner } from "~/types/equipment";
 
 export const useDeleteEquipment = () => {
 	const { equipmentRepository } = useRepository();

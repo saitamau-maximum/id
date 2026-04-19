@@ -1,10 +1,12 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { CreateOrUpdateEquipmentParams } from "@idp/schema/api/equipment";
+import type { EquipmentWithOwner } from "@idp/schema/entity/equipment";
 import { useCallback } from "react";
 import { createCallable } from "react-call";
 import { Plus, X } from "react-feather";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { UserDisplay } from "~/components/feature/user/user-display";
 import { UserSelector } from "~/components/feature/user/user-selector";
 import { ButtonLike } from "~/components/ui/button-like";
@@ -13,13 +15,11 @@ import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { useAllUsers } from "~/routes/dashboard/admin/users/internal/hooks/use-all-user";
 import { ConfigSectionSubHeader } from "~/routes/dashboard/oauth-apps/config/internal/components/config-section-sub-header";
-import { EquipmentSchemas } from "~/schema/equipment";
-import type { Equipment, EquipmentWithOwner } from "~/types/equipment";
 
 type Payload =
 	| {
 			type: "success";
-			payload: Omit<Equipment, "id" | "createdAt" | "updatedAt">;
+			payload: CreateOrUpdateEquipmentParams;
 	  }
 	| {
 			type: "dismiss";
@@ -29,14 +29,8 @@ type DialogProps = {
 	equipment?: EquipmentWithOwner | null;
 };
 
-const CreateEquipmentSchema = v.object({
-	name: EquipmentSchemas.Name,
-	description: EquipmentSchemas.Description,
-	ownerId: EquipmentSchemas.OwnerId,
-});
-
-type CreateFormInputValues = v.InferInput<typeof CreateEquipmentSchema>;
-type CreateFormOutputValues = v.InferOutput<typeof CreateEquipmentSchema>;
+type FormInputValues = v.InferInput<typeof CreateOrUpdateEquipmentParams>;
+type FormOutputValues = v.InferOutput<typeof CreateOrUpdateEquipmentParams>;
 
 export const EquipmentDialog = createCallable<DialogProps, Payload>(
 	({ call, equipment }) => {
@@ -49,8 +43,8 @@ export const EquipmentDialog = createCallable<DialogProps, Payload>(
 			formState: { errors },
 			setValue,
 			watch,
-		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-			resolver: valibotResolver(CreateEquipmentSchema),
+		} = useForm<FormInputValues, unknown, FormOutputValues>({
+			resolver: valibotResolver(CreateOrUpdateEquipmentParams),
 			defaultValues: {
 				name: equipment?.name || "",
 				description: equipment?.description || "",
@@ -58,12 +52,10 @@ export const EquipmentDialog = createCallable<DialogProps, Payload>(
 			},
 		});
 
-		const onSubmit = async (values: CreateFormOutputValues) => {
+		const onSubmit = async (values: FormOutputValues) => {
 			call.end({
 				type: "success",
-				payload: {
-					...values,
-				},
+				payload: values,
 			});
 		};
 

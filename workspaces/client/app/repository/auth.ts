@@ -1,12 +1,8 @@
-import type {
-	User,
-	WithCertifications,
-	WithOAuthConnections,
-} from "~/types/user";
+import type { User } from "@idp/schema/entity/user";
 import { client } from "~/utils/hono";
 
 export interface IAuthRepository {
-	me: () => Promise<WithOAuthConnections<WithCertifications<User>>>;
+	me: () => Promise<User>;
 	me$$key(): unknown[];
 	ping(): Promise<void>;
 	ping$$key(): unknown[];
@@ -21,12 +17,10 @@ export class AuthRepositoryImpl implements IAuthRepository {
 		const data = await res.json();
 		return {
 			...data,
-			initializedAt: data.initializedAt
-				? new Date(data.initializedAt)
-				: undefined,
+			initializedAt: data.initializedAt ? new Date(data.initializedAt) : null,
 			lastPaymentConfirmedAt: data.lastPaymentConfirmedAt
 				? new Date(data.lastPaymentConfirmedAt)
-				: undefined,
+				: null,
 			updatedAt: data.updatedAt ? new Date(data.updatedAt) : undefined,
 			lastLoginAt: data.lastLoginAt ? new Date(data.lastLoginAt) : undefined,
 		};

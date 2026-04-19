@@ -44,7 +44,6 @@ export default function Home() {
 			>
 				<div className={css({ width: "100%", maxWidth: "480px" })}>
 					<ProfileCard
-						id={user.id}
 						displayName={user.displayName}
 						realName={user.realName}
 						displayId={user.displayId}
@@ -121,14 +120,7 @@ export default function Home() {
 					>
 						<ContributionCard
 							isLoading={isLoading}
-							weeks={
-								data?.weeks.map((week) =>
-									week.map((day) => ({
-										...day,
-										date: new Date(day.date),
-									})),
-								) || []
-							}
+							weeks={data || []}
 							clip={14}
 							size={deviceType === "sp" ? "sm" : "md"}
 						/>

@@ -1,63 +1,40 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { InviteCreateParams } from "@idp/schema/api/invite";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { InvitationURLSchemas } from "~/schema/invitation";
 
 type Payload =
 	| {
 			type: "success";
-			payload: {
-				expiresAt: Date | null;
-				remainingUse: number | null;
-				title: string;
-			};
+			payload: InviteCreateParams;
 	  }
 	| {
 			type: "dismiss";
 	  };
 
-const CreateFormSchema = v.object({
-	title: InvitationURLSchemas.Title,
-	expiresAt: InvitationURLSchemas.ExpiresAt,
-	remainingUse: InvitationURLSchemas.RemainingUse,
-});
-
-type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
-type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof InviteCreateParams>;
+type CreateFormOutputValues = v.InferOutput<typeof InviteCreateParams>;
 
 export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 	({ call }) => {
 		const {
 			handleSubmit,
 			register,
-			setError,
 			formState: { errors },
 		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-			resolver: valibotResolver(CreateFormSchema),
-			defaultValues: {
-				expiresAt: null,
-				remainingUse: null,
-			},
+			resolver: valibotResolver(InviteCreateParams),
 		});
 
 		const onSubmit = async (values: CreateFormOutputValues) => {
-			if (!values.expiresAt && !values.remainingUse) {
-				setError("root", {
-					message: "使用可能回数または有効期限のいずれかは必須です",
-				});
-				return;
-			}
 			call.end({
 				type: "success",
-				payload: {
-					...values,
-				},
+				payload: values,
 			});
 		};
 
@@ -92,8 +69,9 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 						error={errors.remainingUse?.message}
 						{...register("remainingUse", {
 							setValueAs: (value) => {
-								if (value === "") return null;
-								return value;
+								if (value === "") return undefined;
+								// parseInt だと小数点以下が切り捨てられてしまうため、 Number で変換してから Valibot 側で整数バリデーションを行う
+								return Number(value);
 							},
 						})}
 					/>
@@ -105,10 +83,9 @@ export const GenerateInvitationURLDialog = createCallable<void, Payload>(
 									id={id}
 									type="datetime-local"
 									{...register("expiresAt", {
-										setValueAs: (value) => {
-											if (value === "") return null;
-											return value;
-										},
+										setValueAs: (value) =>
+											// Valibot は ISOTimestamp 形式を期待しているので変換
+											value ? new Date(value).toISOString() : undefined,
 									})}
 								/>
 								<ErrorDisplay error={errors.expiresAt?.message} />

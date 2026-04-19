@@ -1,3 +1,4 @@
+import type { Certification } from "@idp/schema/entity/certification";
 import { useActionState, useCallback, useState } from "react";
 import { Check, Edit, Trash } from "react-feather";
 import { css } from "styled-system/css";
@@ -6,8 +7,6 @@ import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
-import type { CertificationUpdateParams } from "~/repository/certification";
-import type { Certification } from "~/types/certification";
 import { useCertifications } from "../hooks/use-certifications";
 import { useDeleteCertification } from "../hooks/use-delete-certification";
 import { useUpdateCertification } from "../hooks/use-update-certification";
@@ -85,12 +84,10 @@ const CertificationTableRow = ({ certification }: TableRowProps) => {
 			const description = formData.get("description");
 			if (typeof description !== "string") return null;
 
-			const param: CertificationUpdateParams = {
-				certificationId: certification.id,
-				description,
-			};
-
-			updateCertification(param);
+			updateCertification({
+				id: certification.id,
+				params: { description },
+			});
 			setEditing(false);
 			return null;
 		},

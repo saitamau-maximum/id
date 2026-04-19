@@ -1,9 +1,11 @@
+import type { Location } from "@idp/schema/entity/calendar/location";
 import { eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
+	CreateLocationPayload,
+	GetLocationsRes,
 	ILocationRepository,
-	Location,
 } from "../../../repository/location";
 
 export class CloudflareLocationRepository implements ILocationRepository {
@@ -13,7 +15,7 @@ export class CloudflareLocationRepository implements ILocationRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createLocation(params: Omit<Location, "id">): Promise<string> {
+	async createLocation(params: CreateLocationPayload): Promise<string> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.locations).values({ ...params, id });
 		return id;
@@ -34,7 +36,7 @@ export class CloudflareLocationRepository implements ILocationRepository {
 		};
 	}
 
-	async getLocations(): Promise<Omit<Location, "description">[]> {
+	async getLocations(): Promise<GetLocationsRes> {
 		const res = await this.client.query.locations.findMany({
 			columns: {
 				id: true,

@@ -1,15 +1,5 @@
-import type { OAuthProviderId } from "../constants/oauth";
-
-export type OAuthConnection = {
-	userId: string;
-	providerId: OAuthProviderId;
-	providerUserId: string;
-	refreshToken: string | null;
-	refreshTokenExpiresAt: Date | null;
-	email: string | null;
-	name: string | null;
-	profileImageUrl: string | null;
-};
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 
 export type IOAuthInternalRepository = {
 	fetchUserIdByProviderInfo: (

@@ -1,14 +1,15 @@
-import type { DiscordInfo } from "~/types/discord-info";
+import type {
+	GetDiscordInfoResponse,
+	PostInviteDiscordResponse,
+} from "@idp/schema/api/discord";
 import { client } from "~/utils/hono";
-
-type DiscordAddGuildMemberResult = "failed" | "already_joined" | "added";
 
 export interface IDiscordRepository {
 	getDiscordInfoByUserDisplayID: (
 		userDisplayId: string,
-	) => Promise<DiscordInfo>;
+	) => Promise<GetDiscordInfoResponse>;
 	getDiscordInfoByUserDisplayID$$key: (userDisplayId: string) => unknown[];
-	inviteDiscord: () => Promise<DiscordAddGuildMemberResult>;
+	inviteDiscord: () => Promise<PostInviteDiscordResponse>;
 }
 
 export class DiscordRepositoryImpl implements IDiscordRepository {

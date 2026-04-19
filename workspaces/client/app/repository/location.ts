@@ -1,15 +1,18 @@
-import type { Location } from "~/types/location";
+import type {
+	CalendarLocationCreateParams,
+	CalendarLocationGetLocationsResponse,
+	CalendarLocationUpdateParams,
+} from "@idp/schema/api/calendar/location";
+import type { Location } from "@idp/schema/entity/calendar/location";
 import { client } from "~/utils/hono";
 
 export interface ILocationRepository {
-	getAllLocations: () => Promise<Omit<Location, "description">[]>;
+	getAllLocations: () => Promise<CalendarLocationGetLocationsResponse>;
 	getAllLocations$$key: () => unknown[];
 	getLocationById: (locationId: Location["id"]) => Promise<Location>;
 	getLocationById$$key: (locationId: Location["id"]) => unknown[];
-	createLocation: (
-		location: Omit<Location, "id" | "createdAt">,
-	) => Promise<void>;
-	updateLocation: (location: Omit<Location, "createdAt">) => Promise<void>;
+	createLocation: (location: CalendarLocationCreateParams) => Promise<void>;
+	updateLocation: (location: CalendarLocationUpdateParams) => Promise<void>;
 	deleteLocation: (locationId: Location["id"]) => Promise<void>;
 }
 
@@ -49,7 +52,7 @@ export class LocationRepositoryImpl implements ILocationRepository {
 		return ["location", locationId];
 	}
 
-	async createLocation(location: Omit<Location, "id" | "createdAt">) {
+	async createLocation(location: CalendarLocationCreateParams) {
 		const res = await client.calendar.locations.$post({
 			json: {
 				...location,
@@ -60,7 +63,7 @@ export class LocationRepositoryImpl implements ILocationRepository {
 		}
 	}
 
-	async updateLocation(location: Omit<Location, "createdAt">) {
+	async updateLocation(location: CalendarLocationUpdateParams) {
 		const res = await client.calendar.locations[":id"].$put({
 			param: {
 				id: location.id,

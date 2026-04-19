@@ -1,7 +1,8 @@
+import type { CertificationUpdateParams } from "@idp/schema/api/certification";
+import type { Certification } from "@idp/schema/entity/certification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { CertificationUpdateParams } from "~/repository/certification";
 
 export const useUpdateCertification = () => {
 	const queryClient = useQueryClient();
@@ -9,8 +10,13 @@ export const useUpdateCertification = () => {
 	const { pushToast } = useToast();
 
 	return useMutation({
-		mutationFn: (params: CertificationUpdateParams) =>
-			certificationRepository.updateCertification(params),
+		mutationFn: ({
+			id,
+			params,
+		}: {
+			id: Certification["id"];
+			params: CertificationUpdateParams;
+		}) => certificationRepository.updateCertification(id, params),
 		onSuccess: () => {
 			pushToast({
 				type: "success",

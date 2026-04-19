@@ -1,8 +1,8 @@
+import type { InviteCreateParams } from "@idp/schema/api/invite";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { InformationDialog } from "~/components/logic/callable/information";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { GenerateInvitationOptions } from "~/repository/invitation";
 import { InvitationURLDisplay } from "../components/invitation-url-display";
 
 export const useGenerateInvitation = () => {
@@ -11,11 +11,11 @@ export const useGenerateInvitation = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: async (opt: GenerateInvitationOptions) => {
-			const id = await invitationRepository.generateInvitation(opt);
+		mutationFn: async (params: InviteCreateParams) => {
+			const id = await invitationRepository.generateInvitation(params);
 			return {
 				id,
-				...opt,
+				...params,
 			};
 		},
 		onSuccess: async (data) => {

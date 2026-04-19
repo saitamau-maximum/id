@@ -1,15 +1,19 @@
+import type { EquipmentWithOwner } from "@idp/schema/entity/equipment";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { EquipmentUpdateParams } from "~/repository/equipment";
 
 export const useUpdateEquipment = () => {
 	const { equipmentRepository } = useRepository();
 	const queryClient = useQueryClient();
 	const { pushToast } = useToast();
 	return useMutation({
-		mutationFn: (equipment: EquipmentUpdateParams) =>
-			equipmentRepository.updateEquipment(equipment),
+		mutationFn: (equipment: EquipmentWithOwner) =>
+			equipmentRepository.updateEquipment(equipment.id, {
+				name: equipment.name,
+				description: equipment.description,
+				ownerId: equipment.ownerId,
+			}),
 		onSuccess: (_, equipment) => {
 			pushToast({
 				title: `${equipment.name}を更新しました`,

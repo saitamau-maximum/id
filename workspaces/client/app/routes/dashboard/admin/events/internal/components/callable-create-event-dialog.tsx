@@ -1,37 +1,28 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { CreateEventParams } from "@idp/schema/api/calendar/events";
+import { EVENT_DESCRIPTION_MAX_LINES } from "@idp/schema/entity/calendar/event";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
-import { EVENT_DESCRIPTION_MAX_LINES, EventSchemas } from "~/schema/event";
-import type { CalendarEventWithNotify } from "~/types/event";
 import { DescriptionFormField } from "./detail-form-field";
 
 type Payload =
 	| {
 			type: "success";
-			payload: Omit<CalendarEventWithNotify, "id" | "userId">;
+			payload: CreateEventParams;
 	  }
 	| {
 			type: "dismiss";
 	  };
 
-const CreateFormSchema = v.object({
-	title: EventSchemas.Title,
-	description: EventSchemas.Description,
-	startAt: EventSchemas.StartAt,
-	endAt: EventSchemas.EndAt,
-	locationId: EventSchemas.LocationId,
-	notifyDiscord: EventSchemas.NotifyDiscord,
-});
-
-type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
-type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof CreateEventParams>;
+type CreateFormOutputValues = v.InferOutput<typeof CreateEventParams>;
 
 export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 	const { locations } = useLocations();
@@ -40,30 +31,20 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 		handleSubmit,
 		register,
 		watch,
-		setError,
 		formState: { errors },
 	} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-		resolver: valibotResolver(CreateFormSchema),
+		resolver: valibotResolver(CreateEventParams),
 		defaultValues: {
-			locationId: null,
+			locationId: "", // RHF の仕様上、未選択状態は null になってしまいスキーマエラーになっちゃうので、空文字をデフォルト値にしておく
 		},
 	});
 
 	const onSubmit = async (values: CreateFormOutputValues) => {
-		if (values.startAt >= values.endAt) {
-			setError("root", {
-				message: "終了日時は開始日時よりも後にしてください",
-			});
-			return;
-		}
-
 		call.end({
 			type: "success",
 			payload: {
 				...values,
-				startAt: new Date(values.startAt),
-				endAt: new Date(values.endAt),
-				locationId: values.locationId ?? undefined,
+				locationId: values.locationId ? values.locationId : undefined, // 空文字は undefined に変換して送る
 			},
 		});
 	};
@@ -93,7 +74,7 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 				/>
 
 				<DescriptionFormField
-					description={watch("description")}
+					description={watch("description") || ""}
 					rows={EVENT_DESCRIPTION_MAX_LINES}
 					error={errors.description?.message}
 					register={register("description")}
@@ -107,7 +88,11 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 								id={id}
 								required
 								type="datetime-local"
-								{...register("startAt")}
+								{...register("startAt", {
+									// Valibot は ISOTimestamp 形式を期待しているので変換
+									setValueAs: (value) =>
+										value ? new Date(value).toISOString() : undefined,
+								})}
 							/>
 							<ErrorDisplay error={errors.startAt?.message} />
 						</>
@@ -121,7 +106,10 @@ export const CreateEventDialog = createCallable<void, Payload>(({ call }) => {
 								id={id}
 								required
 								type="datetime-local"
-								{...register("endAt")}
+								{...register("endAt", {
+									setValueAs: (value) =>
+										value ? new Date(value).toISOString() : undefined,
+								})}
 							/>
 							<ErrorDisplay error={errors.endAt?.message} />
 						</>

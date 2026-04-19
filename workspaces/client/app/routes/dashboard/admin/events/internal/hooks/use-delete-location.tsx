@@ -1,14 +1,16 @@
+import type { CalendarLocationGetLocationsResponse } from "@idp/schema/api/calendar/location";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { Location } from "~/types/location";
 
 export const useDeleteLocation = () => {
 	const { locationRepository } = useRepository();
 	const queryClient = useQueryClient();
 	const { pushToast } = useToast();
 	return useMutation({
-		mutationFn: async (location: Omit<Location, "description">) => {
+		mutationFn: async (
+			location: CalendarLocationGetLocationsResponse[number],
+		) => {
 			await locationRepository.deleteLocation(location.id);
 			return location;
 		},

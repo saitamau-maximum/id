@@ -1,10 +1,10 @@
+import type { User } from "@idp/schema/entity/user";
 import { useCallback, useState } from "react";
 import { Key, LogOut, Settings } from "react-feather";
 import { Link, useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { Menu } from "~/components/ui/menu";
 import { useAuth } from "~/hooks/use-auth";
-import type { User } from "~/types/user";
 import { env } from "~/utils/env";
 
 type Navigation = {

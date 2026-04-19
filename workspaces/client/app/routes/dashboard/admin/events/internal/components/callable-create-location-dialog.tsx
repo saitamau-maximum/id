@@ -1,34 +1,28 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { CalendarLocationCreateParams } from "@idp/schema/api/calendar/location";
+import { LOCATION_DESCRIPTION_MAX_LINES } from "@idp/schema/entity/calendar/location";
 import { createCallable } from "react-call";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
-import {
-	LOCATION_DESCRIPTION_MAX_LINES,
-	LocationSchemas,
-} from "~/schema/location";
-import type { Location } from "~/types/location";
 import { DescriptionFormField } from "./detail-form-field";
 
 type Payload =
 	| {
 			type: "success";
-			payload: Omit<Location, "id" | "createdAt">;
+			payload: CalendarLocationCreateParams;
 	  }
 	| {
 			type: "dismiss";
 	  };
 
-const CreateFormSchema = v.object({
-	name: LocationSchemas.Name,
-	description: LocationSchemas.Description,
-});
-
-type CreateFormInputValues = v.InferInput<typeof CreateFormSchema>;
-type CreateFormOutputValues = v.InferOutput<typeof CreateFormSchema>;
+type CreateFormInputValues = v.InferInput<typeof CalendarLocationCreateParams>;
+type CreateFormOutputValues = v.InferOutput<
+	typeof CalendarLocationCreateParams
+>;
 
 export const CreateLocationDialog = createCallable<void, Payload>(
 	({ call }) => {
@@ -38,7 +32,7 @@ export const CreateLocationDialog = createCallable<void, Payload>(
 			formState: { errors },
 			watch,
 		} = useForm<CreateFormInputValues, unknown, CreateFormOutputValues>({
-			resolver: valibotResolver(CreateFormSchema),
+			resolver: valibotResolver(CalendarLocationCreateParams),
 		});
 
 		const onSubmit = async (values: CreateFormOutputValues) => {

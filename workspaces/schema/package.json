@@ -1,0 +1,16 @@
+{
+	"name": "@idp/schema",
+	"type": "module",
+	"scripts": {
+		"fix": "biome check --write ./src",
+		"check": "biome check ./src"
+	},
+	"exports": {
+		"./api/*": "./src/api/*.ts",
+		"./entity/*": "./src/entity/*.ts",
+		"./constants/*": "./src/constants/*.ts"
+	},
+	"dependencies": {
+		"valibot": "^1.2.0"
+	}
+}

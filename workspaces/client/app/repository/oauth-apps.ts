@@ -1,59 +1,26 @@
 import type {
-	OAuthClient,
-	OAuthClientCallback,
-	OAuthClientSecret,
-	OAuthScope,
-} from "~/types/oauth-external";
-import type { UserBasicInfo } from "~/types/user";
+	OAuthAppGenerateSecretResponse,
+	OAuthAppGetClientByIdResponse,
+	OAuthAppGetListResponse,
+	OAuthAppRegisterParams,
+} from "@idp/schema/api/oauth/manage";
 import { client } from "~/utils/hono";
 
-type GetAppsRes = (OAuthClient & {
-	managers: UserBasicInfo[];
-	owner: UserBasicInfo;
-})[];
-
-type GetAppByIdRes = OAuthClient & {
-	callbackUrls: OAuthClientCallback["callbackUrl"][];
-	scopes: OAuthScope[];
-	managers: UserBasicInfo[];
-	owner: UserBasicInfo;
-	secrets: OAuthClientSecret[];
-};
-
-export interface IRegisterAppParams {
-	name: string;
-	description: string;
-	scopeIds: number[];
-	callbackUrls: string[];
-	icon?: File;
-}
-
 export interface IOAuthAppsRepository {
-	getApps: () => Promise<GetAppsRes>;
+	getApps: () => Promise<OAuthAppGetListResponse>;
 	getApps$$key: () => unknown[];
-	getAppById: (appId: string) => Promise<GetAppByIdRes>;
+	getAppById: (appId: string) => Promise<OAuthAppGetClientByIdResponse>;
 	getAppById$$key: (appId: string) => unknown[];
 	updateManagers: (appId: string, managerUserIds: string[]) => Promise<void>;
-	generateSecret: (
-		appId: string,
-	) => Promise<{ secret: string; secretHash: string }>;
+	generateSecret: (appId: string) => Promise<OAuthAppGenerateSecretResponse>;
 	updateSecretDescription: (
 		appId: string,
 		secretHash: string,
 		description: string,
 	) => Promise<void>;
 	deleteSecret: (appId: string, secretHash: string) => Promise<void>;
-	registerApp: (params: IRegisterAppParams) => Promise<{
-		title: string;
-		description: string;
-	}>;
-	updateApp: (
-		appId: string,
-		params: IRegisterAppParams,
-	) => Promise<{
-		title: string;
-		description: string;
-	}>;
+	registerApp: (params: OAuthAppRegisterParams) => Promise<void>;
+	updateApp: (appId: string, params: OAuthAppRegisterParams) => Promise<void>;
 	deleteApp(appId: string): Promise<void>;
 }
 
@@ -77,7 +44,14 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		if (!res.ok) {
 			throw new Error("Failed to fetch app");
 		}
-		return res.json();
+		const data = await res.json();
+		return {
+			...data,
+			secrets: data.secrets.map((secret) => ({
+				...secret,
+				issuedAt: new Date(secret.issuedAt),
+			})),
+		};
 	}
 
 	getAppById$$key(appId: string) {
@@ -127,7 +101,7 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		scopeIds,
 		callbackUrls,
 		icon,
-	}: IRegisterAppParams) {
+	}: OAuthAppRegisterParams) {
 		const form: Parameters<
 			typeof client.oauth.manage.register.$post
 		>[0]["form"] = {
@@ -141,16 +115,11 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 
 		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
-
-		return {
-			title: name,
-			description,
-		};
 	}
 
 	async updateApp(
 		appId: string,
-		{ name, description, scopeIds, callbackUrls, icon }: IRegisterAppParams,
+		{ name, description, scopeIds, callbackUrls, icon }: OAuthAppRegisterParams,
 	) {
 		const form: Parameters<
 			(typeof client.oauth.manage)[":clientId"]["$put"]
@@ -169,11 +138,6 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		});
 
 		if (!res.ok) throw new Error("Failed to update app");
-
-		return {
-			title: name,
-			description,
-		};
 	}
 
 	async deleteApp(appId: string) {

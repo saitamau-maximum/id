@@ -1,10 +1,11 @@
+import type { EquipmentWithOwner } from "@idp/schema/entity/equipment";
 import { eq } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
-	Equipment,
-	EquipmentWithOwner,
+	CreateEquipmentParams,
 	IEquipmentRepository,
+	UpdateEquipmentParams,
 } from "../../../repository/equipment";
 
 export class CloudflareEquipmentRepository implements IEquipmentRepository {
@@ -14,7 +15,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async createEquipment(params: Omit<Equipment, "id">): Promise<string> {
+	async createEquipment(params: CreateEquipmentParams): Promise<string> {
 		const id = crypto.randomUUID();
 		await this.client.insert(schema.equipments).values({
 			id,
@@ -96,7 +97,7 @@ export class CloudflareEquipmentRepository implements IEquipmentRepository {
 		}));
 	}
 
-	async updateEquipment(params: Omit<Equipment, "createdAt">): Promise<void> {
+	async updateEquipment(params: UpdateEquipmentParams): Promise<void> {
 		await this.client
 			.update(schema.equipments)
 			.set({

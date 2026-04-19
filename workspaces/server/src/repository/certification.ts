@@ -1,59 +1,48 @@
-export interface ICertification {
-	id: string;
-	title: string;
-	description: string;
-}
+import type {
+	Certification,
+	CertificationSummary,
+	UserCertification,
+	UserCertificationRelation,
+} from "@idp/schema/entity/certification";
+import type { CertificationRequestWithUser } from "@idp/schema/entity/certification-request";
+import type { User } from "@idp/schema/entity/user";
 
-export interface ICertificationRequest {
-	userId: string;
-	certificationId: string;
-	certifiedIn: number;
-}
+export type GetAllCertificationsRes = Certification[];
+export type GetAllCertificationRequestsRes = CertificationRequestWithUser[];
+export type GetCertificationsSummaryRes = CertificationSummary[];
 
-export interface ICertificationRequestWithUser {
-	user: {
-		id: string;
-		displayId: string | null;
-		displayName: string | null;
-		profileImageURL: string | null;
-	};
-	certificationId: string;
-	certifiedIn: number;
-}
-
-export interface ICertificationUpdateRequest {
-	certificationId: string;
-	// title を変更させないのは、例えば「FE を登録 -> 申請・承認 -> AP に変更」とされなくないため
-	description: string;
-}
-
-export interface ICertificationSummary {
-	id: string;
-	title: string;
-	numberOfHolders: number;
-}
+export type CertificationRequestParams = UserCertificationRelation & {
+	certifiedIn: UserCertification["certifiedIn"];
+};
+export type CreateCertificationParams = Omit<Certification, "id">;
+// title を変更させないのは、例えば「FE を登録 -> 申請・承認 -> AP に変更」とされなくないため
+export type UpdateCertificationParams = Omit<Certification, "title">;
+export type ExistsUserCertificationParams = UserCertificationRelation;
+export type DeleteUserCertificationParams = UserCertificationRelation;
 
 export interface ICertificationRepository {
-	getAllCertifications: () => Promise<ICertification[]>;
-	requestCertification: (params: ICertificationRequest) => Promise<void>;
-	getAllCertificationRequests: () => Promise<ICertificationRequestWithUser[]>;
+	getAllCertifications: () => Promise<GetAllCertificationsRes>;
+	requestCertification: (params: CertificationRequestParams) => Promise<void>;
+	getAllCertificationRequests: () => Promise<GetAllCertificationRequestsRes>;
 	approveCertificationRequest(
-		userId: string,
-		certificationId: string,
+		userId: User["id"],
+		certificationId: Certification["id"],
 	): Promise<void>;
 	rejectCertificationRequest(
-		userId: string,
-		certificationId: string,
+		userId: User["id"],
+		certificationId: Certification["id"],
 	): Promise<void>;
-	existsCertification: (certificationId: string) => Promise<boolean>;
-	createCertification: (params: Omit<ICertification, "id">) => Promise<void>;
-	updateCertification: (params: ICertificationUpdateRequest) => Promise<void>;
-	deleteCertification: (certificationId: string) => Promise<void>;
+	existsCertification: (
+		certificationId: Certification["id"],
+	) => Promise<boolean>;
+	createCertification: (params: CreateCertificationParams) => Promise<void>;
+	updateCertification: (params: UpdateCertificationParams) => Promise<void>;
+	deleteCertification: (certificationId: Certification["id"]) => Promise<void>;
 	existsUserCertification: (
-		params: Omit<ICertificationRequest, "certifiedIn">,
+		params: ExistsUserCertificationParams,
 	) => Promise<boolean>;
 	deleteUserCertification: (
-		params: Omit<ICertificationRequest, "certifiedIn">,
+		params: DeleteUserCertificationParams,
 	) => Promise<void>;
-	getCertificationsSummary: () => Promise<ICertificationSummary[]>;
+	getCertificationsSummary: () => Promise<GetCertificationsSummaryRes>;
 }

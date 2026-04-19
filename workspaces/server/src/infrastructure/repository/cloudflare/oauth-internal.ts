@@ -1,19 +1,17 @@
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
+import {
+	OAUTH_PROVIDER_IDS,
+	OAuthProviderId,
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	OAuth2Routes,
 	type RESTPostOAuth2AccessTokenResult,
 } from "discord-api-types/v10";
 import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import {
-	OAUTH_PROVIDER_IDS,
-	type OAuthProviderId,
-	toOAuthProviderId,
-} from "../../../constants/oauth";
+import * as v from "valibot";
 import * as schema from "../../../db/schema";
-import type {
-	IOAuthInternalRepository,
-	OAuthConnection,
-} from "./../../../repository/oauth-internal";
+import type { IOAuthInternalRepository } from "./../../../repository/oauth-internal";
 
 export class CloudflareOAuthInternalRepository
 	implements IOAuthInternalRepository
@@ -53,10 +51,12 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!user) throw new Error("User not found");
-		return user.oauthConnections.map((conn) => ({
-			...conn,
-			providerId: toOAuthProviderId(conn.providerId),
-		}));
+		return user.oauthConnections
+			.filter((conn) => v.is(OAuthProviderId, conn.providerId))
+			.map((conn) => ({
+				...conn,
+				providerId: conn.providerId as OAuthProviderId,
+			}));
 	}
 
 	async fetchOAuthConnectionsByUserDisplayId(
@@ -69,10 +69,12 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!userProfile) throw new Error("User not found");
-		return userProfile.oauthConnections.map((conn) => ({
-			...conn,
-			providerId: toOAuthProviderId(conn.providerId),
-		}));
+		return userProfile.oauthConnections
+			.filter((conn) => v.is(OAuthProviderId, conn.providerId))
+			.map((conn) => ({
+				...conn,
+				providerId: conn.providerId as OAuthProviderId,
+			}));
 	}
 
 	async createOAuthConnection(data: OAuthConnection): Promise<void> {
