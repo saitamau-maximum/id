@@ -1,7 +1,7 @@
 import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import {
 	OAUTH_PROVIDER_IDS,
-	type OAuthProviderId,
+	OAuthProviderId,
 } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	OAuth2Routes,
@@ -9,6 +9,7 @@ import {
 } from "discord-api-types/v10";
 import { and, eq, gte, isNull, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthInternalRepository } from "./../../../repository/oauth-internal";
 
@@ -66,10 +67,12 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!userProfile) throw new Error("User not found");
-		return userProfile.oauthConnections.map((conn) => ({
-			...conn,
-			providerId: conn.providerId as OAuthProviderId,
-		}));
+		return userProfile.oauthConnections
+			.filter((conn) => v.is(OAuthProviderId, conn.providerId))
+			.map((conn) => ({
+				...conn,
+				providerId: conn.providerId as OAuthProviderId,
+			}));
 	}
 
 	async createOAuthConnection(data: OAuthConnection): Promise<void> {
