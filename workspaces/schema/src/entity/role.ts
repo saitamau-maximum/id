@@ -54,7 +54,6 @@ if (new Set(ROLE_IDS_VALUES).size !== ROLE_IDS_VALUES.length) {
 export const RoleId = v.union(
 	ROLE_IDS_VALUES.map((roleId) => v.literal(roleId)),
 );
-
 export type RoleId = v.InferOutput<typeof RoleId>;
 
 export const Role = v.object({
@@ -135,4 +134,4 @@ export const ROLE_BY_ID = {
 		name: "開発",
 		color: "#0000FF",
 	},
-} satisfies Record<RoleId, Role>;
+} as const satisfies Record<RoleId, Role>;
