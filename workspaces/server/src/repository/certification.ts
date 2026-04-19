@@ -1,10 +1,10 @@
 import type {
 	Certification,
-	CertificationRequestWithUser,
 	CertificationSummary,
 	UserCertification,
 	UserCertificationRelation,
 } from "@idp/schema/entity/certification";
+import type { CertificationRequestWithUser } from "@idp/schema/entity/certification-request";
 import type { User } from "@idp/schema/entity/user";
 
 export type GetAllCertificationsRes = Certification[];

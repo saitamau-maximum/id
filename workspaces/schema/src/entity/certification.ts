@@ -1,5 +1,4 @@
 import * as v from "valibot";
-import { UserBasicInfo } from "./user";
 
 /**
  * 資格・試験の情報
@@ -30,18 +29,6 @@ export const UserCertificationRelation = v.object({
 });
 export type UserCertificationRelation = v.InferOutput<
 	typeof UserCertificationRelation
->;
-
-/**
- * ユーザー情報を含めた資格・試験の申請情報
- */
-export const CertificationRequestWithUser = v.object({
-	user: UserBasicInfo,
-	certificationId: Certification.entries.id,
-	certifiedIn: UserCertification.entries.certifiedIn,
-});
-export type CertificationRequestWithUser = v.InferOutput<
-	typeof CertificationRequestWithUser
 >;
 
 /**

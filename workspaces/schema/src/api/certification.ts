@@ -1,9 +1,9 @@
 import * as v from "valibot";
 import {
 	Certification,
-	CertificationRequestWithUser,
 	UserCertificationRelation,
 } from "../entity/certification";
+import { CertificationRequestWithUser } from "../entity/certification-request";
 
 export const GetAllCertificationsResponse = v.array(Certification);
 export type GetAllCertificationsResponse = v.InferOutput<
