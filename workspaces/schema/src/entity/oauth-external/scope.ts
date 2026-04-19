@@ -73,7 +73,3 @@ export const ScopeIdStr = v.union(
 	Object.values(SCOPES_BY_ID).map((scope) => v.literal(scope.name)),
 );
 export type ScopeIdStr = v.InferOutput<typeof ScopeIdStr>;
-
-// https://datatracker.ietf.org/doc/html/rfc6749#appendix-A.4
-export const OAUTH_SCOPE_REGEX =
-	/^[\x21|\x23-\x5B|\x5D-\x7E]+(?:\x20+[\x21|\x23-\x5B|\x5D-\x7E]+)*$/u;

@@ -1,0 +1,3 @@
+// https://datatracker.ietf.org/doc/html/rfc6749#appendix-A.4
+export const OAUTH_SCOPE_REGEX =
+	/^[\x21|\x23-\x5B|\x5D-\x7E]+(?:\x20+[\x21|\x23-\x5B|\x5D-\x7E]+)*$/u;

@@ -7,7 +7,8 @@
 	},
 	"exports": {
 		"./api/*": "./src/api/*.ts",
-		"./entity/*": "./src/entity/*.ts"
+		"./entity/*": "./src/entity/*.ts",
+		"./constants/*": "./src/constants/*.ts"
 	},
 	"dependencies": {
 		"valibot": "^1.2.0"

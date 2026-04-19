@@ -1,8 +1,6 @@
 import * as v from "valibot";
-import {
-	OAUTH_SCOPE_REGEX,
-	ScopeIdStr,
-} from "../../entity/oauth-external/scope";
+import { OAUTH_SCOPE_REGEX } from "../../constants/oauth-external/scope";
+import { ScopeIdStr } from "../../entity/oauth-external/scope";
 
 // IdP 内部では使われていないが、 OAuth Client が使うかもしれないので定義
 export const OAuthAuthorizeRequestParams = v.object({
