@@ -67,4 +67,13 @@ export const SCOPES_BY_ID = {
 	// 	description:
 	// 		"このサービスがあなたの電話番号を利用することを許可します。 SMS での本人確認や二要素認証によるセキュリティ強化に利用されます。",
 	// },
-} satisfies Record<ScopeId, Scope>;
+} as const;
+
+export const ScopeIdStr = v.union(
+	Object.values(SCOPES_BY_ID).map((scope) => v.literal(scope.name)),
+);
+export type ScopeIdStr = v.InferOutput<typeof ScopeIdStr>;
+
+// https://datatracker.ietf.org/doc/html/rfc6749#appendix-A.4
+export const OAUTH_SCOPE_REGEX =
+	/^[\x21|\x23-\x5B|\x5D-\x7E]+(?:\x20+[\x21|\x23-\x5B|\x5D-\x7E]+)*$/u;
