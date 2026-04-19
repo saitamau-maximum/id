@@ -151,7 +151,7 @@ const EventTableRow = ({ event }: { event: Event }) => {
 	const handleEditEvent = useCallback(async () => {
 		const res = await EditEventDialog.call({ event });
 		if (res.type === "dismiss") return;
-		updateEvent({ eventId: event.id, event: res.payload });
+		updateEvent(res.payload);
 	}, [event, updateEvent]);
 
 	const handleDuplicateEvent = useCallback(async () => {

@@ -1,5 +1,4 @@
-import type { UpdateEventParams } from "@idp/schema/api/calendar/events";
-import type { Event } from "@idp/schema/entity/calendar/event";
+import type { EventWithNotify } from "@idp/schema/entity/calendar/event";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
@@ -9,14 +8,9 @@ export const useUpdateEvent = () => {
 	const queryClient = useQueryClient();
 	const { pushToast } = useToast();
 	return useMutation({
-		mutationFn: async ({
-			eventId,
-			event,
-		}: {
-			eventId: Event["id"];
-			event: UpdateEventParams;
-		}) => {
-			await calendarRepository.updateEvent(eventId, event);
+		mutationFn: async (event: EventWithNotify) => {
+			const { id: eventId, ...updateParams } = event;
+			await calendarRepository.updateEvent(eventId, updateParams);
 			return event;
 		},
 		onSuccess: (event) => {
