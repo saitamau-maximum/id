@@ -59,15 +59,9 @@ const route = app
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
-			const {
-				userId,
-				title,
-				description,
-				startAt,
-				endAt,
-				locationId,
-				notifyDiscord,
-			} = c.req.valid("json");
+			const { userId } = c.get("jwtPayload");
+			const { title, description, startAt, endAt, locationId, notifyDiscord } =
+				c.req.valid("json");
 			const id = c.req.param("id");
 			const eventPayload = {
 				id,

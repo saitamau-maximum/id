@@ -44,7 +44,6 @@ export const EditEventDialog = createCallable<Props, Payload>(
 		} = useForm<UpdateFormInputValues, unknown, UpdateFormOutputValues>({
 			resolver: valibotResolver(UpdateEventParams),
 			defaultValues: {
-				userId: event.userId,
 				title: event.title,
 				description: event.description,
 				startAt: toHTMLDateTimePickerFormat(event.startAt),
