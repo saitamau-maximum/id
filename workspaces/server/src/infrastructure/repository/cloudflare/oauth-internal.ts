@@ -51,10 +51,12 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 		if (!user) throw new Error("User not found");
-		return user.oauthConnections.map((conn) => ({
-			...conn,
-			providerId: conn.providerId as OAuthProviderId,
-		}));
+		return user.oauthConnections
+			.filter((conn) => v.is(OAuthProviderId, conn.providerId))
+			.map((conn) => ({
+				...conn,
+				providerId: conn.providerId as OAuthProviderId,
+			}));
 	}
 
 	async fetchOAuthConnectionsByUserDisplayId(
