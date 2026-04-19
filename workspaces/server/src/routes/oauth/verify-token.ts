@@ -1,32 +1,14 @@
+import type {
+	VerifyTokenFailureResponse,
+	VerifyTokenSuccessResponse,
+} from "@idp/schema/api/oauth/verify-token";
 import { factory } from "../../factory";
 
 const app = factory.createApp();
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/43
 
-interface ValidResponseType {
-	valid: true;
-	client: {
-		id: string;
-		name: string;
-		description: string | null;
-		logo_url: string | null;
-		owner_id: string;
-	};
-	user_id: string;
-	expires_at: number;
-	scopes: string[];
-}
-
-interface InvalidResponseType {
-	valid: false;
-	client: null;
-	user_id: null;
-	expires_at: null;
-	scopes: null;
-}
-
-const INVALID_REQUEST_RESPONSE: InvalidResponseType = {
+const INVALID_REQUEST_RESPONSE: VerifyTokenFailureResponse = {
 	valid: false,
 	client: null,
 	user_id: null,
@@ -48,10 +30,10 @@ const route = app
 			await c.var.OAuthExternalRepository.getTokenByAccessToken(accessToken);
 
 		if (!tokenInfo) {
-			return c.json<InvalidResponseType>(INVALID_REQUEST_RESPONSE, 404);
+			return c.json<VerifyTokenFailureResponse>(INVALID_REQUEST_RESPONSE, 404);
 		}
 
-		const res: ValidResponseType = {
+		const res = {
 			valid: true,
 			client: {
 				id: tokenInfo.client.id,
@@ -63,9 +45,9 @@ const route = app
 			user_id: tokenInfo.userId,
 			expires_at: tokenInfo.accessTokenExpiresAt.getTime(),
 			scopes: tokenInfo.scopes.map((s) => s.name),
-		};
+		} satisfies VerifyTokenSuccessResponse;
 
-		return c.json<ValidResponseType>(res);
+		return c.json<VerifyTokenSuccessResponse>(res);
 	})
 	.all("/", async (c) => {
 		return c.text("method not allowed", 405);

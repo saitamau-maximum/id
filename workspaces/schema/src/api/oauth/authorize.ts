@@ -5,7 +5,7 @@ import {
 	ALLOWED_RESPONSE_TYPES,
 	OAUTH_SCOPE_REGEX,
 } from "../../constants/oauth-external";
-import { ScopeIdStr } from "../../entity/oauth-external/scope";
+import { SCOPES_BY_ID } from "../../entity/oauth-external/scope";
 
 // IdP 内部では使われていないが、 OAuth Client が使うかもしれないので定義
 export const OAuthAuthorizeRequestParams = v.object({
@@ -39,6 +39,9 @@ export const OAuthAuthorizeRequestParams = v.object({
 			v.check((scopeStr) => {
 				const scopeList = scopeStr.split(" ");
 				// 仕様的には知らないスコープがある場合は無視するだけだが、スキーマ検証ではガチガチにチェックしておいて損はないので
+				const ScopeIdStr = v.union([
+					...Object.values(SCOPES_BY_ID).map((s) => v.literal(s.name)),
+				]);
 				return scopeList.every((scope) => v.is(ScopeIdStr, scope));
 			}, "scope must only contain valid scopes"),
 		),

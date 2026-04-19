@@ -7,7 +7,7 @@ import { oauthCallbackRoute } from "./callback";
 import { oauthManageRoute } from "./manage";
 import { oauthResourcesRoute } from "./resources";
 import { oauthUtilRoute } from "./util";
-import { oauthVerifyTokenRoute } from "./verifyToken";
+import { oauthVerifyTokenRoute } from "./verify-token";
 
 const app = factory.createApp();
 

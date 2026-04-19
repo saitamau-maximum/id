@@ -68,8 +68,3 @@ export const SCOPES_BY_ID = {
 	// 		"このサービスがあなたの電話番号を利用することを許可します。 SMS での本人確認や二要素認証によるセキュリティ強化に利用されます。",
 	// },
 } as const satisfies Record<ScopeId, Scope>;
-
-export const ScopeIdStr = v.union(
-	Object.values(SCOPES_BY_ID).map((scope) => v.literal(scope.name)),
-);
-export type ScopeIdStr = v.InferOutput<typeof ScopeIdStr>;
