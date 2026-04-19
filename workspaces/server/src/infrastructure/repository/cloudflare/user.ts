@@ -556,7 +556,9 @@ export class CloudflareUserRepository implements IUserRepository {
 			.where(eq(schema.users.id, userId));
 	}
 
-	async fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember> {
+	async fetchPublicMemberByDisplayId(
+		displayId: string,
+	): Promise<PublicMember | null> {
 		const profile = await this.client.query.userProfiles.findFirst({
 			where: eq(schema.userProfiles.displayId, displayId),
 			with: {
@@ -569,9 +571,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			},
 		});
 
-		if (!profile || !profile.user) {
-			throw new Error("User not found");
-		}
+		if (!profile || !profile.user) return null;
 
 		return {
 			id: profile.user.id,
