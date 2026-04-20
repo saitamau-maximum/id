@@ -33,10 +33,6 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 - `SECRET`: JWT の署名や Cookie の暗号化に使用する鍵
   - 適当な文字列を設定してください。
   - `openssl rand -base64 32` が便利です。
-- `GITHUB_APP_PRIVKEY`: GitHub App の秘密鍵
-  - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp)の「Generate a private key」で取得し、以下のコードで変換してください。
-  - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
-  - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
 - `GITHUB_OAUTH_SECRET`:　 GitHub App の Client Secret
   - [GitHub OAuth Apps 設定画面](https://github.com/settings/developers) に行って、「New OAuth App」から自身の OAuth App を作成してください。
   - Application name, Homepage URL は適当に設定してよいです。 Authorization callback URL には `http://localhost:8787/auth/login/github/callback` を設定してください。
@@ -50,6 +46,18 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 
 - `PRIVKEY_FOR_OAUTH`: IdP OAuth 内で使用する秘密鍵
   - <https://api.id.maximum.vc/oauth/util/keygen> へアクセスして生成してください。
+
+</details>
+
+<details>
+<summary>GitHub 関連の開発</summary>
+
+- `GITHUB_APP_PRIVKEY`: GitHub App の秘密鍵
+  - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev)の「Generate a private key」で取得し、以下のコードで変換してください。
+  - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
+  - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
+
+GitHub App (Dev) では、メンバーの招待はできないようになっています。
 
 </details>
 
