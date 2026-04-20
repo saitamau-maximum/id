@@ -57,7 +57,12 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
   - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
   - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
 
-GitHub App (Dev) では、メンバーの招待はできないようになっています。
+これらの環境変数を設定することで、 Dashboard の活動度などが表示されるようになります。
+
+なお、セキュリティの都合上 GitHub App (Dev) は Readonly になっています。
+すなわち、以下の機能は利用できません。
+
+- GitHub Organization へのメンバー追加
 
 </details>
 
