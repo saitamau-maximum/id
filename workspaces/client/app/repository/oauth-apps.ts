@@ -102,18 +102,18 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: OAuthAppRegisterParams) {
-		const form: Parameters<
+		const json: Parameters<
 			typeof client.oauth.manage.register.$post
-		>[0]["form"] = {
+		>[0]["json"] = {
 			name,
 			description,
-			scopeIds: scopeIds.join(","),
-			callbackUrls: callbackUrls.join(","),
+			scopeIds: scopeIds.map(String),
+			callbackUrls,
 		};
 
-		if (icon) form.icon = icon;
+		if (icon) json.icon = icon;
 
-		const res = await client.oauth.manage.register.$post({ form });
+		const res = await client.oauth.manage.register.$post({ json });
 		if (!res.ok) throw new Error("Failed to register app");
 	}
 
@@ -121,20 +121,20 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		appId: string,
 		{ name, description, scopeIds, callbackUrls, icon }: OAuthAppRegisterParams,
 	) {
-		const form: Parameters<
+		const json: Parameters<
 			(typeof client.oauth.manage)[":clientId"]["$put"]
-		>[0]["form"] = {
+		>[0]["json"] = {
 			name,
 			description,
-			scopeIds: scopeIds.join(","),
-			callbackUrls: callbackUrls.join(","),
+			scopeIds: scopeIds.map(String),
+			callbackUrls,
 		};
 
-		if (icon) form.icon = icon;
+		if (icon) json.icon = icon;
 
 		const res = await client.oauth.manage[":clientId"].$put({
 			param: { clientId: appId },
-			form,
+			json,
 		});
 
 		if (!res.ok) throw new Error("Failed to update app");

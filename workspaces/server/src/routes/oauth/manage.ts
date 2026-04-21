@@ -72,12 +72,12 @@ const route = app
 	.post(
 		"/register",
 		authMiddleware,
-		vValidator("form", OAuthAppRegisterParams),
+		vValidator("json", OAuthAppRegisterParams),
 		async (c) => {
 			// 画像を含むので、multipart/form-data で受け取る
 			const { userId } = c.get("jwtPayload");
 			const { name, description, scopeIds, callbackUrls, icon } =
-				c.req.valid("form");
+				c.req.valid("json");
 			const serverOrigin = new URL(c.req.url).origin;
 
 			try {
@@ -136,11 +136,11 @@ const route = app
 		"/:clientId",
 		authMiddleware,
 		verifyOAuthClientMiddleware,
-		vValidator("form", OAuthAppRegisterParams),
+		vValidator("json", OAuthAppRegisterParams),
 		async (c) => {
 			const { clientId } = c.req.param();
 			const { name, description, scopeIds, callbackUrls, icon } =
-				c.req.valid("form");
+				c.req.valid("json");
 			const serverOrigin = new URL(c.req.url).origin;
 
 			const client = c.get("oauthClientInfo");
