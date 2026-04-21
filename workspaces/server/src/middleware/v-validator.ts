@@ -29,8 +29,8 @@ type HasUndefined<T> = undefined extends T ? true : false;
 
 export const vValidatorForFormdata = <
 	T extends GenericSchema | GenericSchemaAsync,
-	Target extends keyof ValidationTargets,
 	E extends Env,
+	Target extends Extract<keyof ValidationTargets, "form">,
 	P extends string,
 	In = InferInput<T>,
 	Out = InferOutput<T>,
@@ -39,12 +39,14 @@ export const vValidatorForFormdata = <
 			? {
 					[K in Target]?: In extends ValidationTargets[K]
 						? In
-						: { [K2 in keyof In]?: ValidationTargets[K][K2] };
+						: // @ts-expect-error -  ValidationTargets["form"] が Record<string, T | T[]> になってるせいでうまく効かない
+							{ [K2 in keyof In]?: ValidationTargets["form"][K2] };
 				}
 			: {
 					[K in Target]: In extends ValidationTargets[K]
 						? In
-						: { [K2 in keyof In]: ValidationTargets[K][K2] };
+						: // @ts-expect-error - 同上
+							{ [K2 in keyof In]: ValidationTargets[K][K2] };
 				};
 		out: { [K in Target]: Out };
 	},
@@ -68,7 +70,8 @@ export const vValidatorForFormdata = <
 		// arrayKeys で指定された部分が配列じゃないなら配列に変換する
 		for (const key of arrayKeys) {
 			const val = value[key as string];
-			if (!Array.isArray(val)) value[key as string] = [val];
+			// @ts-expect-error - 同上
+			if (typeof val === "string") value[key] = [val];
 		}
 		// ----------------- //
 
