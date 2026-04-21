@@ -106,6 +106,20 @@ export const UserProfile = v.object({
 		),
 	),
 	socialLinks: v.pipe(
+		v.union([
+			// DB からのデータ向け
+			v.array(v.string()),
+			// react-hook-form からのデータ向け
+			v.pipe(
+				v.array(
+					v.object({
+						value: v.string(),
+					}),
+				),
+				// { value: string } の形から string[] の形に変換
+				v.transform((arr) => arr.map((item) => item.value)),
+			),
+		]),
 		v.array(
 			v.pipe(
 				v.string(),

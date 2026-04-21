@@ -31,7 +31,6 @@ export const RegisterForm = () => {
 		register,
 		handleSubmit,
 		watch,
-		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UserRegisterParams),
@@ -57,49 +56,10 @@ export const RegisterForm = () => {
 	const selectedFaculty = watch("faculty");
 
 	const onSubmit = useCallback(
-		(data: FormInputValues) => {
-			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
-			const isGraduateStudent = GRADUATE_GRADE.includes(data.grade);
-			if (!isOutsideMember && !data.academicEmail) {
-				setError("academicEmail", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.studentId) {
-				setError("studentId", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.faculty) {
-				setError("faculty", {
-					message: "学部を選択してください",
-				});
-				return;
-			}
-			// B1-B4の経済学部以外は学科必須
-			if (
-				!isOutsideMember &&
-				!isGraduateStudent &&
-				selectedFaculty !== "経済学部" &&
-				!data.department
-			) {
-				setError("department", {
-					message: "学科を選択してください",
-				});
-				return;
-			}
-			// M, D以上は研究室必須
-			if (isGraduateStudent && !data.laboratory) {
-				setError("laboratory", {
-					message: "研究室を入力してください",
-				});
-				return;
-			}
+		(data: FormOutputValues) => {
 			mutate(data);
 		},
-		[mutate, setError, selectedFaculty],
+		[mutate],
 	);
 
 	const departmentsByFaculty: Record<string, string[]> = {
