@@ -29,11 +29,15 @@ export const InviteCreateParams = v.pipe(
 	}),
 	// react-hook-form でエラーを拾ってくれないので、 forward する
 	v.forward(
-		v.check((data) => {
-			// 招待リンクは expiresAt と remainingUse のどちらか一方が必須（共存可能）
-			if (!data.expiresAt && !data.remainingUse) return false;
-			return true;
-		}, "使用可能回数または有効期限のいずれかは必須です"),
+		v.partialCheck(
+			[["expiresAt"], ["remainingUse"]],
+			({ expiresAt, remainingUse }) => {
+				// 招待リンクは expiresAt と remainingUse のどちらか一方が必須（共存可能）
+				if (!expiresAt && !remainingUse) return false;
+				return true;
+			},
+			"使用可能回数または有効期限のいずれかは必須です",
+		),
 		["expiresAt"],
 	),
 );

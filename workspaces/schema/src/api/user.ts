@@ -18,15 +18,19 @@ export const UserRegisterParams = v.pipe(
 		graduateSchool: v.optional(UserProfile.entries.graduateSchool),
 		specialization: v.optional(UserProfile.entries.specialization),
 	}),
-	v.check(({ grade, academicEmail, studentId }) => {
-		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-		if (grade !== "卒業生" && grade !== "ゲスト") {
-			if (!academicEmail || !studentId) {
-				return false;
+	v.partialCheck(
+		[["grade"], ["academicEmail"], ["studentId"]],
+		({ grade, academicEmail, studentId }) => {
+			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+			if (grade !== "卒業生" && grade !== "ゲスト") {
+				if (!academicEmail || !studentId) {
+					return false;
+				}
 			}
-		}
-		return true;
-	}, "大学メールアドレスと学籍番号は必須です"),
+			return true;
+		},
+		"大学メールアドレスと学籍番号は必須です",
+	),
 );
 export type UserRegisterParams = v.InferOutput<typeof UserRegisterParams>;
 
@@ -48,15 +52,19 @@ export const UserProfileUpdateParams = v.pipe(
 		graduateSchool: v.optional(UserProfile.entries.graduateSchool),
 		specialization: v.optional(UserProfile.entries.specialization),
 	}),
-	v.check(({ grade, academicEmail, studentId }) => {
-		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-		if (grade !== "卒業生" && grade !== "ゲスト") {
-			if (!academicEmail || !studentId) {
-				return false;
+	v.partialCheck(
+		[["grade"], ["academicEmail"], ["studentId"]],
+		({ grade, academicEmail, studentId }) => {
+			// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
+			if (grade !== "卒業生" && grade !== "ゲスト") {
+				if (!academicEmail || !studentId) {
+					return false;
+				}
 			}
-		}
-		return true;
-	}, "大学メールアドレスと学籍番号は必須です"),
+			return true;
+		},
+		"大学メールアドレスと学籍番号は必須です",
+	),
 );
 export type UserProfileUpdateParams = v.InferOutput<
 	typeof UserProfileUpdateParams

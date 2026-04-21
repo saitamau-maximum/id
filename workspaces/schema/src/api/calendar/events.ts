@@ -4,7 +4,8 @@ import { Event, EventWithNotify } from "../../entity/calendar/event";
 export const CreateEventParams = v.pipe(
 	v.omit(EventWithNotify, ["id", "userId"]),
 	v.forward(
-		v.check(
+		v.partialCheck(
+			[["startAt"], ["endAt"]],
 			({ startAt, endAt }) => startAt < endAt,
 			"終了日時は開始日時よりも後にしてください",
 		),
@@ -16,7 +17,8 @@ export type CreateEventParams = v.InferOutput<typeof CreateEventParams>;
 export const UpdateEventParams = v.pipe(
 	v.omit(EventWithNotify, ["id", "userId"]),
 	v.forward(
-		v.check(
+		v.partialCheck(
+			[["startAt"], ["endAt"]],
 			({ startAt, endAt }) => startAt < endAt,
 			"終了日時は開始日時よりも後にしてください",
 		),
