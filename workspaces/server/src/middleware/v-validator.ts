@@ -58,16 +58,17 @@ export const vValidatorForFormdata = <
 		  > = FailedResponse<T>,
 >(
 	target: Target,
-	arrayKeys: (keyof In)[],
+	arrayKeys: (keyof InferInput<T>)[],
 	schema: T,
 	hook?: Hook<T, E, P, Target, R>,
 ): Handler<E, P, V, MustBeResponse<R, T>> =>
 	// @ts-expect-error not typed well
-	validator(target, async (value, c) => {
+	validator("form", async (value, c) => {
 		// ----- added ----- //
-		// arrayKeys で指定された部分が string なら配列に変換する
+		// arrayKeys で指定された部分が配列じゃないなら配列に変換する
 		for (const key of arrayKeys) {
-			if (typeof value[key] === "string") value[key] = [value[key]];
+			const val = value[key as string];
+			if (!Array.isArray(val)) value[key as string] = [val];
 		}
 		// ----------------- //
 
