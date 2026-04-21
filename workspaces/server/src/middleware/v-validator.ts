@@ -63,7 +63,7 @@ export const vValidatorForFormdata = <
 	hook?: Hook<T, E, P, Target, R>,
 ): Handler<E, P, V, MustBeResponse<R, T>> =>
 	// @ts-expect-error not typed well
-	validator("form", async (value, c) => {
+	validator(target, async (value, c) => {
 		// ----- added ----- //
 		// arrayKeys で指定された部分が配列じゃないなら配列に変換する
 		for (const key of arrayKeys) {
