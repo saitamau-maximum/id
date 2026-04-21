@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { OAuthAppRegisterParamsForForm } from "@idp/schema/api/oauth/manage";
+import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
 import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
@@ -19,8 +19,8 @@ export const meta: MetaFunction = () => {
 	return [{ title: "OAuth アプリケーションの新規作成 | Maximum IdP" }];
 };
 
-type FormInputValues = v.InferInput<typeof OAuthAppRegisterParamsForForm>;
-type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParamsForForm>;
+type FormInputValues = v.InferInput<typeof OAuthAppRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParams>;
 
 const iconStyle = css({
 	padding: 1,
@@ -54,7 +54,7 @@ export default function Register() {
 		setValue,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(OAuthAppRegisterParamsForForm),
+		resolver: valibotResolver(OAuthAppRegisterParams),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる
 			scopeIds: [],
@@ -162,7 +162,9 @@ export default function Register() {
 											id={id}
 											type="url"
 											placeholder={`https://example.com/callback/${index + 1}`}
-											{...register(`callbackUrls.${index}.value`)}
+											{...register(`callbackUrls.${index}.value`, {
+												setValueAs: (v) => encodeURIComponent(v), // URL に , が含まれるかもしれないのでエンコードする
+											})}
 										/>
 										{
 											// 2 つ目以降の callback URL には削除ボタンを表示

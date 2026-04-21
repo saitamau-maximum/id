@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { OAuthAppRegisterParamsForForm } from "@idp/schema/api/oauth/manage";
+import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
 import type { Scope } from "@idp/schema/entity/oauth-external/scope";
 import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
@@ -17,8 +17,8 @@ import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
 
-type FormInputValues = v.InferInput<typeof OAuthAppRegisterParamsForForm>;
-type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParamsForForm>;
+type FormInputValues = v.InferInput<typeof OAuthAppRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParams>;
 
 const iconStyle = css({
 	padding: 1,
@@ -67,7 +67,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 		setValue,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(OAuthAppRegisterParamsForForm),
+		resolver: valibotResolver(OAuthAppRegisterParams),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる
 			name: appData.name,
@@ -183,7 +183,9 @@ export const AppEditForm = ({ id, appData }: Props) => {
 										id={id}
 										type="url"
 										placeholder={`https://example.com/callback/${index + 1}`}
-										{...register(`callbackUrls.${index}.value`)}
+										{...register(`callbackUrls.${index}.value`, {
+											setValueAs: (v) => encodeURIComponent(v), // URL に , が含まれるかもしれないのでエンコードする
+										})}
 									/>
 									{
 										// 2 つ目以降の callback URL には削除ボタンを表示

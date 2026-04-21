@@ -1,5 +1,6 @@
 import * as v from "valibot";
 import { MaxLines } from "../common/max-lines";
+import { RHFableArray } from "../common/rhf-array";
 import { UserCertification } from "./certification";
 import { ExportableOAuthConnection } from "./oauth-internal/oauth-connection";
 import { Role } from "./role";
@@ -106,21 +107,7 @@ export const UserProfile = v.object({
 		),
 	),
 	socialLinks: v.pipe(
-		v.union([
-			// DB からのデータ向け
-			v.array(v.string()),
-			// react-hook-form からのデータ向け
-			v.pipe(
-				v.array(
-					v.object({
-						value: v.string(),
-					}),
-				),
-				// { value: string } の形から string[] の形に変換
-				v.transform((arr) => arr.map((item) => item.value)),
-			),
-		]),
-		v.array(
+		RHFableArray(
 			v.pipe(
 				v.string(),
 				v.nonEmpty("ソーシャルリンクを入力してください"),

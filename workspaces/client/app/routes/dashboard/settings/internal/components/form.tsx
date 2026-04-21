@@ -40,7 +40,6 @@ import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
 import { OAuthConnRow } from "./oauth-conn-row";
 
-// react-hook-form で受け取る都合上、 array は { value: string } の形にする必要がある
 type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
