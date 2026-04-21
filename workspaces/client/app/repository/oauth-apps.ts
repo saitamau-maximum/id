@@ -102,18 +102,18 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		callbackUrls,
 		icon,
 	}: OAuthAppRegisterParams) {
-		const json: Parameters<
+		const form: Parameters<
 			typeof client.oauth.manage.register.$post
-		>[0]["json"] = {
+		>[0]["form"] = {
 			name,
 			description,
 			scopeIds: scopeIds.map(String),
 			callbackUrls,
 		};
 
-		if (icon) json.icon = icon;
+		if (icon) form.icon = icon;
 
-		const res = await client.oauth.manage.register.$post({ json });
+		const res = await client.oauth.manage.register.$post({ form });
 		if (!res.ok) throw new Error("Failed to register app");
 	}
 
@@ -121,20 +121,20 @@ export class OAuthAppsRepositoryImpl implements IOAuthAppsRepository {
 		appId: string,
 		{ name, description, scopeIds, callbackUrls, icon }: OAuthAppRegisterParams,
 	) {
-		const json: Parameters<
+		const form: Parameters<
 			(typeof client.oauth.manage)[":clientId"]["$put"]
-		>[0]["json"] = {
+		>[0]["form"] = {
 			name,
 			description,
 			scopeIds: scopeIds.map(String),
 			callbackUrls,
 		};
 
-		if (icon) json.icon = icon;
+		if (icon) form.icon = icon;
 
 		const res = await client.oauth.manage[":clientId"].$put({
 			param: { clientId: appId },
-			json,
+			form,
 		});
 
 		if (!res.ok) throw new Error("Failed to update app");

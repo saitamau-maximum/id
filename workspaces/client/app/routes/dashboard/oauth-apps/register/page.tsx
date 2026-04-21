@@ -162,9 +162,7 @@ export default function Register() {
 											id={id}
 											type="url"
 											placeholder={`https://example.com/callback/${index + 1}`}
-											{...register(`callbackUrls.${index}.value`, {
-												setValueAs: (v) => encodeURIComponent(v), // URL に , が含まれるかもしれないのでエンコードする
-											})}
+											{...register(`callbackUrls.${index}.value`)}
 										/>
 										{
 											// 2 つ目以降の callback URL には削除ボタンを表示

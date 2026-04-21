@@ -62,8 +62,6 @@ export const OAuthAppRegisterParams = v.object({
 	callbackUrls: RHFableArray(
 		v.pipe(
 			v.string(),
-			// encodeURIComponent でエンコードされた URL を受け取るので、バリデーションの前にデコードする
-			v.transform((input) => decodeURIComponent(input)),
 			v.url("URL が正しくありません"),
 			v.check((input) => {
 				// server/src/routes/oauth/authorize.ts で正規化される

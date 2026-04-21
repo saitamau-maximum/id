@@ -8,6 +8,7 @@ export const RHFableArray = <
 	v.union([
 		// 非 RHF からのデータ向け
 		v.array(schema),
+
 		// RHF からのデータ向け
 		// FieldArray は { value: T } の形をしている
 		v.pipe(
