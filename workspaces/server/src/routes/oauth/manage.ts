@@ -5,6 +5,7 @@ import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
+import { vValidatorForFormdata } from "../../middleware/v-validator";
 
 const app = factory.createApp();
 
@@ -72,12 +73,16 @@ const route = app
 	.post(
 		"/register",
 		authMiddleware,
-		vValidator("json", OAuthAppRegisterParams),
+		vValidatorForFormdata(
+			"form",
+			["scopeIds", "callbackUrls"],
+			OAuthAppRegisterParams,
+		),
 		async (c) => {
 			// 画像を含むので、multipart/form-data で受け取る
 			const { userId } = c.get("jwtPayload");
 			const { name, description, scopeIds, callbackUrls, icon } =
-				c.req.valid("json");
+				c.req.valid("form");
 			const serverOrigin = new URL(c.req.url).origin;
 
 			try {
@@ -136,11 +141,15 @@ const route = app
 		"/:clientId",
 		authMiddleware,
 		verifyOAuthClientMiddleware,
-		vValidator("json", OAuthAppRegisterParams),
+		vValidatorForFormdata(
+			"form",
+			["scopeIds", "callbackUrls"],
+			OAuthAppRegisterParams,
+		),
 		async (c) => {
 			const { clientId } = c.req.param();
 			const { name, description, scopeIds, callbackUrls, icon } =
-				c.req.valid("json");
+				c.req.valid("form");
 			const serverOrigin = new URL(c.req.url).origin;
 
 			const client = c.get("oauthClientInfo");
