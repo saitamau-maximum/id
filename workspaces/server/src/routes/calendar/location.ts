@@ -5,7 +5,7 @@ import {
 } from "@idp/schema/api/calendar/location";
 import { factory } from "../../factory";
 import {
-	adminOnlyMiddleware,
+	calendarMutableMiddleware,
 	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
@@ -31,7 +31,7 @@ const route = app
 	})
 	.post(
 		"/",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", CalendarLocationCreateParams),
 		async (c) => {
 			const { name, description } = c.req.valid("json");
@@ -48,7 +48,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", CalendarLocationUpdateParams),
 		async (c) => {
 			const id = c.req.param("id");
@@ -72,7 +72,7 @@ const route = app
 			return c.body(null, 204);
 		},
 	)
-	.delete("/:id", adminOnlyMiddleware, async (c) => {
+	.delete("/:id", calendarMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { LocationRepository } = c.var;
 
