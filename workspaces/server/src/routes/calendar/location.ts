@@ -2,7 +2,7 @@ import { vValidator } from "@hono/valibot-validator";
 import * as v from "valibot";
 import { factory } from "../../factory";
 import {
-	adminOnlyMiddleware,
+	calendarMutableMiddleware,
 	memberOnlyMiddleware,
 } from "../../middleware/auth";
 
@@ -39,7 +39,7 @@ const route = app
 	})
 	.post(
 		"/",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", createLocationSchema),
 		async (c) => {
 			const { name, description } = c.req.valid("json");
@@ -56,7 +56,7 @@ const route = app
 	)
 	.put(
 		"/:id",
-		adminOnlyMiddleware,
+		calendarMutableMiddleware,
 		vValidator("json", updateLocationSchema),
 		async (c) => {
 			const id = c.req.param("id");
@@ -80,7 +80,7 @@ const route = app
 			return c.body(null, 204);
 		},
 	)
-	.delete("/:id", adminOnlyMiddleware, async (c) => {
+	.delete("/:id", calendarMutableMiddleware, async (c) => {
 		const id = c.req.param("id");
 		const { LocationRepository } = c.var;
 
