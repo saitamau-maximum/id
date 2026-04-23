@@ -2,15 +2,16 @@ import { CloudflareUserRepository } from "../infrastructure/repository/cloudflar
 
 const getCurrentFiscalYearStartAt = (): Date => {
 	const now = new Date();
-	const currentYearInTokyo = Number(
-		new Intl.DateTimeFormat("ja-JP", {
+
+	const year = Number(
+		new Intl.DateTimeFormat("en-US", {
 			timeZone: "Asia/Tokyo",
 			year: "numeric",
 		}).format(now),
 	);
 
-	// 4/1 00:00 JST = 3/31 15:00 UTC
-	return new Date(Date.UTC(currentYearInTokyo, 2, 31, 15, 0, 0));
+	// 4/1 00:00 JST
+	return new Date(Date.UTC(year, 2, 31, 15, 0, 0));
 };
 
 // 4/30 15:00 UTC = 5/1 00:00 JST に実行される

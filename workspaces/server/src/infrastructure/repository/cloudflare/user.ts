@@ -478,7 +478,7 @@ export class CloudflareUserRepository implements IUserRepository {
 	async removeMemberRoleFromUsersBefore(
 		lastPaymentConfirmedAt: Date,
 	): Promise<number> {
-		const expiredUsers = this.client
+		const expiredUsers = await this.client
 			.select({ id: schema.users.id })
 			.from(schema.users)
 			.where(
@@ -488,12 +488,18 @@ export class CloudflareUserRepository implements IUserRepository {
 				),
 			);
 
+		const expiredUserIds = expiredUsers.map((user) => user.id);
+
+		if (expiredUserIds.length === 0) {
+			return 0;
+		}
+
 		const res = await this.client
 			.delete(schema.userRoles)
 			.where(
 				and(
 					eq(schema.userRoles.roleId, ROLE_IDS.MEMBER),
-					inArray(schema.userRoles.userId, expiredUsers),
+					inArray(schema.userRoles.userId, expiredUserIds),
 				),
 			);
 
