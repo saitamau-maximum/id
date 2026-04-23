@@ -17,10 +17,12 @@ export default function Dashboard() {
 		isInitialized,
 		isProvisional,
 		isMember,
+		user,
 		lacksRequiredOAuthConnections,
 	} = useAuth();
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
+	const isFormerMember = !!user?.lastPaymentConfirmedAt && !isMember;
 
 	// ping を使って最終ログイン日時を更新し続ける
 	useAuthPing(isAuthorized);
@@ -50,7 +52,20 @@ export default function Dashboard() {
 			return;
 		}
 
-		// メンバーでない場合もログイン画面へ
+		// 以前はメンバーだったが今年度未払いで外れた場合は支払い案内へ
+		if (isFormerMember) {
+			if (location.pathname !== "/update-payment-info") {
+				pushToast({
+					title: "今年度の会費をまだお支払いされていません",
+					description: "支払い方法をご案内します",
+					type: "error",
+				});
+				navigate("/update-payment-info");
+			}
+			return;
+		}
+
+		// 初めて来たなど、そもそもメンバーではない場合はログイン画面へ
 		if (!isMember) {
 			pushToast({
 				title: "このアカウントはメンバーではありません",
@@ -72,6 +87,7 @@ export default function Dashboard() {
 		isInitialized,
 		isProvisional,
 		isMember,
+		isFormerMember,
 		navigate,
 		location,
 		pushToast,
@@ -83,7 +99,7 @@ export default function Dashboard() {
 	if (
 		isLoading ||
 		!isAuthorized ||
-		!isMember ||
+		(!isMember && !isFormerMember) ||
 		!isInitialized ||
 		isProvisional ||
 		lacksRequiredOAuthConnections
