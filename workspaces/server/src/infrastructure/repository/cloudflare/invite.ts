@@ -1,10 +1,10 @@
+import type { Invite, InviteWithIssuer } from "@idp/schema/entity/invite";
 import { and, eq, notExists, sql } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as schema from "../../../db/schema";
 import type {
+	CreateInviteParams,
 	IInviteRepository,
-	InviteStructure,
-	InviteWithUser,
 } from "../../../repository/invite";
 
 export class CloudflareInviteRepository implements IInviteRepository {
@@ -14,7 +14,7 @@ export class CloudflareInviteRepository implements IInviteRepository {
 		this.client = drizzle(db, { schema });
 	}
 
-	async getAllInvites(): Promise<InviteWithUser[]> {
+	async getAllInvites(): Promise<InviteWithIssuer[]> {
 		const res = await this.client.query.invites.findMany({
 			with: {
 				issuedBy: {
@@ -38,16 +38,18 @@ export class CloudflareInviteRepository implements IInviteRepository {
 		}));
 	}
 
-	async createInvite(params: Omit<InviteStructure, "id">) {
+	async createInvite(params: CreateInviteParams): Promise<string> {
 		const inviteId = crypto.randomUUID();
+		const now = new Date();
 		await this.client.insert(schema.invites).values({
 			id: inviteId,
+			createdAt: now,
 			...params,
 		});
 		return inviteId;
 	}
 
-	async getInviteById(id: string): Promise<InviteStructure> {
+	async getInviteById(id: string): Promise<Invite> {
 		const res = await this.client.query.invites.findFirst({
 			where: eq(schema.invites.id, id),
 		});

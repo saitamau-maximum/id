@@ -1,7 +1,12 @@
+import {
+	SCOPES_BY_ID,
+	type Scope,
+	ScopeId,
+} from "@idp/schema/entity/oauth-external/scope";
+import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
 import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
-import { ROLE_BY_ID } from "../../../constants/role";
-import { getScopeById, type Scope } from "../../../constants/scope";
+import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
@@ -13,7 +18,6 @@ const USER_BASIC_INFO_COLUMNS_GETTER = {
 		id: true,
 	},
 	with: {
-		roles: true,
 		profile: {
 			columns: {
 				displayId: true,
@@ -30,14 +34,12 @@ type UserBasicInfoRawData = {
 		displayName: string | null;
 		profileImageURL: string | null;
 	};
-	roles: { userId: string; roleId: number }[];
 };
 const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	id: user.id,
 	displayId: user.profile.displayId ?? undefined,
 	displayName: user.profile.displayName ?? undefined,
 	profileImageURL: user.profile.profileImageURL ?? undefined,
-	roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
 });
 
 export class CloudflareOAuthExternalRepository
@@ -76,7 +78,10 @@ export class CloudflareOAuthExternalRepository
 		return {
 			...client,
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
-			scopes: scopes.map((clientScope) => getScopeById(clientScope.scopeId)),
+			scopes: scopes
+				.map((clientScope) => clientScope.scopeId) // 型ガードを通すため scopeId で map し filter する
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			managers: managers
 				.map((manager) => manager.user)
 				.map(USER_BASIC_INFO_TRANSFORMER),
@@ -380,7 +385,10 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			scopes: scopes
+				.map((scope) => scope.scopeId)
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			oidcParams: {
 				nonce: oidcNonce ?? undefined,
 				authTime: oidcAuthTime ?? undefined,
@@ -446,7 +454,10 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...token,
-			scopes: scopes.map((scope) => getScopeById(scope.scopeId)),
+			scopes: scopes
+				.map((scope) => scope.scopeId)
+				.filter((scopeId) => v.is(ScopeId, scopeId))
+				.map((scopeId) => SCOPES_BY_ID[scopeId]),
 			user: {
 				...user,
 				profile: {
@@ -463,7 +474,10 @@ export class CloudflareOAuthExternalRepository
 					realNameKana: user.profile.realNameKana ?? undefined,
 					socialLinks: user.socialLinks.map((link) => link.url),
 				},
-				roles: user.roles.map((role) => ROLE_BY_ID[role.roleId]),
+				roles: user.roles
+					.map((role) => role.roleId)
+					.filter((roleId) => v.is(RoleId, roleId))
+					.map((roleId) => ROLE_BY_ID[roleId]),
 				socialLinks: undefined,
 			},
 		};

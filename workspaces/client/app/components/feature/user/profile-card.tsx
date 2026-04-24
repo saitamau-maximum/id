@@ -1,22 +1,28 @@
-import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
+import type { GetDiscordInfoResponse } from "@idp/schema/api/discord";
+import type { Member } from "@idp/schema/entity/member";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { SOCIAL_SERVICES_IDS } from "~/constant";
 import { useMarkdown } from "~/hooks/use-markdown";
-import type { DiscordInfo } from "~/types/discord-info";
-import type { OAuthConnection } from "~/types/oauth-internal";
-import type { Member } from "~/types/user";
 import { isNowLoggedIn } from "~/utils/auth-ping";
 import { formatDateTime } from "~/utils/date";
 import { parseSocialLink } from "~/utils/social-link";
 import { RoleBadge } from "./role-badge";
 
-type Props = Omit<Member, "certifications" | "initializedAt"> & {
-	socialLinks?: string[];
-	lastLoginAt?: Date | undefined;
-	discordInfo?: DiscordInfo;
-	oauthConnections?: OAuthConnection[];
+type Props = {
+	displayName: Member["displayName"];
+	realName: Member["realName"];
+	displayId: Member["displayId"];
+	profileImageURL: Member["profileImageURL"];
+	grade: Member["grade"];
+	roles: Member["roles"];
+	bio: Member["bio"];
+	socialLinks: Member["socialLinks"];
+	lastLoginAt: Member["lastLoginAt"];
+	oauthConnections: Member["oauthConnections"];
+	discordInfo?: GetDiscordInfoResponse;
 };
 
 export const ProfileCard: React.FC<Props> = ({

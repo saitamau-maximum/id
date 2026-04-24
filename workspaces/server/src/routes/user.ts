@@ -1,17 +1,16 @@
 import { vValidator } from "@hono/valibot-validator";
+import {
+	UserProfileUpdateParams,
+	UserRegisterParams,
+} from "@idp/schema/api/user";
+import {
+	OAUTH_PROVIDER_IDS,
+	OAuthProviderId,
+	REQUIRED_OAUTH_PROVIDER_IDS,
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
-import {
-	isValidOAuthProviderId,
-	OAUTH_PROVIDER_IDS,
-	REQUIRED_OAUTH_PROVIDER_IDS,
-} from "../constants/oauth";
-import {
-	ACADEMIC_EMAIL_DOMAIN,
-	BIO_MAX_LENGTH,
-	RESERVED_WORDS,
-} from "../constants/validation";
 import { factory } from "../factory";
 import { authMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 
@@ -22,119 +21,6 @@ const normalizeRealName = (text: string) => {
 	return text.trim().replace(/\s+/g, " ");
 };
 
-// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
-const realNamePattern = /^(?=.*\S(?:[\s　]+)\S).+$/;
-
-const ProfileSchema = v.object({
-	displayName: v.pipe(v.string(), v.nonEmpty()),
-	realName: v.pipe(
-		v.string(),
-		v.regex(realNamePattern),
-		v.nonEmpty(),
-		v.maxLength(16),
-	),
-	realNameKana: v.pipe(
-		v.string(),
-		v.regex(realNamePattern),
-		v.nonEmpty(),
-		v.maxLength(16),
-	),
-	displayId: v.pipe(
-		v.string(),
-		v.nonEmpty(),
-		v.check((value) => !value.match(/^_+$/)),
-		v.check((value) => !RESERVED_WORDS.includes(value)),
-		v.regex(/^[a-z0-9_]{3,16}$/),
-	),
-	email: v.pipe(
-		v.string(),
-		v.nonEmpty(),
-		v.email(),
-		v.check((value) => {
-			const domain = value.split("@")[1];
-			return domain !== ACADEMIC_EMAIL_DOMAIN;
-		}),
-	),
-	academicEmail: v.optional(
-		v.pipe(
-			v.string(),
-			v.nonEmpty(),
-			v.email(),
-			v.check((value) => {
-				const domain = value.split("@")[1];
-				return domain === ACADEMIC_EMAIL_DOMAIN;
-			}),
-		),
-	),
-	studentId: v.optional(
-		v.pipe(v.string(), v.nonEmpty(), v.regex(/^\d{2}[A-Z]{2}\d{3}$/)),
-	),
-	grade: v.pipe(v.string(), v.nonEmpty()),
-	faculty: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	department: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	laboratory: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	graduateSchool: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	specialization: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	bio: v.pipe(v.string(), v.maxLength(BIO_MAX_LENGTH)),
-	socialLinks: v.pipe(v.array(v.pipe(v.string(), v.url())), v.maxLength(5)),
-});
-
-const registerSchema = v.pipe(
-	v.object({
-		displayName: ProfileSchema.entries.displayName,
-		realName: ProfileSchema.entries.realName,
-		realNameKana: ProfileSchema.entries.realNameKana,
-		displayId: ProfileSchema.entries.displayId,
-		email: ProfileSchema.entries.email,
-		academicEmail: ProfileSchema.entries.academicEmail,
-		studentId: ProfileSchema.entries.studentId,
-		grade: ProfileSchema.entries.grade,
-		faculty: ProfileSchema.entries.faculty,
-		department: v.optional(v.pipe(v.string(), v.nonEmpty())),
-		laboratory: ProfileSchema.entries.laboratory,
-		graduateSchool: ProfileSchema.entries.graduateSchool,
-		specialization: ProfileSchema.entries.specialization,
-	}),
-	v.check(({ grade, academicEmail, studentId }) => {
-		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-		if (grade !== "卒業生" && grade !== "ゲスト") {
-			if (!academicEmail || !studentId) {
-				return false;
-			}
-		}
-		return true;
-	}, "academicEmail and studentId are required"),
-);
-
-const updateSchema = v.pipe(
-	v.object({
-		displayName: ProfileSchema.entries.displayName,
-		realName: ProfileSchema.entries.realName,
-		realNameKana: ProfileSchema.entries.realNameKana,
-		displayId: ProfileSchema.entries.displayId,
-		email: ProfileSchema.entries.email,
-		academicEmail: ProfileSchema.entries.academicEmail,
-		studentId: ProfileSchema.entries.studentId,
-		grade: ProfileSchema.entries.grade,
-		faculty: ProfileSchema.entries.faculty,
-		department: v.optional(v.pipe(v.string(), v.nonEmpty())),
-		laboratory: ProfileSchema.entries.laboratory,
-		graduateSchool: ProfileSchema.entries.graduateSchool,
-		specialization: ProfileSchema.entries.specialization,
-		bio: ProfileSchema.entries.bio,
-		socialLinks: ProfileSchema.entries.socialLinks,
-	}),
-	v.check(({ grade, academicEmail, studentId }) => {
-		// もしgradeが卒業生かゲストでないなら、academicEmailとstudentIdは必須
-		if (grade !== "卒業生" && grade !== "ゲスト") {
-			if (!academicEmail || !studentId) {
-				return false;
-			}
-		}
-		return true;
-	}, "academicEmail and studentId are required"),
-);
-
 const updateProfileImageSchema = v.object({
 	image: v.pipe(v.file(), v.maxSize(1024 * 1024 * 5)), // 5MiB
 });
@@ -143,7 +29,7 @@ const route = app
 	.post(
 		"/register",
 		authMiddleware,
-		vValidator("json", registerSchema),
+		vValidator("json", UserRegisterParams),
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;
@@ -190,7 +76,7 @@ const route = app
 	.put(
 		"/update",
 		memberOnlyMiddleware,
-		vValidator("json", updateSchema),
+		vValidator("json", UserProfileUpdateParams),
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;
@@ -325,7 +211,7 @@ const route = app
 		if (
 			!/^\d+$/.test(providerIdStr) ||
 			Number.isNaN(providerId) ||
-			!isValidOAuthProviderId(providerId)
+			!v.is(OAuthProviderId, providerId)
 		) {
 			return c.text("Invalid providerId", 400);
 		}

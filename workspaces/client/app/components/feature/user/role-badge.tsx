@@ -1,5 +1,5 @@
+import type { Role } from "@idp/schema/entity/role";
 import { css } from "styled-system/css";
-import type { Role } from "~/types/role";
 
 interface Props {
 	role: Role;

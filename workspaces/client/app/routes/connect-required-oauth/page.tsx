@@ -1,7 +1,7 @@
 import {
 	OAUTH_PROVIDERS,
 	REQUIRED_OAUTH_PROVIDER_IDS,
-} from "@idp/server/shared/oauth";
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { useEffect } from "react";
 import { type MetaFunction, useNavigate } from "react-router";
 import { css } from "styled-system/css";

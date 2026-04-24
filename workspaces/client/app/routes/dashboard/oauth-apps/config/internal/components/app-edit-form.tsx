@@ -1,10 +1,12 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { scope } from "@idp/server/shared/scope";
+import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
+import type { Scope } from "@idp/schema/entity/oauth-external/scope";
+import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, Save, Trash, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import { css, cx } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
@@ -12,21 +14,11 @@ import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
-import { OAuthSchemas } from "~/schema/oauth";
-import type { OAuthScope } from "~/types/oauth-external";
 import { useDeleteApp } from "../hooks/use-delete-app";
 import { useUpdateOAuthApp } from "../hooks/use-update-oauth-app";
 
-const UpdateFormSchema = v.object({
-	name: OAuthSchemas.ApplicationName,
-	description: OAuthSchemas.Description,
-	scopeIds: OAuthSchemas.ScopeIds,
-	callbackUrls: OAuthSchemas.CallbackUrls,
-	icon: OAuthSchemas.Icon,
-});
-
-type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
-type FormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
+type FormInputValues = v.InferInput<typeof OAuthAppRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParams>;
 
 const iconStyle = css({
 	padding: 1,
@@ -55,7 +47,7 @@ interface Props {
 		description: string | null;
 		logoUrl: string | null;
 		ownerId: string;
-		scopes: OAuthScope[];
+		scopes: Scope[];
 		callbackUrls: string[];
 	};
 }
@@ -75,7 +67,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 		setValue,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(UpdateFormSchema),
+		resolver: valibotResolver(OAuthAppRegisterParams),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる
 			name: appData.name,
@@ -160,7 +152,7 @@ export const AppEditForm = ({ id, appData }: Props) => {
 					{() => (
 						<>
 							<Form.SelectGroup>
-								{Object.entries(scope.SCOPES_BY_ID).map(([id, scope]) => (
+								{Object.entries(SCOPES_BY_ID).map(([id, scope]) => (
 									<Form.Select
 										key={id}
 										value={id}

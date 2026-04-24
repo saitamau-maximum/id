@@ -1,6 +1,6 @@
+import type { UserCertification } from "@idp/schema/entity/certification";
 import { AlertCircle } from "react-feather";
 import { css } from "styled-system/css";
-import type { UserCertification } from "~/types/certification";
 
 interface Props {
 	certifications: UserCertification[];

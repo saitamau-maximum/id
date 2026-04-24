@@ -1,4 +1,4 @@
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { factory } from "../factory";
 import { memberOnlyMiddleware } from "../middleware/auth";
 

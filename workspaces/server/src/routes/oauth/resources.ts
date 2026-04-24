@@ -1,24 +1,20 @@
 // OAuth の Resource Owner としての役割を果たすルーティング
 
+import type { AuthUserResponse } from "@idp/schema/api/oauth/resources";
+import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
+import {
+	SCOPE_IDS,
+	SCOPES_BY_ID,
+} from "@idp/schema/entity/oauth-external/scope";
 import {
 	FORBIDDEN_RESPONSE,
 	UNAUTHORIZED_RESPONSE,
 } from "../../constants/oauth-external";
-import { SCOPE_IDS, SCOPES_BY_ID } from "../../constants/scope";
 import { factory } from "../../factory";
 import { authByAccessTokenMiddleware } from "../../middleware/oauth";
-import type { OidcUserInfo } from "../../utils/oauth/constant";
 import { generateSub } from "../../utils/oauth/oidc-logic";
 
 const app = factory.createApp();
-
-interface UserInfo {
-	id: string;
-	display_id: string | undefined;
-	display_name: string | undefined;
-	profile_image_url: string | undefined;
-	roles: string[];
-}
 
 const route = app
 	.use(authByAccessTokenMiddleware)
@@ -36,7 +32,7 @@ const route = app
 		}
 
 		// ユーザー情報を返す
-		return c.json<UserInfo>({
+		return c.json<AuthUserResponse>({
 			id: tokenInfo.user.id,
 			display_id: tokenInfo.user.profile.displayId,
 			display_name: tokenInfo.user.profile.displayName,
@@ -61,7 +57,7 @@ const route = app
 			return c.text(...FORBIDDEN_RESPONSE);
 		}
 
-		const userInfo: OidcUserInfo = {
+		const userInfo: OIDCUserInfo = {
 			sub: await generateSub(tokenInfo.clientId, tokenInfo.userId),
 		};
 		if (tokenInfo.user.profile.updatedAt)
@@ -101,7 +97,7 @@ const route = app
 			}
 		}
 
-		return c.json(userInfo);
+		return c.json<OIDCUserInfo>(userInfo);
 	});
 
 export { route as oauthResourcesRoute };

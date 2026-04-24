@@ -1,3 +1,4 @@
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { useCallback } from "react";
 import { Search } from "react-feather";
 import { css } from "styled-system/css";
@@ -6,12 +7,11 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Document } from "~/components/ui/document";
 import { useMarkdown } from "~/hooks/use-markdown";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
-import type { CalendarEvent } from "~/types/event";
 import { formatDuration } from "~/utils/date";
 import { LocationDisplay } from "./location-display";
 
 interface Props {
-	events: CalendarEvent[];
+	events: Event[];
 }
 
 // あくまでも表示用のコンポーネントなので、ソートやフィルタなどの処理は行わない
@@ -25,9 +25,9 @@ export const EventList = ({ events }: Props) => {
 	);
 };
 
-const EventRow = ({ event }: { event: CalendarEvent }) => {
+const EventRow = ({ event }: { event: Event }) => {
 	const { locationMap } = useLocations();
-	const isActiveEvent = useCallback((event: CalendarEvent) => {
+	const isActiveEvent = useCallback((event: Event) => {
 		const now = new Date();
 		return event.startAt <= now && now <= event.endAt;
 	}, []);

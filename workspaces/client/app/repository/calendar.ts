@@ -1,14 +1,20 @@
-import type { CalendarEvent, CalendarEventWithNotify } from "~/types/event";
+import type {
+	CreateEventParams,
+	GetEventsResponse,
+	UpdateEventParams,
+} from "@idp/schema/api/calendar/events";
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { client } from "~/utils/hono";
 
 export interface ICalendarRepository {
-	getAllEvents: () => Promise<CalendarEvent[]>;
+	getAllEvents: () => Promise<GetEventsResponse>;
 	getAllEvents$$key: () => unknown[];
-	createEvent: (
-		event: Omit<CalendarEventWithNotify, "id" | "userId">,
+	createEvent: (event: CreateEventParams) => Promise<void>;
+	updateEvent: (
+		eventId: Event["id"],
+		params: UpdateEventParams,
 	) => Promise<void>;
-	updateEvent: (event: CalendarEventWithNotify) => Promise<void>;
-	deleteEvent: (id: CalendarEvent["id"]) => Promise<void>;
+	deleteEvent: (eventId: Event["id"]) => Promise<void>;
 	generateURL: () => Promise<string>;
 }
 
@@ -29,7 +35,7 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		return ["calendar-events"];
 	}
 
-	async createEvent(event: Omit<CalendarEventWithNotify, "id" | "userId">) {
+	async createEvent(event: CreateEventParams) {
 		const res = await client.calendar.events.$post({
 			json: {
 				...event,
@@ -42,15 +48,15 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		}
 	}
 
-	async updateEvent(event: CalendarEventWithNotify) {
+	async updateEvent(eventId: Event["id"], params: UpdateEventParams) {
 		const res = await client.calendar.events[":id"].$put({
 			param: {
-				id: event.id,
+				id: eventId,
 			},
 			json: {
-				...event,
-				startAt: event.startAt.toISOString(),
-				endAt: event.endAt.toISOString(),
+				...params,
+				startAt: params.startAt.toISOString(),
+				endAt: params.endAt.toISOString(),
 			},
 		});
 		if (!res.ok) {
@@ -58,10 +64,10 @@ export class CalendarRepositoryImpl implements ICalendarRepository {
 		}
 	}
 
-	async deleteEvent(id: CalendarEvent["id"]) {
+	async deleteEvent(eventId: Event["id"]) {
 		const res = await client.calendar.events[":id"].$delete({
 			param: {
-				id,
+				id: eventId,
 			},
 		});
 		if (!res.ok) {

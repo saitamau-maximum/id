@@ -1,5 +1,5 @@
+import type { Contributions } from "@idp/schema/entity/contribution";
 import type { IContributionCacheRepository } from "../../../repository/cache";
-import type { Contribitions } from "../../../repository/contribution";
 
 export class CloudflareContributionCacheRepository
 	implements IContributionCacheRepository
@@ -10,8 +10,8 @@ export class CloudflareContributionCacheRepository
 		return `contribution:${username}`;
 	}
 
-	async get(username: string): Promise<Contribitions | null> {
-		const res = await this.kv.get<Contribitions>(
+	async get(username: string): Promise<Contributions | null> {
+		const res = await this.kv.get<Contributions>(
 			this.generateKey(username),
 			"json",
 		);
@@ -21,7 +21,7 @@ export class CloudflareContributionCacheRepository
 		return res;
 	}
 
-	async set(username: string, value: Contribitions): Promise<void> {
+	async set(username: string, value: Contributions): Promise<void> {
 		await this.kv.put(this.generateKey(username), JSON.stringify(value), {
 			expirationTtl: 60 * 60, // 1 hour
 		});

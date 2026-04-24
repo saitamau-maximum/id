@@ -1,29 +1,14 @@
 import { vValidator } from "@hono/valibot-validator";
-import * as v from "valibot";
+import {
+	CertificationCreateParams,
+	CertificationRequestParams,
+	CertificationReviewParams,
+	CertificationUpdateParams,
+} from "@idp/schema/api/certification";
 import { factory } from "../factory";
 import { adminOnlyMiddleware, memberOnlyMiddleware } from "../middleware/auth";
 
 const app = factory.createApp();
-
-const CertificationRequestSchema = v.object({
-	certificationId: v.pipe(v.string(), v.nonEmpty()),
-	certifiedIn: v.pipe(v.number(), v.minValue(2000)),
-});
-
-const CertificationReviewSchema = v.object({
-	userId: v.pipe(v.string(), v.nonEmpty()),
-	certificationId: v.pipe(v.string(), v.nonEmpty()),
-	isApproved: v.boolean(),
-});
-
-const CertificationCreateSchema = v.object({
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.string(),
-});
-
-const CertificationUpdateSchema = v.object({
-	description: v.string(),
-});
 
 const route = app
 	.get("/all", async (c) => {
@@ -34,7 +19,7 @@ const route = app
 	.post(
 		"/request",
 		memberOnlyMiddleware,
-		vValidator("json", CertificationRequestSchema),
+		vValidator("json", CertificationRequestParams),
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { CertificationRepository } = c.var;
@@ -58,7 +43,7 @@ const route = app
 	.put(
 		"/review",
 		adminOnlyMiddleware,
-		vValidator("json", CertificationReviewSchema),
+		vValidator("json", CertificationReviewParams),
 		async (c) => {
 			const { CertificationRepository } = c.var;
 			const { userId, certificationId, isApproved } = c.req.valid("json");
@@ -90,7 +75,7 @@ const route = app
 	.post(
 		"/create",
 		adminOnlyMiddleware,
-		vValidator("json", CertificationCreateSchema),
+		vValidator("json", CertificationCreateParams),
 		async (c) => {
 			const { CertificationRepository } = c.var;
 			const { title, description } = c.req.valid("json");
@@ -104,7 +89,7 @@ const route = app
 	.put(
 		"/:certificationId",
 		adminOnlyMiddleware,
-		vValidator("json", CertificationUpdateSchema),
+		vValidator("json", CertificationUpdateParams),
 		async (c) => {
 			const { CertificationRepository } = c.var;
 			const certificationId = c.req.param("certificationId");
@@ -118,7 +103,7 @@ const route = app
 			}
 
 			await CertificationRepository.updateCertification({
-				certificationId,
+				id: certificationId,
 				description,
 			});
 			return c.body(null, 204);

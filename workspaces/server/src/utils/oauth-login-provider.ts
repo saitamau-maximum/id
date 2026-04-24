@@ -1,3 +1,6 @@
+import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { Context } from "hono";
 import {
 	deleteCookie,
@@ -10,8 +13,6 @@ import { sign, verify } from "hono/jwt";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../constants/cookie";
 import { JWT_ALG } from "../constants/jwt";
-import type { OAuthProviderId } from "../constants/oauth";
-import { ROLE_IDS } from "../constants/role";
 import {
 	DEV_NEW_USER_CREATED_WO_INVITATION,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
@@ -20,7 +21,6 @@ import {
 	ToastHashFn,
 } from "../constants/toast";
 import type { HonoEnv } from "../factory";
-import type { OAuthConnection } from "../repository/oauth-internal";
 import { validateInvitation } from "../service/invite";
 import { getCookieDomain, getDeleteCookieOptions } from "./cookie";
 import { binaryToBase64 } from "./oauth/convert-bin-base64";

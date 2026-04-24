@@ -1,3 +1,4 @@
+import type { ExportableClientSecret } from "@idp/schema/entity/oauth-external/client";
 import { useCallback } from "react";
 import { Plus, Trash2 } from "react-feather";
 import { css } from "styled-system/css";
@@ -6,14 +7,13 @@ import { UserDisplay } from "~/components/feature/user/user-display";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { IconButton } from "~/components/ui/icon-button";
 import { useMembers } from "~/routes/dashboard/members/internal/hooks/use-members";
-import type { OAuthClientSecret } from "~/types/oauth-external";
 import { useDeleteSecret } from "../hooks/use-delete-secret";
 import { useGenerateSecret } from "../hooks/use-generate-secret";
 import { ConfigSectionSubHeader } from "./config-section-sub-header";
 
 interface Props {
 	appId: string;
-	secrets: OAuthClientSecret[];
+	secrets: ExportableClientSecret[];
 }
 export const SecretsManager = ({ appId, secrets }: Props) => {
 	const { mutate: generateSecret } = useGenerateSecret({ appId });

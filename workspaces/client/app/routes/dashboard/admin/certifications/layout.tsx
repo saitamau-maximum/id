@@ -1,4 +1,4 @@
-import { ROLE_IDS } from "node_modules/@idp/server/dist/constants/role";
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { Outlet } from "react-router";
 import { useRoleBlock } from "../internal/hooks/use-role-block";
 

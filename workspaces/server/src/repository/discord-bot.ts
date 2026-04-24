@@ -1,21 +1,18 @@
+import type { EventWithLocation } from "@idp/schema/entity/calendar/event";
+import type { DiscordInviteResult } from "@idp/schema/entity/oauth-internal/discord-info";
 import type {
 	RESTGetAPICurrentUserResult,
 	RESTGetAPIGuildMemberResult,
 	RESTPostAPIChannelMessageJSONBody,
 	RESTPostAPIChannelMessageResult,
 } from "discord-api-types/v10";
-import type { ICalendarEventWithLocation } from "./calendar";
 
-export type DiscordAddGuildMemberResult = "failed" | "already_joined" | "added";
 export type CalendarNotifyType = "new" | "update";
-export type CalendarEventForNotification = Omit<
-	ICalendarEventWithLocation,
-	"id"
->;
+export type CalendarEventForNotification = Omit<EventWithLocation, "id">;
 
 export interface IDiscordBotRepository {
 	getGuildMember(memberId: string): Promise<RESTGetAPIGuildMemberResult | null>;
-	addGuildMember(accessToken: string): Promise<DiscordAddGuildMemberResult>;
+	addGuildMember(accessToken: string): Promise<DiscordInviteResult>;
 	fetchUserByAccessToken(
 		accessToken: string,
 	): Promise<RESTGetAPICurrentUserResult>;

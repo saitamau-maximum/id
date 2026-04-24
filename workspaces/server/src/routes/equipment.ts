@@ -1,5 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import * as v from "valibot";
+import { CreateOrUpdateEquipmentParams } from "@idp/schema/api/equipment";
 import { factory } from "../factory";
 import {
 	equipmentMutableMiddleware,
@@ -7,18 +7,6 @@ import {
 } from "../middleware/auth";
 
 const app = factory.createApp();
-
-const createEquipmentSchema = v.object({
-	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	ownerId: v.pipe(v.string(), v.nonEmpty()),
-});
-
-const updateEquipmentSchema = v.object({
-	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.optional(v.string()),
-	ownerId: v.pipe(v.string(), v.nonEmpty()),
-});
 
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
@@ -44,7 +32,7 @@ const route = app
 	.post(
 		"/",
 		equipmentMutableMiddleware,
-		vValidator("json", createEquipmentSchema),
+		vValidator("json", CreateOrUpdateEquipmentParams),
 		async (c) => {
 			const { name, description, ownerId } = c.req.valid("json");
 			const { EquipmentRepository } = c.var;
@@ -62,7 +50,7 @@ const route = app
 	.put(
 		"/:id",
 		equipmentMutableMiddleware,
-		vValidator("json", updateEquipmentSchema),
+		vValidator("json", CreateOrUpdateEquipmentParams),
 		async (c) => {
 			const id = c.req.param("id");
 			const { name, description, ownerId } = c.req.valid("json");

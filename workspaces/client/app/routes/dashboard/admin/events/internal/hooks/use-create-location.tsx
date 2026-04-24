@@ -1,14 +1,14 @@
+import type { CalendarLocationCreateParams } from "@idp/schema/api/calendar/location";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { Location } from "~/types/location";
 
 export const useCreateLocation = () => {
 	const { locationRepository } = useRepository();
 	const queryClient = useQueryClient();
 	const { pushToast } = useToast();
 	return useMutation({
-		mutationFn: async (location: Omit<Location, "id" | "createdAt">) => {
+		mutationFn: async (location: CalendarLocationCreateParams) => {
 			await locationRepository.createLocation(location);
 			return location;
 		},

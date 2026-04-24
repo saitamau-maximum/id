@@ -1,7 +1,7 @@
+import type { CertificationRequestParams } from "@idp/schema/api/certification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRepository } from "~/hooks/use-repository";
 import { useToast } from "~/hooks/use-toast";
-import type { CertificationRequestParams } from "~/repository/certification";
 
 export const useSendCertificationRequest = () => {
 	const queryClient = useQueryClient();

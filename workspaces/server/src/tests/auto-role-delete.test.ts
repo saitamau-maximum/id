@@ -1,8 +1,8 @@
 import { env } from "cloudflare:test";
+import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";
 import { beforeEach, describe, expect, it } from "vitest";
-import { ROLE_IDS } from "../constants/role";
 import * as schema from "../db/schema";
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
 
@@ -38,7 +38,7 @@ const clearDatabase = async () => {
 
 const createUserWithRoles = async (
 	lastPaymentConfirmedAt: Date | null,
-	roleIds: number[],
+	roleIds: RoleId[],
 ) => {
 	const userId = await userRepository.createUser({});
 

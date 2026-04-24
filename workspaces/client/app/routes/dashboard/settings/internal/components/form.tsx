@@ -1,10 +1,13 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { OAUTH_PROVIDER_IDS } from "@idp/server/shared/oauth";
+import { UserProfileUpdateParams } from "@idp/schema/api/user";
+import type { UserCertification } from "@idp/schema/entity/certification";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { CertificationCard } from "~/components/feature/user/certification-card";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
@@ -26,8 +29,6 @@ import {
 	OUTSIDE_GRADE,
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { BIO_MAX_LENGTH, BIO_MAX_LINES, UserSchemas } from "~/schema/user";
-import type { UserCertification } from "~/types/certification";
 import { detectSocialService } from "~/utils/social-link";
 import {
 	useCertifications,
@@ -39,26 +40,8 @@ import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
 import { OAuthConnRow } from "./oauth-conn-row";
 
-const UpdateFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
-	faculty: v.optional(UserSchemas.Faculty),
-	department: v.optional(UserSchemas.Department),
-	laboratory: v.optional(v.string()),
-	graduateSchool: v.optional(v.string()),
-	specialization: v.optional(v.string()),
-	bio: UserSchemas.Bio,
-	socialLinks: UserSchemas.SocialLinks,
-});
-
-type FormInputValues = v.InferInput<typeof UpdateFormSchema>;
-type FormOutputValues = v.InferOutput<typeof UpdateFormSchema>;
+type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
+type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
@@ -100,10 +83,9 @@ export const ProfileUpdateForm = () => {
 		handleSubmit,
 		watch,
 		control,
-		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(UpdateFormSchema),
+		resolver: valibotResolver(UserProfileUpdateParams),
 		defaultValues: {
 			displayName: user?.displayName,
 			realName: user?.realName,
@@ -139,73 +121,10 @@ export const ProfileUpdateForm = () => {
 	const selectedFaculty = watch("faculty");
 
 	const onSubmit = useCallback(
-		(data: FormInputValues) => {
-			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
-			const isGraduateStudent = GRADUATE_GRADE.includes(data.grade);
-			if (!isOutsideMember && !data.academicEmail) {
-				setError("academicEmail", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.studentId) {
-				setError("studentId", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.grade) {
-				setError("grade", {
-					message: "学年を選択してください",
-				});
-				return;
-			}
-			// B1-D2は学部必須
-			if (!isOutsideMember && !data.faculty) {
-				setError("faculty", {
-					message: "学部を選択してください",
-				});
-				return;
-			}
-			// B1-D2の経済学部以外は学科必須
-			if (
-				!isOutsideMember &&
-				!isGraduateStudent &&
-				selectedFaculty !== "経済学部" &&
-				!data.department
-			) {
-				setError("department", {
-					message: "学科を選択してください",
-				});
-				return;
-			}
-			// M, D以上は研究室・研究科・専攻必須
-			if (isGraduateStudent && !data.laboratory) {
-				setError("laboratory", {
-					message: "研究室を入力してください",
-				});
-				return;
-			}
-			if (isGraduateStudent && !data.graduateSchool) {
-				setError("graduateSchool", {
-					message: "研究科を入力してください",
-				});
-				return;
-			}
-			if (isGraduateStudent && !data.specialization) {
-				setError("specialization", {
-					message: "専攻を入力してください",
-				});
-				return;
-			}
-			const socialLinks = data.socialLinks.map((link) => link.value);
-			const payload = {
-				...data,
-				socialLinks,
-			};
-			mutate(payload);
+		(data: FormOutputValues) => {
+			mutate(data);
 		},
-		[mutate, setError, selectedFaculty],
+		[mutate],
 	);
 
 	const departmentsByFaculty: Record<string, string[]> = {
@@ -582,9 +501,7 @@ export const ProfileUpdateForm = () => {
 				>
 					{socialLinks.map((field, index) => (
 						<li className={css({ listStyle: "none" })} key={field.id}>
-							<ErrorDisplay
-								error={errors.socialLinks?.[index]?.value?.message}
-							/>
+							<ErrorDisplay error={errors.socialLinks?.[index]?.message} />
 							<div
 								className={css({
 									display: "flex",

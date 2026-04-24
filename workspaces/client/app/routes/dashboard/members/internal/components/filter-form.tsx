@@ -1,4 +1,4 @@
-import { ROLE_BY_ID } from "node_modules/@idp/server/dist/constants/role";
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { useId } from "react";
 import { css } from "styled-system/css";
 import { Form } from "~/components/ui/form";
@@ -106,7 +106,7 @@ export const FilterForm = ({
 								key={id}
 								value={id}
 								label={role.name}
-								checked={filter.selectedRoleIds.includes(Number(id))}
+								checked={filter.selectedRoleIds.includes(role.id)}
 								onChange={handleRoleSelectChange}
 							/>
 						))}

@@ -1,55 +1,36 @@
-import type { Certification } from "~/types/certification";
+import type {
+	CertificationCreateParams,
+	CertificationRequestParams,
+	CertificationReviewParams,
+	CertificationUpdateParams,
+	GetAllCertificationsResponse,
+	GetCertificationRequestsResponse,
+} from "@idp/schema/api/certification";
+import type { Certification } from "@idp/schema/entity/certification";
 import { client } from "~/utils/hono";
 
-export interface CertificationRequestParams {
-	certificationId: string;
-	certifiedIn: number;
-}
-
-export interface CertificationRequestWithUser {
-	user: {
-		id: string;
-		displayId: string | null;
-		displayName: string | null;
-		profileImageURL: string | null;
-	};
-	certificationId: string;
-	certifiedIn: number;
-}
-
-export interface CertificationRequestReviewParams {
-	userId: string;
-	certificationId: string;
-	isApproved: boolean;
-}
-
-export interface CertificationCreateParams {
-	title: string;
-	description: string;
-}
-
-export interface CertificationUpdateParams {
-	certificationId: string;
-	description: string;
-}
-
 export interface ICertificationRepository {
-	getAllCertifications(): Promise<Certification[]>;
+	getAllCertifications(): Promise<GetAllCertificationsResponse>;
 	getAllCertifications$$key(): unknown[];
 	requestCertification: (params: CertificationRequestParams) => Promise<void>;
-	getAllCertificationRequests: () => Promise<CertificationRequestWithUser[]>;
+	getAllCertificationRequests: () => Promise<GetCertificationRequestsResponse>;
 	getAllCertificationRequests$$key(): unknown[];
 	reviewCertificationRequest: (
-		params: CertificationRequestReviewParams,
+		params: CertificationReviewParams,
 	) => Promise<void>;
 	createCertification: (params: CertificationCreateParams) => Promise<void>;
-	updateCertification: (params: CertificationUpdateParams) => Promise<void>;
-	deleteCertification: (certificationId: string) => Promise<void>;
-	deleteUserCertification: (certificationId: string) => Promise<void>;
+	updateCertification: (
+		certificationId: Certification["id"],
+		params: CertificationUpdateParams,
+	) => Promise<void>;
+	deleteCertification: (certificationId: Certification["id"]) => Promise<void>;
+	deleteUserCertification: (
+		certificationId: Certification["id"],
+	) => Promise<void>;
 }
 
 export class CertificationRepositoryImpl implements ICertificationRepository {
-	async getAllCertifications(): Promise<Certification[]> {
+	async getAllCertifications(): Promise<GetAllCertificationsResponse> {
 		const res = await client.certification.all.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch certifications");
@@ -76,7 +57,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async getAllCertificationRequests(): Promise<CertificationRequestWithUser[]> {
+	async getAllCertificationRequests(): Promise<GetCertificationRequestsResponse> {
 		const res = await client.certification.request.$get();
 		if (!res.ok) {
 			throw new Error("Failed to fetch certification requests");
@@ -92,7 +73,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		userId,
 		certificationId,
 		isApproved,
-	}: CertificationRequestReviewParams) {
+	}: CertificationReviewParams) {
 		const res = await client.certification.review.$put({
 			json: {
 				userId,
@@ -117,10 +98,13 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async updateCertification(params: CertificationUpdateParams) {
+	async updateCertification(
+		certificationId: Certification["id"],
+		params: CertificationUpdateParams,
+	) {
 		const res = await client.certification[":certificationId"].$put({
 			param: {
-				certificationId: params.certificationId,
+				certificationId,
 			},
 			json: {
 				description: params.description,
@@ -131,7 +115,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async deleteCertification(certificationId: string) {
+	async deleteCertification(certificationId: Certification["id"]) {
 		const res = await client.certification[":certificationId"].$delete({
 			param: {
 				certificationId,
@@ -142,7 +126,7 @@ export class CertificationRepositoryImpl implements ICertificationRepository {
 		}
 	}
 
-	async deleteUserCertification(certificationId: string) {
+	async deleteUserCertification(certificationId: Certification["id"]) {
 		const res = await client.certification[":certificationId"].my.$delete({
 			param: {
 				certificationId,

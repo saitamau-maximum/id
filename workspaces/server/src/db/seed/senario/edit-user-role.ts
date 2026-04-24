@@ -1,7 +1,7 @@
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { and, eq, inArray } from "drizzle-orm";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import prompts from "prompts";
-import { ROLE_BY_ID } from "../../../constants/role";
 import * as schema from "../../../db/schema";
 import { getUserFromDisplayIdPrompt } from "./common/get-user-from-display-id-prompt";
 

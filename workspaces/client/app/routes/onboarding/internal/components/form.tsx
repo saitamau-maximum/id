@@ -1,8 +1,9 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { UserRegisterParams } from "@idp/schema/api/user";
 import { Fragment, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -17,27 +18,10 @@ import {
 	OUTSIDE_GRADE,
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
-import { UserSchemas } from "~/schema/user";
 import { useRegister } from "../hooks/use-register";
 
-const RegisterFormSchema = v.object({
-	displayName: UserSchemas.DisplayName,
-	realName: UserSchemas.RealName,
-	realNameKana: UserSchemas.RealNameKana,
-	displayId: UserSchemas.DisplayId,
-	email: UserSchemas.Email,
-	academicEmail: v.optional(UserSchemas.AcademicEmail),
-	studentId: v.optional(UserSchemas.StudentId),
-	grade: UserSchemas.Grade,
-	faculty: v.optional(UserSchemas.Faculty),
-	department: v.optional(UserSchemas.Department),
-	laboratory: v.optional(UserSchemas.Laboratory),
-	graduateSchool: v.optional(UserSchemas.GraduateSchool),
-	specialization: v.optional(UserSchemas.Specialization),
-});
-
-type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
-type FormOutputValues = v.InferOutput<typeof RegisterFormSchema>;
+type FormInputValues = v.InferInput<typeof UserRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof UserRegisterParams>;
 
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
@@ -47,10 +31,9 @@ export const RegisterForm = () => {
 		register,
 		handleSubmit,
 		watch,
-		setError,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(RegisterFormSchema),
+		resolver: valibotResolver(UserRegisterParams),
 		defaultValues: {
 			displayName: user?.displayName,
 			realName: user?.realName,
@@ -73,49 +56,10 @@ export const RegisterForm = () => {
 	const selectedFaculty = watch("faculty");
 
 	const onSubmit = useCallback(
-		(data: FormInputValues) => {
-			const isOutsideMember = OUTSIDE_GRADE.includes(data.grade);
-			const isGraduateStudent = GRADUATE_GRADE.includes(data.grade);
-			if (!isOutsideMember && !data.academicEmail) {
-				setError("academicEmail", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.studentId) {
-				setError("studentId", {
-					message: "学籍番号と大学のメールアドレスは必須です",
-				});
-				return;
-			}
-			if (!isOutsideMember && !data.faculty) {
-				setError("faculty", {
-					message: "学部を選択してください",
-				});
-				return;
-			}
-			// B1-B4の経済学部以外は学科必須
-			if (
-				!isOutsideMember &&
-				!isGraduateStudent &&
-				selectedFaculty !== "経済学部" &&
-				!data.department
-			) {
-				setError("department", {
-					message: "学科を選択してください",
-				});
-				return;
-			}
-			// M, D以上は研究室必須
-			if (isGraduateStudent && !data.laboratory) {
-				setError("laboratory", {
-					message: "研究室を入力してください",
-				});
-				return;
-			}
+		(data: FormOutputValues) => {
 			mutate(data);
 		},
-		[mutate, setError, selectedFaculty],
+		[mutate],
 	);
 
 	const departmentsByFaculty: Record<string, string[]> = {
