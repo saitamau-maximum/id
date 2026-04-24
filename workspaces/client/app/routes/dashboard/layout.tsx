@@ -60,7 +60,7 @@ export default function Dashboard() {
 				pushToast({
 					title: "今年度の会費をまだお支払いされていません",
 					description: "支払い方法をご案内します",
-					type: "error",
+					type: "info",
 				});
 				navigate("/update-payment-info");
 			}
