@@ -1,21 +1,8 @@
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
+import { getFiscalYear } from "../utils/date";
 
 const getCurrentFiscalYearStartAt = (): Date => {
-	const now = new Date();
-
-	const year = Number(
-		new Intl.DateTimeFormat("en-US", {
-			timeZone: "Asia/Tokyo",
-			year: "numeric",
-		}).format(now),
-	);
-	const month = Number(
-		new Intl.DateTimeFormat("en-US", {
-			timeZone: "Asia/Tokyo",
-			month: "numeric",
-		}).format(now),
-	);
-	const fiscalYearStartYear = month < 4 ? year - 1 : year;
+	const fiscalYearStartYear = getFiscalYear(new Date());
 
 	// 現在属している年度の 4/1 00:00 JST
 	return new Date(Date.UTC(fiscalYearStartYear, 2, 31, 15, 0, 0));
