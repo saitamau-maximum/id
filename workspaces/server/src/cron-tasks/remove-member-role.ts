@@ -9,9 +9,16 @@ const getCurrentFiscalYearStartAt = (): Date => {
 			year: "numeric",
 		}).format(now),
 	);
+	const month = Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "Asia/Tokyo",
+			month: "numeric",
+		}).format(now),
+	);
+	const fiscalYearStartYear = month < 4 ? year - 1 : year;
 
-	// 4/1 00:00 JST
-	return new Date(Date.UTC(year, 2, 31, 15, 0, 0));
+	// 現在属している年度の 4/1 00:00 JST
+	return new Date(Date.UTC(fiscalYearStartYear, 2, 31, 15, 0, 0));
 };
 
 // 4/30 15:00 UTC = 5/1 00:00 JST に実行される
