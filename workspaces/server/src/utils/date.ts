@@ -1,4 +1,32 @@
 /**
+ * 指定された日付が属する年度を取得する関数。
+ * タイムゾーンは Asia/Tokyo
+ *
+ * @param date - 対象の日付オブジェクト。
+ * @returns 年度を表す数値。
+ */
+export const getFiscalYear = (date: Date): number => {
+	const year = Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "Asia/Tokyo",
+			year: "numeric",
+		}).format(date),
+	);
+	const month = Number(
+		new Intl.DateTimeFormat("en-US", {
+			timeZone: "Asia/Tokyo",
+			month: "numeric",
+		}).format(date),
+	);
+
+	if (month >= 4) {
+		return year;
+	}
+
+	return year - 1;
+};
+
+/**
  * 開始日時と終了日時を期間表示形式に変換する関数。
  * タイムゾーンは Asia/Tokyo
  *

@@ -2,7 +2,16 @@ import type { Member, PublicMember } from "@idp/schema/entity/member";
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
 import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
-import { eq, type InferInsertModel, isNotNull, isNull } from "drizzle-orm";
+import {
+	and,
+	eq,
+	type InferInsertModel,
+	inArray,
+	isNotNull,
+	isNull,
+	lt,
+	or,
+} from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
@@ -469,6 +478,35 @@ export class CloudflareUserRepository implements IUserRepository {
 		if (!res.success) {
 			throw new Error("Failed to add user role");
 		}
+	}
+
+	async removeMemberRoleFromUsersBefore(
+		lastPaymentConfirmedAt: Date,
+	): Promise<number> {
+		const expiredUsersQuery = this.client
+			.select({ id: schema.users.id })
+			.from(schema.users)
+			.where(
+				or(
+					isNull(schema.users.lastPaymentConfirmedAt),
+					lt(schema.users.lastPaymentConfirmedAt, lastPaymentConfirmedAt),
+				),
+			);
+
+		const res = await this.client
+			.delete(schema.userRoles)
+			.where(
+				and(
+					eq(schema.userRoles.roleId, ROLE_IDS.MEMBER),
+					inArray(schema.userRoles.userId, expiredUsersQuery),
+				),
+			);
+
+		if (!res.success) {
+			throw new Error("Failed to remove member role from expired users");
+		}
+
+		return res.meta.changes;
 	}
 
 	async fetchProvisionalUsers(): Promise<FetchProvisionalUsersRes> {
