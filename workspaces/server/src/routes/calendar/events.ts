@@ -59,19 +59,10 @@ const route = app
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
-			const { userId } = c.get("jwtPayload");
+			const { userId: reqUserId } = c.get("jwtPayload");
 			const { title, description, startAt, endAt, locationId, notifyDiscord } =
 				c.req.valid("json");
 			const id = c.req.param("id");
-			const eventPayload = {
-				id,
-				userId,
-				title,
-				description,
-				startAt,
-				endAt,
-				locationId,
-			};
 
 			// イベントが存在するかチェック
 			const event = await CalendarRepository.getEventById(id).catch(() => null);
@@ -81,11 +72,23 @@ const route = app
 
 			// もしAdminじゃないなら、自分のイベントだけ更新できる
 			const roleIds = c.get("roleIds");
-			if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== userId) {
+			if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== reqUserId) {
 				return c.body(null, 403);
 			}
 
 			// イベントを更新
+			const eventPayload = {
+				id,
+				title,
+				description,
+				startAt,
+				endAt,
+				locationId,
+				// userId は元の情報から引き継ぐ
+				// - jwt の userId だと Admin が更新したときにイベントの所有者が Admin に変わってしまう
+				// - リクエストの userId は改ざんされうるので信頼しない
+				userId: event.userId,
+			};
 			await CalendarRepository.updateEvent(eventPayload);
 
 			if (notifyDiscord) {
