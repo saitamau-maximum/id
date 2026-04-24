@@ -1,10 +1,10 @@
+import type { UserBasicInfo } from "@idp/schema/entity/user";
 import { useCallback, useMemo, useState } from "react";
 import { createCallable } from "react-call";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
-import type { UserBasicInfo } from "~/types/user";
 import { UserDisplay } from "./user-display";
 
 interface Props {

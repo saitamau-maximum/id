@@ -1,3 +1,4 @@
+import { OAUTH_SCOPE_REGEX } from "@idp/schema/constants/oauth-external";
 import type { Context } from "hono";
 import { deleteCookie, getSignedCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
@@ -5,7 +6,6 @@ import { validator } from "hono/validator";
 import * as v from "valibot";
 import { COOKIE_NAME } from "../../constants/cookie";
 import { JWT_ALG } from "../../constants/jwt";
-import { OAUTH_SCOPE_REGEX } from "../../constants/oauth";
 import {
 	PLEASE_RELOGIN_FOR_OAUTH,
 	TOAST_SEARCHPARAM,

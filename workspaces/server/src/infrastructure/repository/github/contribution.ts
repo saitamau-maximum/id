@@ -1,8 +1,6 @@
+import type { Contributions } from "@idp/schema/entity/contribution";
 import type { Octokit } from "octokit";
-import type {
-	Contribitions,
-	IContributionRepository,
-} from "../../../repository/contribution";
+import type { IContributionRepository } from "../../../repository/contribution";
 
 const queryGetContributions = `
 query ($username: String!, $organizationId: ID!) {
@@ -43,7 +41,7 @@ const ORGANIZATION_ID = "O_kgDOBzHRyQ"; // @saitamau-maximum
 export class GithubContributionRepository implements IContributionRepository {
 	constructor(private readonly octokit: Octokit) {}
 
-	async getContributions(username: string): Promise<Contribitions> {
+	async getContributions(username: string): Promise<Contributions> {
 		const data = await this.octokit.graphql<QueryGetContributionsResponse>(
 			queryGetContributions,
 			{
@@ -54,13 +52,11 @@ export class GithubContributionRepository implements IContributionRepository {
 
 		const weeks = data.user.contributionsCollection.contributionCalendar.weeks;
 
-		return {
-			weeks: weeks.map((week) =>
-				week.contributionDays.map((day) => ({
-					date: new Date(day.date),
-					rate: Math.min(day.contributionCount / 5, 1),
-				})),
-			),
-		};
+		return weeks.map((week) =>
+			week.contributionDays.map((day) => ({
+				date: day.date,
+				rate: Math.min(day.contributionCount / 5, 1),
+			})),
+		);
 	}
 }

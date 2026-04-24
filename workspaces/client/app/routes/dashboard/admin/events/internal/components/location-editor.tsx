@@ -1,3 +1,4 @@
+import type { CalendarLocationGetLocationsResponse } from "@idp/schema/api/calendar/location";
 import { useCallback } from "react";
 import { Edit, Plus, Trash } from "react-feather";
 import { css } from "styled-system/css";
@@ -7,7 +8,6 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { IconButton } from "~/components/ui/icon-button";
 import { Table } from "~/components/ui/table";
 import { useLocations } from "~/routes/dashboard/calendar/hooks/use-locations";
-import type { Location } from "~/types/location";
 import { useCreateLocation } from "../hooks/use-create-location";
 import { useDeleteLocation } from "../hooks/use-delete-location";
 import { useUpdateLocation } from "../hooks/use-update-location";
@@ -98,7 +98,7 @@ export const LocationEditor = () => {
 };
 
 interface LocationTableRowProps {
-	location: Omit<Location, "description">;
+	location: CalendarLocationGetLocationsResponse[number];
 }
 
 const LocationTableRow = ({ location }: LocationTableRowProps) => {

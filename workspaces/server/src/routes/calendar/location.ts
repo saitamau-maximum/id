@@ -1,5 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
-import * as v from "valibot";
+import {
+	CalendarLocationCreateParams,
+	CalendarLocationUpdateParams,
+} from "@idp/schema/api/calendar/location";
 import { factory } from "../../factory";
 import {
 	calendarMutableMiddleware,
@@ -7,17 +10,6 @@ import {
 } from "../../middleware/auth";
 
 const app = factory.createApp();
-
-const createLocationSchema = v.object({
-	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.pipe(v.string(), v.nonEmpty()),
-});
-
-const updateLocationSchema = v.object({
-	id: v.pipe(v.string(), v.nonEmpty()),
-	name: v.pipe(v.string(), v.nonEmpty()),
-	description: v.pipe(v.string(), v.nonEmpty()),
-});
 
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
@@ -40,7 +32,7 @@ const route = app
 	.post(
 		"/",
 		calendarMutableMiddleware,
-		vValidator("json", createLocationSchema),
+		vValidator("json", CalendarLocationCreateParams),
 		async (c) => {
 			const { name, description } = c.req.valid("json");
 			const { LocationRepository } = c.var;
@@ -57,7 +49,7 @@ const route = app
 	.put(
 		"/:id",
 		calendarMutableMiddleware,
-		vValidator("json", updateLocationSchema),
+		vValidator("json", CalendarLocationUpdateParams),
 		async (c) => {
 			const id = c.req.param("id");
 			const { name, description } = c.req.valid("json");

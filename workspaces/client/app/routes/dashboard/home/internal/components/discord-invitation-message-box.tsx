@@ -1,12 +1,12 @@
+import type { GetDiscordInfoResponse } from "@idp/schema/api/discord";
 import { ArrowUpRight } from "react-feather";
 import { useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { MessageBox } from "~/components/ui/message-box";
-import type { DiscordInfo } from "~/types/discord-info";
 import { useDiscordInvite } from "../hooks/use-discord-invite";
 
 interface DiscordInvitationMessageBoxProps {
-	discordInfo?: DiscordInfo;
+	discordInfo?: GetDiscordInfoResponse;
 }
 
 export const DiscordInvitationMessageBox = ({

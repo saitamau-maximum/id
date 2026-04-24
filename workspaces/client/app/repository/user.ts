@@ -1,55 +1,26 @@
-import type { User } from "~/types/user";
+import type {
+	AdminUserGetProvisionalUsersResponse,
+	AdminUserGetUsersResponse,
+} from "@idp/schema/api/admin/user";
+import type {
+	UserGetContributionsResponse,
+	UserProfileUpdateParams,
+	UserRegisterParams,
+} from "@idp/schema/api/user";
+import type { RoleId } from "@idp/schema/entity/role";
 import { client } from "~/utils/hono";
-
-export interface UserRegisterParams {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail?: string;
-	email: string;
-	studentId?: string;
-	grade: string;
-	faculty?: string;
-	department?: string;
-	laboratory?: string;
-	graduateSchool?: string;
-	specialization?: string;
-}
-
-export interface ProfileUpdateParams {
-	displayName: string;
-	realName: string;
-	realNameKana: string;
-	displayId: string;
-	academicEmail?: string;
-	email: string;
-	studentId?: string;
-	grade: string;
-	faculty?: string;
-	department?: string;
-	laboratory?: string;
-	graduateSchool?: string;
-	specialization?: string;
-	bio: string;
-	socialLinks: string[];
-}
 
 export interface IUserRepository {
 	register: (params: UserRegisterParams) => Promise<void>;
-	update: (params: ProfileUpdateParams) => Promise<void>;
-	getContributions: () => Promise<{
-		weeks: {
-			date: string;
-			rate: number;
-		}[][];
-	}>;
+	update: (params: UserProfileUpdateParams) => Promise<void>;
+	getContributions: () => Promise<UserGetContributionsResponse>;
 	getContributions$$key: () => unknown[];
-	getAllUsers: () => Promise<User[]>;
+
+	getAllUsers: () => Promise<AdminUserGetUsersResponse>;
 	getAllUsers$$key: () => unknown[];
-	updateUserRole: (userId: string, roleIds: number[]) => Promise<void>;
+	updateUserRole: (userId: string, roleIds: RoleId[]) => Promise<void>;
 	updateUserProfileImage: (file: File) => Promise<void>;
-	getAllProvisionalUsers: () => Promise<User[]>;
+	getAllProvisionalUsers: () => Promise<AdminUserGetProvisionalUsersResponse>;
 	getAllProvisionalUsers$$key: () => unknown[];
 	approveInvitation: (userId: string) => Promise<void>;
 	rejectInvitation: (userId: string) => Promise<void>;
@@ -111,7 +82,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		specialization,
 		bio,
 		socialLinks,
-	}: ProfileUpdateParams) {
+	}: UserProfileUpdateParams) {
 		const res = await client.user.update.$put({
 			json: {
 				displayName,
@@ -156,12 +127,10 @@ export class UserRepositoryImpl implements IUserRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
-			initializedAt: user.initializedAt
-				? new Date(user.initializedAt)
-				: undefined,
+			initializedAt: user.initializedAt ? new Date(user.initializedAt) : null,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
 				? new Date(user.lastPaymentConfirmedAt)
-				: undefined,
+				: null,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 			lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
 		}));
@@ -171,7 +140,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		return ["users"];
 	}
 
-	async updateUserRole(userId: string, roleIds: number[]) {
+	async updateUserRole(userId: string, roleIds: RoleId[]) {
 		const res = await client.admin.users[":userId"].role.$put({
 			param: {
 				userId,
@@ -204,12 +173,10 @@ export class UserRepositoryImpl implements IUserRepository {
 		const data = await res.json();
 		return data.map((user) => ({
 			...user,
-			initializedAt: user.initializedAt
-				? new Date(user.initializedAt)
-				: undefined,
+			initializedAt: user.initializedAt ? new Date(user.initializedAt) : null,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt
 				? new Date(user.lastPaymentConfirmedAt)
-				: undefined,
+				: null,
 			updatedAt: user.updatedAt ? new Date(user.updatedAt) : undefined,
 			lastLoginAt: user.lastLoginAt ? new Date(user.lastLoginAt) : undefined,
 		}));

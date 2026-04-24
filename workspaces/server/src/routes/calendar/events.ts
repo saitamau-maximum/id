@@ -1,6 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
-import * as v from "valibot";
-import { ROLE_IDS } from "../../constants/role";
+import {
+	CreateEventParams,
+	UpdateEventParams,
+} from "@idp/schema/api/calendar/events";
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { factory } from "../../factory";
 import {
 	calendarMutableMiddleware,
@@ -8,37 +11,6 @@ import {
 } from "../../middleware/auth";
 
 const app = factory.createApp();
-
-const createEventSchema = v.pipe(
-	v.object({
-		title: v.pipe(v.string(), v.nonEmpty()),
-		description: v.optional(v.string()),
-		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-		locationId: v.optional(v.string()),
-		notifyDiscord: v.boolean(),
-	}),
-	v.check(
-		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
-		"startAt must be before endAt",
-	),
-);
-
-const updateEventSchema = v.pipe(
-	v.object({
-		userId: v.pipe(v.string(), v.nonEmpty()),
-		title: v.pipe(v.string(), v.nonEmpty()),
-		description: v.optional(v.string()),
-		startAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-		endAt: v.pipe(v.string(), v.isoTimestamp(), v.nonEmpty()),
-		locationId: v.optional(v.string()),
-		notifyDiscord: v.boolean(),
-	}),
-	v.check(
-		({ startAt, endAt }) => new Date(startAt) < new Date(endAt),
-		"startAt must be before endAt",
-	),
-);
 
 const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
@@ -49,7 +21,7 @@ const route = app
 	.post(
 		"/",
 		calendarMutableMiddleware,
-		vValidator("json", createEventSchema),
+		vValidator("json", CreateEventParams),
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
@@ -60,8 +32,8 @@ const route = app
 				userId,
 				title,
 				description,
-				startAt: new Date(startAt),
-				endAt: new Date(endAt),
+				startAt,
+				endAt,
 				locationId,
 			};
 
@@ -83,29 +55,14 @@ const route = app
 	.put(
 		"/:id",
 		calendarMutableMiddleware,
-		vValidator("json", updateEventSchema),
+		vValidator("json", UpdateEventParams),
 		async (c) => {
 			const { CalendarRepository, DiscordBotRepository, LocationRepository } =
 				c.var;
-			const {
-				userId,
-				title,
-				description,
-				startAt,
-				endAt,
-				locationId,
-				notifyDiscord,
-			} = c.req.valid("json");
+			const { userId: reqUserId } = c.get("jwtPayload");
+			const { title, description, startAt, endAt, locationId, notifyDiscord } =
+				c.req.valid("json");
 			const id = c.req.param("id");
-			const eventPayload = {
-				id,
-				userId,
-				title,
-				description,
-				startAt: new Date(startAt),
-				endAt: new Date(endAt),
-				locationId,
-			};
 
 			// イベントが存在するかチェック
 			const event = await CalendarRepository.getEventById(id).catch(() => null);
@@ -115,11 +72,23 @@ const route = app
 
 			// もしAdminじゃないなら、自分のイベントだけ更新できる
 			const roleIds = c.get("roleIds");
-			if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== userId) {
+			if (!roleIds.includes(ROLE_IDS.ADMIN) && event.userId !== reqUserId) {
 				return c.body(null, 403);
 			}
 
 			// イベントを更新
+			const eventPayload = {
+				id,
+				title,
+				description,
+				startAt,
+				endAt,
+				locationId,
+				// userId は元の情報から引き継ぐ
+				// - jwt の userId だと Admin が更新したときにイベントの所有者が Admin に変わってしまう
+				// - リクエストの userId は改ざんされうるので信頼しない
+				userId: event.userId,
+			};
 			await CalendarRepository.updateEvent(eventPayload);
 
 			if (notifyDiscord) {

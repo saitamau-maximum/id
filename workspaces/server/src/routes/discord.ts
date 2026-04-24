@@ -1,25 +1,19 @@
+import type {
+	DiscordInfoJoinedResponse,
+	DiscordInfoNotJoinedResponse,
+	DiscordInfoNotLinkedResponse,
+	PostInviteDiscordResponse,
+} from "@idp/schema/api/discord";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	OAuth2Routes,
 	OAuth2Scopes,
 	PermissionFlagsBits,
 } from "discord-api-types/v10";
-import { OAUTH_PROVIDER_IDS } from "../constants/oauth";
 import { factory } from "../factory";
 import { cookieAuthMiddleware, memberOnlyMiddleware } from "../middleware/auth";
-import type { DiscordAddGuildMemberResult } from "../repository/discord-bot";
 
 const app = factory.createApp();
-
-type DiscordInfoResNotLinked = {
-	status: "not_linked";
-};
-type DiscordInfoResNotJoined = {
-	status: "not_joined";
-};
-type DiscordInfoResJoined = {
-	status: "joined";
-	displayName: string;
-};
 
 const route = app
 	.get("/add-bot", cookieAuthMiddleware, async (c) => {
@@ -56,7 +50,7 @@ const route = app
 			(c) => c.providerId === OAUTH_PROVIDER_IDS.DISCORD,
 		);
 		if (!discordConn) {
-			return c.json<DiscordInfoResNotLinked>({ status: "not_linked" });
+			return c.json<DiscordInfoNotLinkedResponse>({ status: "not_linked" });
 		}
 		const member = await DiscordBotRepository.getGuildMember(
 			discordConn.providerUserId,
@@ -64,10 +58,10 @@ const route = app
 		// Discord Docs には member.user は存在すると書かれているが
 		// なぜか存在しないことがあるので念のためチェックする
 		if (!member || !member.user) {
-			return c.json<DiscordInfoResNotJoined>({ status: "not_joined" });
+			return c.json<DiscordInfoNotJoinedResponse>({ status: "not_joined" });
 		}
 		// 載せたくない情報も含まれているので制限する
-		return c.json<DiscordInfoResJoined>({
+		return c.json<DiscordInfoJoinedResponse>({
 			status: "joined",
 			displayName:
 				member.nick || member.user.global_name || member.user.username,
@@ -85,7 +79,7 @@ const route = app
 			);
 
 		if (!discordAccessToken) {
-			return c.text<DiscordAddGuildMemberResult>("failed");
+			return c.text<PostInviteDiscordResponse>("failed");
 		}
 
 		const res = await DiscordBotRepository.addGuildMember(discordAccessToken);

@@ -1,6 +1,7 @@
+import type { Member } from "@idp/schema/entity/member";
+import { type Role, RoleId } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
-import type { Role } from "~/types/role";
-import type { Member } from "~/types/user";
+import * as v from "valibot";
 
 export interface Filter {
 	keyword: string;
@@ -14,7 +15,9 @@ const katakanaToHiragana = (str: string) => {
 	);
 };
 
-export function useMembersFilter(members: Member[]) {
+export function useMembersFilter(
+	members: Omit<Member, "certifications" | "oauthConnections">[],
+) {
 	const [filter, setFilter] = useState<Filter>({
 		keyword: "",
 		selectedGrades: [],
@@ -85,7 +88,12 @@ export function useMembersFilter(members: Member[]) {
 
 	const handleRoleSelectChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = Number(event.target.value);
+			const { output: value, success } = v.safeParse(
+				RoleId,
+				Number(event.target.value),
+			);
+			if (!success) return;
+
 			setFilter((prev) => {
 				if (prev.selectedRoleIds.includes(value)) {
 					return {

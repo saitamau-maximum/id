@@ -1,17 +1,17 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { scope } from "@idp/server/shared/scope";
+import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
+import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import type { MetaFunction } from "react-router";
 import { css, cx } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { IconButton } from "~/components/ui/icon-button";
 import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
-import { OAuthSchemas } from "~/schema/oauth";
 import { OAuthSectionHeader } from "../internal/components/oauth-section-header";
 import { useRegisterOAuthApp } from "./internal/hooks/use-register-oauth-app";
 
@@ -19,16 +19,8 @@ export const meta: MetaFunction = () => {
 	return [{ title: "OAuth アプリケーションの新規作成 | Maximum IdP" }];
 };
 
-const RegisterFormSchema = v.object({
-	name: OAuthSchemas.ApplicationName,
-	description: OAuthSchemas.Description,
-	scopeIds: OAuthSchemas.ScopeIds,
-	callbackUrls: OAuthSchemas.CallbackUrls,
-	icon: OAuthSchemas.Icon,
-});
-
-type FormInputValues = v.InferInput<typeof RegisterFormSchema>;
-type FormOutputValues = v.InferOutput<typeof RegisterFormSchema>;
+type FormInputValues = v.InferInput<typeof OAuthAppRegisterParams>;
+type FormOutputValues = v.InferOutput<typeof OAuthAppRegisterParams>;
 
 const iconStyle = css({
 	padding: 1,
@@ -62,7 +54,7 @@ export default function Register() {
 		setValue,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(RegisterFormSchema),
+		resolver: valibotResolver(OAuthAppRegisterParams),
 		defaultValues: {
 			// hack: 初期値を配列にしておくと、checkboxの値が配列で返ってくる
 			scopeIds: [],
@@ -139,7 +131,7 @@ export default function Register() {
 						{() => (
 							<>
 								<Form.SelectGroup>
-									{Object.entries(scope.SCOPES_BY_ID).map(([id, scope]) => (
+									{Object.entries(SCOPES_BY_ID).map(([id, scope]) => (
 										<Form.Select
 											key={id}
 											value={id}

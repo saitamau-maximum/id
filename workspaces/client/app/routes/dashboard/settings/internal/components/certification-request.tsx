@@ -1,3 +1,5 @@
+import type { CertificationRequestParams } from "@idp/schema/api/certification";
+import type { Certification } from "@idp/schema/entity/certification";
 import { useCallback, useState } from "react";
 import { createCallable } from "react-call";
 import { css } from "styled-system/css";
@@ -6,8 +8,6 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Dialog } from "~/components/ui/dialog";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
-import type { CertificationRequestParams } from "~/repository/certification";
-import type { Certification } from "~/types/certification";
 
 interface Props {
 	certifications: Certification[];

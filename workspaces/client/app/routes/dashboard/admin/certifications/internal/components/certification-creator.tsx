@@ -1,18 +1,14 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
+import { CertificationCreateParams } from "@idp/schema/api/certification";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
-import * as v from "valibot";
+import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { useCreateCertification } from "../hooks/use-create-certification";
 
-const CreateFormSchema = v.object({
-	title: v.pipe(v.string(), v.nonEmpty()),
-	description: v.string(),
-});
-
-type FormInputValues = v.InferInput<typeof CreateFormSchema>;
-type FormOutputValues = v.InferOutput<typeof CreateFormSchema>;
+type FormInputValues = v.InferInput<typeof CertificationCreateParams>;
+type FormOutputValues = v.InferOutput<typeof CertificationCreateParams>;
 
 export const CertificationCreator = () => {
 	const { mutate, isPending } = useCreateCertification();
@@ -22,7 +18,7 @@ export const CertificationCreator = () => {
 		unknown,
 		FormOutputValues
 	>({
-		resolver: valibotResolver(CreateFormSchema),
+		resolver: valibotResolver(CertificationCreateParams),
 	});
 
 	return (

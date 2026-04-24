@@ -1,25 +1,15 @@
-export type Equipment = {
-	id: string;
-	name: string;
-	description?: string;
-	createdAt: Date;
-	updatedAt: Date;
-	ownerId: string;
-};
+import type {
+	Equipment,
+	EquipmentWithOwner,
+} from "@idp/schema/entity/equipment";
 
-export type EquipmentWithOwner = Equipment & {
-	owner: {
-		id: string;
-		displayName: string;
-		displayId?: string;
-		profileImageURL?: string;
-	};
-};
+export type CreateEquipmentParams = Omit<Equipment, "id">;
+export type UpdateEquipmentParams = Omit<Equipment, "createdAt">;
 
 export interface IEquipmentRepository {
-	createEquipment: (params: Omit<Equipment, "id">) => Promise<string>;
+	createEquipment: (params: CreateEquipmentParams) => Promise<string>;
 	getEquipmentById: (id: string) => Promise<EquipmentWithOwner>;
 	getAllEquipments: () => Promise<EquipmentWithOwner[]>;
-	updateEquipment: (params: Omit<Equipment, "createdAt">) => Promise<void>;
+	updateEquipment: (params: UpdateEquipmentParams) => Promise<void>;
 	deleteEquipment: (id: string) => Promise<void>;
 }

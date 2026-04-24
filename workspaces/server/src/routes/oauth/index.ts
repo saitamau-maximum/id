@@ -1,13 +1,13 @@
 import { factory } from "../../factory";
 import { noCacheMiddleware } from "../../middleware/cache";
 import { derivePublicKey, importKey } from "../../utils/oauth/key";
-import { oauthAccessTokenRoute } from "./accessToken";
+import { oauthAccessTokenRoute } from "./access-token";
 import { oauthAuthorizeRoute } from "./authorize";
 import { oauthCallbackRoute } from "./callback";
 import { oauthManageRoute } from "./manage";
 import { oauthResourcesRoute } from "./resources";
 import { oauthUtilRoute } from "./util";
-import { oauthVerifyTokenRoute } from "./verifyToken";
+import { oauthVerifyTokenRoute } from "./verify-token";
 
 const app = factory.createApp();
 

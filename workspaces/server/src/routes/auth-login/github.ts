@@ -1,7 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import type { Endpoints } from "@octokit/types";
 import { Octokit } from "octokit";
-import { OAUTH_PROVIDER_IDS } from "../../constants/oauth";
 import { factory } from "../../factory";
 import { noCacheMiddleware } from "../../middleware/cache";
 import { OAuthLoginProvider } from "../../utils/oauth-login-provider";

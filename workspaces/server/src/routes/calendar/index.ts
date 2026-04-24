@@ -1,9 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
+import { ROLE_IDS } from "@idp/schema/entity/role";
 import { sign, verify } from "hono/jwt";
 import { createEvents, type EventAttributes } from "ics";
 import * as v from "valibot";
 import { JWT_ALG } from "../../constants/jwt";
-import { ROLE_IDS } from "../../constants/role";
 import { factory } from "../../factory";
 import { memberOnlyMiddleware } from "../../middleware/auth";
 import { calendarEventRoute } from "./events";

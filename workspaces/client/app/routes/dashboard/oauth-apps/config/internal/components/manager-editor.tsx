@@ -1,3 +1,4 @@
+import type { UserBasicInfo } from "@idp/schema/entity/user";
 import { useCallback, useMemo } from "react";
 import { Plus } from "react-feather";
 import { css } from "styled-system/css";
@@ -5,7 +6,6 @@ import { UserDisplay } from "~/components/feature/user/user-display";
 import { UserSelector } from "~/components/feature/user/user-selector";
 import { IconButton } from "~/components/ui/icon-button";
 import { useMembers } from "~/routes/dashboard/members/internal/hooks/use-members";
-import type { UserBasicInfo } from "~/types/user";
 import { useUpdateManagers } from "../hooks/use-update-managers";
 import { ConfigSectionSubHeader } from "./config-section-sub-header";
 

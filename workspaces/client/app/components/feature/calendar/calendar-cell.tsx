@@ -1,10 +1,10 @@
+import type { Event } from "@idp/schema/entity/calendar/event";
 import { css } from "styled-system/css";
-import type { CalendarEvent } from "~/types/event";
 import type { TCalendarCell } from "./types";
 
 interface CellProps {
 	cell: TCalendarCell;
-	events: CalendarEvent[];
+	events: Event[];
 	onDateClick?: (date: Date) => void;
 	active?: boolean;
 	variant: "sm" | "md";

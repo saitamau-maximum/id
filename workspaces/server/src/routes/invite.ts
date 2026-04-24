@@ -1,17 +1,11 @@
 import { vValidator } from "@hono/valibot-validator";
-import * as v from "valibot";
+import { InviteCreateParams } from "@idp/schema/api/invite";
 import { factory } from "../factory";
 import { adminOnlyMiddleware } from "../middleware/auth";
 import { noCacheMiddleware } from "../middleware/cache";
 import { validateInvitation } from "../service/invite";
 
 const app = factory.createApp();
-
-const createInviteSchema = v.object({
-	title: v.pipe(v.string(), v.nonEmpty(), v.maxLength(64)),
-	expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
-	remainingUse: v.optional(v.pipe(v.number(), v.minValue(1))),
-});
 
 const publicRoute = app.get("/:id", async (c) => {
 	const id = c.req.param("id");
@@ -34,16 +28,9 @@ const protectedRoute = app
 	.post(
 		"/",
 		noCacheMiddleware,
-		vValidator("json", createInviteSchema),
+		vValidator("json", InviteCreateParams),
 		async (c) => {
 			const { expiresAt, remainingUse, title } = c.req.valid("json");
-
-			// 招待リンクはexpiresAt と remainingUse のどちらか一方が必須（共存可能）
-			if (!expiresAt && !remainingUse) {
-				return c.body(null, 400);
-			}
-
-			const createdAt = new Date();
 			const issuedByUserId = c.get("jwtPayload").userId;
 
 			// DB に格納して返す
@@ -51,7 +38,6 @@ const protectedRoute = app
 				title: title,
 				expiresAt: expiresAt ? new Date(expiresAt) : null,
 				remainingUse: remainingUse ?? null,
-				createdAt,
 				issuedByUserId,
 			});
 			return c.json({ id }, 201);
