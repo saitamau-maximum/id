@@ -58,7 +58,7 @@ export default function Dashboard() {
 		if (isFormerMember) {
 			if (location.pathname !== "/update-payment-info") {
 				pushToast({
-					title: "今年度の会費をまだお支払いされていません",
+					title: "今年度の会費がまだお支払いされていません",
 					description: "支払い方法をご案内します",
 					type: "info",
 				});

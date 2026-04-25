@@ -62,10 +62,10 @@ describe.sequential("CloudflareUserRepository.removeMemberRoleFromUsersBefore", 
 	});
 
 	it("removes only MEMBER from users before the cutoff or with null payment date, and returns the removed count", async () => {
-		const cutoff = new Date("2025-04-01T00:00:00.000Z");
+		const cutoff = new Date("2025-03-31T15:00:00.000Z");
 
 		const expiredUserId = await createUserWithRoles(
-			new Date("2025-03-31T23:59:59.000Z"),
+			new Date("2025-03-31T14:59:59.000Z"),
 			[ROLE_IDS.MEMBER, ROLE_IDS.DEV],
 		);
 		const nullPaymentUserId = await createUserWithRoles(null, [
@@ -73,7 +73,7 @@ describe.sequential("CloudflareUserRepository.removeMemberRoleFromUsersBefore", 
 			ROLE_IDS.PR,
 		]);
 		const currentUserId = await createUserWithRoles(
-			new Date("2025-04-01T00:00:01.000Z"),
+			new Date("2025-03-31T15:00:01.000Z"),
 			[ROLE_IDS.MEMBER, ROLE_IDS.CP],
 		);
 		const boundaryUserId = await createUserWithRoles(cutoff, [ROLE_IDS.MEMBER]);
@@ -104,10 +104,10 @@ describe.sequential("CloudflareUserRepository.removeMemberRoleFromUsersBefore", 
 	});
 
 	it("returns 0 when no MEMBER user matches the cutoff", async () => {
-		const cutoff = new Date("2025-04-01T00:00:00.000Z");
+		const cutoff = new Date("2025-03-31T15:00:00.000Z");
 
 		const currentUserId = await createUserWithRoles(
-			new Date("2025-04-02T00:00:00.000Z"),
+			new Date("2025-03-31T15:00:01.000Z"),
 			[ROLE_IDS.MEMBER, ROLE_IDS.WEB],
 		);
 		const boundaryUserId = await createUserWithRoles(cutoff, [ROLE_IDS.MEMBER]);
