@@ -24,7 +24,7 @@ export default function Dashboard() {
 	const { pushToast } = useToast();
 	const { setInvitationCode } = useInvitation();
 	const isFormerMember =
-		!!user?.lastPaymentConfirmedAt && !isFiscalYearPaid && !isMember;
+		user?.lastPaymentConfirmedAt != null && !isFiscalYearPaid && !isMember;
 
 	// ping を使って最終ログイン日時を更新し続ける
 	useAuthPing(isAuthorized);
