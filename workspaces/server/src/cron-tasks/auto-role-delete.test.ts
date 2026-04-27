@@ -29,10 +29,14 @@ const createUserWithRoles = async (
 };
 
 describe("CloudflareUserRepository.removeMemberRoleFromUsersBefore", () => {
+	const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
 	it("removes MEMBER role from user before cutoff", async () => {
 		const userRepository = new CloudflareUserRepository(env.DB);
 		const db = drizzle(env.DB, { schema });
-		const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
+		// Drain pre-existing removable rows from other test files.
+		await userRepository.removeMemberRoleFromUsersBefore(cutoff);
 
 		const expiredUserId = await createUserWithRoles(
 			userRepository,
@@ -53,7 +57,9 @@ describe("CloudflareUserRepository.removeMemberRoleFromUsersBefore", () => {
 	it("removes MEMBER role when payment date is null", async () => {
 		const userRepository = new CloudflareUserRepository(env.DB);
 		const db = drizzle(env.DB, { schema });
-		const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
+		// Drain pre-existing removable rows from other test files.
+		await userRepository.removeMemberRoleFromUsersBefore(cutoff);
 
 		const nullPaymentUserId = await createUserWithRoles(
 			userRepository,
@@ -74,7 +80,9 @@ describe("CloudflareUserRepository.removeMemberRoleFromUsersBefore", () => {
 	it("does not remove MEMBER role from user after cutoff", async () => {
 		const userRepository = new CloudflareUserRepository(env.DB);
 		const db = drizzle(env.DB, { schema });
-		const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
+		// Drain pre-existing removable rows from other test files.
+		await userRepository.removeMemberRoleFromUsersBefore(cutoff);
 
 		const currentUserId = await createUserWithRoles(
 			userRepository,
@@ -96,7 +104,9 @@ describe("CloudflareUserRepository.removeMemberRoleFromUsersBefore", () => {
 	it("does not remove MEMBER role at cutoff boundary", async () => {
 		const userRepository = new CloudflareUserRepository(env.DB);
 		const db = drizzle(env.DB, { schema });
-		const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
+		// Drain pre-existing removable rows from other test files.
+		await userRepository.removeMemberRoleFromUsersBefore(cutoff);
 
 		const boundaryUserId = await createUserWithRoles(
 			userRepository,
@@ -117,7 +127,9 @@ describe("CloudflareUserRepository.removeMemberRoleFromUsersBefore", () => {
 	it("does not affect users without MEMBER role", async () => {
 		const userRepository = new CloudflareUserRepository(env.DB);
 		const db = drizzle(env.DB, { schema });
-		const cutoff = new Date("2025-03-31T15:00:00.000Z");
+
+		// Drain pre-existing removable rows from other test files.
+		await userRepository.removeMemberRoleFromUsersBefore(cutoff);
 
 		const nonMemberUserId = await createUserWithRoles(
 			userRepository,
