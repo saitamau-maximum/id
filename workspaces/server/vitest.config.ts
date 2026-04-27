@@ -2,12 +2,7 @@ import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
 
 export default defineWorkersConfig({
 	test: {
-		exclude: [
-			"src/tests/**/*.test.ts",
-			"src/cron-tasks/**/*.test.ts",
-			"dist/**",
-			"node_modules/**",
-		],
+		exclude: ["src/tests/**/*.test.ts", "dist/**", "node_modules/**"],
 		// Error: no such module みたいなのが出てくるので
 		// ref: https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
 		deps: {
