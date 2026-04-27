@@ -12,7 +12,7 @@ export default defineWorkersConfig(async () => {
 
 	return {
 		test: {
-			include: ["src/tests/**/*.test.ts"],
+			include: ["src/tests/**/*.test.ts", "src/cron-tasks/**/*.test.ts"],
 			setupFiles: ["./src/tests/setup/apply-migrations.ts"],
 			// Error: no such module みたいなのが出てくるので
 			// ref: https://developers.cloudflare.com/workers/testing/vitest-integration/known-issues/#module-resolution
