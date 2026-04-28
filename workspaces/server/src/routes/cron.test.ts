@@ -9,7 +9,7 @@ describe("Cron Handler", () => {
 	let app: Hono<HonoEnv>;
 	let mockedWaitUntil: () => void;
 	const TEST_TOKEN = "test-cron-token";
-	const TEST_CRON_EXPRESSION = "0 18 * * *";
+	const TEST_CRON_EXPRESSION = "0 3 * * *";
 
 	const makeRequestBase = ({
 		cron,
