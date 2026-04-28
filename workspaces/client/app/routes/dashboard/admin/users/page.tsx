@@ -1,6 +1,6 @@
 import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
 import { useCallback } from "react";
-import { Download } from "react-feather";
+import { Copy } from "react-feather";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
@@ -10,7 +10,7 @@ import {
 	NonMemberUsersTable,
 } from "./internal/components/table";
 import { useAllUsers } from "./internal/hooks/use-all-user";
-import { exportMembersTsv } from "./internal/utils/export-tsv";
+import { copyMembersTsv } from "./internal/utils/copy-tsv";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "ユーザー管理 | Maximum IdP" }];
@@ -23,7 +23,7 @@ export default function AdminUsers() {
 		const memberUsers = users.filter((user) =>
 			user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
 		);
-		exportMembersTsv(memberUsers);
+		copyMembersTsv(memberUsers);
 	}, [users]);
 
 	return (
@@ -70,8 +70,8 @@ export default function AdminUsers() {
 				>
 					<button type="button" onClick={handleExportTsv}>
 						<ButtonLike variant="secondary" size="sm">
-							<Download size={14} />
-							TSV エクスポート
+							<Copy size={14} />
+							TSV コピー
 						</ButtonLike>
 					</button>
 				</div>
