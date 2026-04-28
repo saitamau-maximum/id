@@ -17,7 +17,7 @@ const route = app
 		// 量が少ないので直書き
 		const res = `
 <h1>Cron Simulator</h1>
-<form method="GET" action="/cron">
+<form method="POST" action="/cron/trigger">
   <label for="cron">Cron expression:</label>
   <input type="text" id="cron" name="cron" placeholder="0 3 * * *">
   <button type="submit">Simulate</button>
