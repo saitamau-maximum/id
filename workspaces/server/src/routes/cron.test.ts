@@ -23,14 +23,14 @@ describe("Cron Handler", () => {
 		const headers = new Headers();
 		if (reqToken) headers.set("X-Cron-Trigger-Token", reqToken);
 
-		let reqTo = "/cron";
-		if (cron) reqTo += `?cron=${encodeURIComponent(cron)}`;
+		const body = new FormData();
+		if (cron) body.set("cron", cron);
 
 		mockedWaitUntil = vi.fn();
 
 		return app.request(
-			reqTo,
-			{ headers },
+			"/cron",
+			{ headers, body, method: "POST" },
 			env,
 			{
 				waitUntil: mockedWaitUntil,
@@ -52,7 +52,7 @@ describe("Cron Handler", () => {
 		app.route("/cron", cronRoute);
 	});
 
-	describe("GET /cron/", () => {
+	describe("POST /cron/", () => {
 		describe("Env: development", () => {
 			const makeRequest = (
 				cron?: string,
