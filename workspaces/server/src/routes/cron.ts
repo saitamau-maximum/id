@@ -14,7 +14,7 @@ const CronTriggerRequestParams = v.object({
 });
 
 const route = app.post(
-	"/",
+	"/trigger",
 	(c, next) => {
 		// CRON_TRIGGER_TOKEN の存在チェック
 		// env 設定されてない場合は 400 じゃなくて 500 にしたい (ユーザーに問題があるわけではないので)

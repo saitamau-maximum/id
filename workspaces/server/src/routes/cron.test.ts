@@ -29,7 +29,7 @@ describe("Cron Handler", () => {
 		mockedWaitUntil = vi.fn();
 
 		return app.request(
-			"/cron",
+			"/cron/trigger",
 			{ headers, body, method: "POST" },
 			env,
 			{
@@ -52,7 +52,7 @@ describe("Cron Handler", () => {
 		app.route("/cron", cronRoute);
 	});
 
-	describe("POST /cron/", () => {
+	describe("POST /cron/trigger", () => {
 		describe("Env: development", () => {
 			const makeRequest = (
 				cron?: string,
