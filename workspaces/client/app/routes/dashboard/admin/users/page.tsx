@@ -71,7 +71,7 @@ export default function AdminUsers() {
 					<button type="button" onClick={handleExportTsv}>
 						<ButtonLike variant="secondary" size="sm">
 							<Copy size={14} />
-							TSV コピー
+							メンバー情報をコピー
 						</ButtonLike>
 					</button>
 				</div>
