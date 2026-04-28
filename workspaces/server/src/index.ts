@@ -3,8 +3,6 @@ import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
 import { logger } from "hono/logger";
 import { Octokit } from "octokit";
-import { removeExpiredAccessTokenTask } from "./cron-tasks/remove-expired-access-token";
-import { removeMemberRoleTask } from "./cron-tasks/remove-member-role";
 import { factory } from "./factory";
 import { CloudflareContributionCacheRepository } from "./infrastructure/repository/cloudflare/cache";
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
@@ -24,6 +22,7 @@ import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
 import { certificationRoute } from "./routes/certification";
+import { cronRoute } from "./routes/cron";
 import { devRoute } from "./routes/dev";
 import { discordRoute } from "./routes/discord";
 import { equipmentRoute } from "./routes/equipment";
@@ -181,31 +180,7 @@ export const route = app
 	.route("/public", publicRoute)
 	.route("/discord", discordRoute)
 	.route("/dev", devRoute)
-	.route("/.well-known", wellKnownRoute);
+	.route("/.well-known", wellKnownRoute)
+	.route("/cron", cronRoute);
 
-const scheduled: ExportedHandlerScheduledHandler<Env> = async (
-	controller,
-	env,
-	ctx,
-) => {
-	switch (controller.cron) {
-		case "0 18 * * *":
-			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
-			ctx.waitUntil(removeExpiredAccessTokenTask(env));
-			break;
-		case "0 15 30 4 *":
-			console.log(
-				"Cron job executed at 15:00 UTC on April 30 (00:00 JST on May 1)",
-			);
-			ctx.waitUntil(removeMemberRoleTask(env));
-			break;
-		default:
-			console.warn(`Unknown cron event: ${controller.cron}`);
-			break;
-	}
-};
-
-export default {
-	fetch: app.fetch,
-	scheduled,
-};
+export default app;
