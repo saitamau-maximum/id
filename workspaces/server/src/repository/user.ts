@@ -46,4 +46,7 @@ export interface IUserRepository {
 	rejectProvisionalUser: (userId: string) => Promise<void>;
 	updateLastLoginAt: (userId: string) => Promise<void>;
 	fetchPublicMemberByDisplayId(displayId: string): Promise<PublicMember | null>;
+	removeMemberRoleFromUsersBefore: (
+		lastPaymentConfirmedAt: Date,
+	) => Promise<number>;
 }
