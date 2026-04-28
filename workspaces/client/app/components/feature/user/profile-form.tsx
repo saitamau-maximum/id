@@ -54,6 +54,9 @@ export type ProfileFormProps =
 export const ProfileForm = (props: ProfileFormProps) => {
 	const { mode, onSubmit, isPending, submitLabel } = props;
 	const isOnboarding = mode === "onboarding";
+	const certificationSection =
+		mode === "settings" ? props.certificationSection : null;
+	const oauthSection = mode === "settings" ? props.oauthSection : null;
 
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
@@ -420,7 +423,7 @@ export const ProfileForm = (props: ProfileFormProps) => {
 
 			{!isOnboarding && (
 				<>
-					{(props as ProfileFormSettingsProps).certificationSection}
+					{certificationSection}
 
 					<Form.FieldSet>
 						<div
@@ -469,7 +472,7 @@ export const ProfileForm = (props: ProfileFormProps) => {
 						</p>
 					</Form.FieldSet>
 
-					{(props as ProfileFormSettingsProps).oauthSection}
+					{oauthSection}
 
 					<Form.FieldSet>
 						<legend>
