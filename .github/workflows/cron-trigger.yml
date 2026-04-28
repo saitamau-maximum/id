@@ -1,0 +1,27 @@
+name: Cron Trigger
+
+on:
+  schedule:
+    # 毎日 03:00 JST
+    - cron: 0 3 * * *
+      timezone: Asia/Tokyo
+    # 5/1 00:00 JST
+    - cron: 0 0 1 5 *
+      timezone: Asia/Tokyo
+
+jobs:
+  run-cron:
+    name: ${{ github.event.schedule }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        host:
+          - api.id.maximum.vc
+          - api-preview.id.maximum.vc
+    steps:
+      - name: Run
+        run: |
+          # encodeURIComponent 相当の処理
+          cron_schedule=$(echo -n "${{ github.event.schedule }}" | jq -sRr @uri)
+          # [HOST]/cron?cron=[schedule] にリクエストを送る
+          curl -X GET "https://${{ matrix.host }}/cron?cron=${cron_schedule}"
