@@ -1,17 +1,31 @@
 import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
+import { useCallback } from "react";
+import { Download } from "react-feather";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
+import { ButtonLike } from "~/components/ui/button-like";
 import {
 	MemberUsersTable,
 	NonMemberUsersTable,
 } from "./internal/components/table";
+import { useAllUsers } from "./internal/hooks/use-all-user";
+import { exportMembersTsv } from "./internal/utils/export-tsv";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "ユーザー管理 | Maximum IdP" }];
 };
 
 export default function AdminUsers() {
+	const { data: users } = useAllUsers();
+
+	const handleExportTsv = useCallback(() => {
+		const memberUsers = users.filter((user) =>
+			user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
+		);
+		exportMembersTsv(memberUsers);
+	}, [users]);
+
 	return (
 		<div
 			className={css({
@@ -47,6 +61,20 @@ export default function AdminUsers() {
 					</span>
 					を削除することで、非会員にすることができます。
 				</p>
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "flex-end",
+						marginBottom: 2,
+					})}
+				>
+					<button type="button" onClick={handleExportTsv}>
+						<ButtonLike variant="secondary" size="sm">
+							<Download size={14} />
+							TSV エクスポート
+						</ButtonLike>
+					</button>
+				</div>
 				<MemberUsersTable />
 			</div>
 			<div>
