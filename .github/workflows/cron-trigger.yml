@@ -9,6 +9,9 @@ on:
     - cron: 0 0 1 5 *
       timezone: Asia/Tokyo
 
+permissions:
+  contents: read
+
 jobs:
   run-cron:
     name: ${{ github.event.schedule }}
@@ -24,4 +27,4 @@ jobs:
           # encodeURIComponent 相当の処理
           cron_schedule=$(echo -n "${{ github.event.schedule }}" | jq -sRr @uri)
           # [HOST]/cron?cron=[schedule] にリクエストを送る
-          curl -X GET "https://${{ matrix.host }}/cron?cron=${cron_schedule}"
+          curl -X GET "https://${{ matrix.host }}/cron?cron=${cron_schedule}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
