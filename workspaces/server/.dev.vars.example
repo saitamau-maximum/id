@@ -1,12 +1,14 @@
 # 以下の環境変数を設定してください
 SECRET=""
-GITHUB_APP_PRIVKEY=""
-GITHUB_OAUTH_SECRET=""
 GITHUB_OAUTH_ID=""
+GITHUB_OAUTH_SECRET=""
 
 # ----- 以下は必要に応じて設定してください ----- #
 # IdP OAuth の開発
 PRIVKEY_FOR_OAUTH=""
+
+# GitHub 関連の開発
+GITHUB_APP_PRIVKEY=""
 
 # Discord 関連の開発
 DISCORD_OAUTH_ID=""
@@ -16,3 +18,4 @@ DISCORD_GUILD_ID=""
 DISCORD_CALENDAR_CHANNEL_ID=""
 
 # その他
+CRON_TRIGGER_TOKEN=""
