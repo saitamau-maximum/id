@@ -28,14 +28,14 @@ const route = app.get("/", async (c) => {
 	switch (cron) {
 		case "0 18 * * *":
 			console.log("Cron job executed at 18:00 UTC (03:00 JST)");
-			c.executionCtx.waitUntil(removeExpiredAccessTokenTask(c.env));
+			c.executionCtx.waitUntil(removeExpiredAccessTokenTask(c));
 			break;
 
 		case "0 15 30 4 *":
 			console.log(
 				"Cron job executed at 15:00 UTC on April 30 (00:00 JST on May 1)",
 			);
-			c.executionCtx.waitUntil(removeMemberRoleTask(c.env));
+			c.executionCtx.waitUntil(removeMemberRoleTask(c));
 			break;
 
 		default:
