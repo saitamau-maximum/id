@@ -25,8 +25,10 @@ migrations_dir = "drizzle"
 binding = 'STORAGE'
 bucket_name = 'idp-storage-local'
 
+# GHA 経由で Cron Trigger するようになりました
+# .github/workflows/cron.yml を参照
 [triggers]
-crons = ["0 18 * * *", "0 15 30 4 *"]  # 毎日 18:00 UTC (03:00 JST) と毎年 4/30 15:00 UTC (5/1 00:00 JST) に実行
+crons = []
 
 [observability]
 enabled = true
@@ -66,7 +68,7 @@ binding = 'STORAGE'
 bucket_name = 'idp-storage-preview'
 
 [env.preview.triggers]
-crons = ["0 18 * * *", "0 15 30 4 *"]
+crons = []
 
 [env.preview.observability]
 enabled = true
@@ -106,7 +108,7 @@ binding = 'STORAGE'
 bucket_name = 'idp-storage'
 
 [env.production.triggers]
-crons = ["0 18 * * *", "0 15 30 4 *"]
+crons = []
 
 [env.production.observability]
 enabled = true
