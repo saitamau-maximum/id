@@ -10,7 +10,7 @@ const CronTriggerRequestParams = v.object({
 	// TODO: cron param の書式が合ってるかチェック
 	//       valibot でそのうち実装されそう？
 	// ref: https://github.com/open-circle/valibot/pull/1411
-	cron: v.string(),
+	schedule: v.string(),
 });
 
 const route = app.post(
@@ -33,13 +33,13 @@ const route = app.post(
 		if (c.env.ENV !== "development" && token !== c.env.CRON_TRIGGER_TOKEN)
 			return c.text("Invalid token", 401);
 
-		const { cron } = c.req.valid("form");
-		if (!cron) return c.text("Missing cron parameter", 400);
+		const { schedule } = c.req.valid("form");
+		if (!schedule) return c.text("Missing cron parameter", 400);
 
 		// cron 処理
 		// GitHub Actions では Asia/Tokyo の時刻で cron が動くようになっているので、 UTC での時刻を考慮する必要はない
 		// ex: "0 3 * * *" は 03:00 UTC (= 12:00 JST) ではなく 03:00 JST に動く
-		switch (cron) {
+		switch (schedule) {
 			case "0 3 * * *":
 				console.log("Cron job executed at 03:00 JST");
 				c.executionCtx.waitUntil(removeExpiredAccessTokenTask(c));
@@ -51,7 +51,7 @@ const route = app.post(
 				break;
 
 			default:
-				console.warn(`Unknown cron event: ${cron}`);
+				console.warn(`Unknown cron event: ${schedule}`);
 				return c.text("Unknown cron event", 400);
 		}
 

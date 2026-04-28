@@ -12,11 +12,11 @@ describe("Cron Handler", () => {
 	const TEST_CRON_EXPRESSION = "0 3 * * *";
 
 	const makeRequestBase = ({
-		cron,
+		schedule,
 		reqToken,
 		env,
 	}: {
-		cron?: string;
+		schedule?: string;
 		reqToken?: string;
 		env: Partial<Env>;
 	}) => {
@@ -24,7 +24,7 @@ describe("Cron Handler", () => {
 		if (reqToken) headers.set("X-Cron-Trigger-Token", reqToken);
 
 		const body = new FormData();
-		if (cron) body.set("cron", cron);
+		if (schedule) body.set("schedule", schedule);
 
 		mockedWaitUntil = vi.fn();
 
@@ -55,12 +55,12 @@ describe("Cron Handler", () => {
 	describe("POST /cron/trigger", () => {
 		describe("Env: development", () => {
 			const makeRequest = (
-				cron?: string,
+				schedule?: string,
 				reqToken?: string,
 				envToken?: string,
 			) =>
 				makeRequestBase({
-					cron,
+					schedule,
 					reqToken,
 					env: {
 						ENV: "development",
@@ -123,12 +123,12 @@ describe("Cron Handler", () => {
 
 		describe("Env: production", () => {
 			const makeRequest = (
-				cron?: string,
+				schedule?: string,
 				reqToken?: string,
 				envToken?: string,
 			) =>
 				makeRequestBase({
-					cron,
+					schedule,
 					reqToken,
 					env: {
 						ENV: "production",

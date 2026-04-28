@@ -25,4 +25,4 @@ jobs:
       - name: Run
         run: |
           # [HOST]/cron?cron=[schedule] にリクエストを送る
-          curl --fail-with-body --show-error -X POST "https://${{ matrix.host }}/cron/trigger" -d "cron=${{ github.event.schedule }}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
+          curl --fail-with-body --show-error -X POST "https://${{ matrix.host }}/cron/trigger" -d "schedule=${{ github.event.schedule }}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
