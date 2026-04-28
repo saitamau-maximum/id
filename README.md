@@ -95,6 +95,8 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 
 - `CRON_TRIGGER_TOKEN`: 指定時刻に Cron Triggers を発火させるためのトークン
   - `openssl rand -base64 32` が便利です。
+  - CI の都合上、 prod, preview で同じ値を設定してください
+  - prod, preview にリクエストを送る際は、 `X-Cron-Trigger-Token` ヘッダーにこのトークンを設定してください。
 
 </details>
 

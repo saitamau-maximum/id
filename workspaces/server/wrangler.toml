@@ -26,7 +26,7 @@ binding = 'STORAGE'
 bucket_name = 'idp-storage-local'
 
 # GHA 経由で Cron Trigger するようになりました
-# .github/workflows/cron.yml を参照
+# .github/workflows/cron-trigger.yml を参照
 [triggers]
 crons = []
 
