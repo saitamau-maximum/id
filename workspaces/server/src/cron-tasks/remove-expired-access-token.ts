@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import type { HonoEnv } from "../factory";
 
-// 18:00 UTC (03:00 JST) に実行される
+// 毎日 03:00 JST に実行される
 // 期限切れの Access Token を削除する
 export const removeExpiredAccessTokenTask = async (c: Context<HonoEnv>) => {
 	const OAuthExternalRepository = c.get("OAuthExternalRepository");
