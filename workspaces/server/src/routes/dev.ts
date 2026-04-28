@@ -19,7 +19,7 @@ const route = app
 <h1>Cron Simulator</h1>
 <form method="GET" action="/cron">
   <label for="cron">Cron expression:</label>
-  <input type="text" id="cron" name="cron" placeholder="0 18 * * *">
+  <input type="text" id="cron" name="cron" placeholder="0 3 * * *">
   <button type="submit">Simulate</button>
 </form>
 `;
