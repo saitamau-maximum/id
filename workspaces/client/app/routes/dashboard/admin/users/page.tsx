@@ -5,6 +5,7 @@ import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
 import { ButtonLike } from "~/components/ui/button-like";
+import { useToast } from "~/hooks/use-toast";
 import {
 	MemberUsersTable,
 	NonMemberUsersTable,
@@ -18,13 +19,19 @@ export const meta: MetaFunction = () => {
 
 export default function AdminUsers() {
 	const { data: users } = useAllUsers();
+	const { pushToast } = useToast();
 
-	const handleExportTsv = useCallback(() => {
+	const handleExportTsv = useCallback(async () => {
 		const memberUsers = users.filter((user) =>
 			user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
 		);
-		copyMembersTsv(memberUsers);
-	}, [users]);
+		await copyMembersTsv(memberUsers);
+		pushToast({
+			type: "success",
+			title: "コピーしました",
+			description: "クリップボードにメンバー情報をコピーしました",
+		});
+	}, [users, pushToast]);
 
 	return (
 		<div
