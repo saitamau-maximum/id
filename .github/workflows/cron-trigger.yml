@@ -27,11 +27,13 @@ jobs:
           - api-preview.id.maximum.vc
     steps:
       - name: Setup Trigger Utility
+        # タスクが増えたときに curl ... をわざわざ書くのは面倒なので、簡単なスクリプトを準備しておく
+        # 量が量だし checkout するのも手間なので、わざわざリポジトリ内に sh ファイルは用意しない
         run: |
           echo << EOF > trigger
           #!/bin/bash
           task="$1"
-          curl --fail-with-body --show-error -X POST "https://${{ matrix.host }}/cron/${task}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
+          curl --fail-with-body --show-error -vvv -X POST "https://${{ matrix.host }}/cron/${task}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
           EOF
           chmod +x trigger
 
