@@ -1,10 +1,6 @@
 name: Cron Trigger
 
 on:
-  # debug
-  push:
-    branches:
-      - fix/cron
   schedule:
     # 毎日 03:00 JST
     - cron: 0 3 * * *
@@ -33,12 +29,12 @@ jobs:
           cat << 'EOF' > trigger
           #!/bin/bash
           task="$1"
-          curl --fail-with-body --show-error -vvv -X POST "https://${{ matrix.host }}/cron/${task}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
+          curl --fail-with-body --show-error -X POST "https://${{ matrix.host }}/cron/${task}" -H "X-Cron-Trigger-Token: ${{ secrets.CRON_TOKEN }}"
           EOF
           chmod +x trigger
 
       - name: Remove Expired Access Token (0 3 * * *)
-        if: github.event.schedule == '0 3 * * *' || github.event_name == 'push'
+        if: github.event.schedule == '0 3 * * *'
         run: ./trigger remove-expired-access-token
 
       - name: Remove Member Role (0 0 1 5 *)
