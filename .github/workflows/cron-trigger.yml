@@ -1,6 +1,9 @@
 name: Cron Trigger
 
 on:
+  push:
+    branches:
+      - fix/cron
   schedule:
     # 毎日 03:00 JST
     - cron: 0 3 * * *
@@ -14,7 +17,8 @@ permissions:
 
 jobs:
   run-cron:
-    name: ${{ github.event.schedule }}
+    name: |
+      ${{ github.event_name }} [${{ case(matrix.host == 'api.id.maximum.vc', 'production', 'preview') }}]
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -33,10 +37,10 @@ jobs:
           EOF
           chmod +x trigger
 
-      - name: Remove Expired Access Token (0 3 * * *)
+      - name: Remove Expired Access Token [0 3 * * *]
         if: github.event.schedule == '0 3 * * *'
         run: ./trigger remove-expired-access-token
 
-      - name: Remove Member Role (0 0 1 5 *)
+      - name: Remove Member Role [0 0 1 5 *]
         if: github.event.schedule == '0 0 1 5 *'
         run: ./trigger remove-member-role
