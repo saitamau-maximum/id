@@ -37,8 +37,8 @@ jobs:
 
       - name: Remove Expired Access Token (0 3 * * *)
         if: github.event.schedule == '0 3 * * *' || github.event_name == 'push'
-        run: trigger remove-expired-access-token
+        run: ./trigger remove-expired-access-token
 
       - name: Remove Member Role (0 0 1 5 *)
         if: github.event.schedule == '0 0 1 5 *'
-        run: trigger remove-member-role
+        run: ./trigger remove-member-role
