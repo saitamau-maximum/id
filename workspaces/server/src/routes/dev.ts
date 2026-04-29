@@ -13,18 +13,6 @@ const onlyDevMiddleware = factory.createMiddleware(async (c, next) => {
 
 const route = app
 	.use(onlyDevMiddleware)
-	.get("/cron", (c) => {
-		// 量が少ないので直書き
-		const res = `
-<h1>Cron Simulator</h1>
-<form method="POST" action="/cron/trigger">
-  <label for="cron">Cron expression:</label>
-  <input type="text" id="cron" name="schedule" placeholder="0 3 * * *">
-  <button type="submit">Simulate</button>
-</form>
-`;
-		return c.html(res);
-	})
 	.get("/oauth/:clientId/:clientSecret", async (c) => {
 		const { clientId, clientSecret } = c.req.param();
 		const redirectTo = new URL(c.req.url);
