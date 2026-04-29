@@ -1,9 +1,6 @@
 name: Cron Trigger
 
 on:
-  push:
-    branches:
-      - fix/cron
   schedule:
     # 毎日 03:00 JST
     - cron: 0 3 * * *
@@ -18,7 +15,7 @@ permissions:
 jobs:
   run-cron:
     name: |
-      ${{ github.event_name }} [${{ case(matrix.host == 'api.id.maximum.vc', 'production', 'preview') }}]
+      ${{ github.event.schedule }} [${{ case(matrix.host == 'api.id.maximum.vc', 'production', 'preview') }}]
     runs-on: ubuntu-latest
     strategy:
       matrix:
