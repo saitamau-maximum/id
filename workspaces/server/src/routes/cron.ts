@@ -10,7 +10,7 @@ const CronTriggerRequestParams = v.object({
 	// TODO: cron param の書式が合ってるかチェック
 	//       valibot でそのうち実装されそう？
 	// ref: https://github.com/open-circle/valibot/pull/1411
-	schedule: v.string(),
+	schedule: v.pipe(v.string(), v.nonEmpty()),
 });
 
 const route = app.post(
@@ -34,7 +34,6 @@ const route = app.post(
 			return c.text("Invalid token", 401);
 
 		const { schedule } = c.req.valid("form");
-		if (!schedule) return c.text("Missing cron parameter", 400);
 
 		// cron 処理
 		// GitHub Actions では Asia/Tokyo の時刻で cron が動くようになっているので、 UTC での時刻を考慮する必要はない
