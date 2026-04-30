@@ -2,7 +2,7 @@
 	"name": "@idp/server",
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev --local --test-scheduled",
+		"dev": "wrangler dev --local",
 		"build": "tsc",
 		"typegen": "wrangler types",
 		"generate:migrations": "drizzle-kit generate",

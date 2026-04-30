@@ -22,5 +22,6 @@ export const createMockUserRepository = (): IUserRepository => {
 		rejectProvisionalUser: vi.fn(),
 		updateLastLoginAt: vi.fn(),
 		fetchPublicMemberByDisplayId: vi.fn(),
+		removeMemberRoleFromUsersBefore: vi.fn(),
 	};
 };

@@ -93,7 +93,11 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 <details>
 <summary>その他</summary>
 
-(なし)
+- `CRON_TRIGGER_TOKEN`: 指定時刻に Cron Triggers を発火させるためのトークン
+  - `openssl rand -base64 32` が便利です。
+  - CI の都合上、 prod, preview で同じ値を設定してください。
+  - prod, preview にリクエストを送る際は、 `X-Cron-Trigger-Token` ヘッダーにこのトークンを設定してください。
+  - local の場合、ヘッダーを設定していなくてもリクエストを受け付けるようになっています。 なので動作確認時はふつうに `localhost:8787/cron/TASK_NAME` に POST すればよいです。
 
 </details>
 
@@ -144,8 +148,6 @@ pnpm -C workspaces/server run build
 ```bash
 pnpm dev
 ```
-
-Cron Triggers のテストを行いたい場合、 `pnpm dev` 後にブラウザで `localhost:8787/dev/cron` にアクセスすると簡単に発火できます。
 
 ### Pre-commit フック
 
