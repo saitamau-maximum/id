@@ -1,5 +1,5 @@
 import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Copy } from "react-feather";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
@@ -21,8 +21,13 @@ export default function AdminUsers() {
 	const { data: users } = useAllUsers();
 	const { pushToast } = useToast();
 	const [isCopying, setIsCopying] = useState(false);
+	const isCopyingRef = useRef(false);
 
 	const handleExportTsv = useCallback(async () => {
+		if (isCopyingRef.current) {
+			return;
+		}
+		isCopyingRef.current = true;
 		setIsCopying(true);
 		try {
 			const memberUsers = users.filter((user) =>
@@ -42,6 +47,7 @@ export default function AdminUsers() {
 					"クリップボードへのコピーに失敗しました。ブラウザの権限設定などを確認してください。",
 			});
 		} finally {
+			isCopyingRef.current = false;
 			setIsCopying(false);
 		}
 	}, [users, pushToast]);
@@ -89,7 +95,7 @@ export default function AdminUsers() {
 					})}
 				>
 					<button type="button" onClick={handleExportTsv} disabled={isCopying}>
-						<ButtonLike variant="secondary" size="sm">
+						<ButtonLike variant="secondary" size="sm" disabled={isCopying}>
 							<Copy size={14} />
 							メンバー情報をコピー
 						</ButtonLike>
