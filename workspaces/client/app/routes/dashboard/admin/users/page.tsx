@@ -1,5 +1,5 @@
 import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { Copy } from "react-feather";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
@@ -20,17 +20,30 @@ export const meta: MetaFunction = () => {
 export default function AdminUsers() {
 	const { data: users } = useAllUsers();
 	const { pushToast } = useToast();
+	const [isCopying, setIsCopying] = useState(false);
 
 	const handleExportTsv = useCallback(async () => {
-		const memberUsers = users.filter((user) =>
-			user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
-		);
-		await copyMembersTsv(memberUsers);
-		pushToast({
-			type: "success",
-			title: "コピーしました",
-			description: "クリップボードにメンバー情報をコピーしました",
-		});
+		setIsCopying(true);
+		try {
+			const memberUsers = users.filter((user) =>
+				user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
+			);
+			await copyMembersTsv(memberUsers);
+			pushToast({
+				type: "success",
+				title: "コピーしました",
+				description: "クリップボードにメンバー情報をコピーしました",
+			});
+		} catch {
+			pushToast({
+				type: "error",
+				title: "コピーに失敗しました",
+				description:
+					"クリップボードへのコピーに失敗しました。ブラウザの権限設定などを確認してください。",
+			});
+		} finally {
+			setIsCopying(false);
+		}
 	}, [users, pushToast]);
 
 	return (
@@ -75,7 +88,7 @@ export default function AdminUsers() {
 						marginBottom: 2,
 					})}
 				>
-					<button type="button" onClick={handleExportTsv}>
+					<button type="button" onClick={handleExportTsv} disabled={isCopying}>
 						<ButtonLike variant="secondary" size="sm">
 							<Copy size={14} />
 							メンバー情報をコピー

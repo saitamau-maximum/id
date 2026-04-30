@@ -14,5 +14,10 @@ export const copyMembersTsv = (users: ExportableUser[]) => {
 			.map((user) => [user.studentId ?? "", user.realName ?? ""]),
 	];
 	const tsv = rows.map((row) => row.join("\t")).join("\n");
+	if (!navigator.clipboard?.writeText) {
+		throw new Error(
+			"クリップボードへのアクセスがサポートされていません。最新版のブラウザで実行してください。",
+		);
+	}
 	return navigator.clipboard.writeText(tsv);
 };
