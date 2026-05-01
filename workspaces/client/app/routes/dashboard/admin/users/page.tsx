@@ -1,17 +1,51 @@
 import { ROLE_BY_ID, ROLE_IDS } from "@idp/schema/entity/role";
+import { useCallback, useState } from "react";
+import { Copy } from "react-feather";
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { RoleBadge } from "~/components/feature/user/role-badge";
+import { ButtonLike } from "~/components/ui/button-like";
+import { useToast } from "~/hooks/use-toast";
 import {
 	MemberUsersTable,
 	NonMemberUsersTable,
 } from "./internal/components/table";
+import { useAllUsers } from "./internal/hooks/use-all-user";
+import { copyMembersTsv } from "./internal/utils/copy-tsv";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "ユーザー管理 | Maximum IdP" }];
 };
 
 export default function AdminUsers() {
+	const { data: users } = useAllUsers();
+	const { pushToast } = useToast();
+	const [isCopying, setIsCopying] = useState(false);
+
+	const handleExportTsv = useCallback(async () => {
+		setIsCopying(true);
+		try {
+			const memberUsers = users.filter((user) =>
+				user.roles.some((role) => role.id === ROLE_IDS.MEMBER),
+			);
+			await copyMembersTsv(memberUsers);
+			pushToast({
+				type: "success",
+				title: "コピーしました",
+				description: "クリップボードにメンバー情報をコピーしました",
+			});
+		} catch {
+			pushToast({
+				type: "error",
+				title: "コピーに失敗しました",
+				description:
+					"クリップボードへのコピーに失敗しました。ブラウザの権限設定などを確認してください。",
+			});
+		} finally {
+			setIsCopying(false);
+		}
+	}, [users, pushToast]);
+
 	return (
 		<div
 			className={css({
@@ -47,6 +81,20 @@ export default function AdminUsers() {
 					</span>
 					を削除することで、非会員にすることができます。
 				</p>
+				<div
+					className={css({
+						display: "flex",
+						justifyContent: "flex-end",
+						marginBottom: 2,
+					})}
+				>
+					<button type="button" onClick={handleExportTsv} disabled={isCopying}>
+						<ButtonLike variant="secondary" size="sm" disabled={isCopying}>
+							<Copy size={14} />
+							メンバー情報をコピー
+						</ButtonLike>
+					</button>
+				</div>
 				<MemberUsersTable />
 			</div>
 			<div>
