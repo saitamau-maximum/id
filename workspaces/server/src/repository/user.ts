@@ -49,4 +49,5 @@ export interface IUserRepository {
 	removeMemberRoleFromUsersBefore: (
 		lastPaymentConfirmedAt: Date,
 	) => Promise<number>;
+	fetchDiscordUserIdsOfMembersToExpire: (cutoffDate: Date) => Promise<string[]>;
 }

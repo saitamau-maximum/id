@@ -1,5 +1,8 @@
 import type { Member, PublicMember } from "@idp/schema/entity/member";
-import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import {
+	OAUTH_PROVIDER_IDS,
+	type OAuthProviderId,
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
 import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
 import {
@@ -592,6 +595,36 @@ export class CloudflareUserRepository implements IUserRepository {
 			.update(schema.users)
 			.set({ lastLoginAt: new Date() })
 			.where(eq(schema.users.id, userId));
+	}
+
+	async fetchDiscordUserIdsOfMembersToExpire(
+		cutoffDate: Date,
+	): Promise<string[]> {
+		const expiredMembersQuery = this.client
+			.select({ userId: schema.users.id })
+			.from(schema.users)
+			.innerJoin(schema.userRoles, eq(schema.userRoles.userId, schema.users.id))
+			.where(
+				and(
+					eq(schema.userRoles.roleId, ROLE_IDS.MEMBER),
+					or(
+						isNull(schema.users.lastPaymentConfirmedAt),
+						lt(schema.users.lastPaymentConfirmedAt, cutoffDate),
+					),
+				),
+			);
+
+		const connections = await this.client
+			.select({ discordUserId: schema.oauthConnections.providerUserId })
+			.from(schema.oauthConnections)
+			.where(
+				and(
+					eq(schema.oauthConnections.providerId, OAUTH_PROVIDER_IDS.DISCORD),
+					inArray(schema.oauthConnections.userId, expiredMembersQuery),
+				),
+			);
+
+		return connections.map((c) => c.discordUserId);
 	}
 
 	async fetchPublicMemberByDisplayId(
