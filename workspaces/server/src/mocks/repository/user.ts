@@ -23,6 +23,6 @@ export const createMockUserRepository = (): IUserRepository => {
 		updateLastLoginAt: vi.fn(),
 		fetchPublicMemberByDisplayId: vi.fn(),
 		removeMemberRoleFromUsersBefore: vi.fn(),
-		fetchDiscordUserIdsOfMembersToExpire: vi.fn(),
+		fetchDiscordUserIdsOfExpiredMembers: vi.fn(),
 	};
 };

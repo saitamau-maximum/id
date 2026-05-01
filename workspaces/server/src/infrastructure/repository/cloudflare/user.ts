@@ -597,20 +597,16 @@ export class CloudflareUserRepository implements IUserRepository {
 			.where(eq(schema.users.id, userId));
 	}
 
-	async fetchDiscordUserIdsOfMembersToExpire(
+	async fetchDiscordUserIdsOfExpiredMembers(
 		cutoffDate: Date,
 	): Promise<string[]> {
-		const expiredMembersQuery = this.client
+		const expiredUsersQuery = this.client
 			.select({ userId: schema.users.id })
 			.from(schema.users)
-			.innerJoin(schema.userRoles, eq(schema.userRoles.userId, schema.users.id))
 			.where(
-				and(
-					eq(schema.userRoles.roleId, ROLE_IDS.MEMBER),
-					or(
-						isNull(schema.users.lastPaymentConfirmedAt),
-						lt(schema.users.lastPaymentConfirmedAt, cutoffDate),
-					),
+				or(
+					isNull(schema.users.lastPaymentConfirmedAt),
+					lt(schema.users.lastPaymentConfirmedAt, cutoffDate),
 				),
 			);
 
@@ -620,7 +616,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			.where(
 				and(
 					eq(schema.oauthConnections.providerId, OAUTH_PROVIDER_IDS.DISCORD),
-					inArray(schema.oauthConnections.userId, expiredMembersQuery),
+					inArray(schema.oauthConnections.userId, expiredUsersQuery),
 				),
 			);
 
