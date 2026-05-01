@@ -1,3 +1,4 @@
+import { removeDiscordMemberRoleTask } from "../cron-tasks/remove-discord-member-role";
 import { removeExpiredAccessTokenTask } from "../cron-tasks/remove-expired-access-token";
 import { removeMemberRoleTask } from "../cron-tasks/remove-member-role";
 import { factory } from "../factory";
@@ -32,6 +33,10 @@ const route = app
 	})
 	.post("/remove-member-role", async (c) => {
 		c.executionCtx.waitUntil(removeMemberRoleTask(c));
+		return c.text("OK", 200);
+	})
+	.post("/remove-discord-member-role", async (c) => {
+		c.executionCtx.waitUntil(removeDiscordMemberRoleTask(c));
 		return c.text("OK", 200);
 	});
 
