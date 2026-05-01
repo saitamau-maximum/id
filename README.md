@@ -74,6 +74,7 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 - `DISCORD_BOT_TOKEN`: Discord Bot のトークン
 - `DISCORD_GUILD_ID`: Discord Bot を追加するサーバーの ID
 - `DISCORD_CALENDAR_CHANNEL_ID`: Calendar の通知を送信する Discord チャンネルの ID
+- `DISCORD_MEMBER_ROLE_ID`: ”メンバー”ロールのID
 
 Discord Developer Portal (<https://discord.com/developers/applications>) から新しくアプリケーションを作成してください。
 Bot タブの Public bot を有効にしてから、 Installation タブの Installation Contexts で User Install と Guild Install の両方を有効にしてください。
