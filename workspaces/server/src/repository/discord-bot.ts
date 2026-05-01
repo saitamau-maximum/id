@@ -24,4 +24,6 @@ export interface IDiscordBotRepository {
 		type: CalendarNotifyType,
 		event: CalendarEventForNotification,
 	): Promise<void>;
+	addRoleToMember(discordUserId: string, roleId: string): Promise<void>;
+	removeRoleFromMember(discordUserId: string, roleId: string): Promise<void>;
 }

@@ -133,4 +133,27 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 			],
 		});
 	}
+
+	async addRoleToMember(discordUserId: string, roleId: string): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, discordUserId, roleId),
+			{ method: "PUT" },
+		);
+		if (!res.ok && res.status !== 204) {
+			throw new Error(`ロールの追加に失敗しました: ${res.status}`);
+		}
+	}
+
+	async removeRoleFromMember(
+		discordUserId: string,
+		roleId: string,
+	): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, discordUserId, roleId),
+			{ method: "DELETE" },
+		);
+		if (!res.ok && res.status !== 204) {
+			throw new Error(`ロールの削除に失敗しました: ${res.status}`);
+		}
+	}
 }
