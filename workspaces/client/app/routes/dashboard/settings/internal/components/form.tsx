@@ -1,7 +1,6 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { UserProfileUpdateParams } from "@idp/schema/api/user";
 import type { UserCertification } from "@idp/schema/entity/certification";
-import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
 import { Fragment, useCallback, useMemo, useState } from "react";
 import { Plus, X } from "react-feather";
@@ -10,6 +9,7 @@ import { css } from "styled-system/css";
 import type * as v from "valibot";
 import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
 import { CertificationCard } from "~/components/feature/user/certification-card";
+import { UserSettingOAuthConnect } from "~/components/feature/user/setting/oauth-connect";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
@@ -17,7 +17,6 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { IconButton } from "~/components/ui/icon-button";
 import { SocialIcon } from "~/components/ui/social-icon";
 import { Switch } from "~/components/ui/switch";
-import { Table } from "~/components/ui/table";
 import {
 	FACULTY,
 	FACULTY_OF_EDUCATION,
@@ -38,7 +37,6 @@ import { useSendCertificationRequest } from "../hooks/use-send-certification-req
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
 import { CertificationRequest } from "./certification-request";
-import { OAuthConnRow } from "./oauth-conn-row";
 
 type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
@@ -466,26 +464,7 @@ export const ProfileUpdateForm = () => {
 				</p>
 			</Form.FieldSet>
 
-			<Form.FieldSet>
-				<legend>
-					<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
-				</legend>
-
-				<Table.Root>
-					<Table.Tr>
-						<Table.Th>サービス</Table.Th>
-						<Table.Th>アカウント</Table.Th>
-						<Table.Th>連携</Table.Th>
-					</Table.Tr>
-					{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
-						<OAuthConnRow
-							key={providerId}
-							providerId={providerId}
-							conns={user?.oauthConnections ?? []}
-						/>
-					))}
-				</Table.Root>
-			</Form.FieldSet>
+			<UserSettingOAuthConnect />
 
 			<Form.FieldSet>
 				<legend>
