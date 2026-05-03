@@ -1,7 +1,7 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { UserProfileUpdateParams } from "@idp/schema/api/user";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -11,9 +11,9 @@ import { UserSettingOAuthConnect } from "~/components/feature/user/setting/oauth
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { PreviewableField } from "~/components/ui/form/previewable-field";
 import { IconButton } from "~/components/ui/icon-button";
 import { SocialIcon } from "~/components/ui/social-icon";
-import { Switch } from "~/components/ui/switch";
 import {
 	FACULTY,
 	FACULTY_OF_EDUCATION,
@@ -27,7 +27,6 @@ import {
 import { useAuth } from "~/hooks/use-auth";
 import { detectSocialService } from "~/utils/social-link";
 import { useUpdateProfile } from "../hooks/use-update-profile";
-import { BioPreview } from "./bio-preview";
 
 type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
@@ -35,7 +34,6 @@ type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
 	const { user } = useAuth();
-	const [isPreview, setIsPreview] = useState(false);
 
 	const {
 		register,
@@ -72,8 +70,6 @@ export const ProfileUpdateForm = () => {
 		control,
 		name: "socialLinks",
 	});
-	const bio = watch("bio");
-	const bioLength = bio?.length || 0;
 
 	const isOutsideMember = OUTSIDE_GRADE.includes(watch("grade"));
 	const isGraduateStudent = GRADUATE_GRADE.includes(watch("grade"));
@@ -372,41 +368,14 @@ export const ProfileUpdateForm = () => {
 					<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
 					<ErrorDisplay error={errors.bio?.message} />
 				</div>
-				<Switch.List>
-					<Switch.Item
-						isActive={!isPreview}
-						onClick={() => setIsPreview(!isPreview)}
-					>
-						Edit
-					</Switch.Item>
-					<Switch.Item
-						isActive={isPreview}
-						onClick={() => setIsPreview(!isPreview)}
-					>
-						Preview
-					</Switch.Item>
-				</Switch.List>
-				{isPreview ? (
-					<BioPreview bio={bio} />
-				) : (
-					<div className={css({ height: "240px" })}>
-						<Form.Textarea
-							placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
-							rows={BIO_MAX_LINES}
-							{...register("bio")}
-						/>
-					</div>
-				)}
-				<p
-					className={css({
-						display: "block",
-						fontSize: "sm",
-						color: "gray.600",
-						textAlign: "right",
-					})}
-				>
-					{bioLength} / {BIO_MAX_LENGTH}
-				</p>
+				<PreviewableField
+					register={register}
+					watch={watch}
+					name="bio"
+					placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
+					maxLines={BIO_MAX_LINES}
+					maxLength={BIO_MAX_LENGTH}
+				/>
 			</Form.FieldSet>
 
 			<UserSettingOAuthConnect />
