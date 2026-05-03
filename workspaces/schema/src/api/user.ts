@@ -17,8 +17,6 @@ export const UserProfileUpdateParams = v.config(
 				"displayId",
 				"email",
 				"grade",
-				"bio",
-				"socialLinks",
 			]),
 			// Optional
 			v.partial(
@@ -30,6 +28,8 @@ export const UserProfileUpdateParams = v.config(
 					"laboratory",
 					"graduateSchool",
 					"specialization",
+					"bio",
+					"socialLinks",
 				]),
 			),
 		]),
