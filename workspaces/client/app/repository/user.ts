@@ -58,6 +58,9 @@ export class UserRepositoryImpl implements IUserRepository {
 				laboratory,
 				graduateSchool,
 				specialization,
+				// 以下 2 つは onboarding では入力しないので、空で送る
+				bio: "",
+				socialLinks: [] as string[],
 			},
 		});
 		if (!res.ok) {
@@ -98,7 +101,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				graduateSchool,
 				specialization,
 				bio,
-				socialLinks: socialLinks ?? [],
+				socialLinks,
 			},
 		});
 		if (!res.ok) {
