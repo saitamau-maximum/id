@@ -1,20 +1,23 @@
 import type { ExportableOAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import {
+	OAUTH_PROVIDER_IDS,
 	OAUTH_PROVIDERS,
 	type OAuthProviderId,
 } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { useCallback } from "react";
 import { css } from "styled-system/css";
-import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
-import { OAuthServiceProviderBadge } from "~/components/feature/oauth-internal/service-provider-badge";
-import { OAuthUserBadge } from "~/components/feature/oauth-internal/user-badge";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { AnchorLike } from "~/components/ui/anchor-like";
+import { Form } from "~/components/ui/form";
 import { Table } from "~/components/ui/table";
+import { useAuth } from "~/hooks/use-auth";
 import { env } from "~/utils/env";
-import { useDeleteOAuthConnection } from "../hooks/use-delete-oauth-connection";
+import { DeleteConfirmation } from "../../delete-confirmation";
+import { OAuthServiceProviderBadge } from "../../oauth-internal/service-provider-badge";
+import { OAuthUserBadge } from "../../oauth-internal/user-badge";
+import { useDeleteOAuthConnection } from "./hooks/use-delete-oauth-connection";
 
-export const OAuthConnRow = ({
+const OAuthConnRow = ({
 	providerId,
 	conns,
 }: {
@@ -78,5 +81,32 @@ export const OAuthConnRow = ({
 				)}
 			</Table.Td>
 		</Table.Tr>
+	);
+};
+
+export const UserSettingOAuthConnect = () => {
+	const { user } = useAuth();
+
+	return (
+		<Form.FieldSet>
+			<legend>
+				<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
+			</legend>
+
+			<Table.Root>
+				<Table.Tr>
+					<Table.Th>サービス</Table.Th>
+					<Table.Th>アカウント</Table.Th>
+					<Table.Th>連携</Table.Th>
+				</Table.Tr>
+				{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
+					<OAuthConnRow
+						key={providerId}
+						providerId={providerId}
+						conns={user?.oauthConnections ?? []}
+					/>
+				))}
+			</Table.Root>
+		</Form.FieldSet>
 	);
 };
