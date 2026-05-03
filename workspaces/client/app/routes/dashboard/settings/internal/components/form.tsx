@@ -1,16 +1,13 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { UserProfileUpdateParams } from "@idp/schema/api/user";
-import type { UserCertification } from "@idp/schema/entity/certification";
 import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
-import { Fragment, useCallback, useMemo, useState } from "react";
+import { Fragment, useCallback, useState } from "react";
 import { Plus, X } from "react-feather";
 import { useFieldArray, useForm } from "react-hook-form";
 import { css } from "styled-system/css";
 import type * as v from "valibot";
-import { DeleteConfirmation } from "~/components/feature/delete-confirmation";
-import { CertificationCard } from "~/components/feature/user/certification-card";
+import { UserSettingCertificationRequest } from "~/components/feature/user/setting/certification-request";
 import { UserSettingOAuthConnect } from "~/components/feature/user/setting/oauth-connect";
-import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -29,52 +26,16 @@ import {
 } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { detectSocialService } from "~/utils/social-link";
-import {
-	useCertifications,
-	useDeleteUserCertification,
-} from "../hooks/use-certifications";
-import { useSendCertificationRequest } from "../hooks/use-send-certification-request";
 import { useUpdateProfile } from "../hooks/use-update-profile";
 import { BioPreview } from "./bio-preview";
-import { CertificationRequest } from "./certification-request";
 
 type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 export const ProfileUpdateForm = () => {
 	const { mutate, isPending } = useUpdateProfile();
-	const { mutate: sendCertificationRequest } = useSendCertificationRequest();
 	const { user } = useAuth();
 	const [isPreview, setIsPreview] = useState(false);
-	const { data: certifications } = useCertifications();
-	const { mutate: deleteCertification } = useDeleteUserCertification();
-
-	const requestableCertifications = useMemo(() => {
-		const requestedIds = user?.certifications.map((c) => c.id) || [];
-		return certifications?.filter((c) => !requestedIds.includes(c.id)) || [];
-	}, [certifications, user]);
-
-	const handleCertRequest = useCallback(async () => {
-		if ((requestableCertifications ?? []).length === 0) return;
-		const res = await CertificationRequest.call({
-			certifications: requestableCertifications,
-		});
-		if (res.type === "dismiss") return;
-		sendCertificationRequest(res.request);
-	}, [requestableCertifications, sendCertificationRequest]);
-
-	const handleCertDelete = useCallback(
-		async (certification: UserCertification) => {
-			const res = await ConfirmDialog.call({
-				title: "資格・試験の削除",
-				danger: true,
-				children: <DeleteConfirmation title={certification.title} />,
-			});
-			if (res.type === "dismiss") return;
-			deleteCertification(certification.id);
-		},
-		[deleteCertification],
-	);
 
 	const {
 		register,
@@ -399,23 +360,7 @@ export const ProfileUpdateForm = () => {
 				{...register("email")}
 			/>
 
-			<Form.FieldSet>
-				<legend>
-					<Form.LabelText>資格・試験</Form.LabelText>
-				</legend>
-				<CertificationCard
-					certifications={user?.certifications ?? []}
-					onClick={handleCertDelete}
-				/>
-				{requestableCertifications.length > 0 && (
-					<button type="button" onClick={handleCertRequest}>
-						<ButtonLike size="sm" variant="secondary">
-							<Plus size={16} />
-							資格・試験の情報を申請する
-						</ButtonLike>
-					</button>
-				)}
-			</Form.FieldSet>
+			<UserSettingCertificationRequest />
 
 			<Form.FieldSet>
 				<div
