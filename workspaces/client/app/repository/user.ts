@@ -5,13 +5,12 @@ import type {
 import type {
 	UserGetContributionsResponse,
 	UserProfileUpdateParams,
-	UserRegisterParams,
 } from "@idp/schema/api/user";
 import type { RoleId } from "@idp/schema/entity/role";
 import { client } from "~/utils/hono";
 
 export interface IUserRepository {
-	register: (params: UserRegisterParams) => Promise<void>;
+	register: (params: UserProfileUpdateParams) => Promise<void>;
 	update: (params: UserProfileUpdateParams) => Promise<void>;
 	getContributions: () => Promise<UserGetContributionsResponse>;
 	getContributions$$key: () => unknown[];
@@ -43,7 +42,7 @@ export class UserRepositoryImpl implements IUserRepository {
 		laboratory,
 		graduateSchool,
 		specialization,
-	}: UserRegisterParams) {
+	}: UserProfileUpdateParams) {
 		const res = await client.user.register.$post({
 			json: {
 				displayName,
@@ -99,7 +98,7 @@ export class UserRepositoryImpl implements IUserRepository {
 				graduateSchool,
 				specialization,
 				bio,
-				socialLinks,
+				socialLinks: socialLinks ?? [],
 			},
 		});
 		if (!res.ok) {

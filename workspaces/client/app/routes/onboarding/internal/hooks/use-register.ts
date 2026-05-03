@@ -1,4 +1,4 @@
-import type { UserRegisterParams } from "@idp/schema/api/user";
+import type { UserProfileUpdateParams } from "@idp/schema/api/user";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { useAuth } from "~/hooks/use-auth";
@@ -13,7 +13,7 @@ export const useRegister = () => {
 	const navigate = useNavigate();
 
 	return useMutation({
-		mutationFn: (payload: UserRegisterParams) =>
+		mutationFn: (payload: UserProfileUpdateParams) =>
 			userRepository.register(payload),
 		onSuccess: async () => {
 			pushToast({

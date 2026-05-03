@@ -1,5 +1,5 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
-import { UserRegisterParams } from "@idp/schema/api/user";
+import { UserProfileUpdateParams } from "@idp/schema/api/user";
 import { Fragment, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { css } from "styled-system/css";
@@ -20,8 +20,8 @@ import {
 import { useAuth } from "~/hooks/use-auth";
 import { useRegister } from "../hooks/use-register";
 
-type FormInputValues = v.InferInput<typeof UserRegisterParams>;
-type FormOutputValues = v.InferOutput<typeof UserRegisterParams>;
+type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
+type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 export const RegisterForm = () => {
 	const { mutate, isPending } = useRegister();
@@ -33,7 +33,7 @@ export const RegisterForm = () => {
 		watch,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(UserRegisterParams),
+		resolver: valibotResolver(UserProfileUpdateParams),
 		defaultValues: {
 			displayName: user?.displayName,
 			realName: user?.realName,

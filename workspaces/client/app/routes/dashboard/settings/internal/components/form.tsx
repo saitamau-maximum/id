@@ -435,7 +435,7 @@ export const ProfileUpdateForm = () => {
 							>
 								<SocialIcon
 									service={detectSocialService(
-										watch(`socialLinks.${index}.value` || ""),
+										watch(`socialLinks.${index}.value` || "") ?? "",
 									)}
 									size={24}
 								/>
