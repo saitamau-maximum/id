@@ -73,7 +73,7 @@ export const PreviewableField = <T extends FieldValues>({
 	);
 };
 
-const MdPreview = ({ content }: { content: string }) => {
+const MdPreview = ({ content }: { content?: string }) => {
 	const { reactContent } = useMarkdown(content);
 
 	return (
