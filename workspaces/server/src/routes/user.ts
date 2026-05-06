@@ -1,8 +1,5 @@
 import { vValidator } from "@hono/valibot-validator";
-import {
-	UserProfileUpdateParams,
-	UserRegisterParams,
-} from "@idp/schema/api/user";
+import { UserProfileUpdateParams } from "@idp/schema/api/user";
 import {
 	OAUTH_PROVIDER_IDS,
 	OAuthProviderId,
@@ -29,7 +26,7 @@ const route = app
 	.post(
 		"/register",
 		authMiddleware,
-		vValidator("json", UserRegisterParams),
+		vValidator("json", UserProfileUpdateParams),
 		async (c) => {
 			const payload = c.get("jwtPayload");
 			const { UserRepository } = c.var;

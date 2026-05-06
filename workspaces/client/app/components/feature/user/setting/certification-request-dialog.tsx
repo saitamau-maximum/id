@@ -22,7 +22,7 @@ type Payload =
 			type: "dismiss";
 	  };
 
-export const CertificationRequest = createCallable<Props, Payload>(
+export const CertificationRequestDialog = createCallable<Props, Payload>(
 	({ call, certifications }) => {
 		const [selectedCertification, setSelectedCertification] =
 			useState<Certification | null>(null);
