@@ -106,8 +106,8 @@ export const notifyDiscordOnComment = (
 								inline: true,
 								value:
 									assignees
+										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
 										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.filter((val) => val !== null)
 										.join("\n") || "",
 							},
 							{
@@ -115,8 +115,8 @@ export const notifyDiscordOnComment = (
 								inline: true,
 								value:
 									reviewers
+										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
 										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.filter((val) => val !== null)
 										.join("\n") || "",
 							},
 							{
@@ -124,8 +124,8 @@ export const notifyDiscordOnComment = (
 								inline: true,
 								value:
 									participants
+										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
 										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.filter((val) => val !== null)
 										.join("\n") || "",
 							},
 						].filter((field) => field.value !== ""), // value が空のフィールドは除外
