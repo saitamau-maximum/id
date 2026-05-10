@@ -86,8 +86,7 @@ export const notifyDiscordOnComment = (
 		// 送信
 		const DiscordBotRepository = c.get("DiscordBotRepository");
 		await DiscordBotRepository.sendMessage(
-			// temporary impl
-			c.env.DISCORD_CALENDAR_CHANNEL_ID,
+			c.env.DISCORD_GITHUB_NOTIFICATION_CHANNEL_ID,
 			{
 				content: `${mentions} ${message}`,
 				embeds: [
