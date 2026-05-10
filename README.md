@@ -56,8 +56,13 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
   - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev)の「Generate a private key」で取得し、以下のコードで変換してください。
   - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
   - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
-
-これらの環境変数を設定することで、 Dashboard の活動度などが表示されるようになります。
+  - この環境変数を設定することで、 Dashboard の活動度などが表示されるようになります。
+- `GITHUB_WEBHOOK_SECRET`: GitHub Webhook のシークレット
+  - GitHub App 設定画面の Webhook タブで設定しています。
+  - `openssl rand -base64 32` などで適当な文字列を生成して設定してください。
+  - Webhook URL には `localhost` を指定できません。そのため:
+    - smee.io などのサービスを利用して、 GitHub からの Webhook をローカルの開発環境に転送してください。
+    - 詳しいことは <http://localhost:8787/dev/webhook/github> に書いてあります。 ここから簡単にテストすることもできます。
 
 なお、セキュリティの都合上 GitHub App (Dev) は Readonly になっています。
 すなわち、以下の機能は利用できません。

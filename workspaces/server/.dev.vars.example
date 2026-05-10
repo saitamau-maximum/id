@@ -9,6 +9,7 @@ PRIVKEY_FOR_OAUTH=""
 
 # GitHub 関連の開発
 GITHUB_APP_PRIVKEY=""
+GITHUB_WEBHOOK_SECRET=""
 
 # Discord 関連の開発
 DISCORD_OAUTH_ID=""
