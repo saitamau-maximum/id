@@ -1,6 +1,6 @@
 import { Webhooks } from "@octokit/webhooks";
 import { factory } from "../factory";
-import { notifyDiscordOnComment } from "../webhooks-handler/github/notify-discord-on-comment";
+import { registerGithubWebhookHandlers } from "../webhooks-handler/github";
 
 const app = factory.createApp();
 
@@ -10,13 +10,7 @@ const route = app.post("/github", async (c) => {
 
 	// ここでしか使わないので、特に抽象化せず @octokit/webhooks を使う
 	const webhooks = new Webhooks({ secret });
-
-	webhooks.on("ping", () => {
-		console.log("GitHub Webhook Received: ping -> pong");
-	});
-
-	// --- handler 登録 --- //
-	notifyDiscordOnComment(c, webhooks);
+	registerGithubWebhookHandlers(c, webhooks);
 
 	const id = c.req.header("x-github-delivery");
 	const name = c.req.header("x-github-event");
