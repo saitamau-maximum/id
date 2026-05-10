@@ -56,8 +56,13 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
   - [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev)の「Generate a private key」で取得し、以下のコードで変換してください。
   - `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in INPUT_FILE | openssl base64 -A`
   - ダウンロードしたファイルを `INPUT_FILE` に指定してください。
-
-これらの環境変数を設定することで、 Dashboard の活動度などが表示されるようになります。
+  - この環境変数を設定することで、 Dashboard の活動度などが表示されるようになります。
+- `GITHUB_WEBHOOK_SECRET`: GitHub Webhook のシークレット
+  - GitHub App 設定画面の Webhook タブで設定しています。
+  - `openssl rand -base64 32` などで適当な文字列を生成して設定してください。
+  - Webhook URL には `localhost` を指定できません。そのため:
+    - smee.io などのサービスを利用して、 GitHub からの Webhook をローカルの開発環境に転送してください。
+    - 詳しいことは <http://localhost:8787/dev/webhook/github> に書いてあります。 ここから簡単にテストすることもできます。
 
 なお、セキュリティの都合上 GitHub App (Dev) は Readonly になっています。
 すなわち、以下の機能は利用できません。
@@ -74,6 +79,7 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 - `DISCORD_BOT_TOKEN`: Discord Bot のトークン
 - `DISCORD_GUILD_ID`: Discord Bot を追加するサーバーの ID
 - `DISCORD_CALENDAR_CHANNEL_ID`: Calendar の通知を送信する Discord チャンネルの ID
+- `DISCORD_GITHUB_NOTIFICATION_CHANNEL_ID`: GitHub Webhook 通知を送信する Discord チャンネルの ID
 
 Discord Developer Portal (<https://discord.com/developers/applications>) から新しくアプリケーションを作成してください。
 Bot タブの Public bot を有効にしてから、 Installation タブの Installation Contexts で User Install と Guild Install の両方を有効にしてください。
@@ -110,7 +116,7 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 
 - `CLIENT_REDIRECT_URL`: ログイン後にクライアント側にリダイレクトされる URL。
 - `CLIENT_ORIGIN`: クライアント側の URL。
-- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
+- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
 - `GITHUB_APP_INSTALLID`: GitHub App の Install ID。 GitHub の REST API を使って取得できます。 詳しくは [公式ドキュメント](https://docs.github.com/ja/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) を参照してください。
 
 > [!TIP]

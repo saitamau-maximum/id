@@ -31,6 +31,7 @@ import { memberRoute } from "./routes/member";
 import { oauthRoute } from "./routes/oauth";
 import { publicRoute } from "./routes/public";
 import { userRoute } from "./routes/user";
+import { webhookRoute } from "./routes/webhook";
 import { wellKnownRoute } from "./routes/well-known";
 
 const app = factory.createApp();
@@ -142,13 +143,14 @@ export const route = app
 	.use((c, next) => {
 		// OAuth のフロー上、クロスサイトからのリクエストが来る可能性があるため、 OAuth 関連のルートは CSRF チェックから除外する
 		// public API は外部オリジンからの利用を許可するため、 /public も CSRF チェックから除外する
-		// cron trigger も同様
+		// cron trigger, webhook handler も同様
 		// csrf の secFetchSide オプションでテストしようとすると、 curl などで Origin が付与されていない場合即座に拒否されちゃうので、ここでパスベースで除外する
 		// ref: https://github.com/honojs/hono/blob/8217d9ece6f4d302e446b8dc353d1b3cbf51d92e/src/middleware/csrf/index.ts#L107-L110
 		if (
 			c.req.path.startsWith("/oauth/") ||
 			c.req.path.startsWith("/public/") ||
-			c.req.path.startsWith("/cron/")
+			c.req.path.startsWith("/cron/") ||
+			c.req.path.startsWith("/webhook/")
 		) {
 			return next();
 		}
@@ -186,6 +188,7 @@ export const route = app
 	.route("/discord", discordRoute)
 	.route("/dev", devRoute)
 	.route("/.well-known", wellKnownRoute)
-	.route("/cron", cronRoute);
+	.route("/cron", cronRoute)
+	.route("/webhook", webhookRoute);
 
 export default app;
