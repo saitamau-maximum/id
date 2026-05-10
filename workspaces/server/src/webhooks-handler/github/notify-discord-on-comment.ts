@@ -95,6 +95,7 @@ export const notifyDiscordOnComment = (
 						title: `${repo} #${num}`,
 						url,
 						description: prtitle,
+						timestamp: new Date().toISOString(),
 						fields: [
 							{
 								name: "Sender",
