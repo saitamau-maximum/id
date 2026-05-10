@@ -171,9 +171,9 @@ export const notifyDiscordOnComment = (
 	webhooks.on(["pull_request_review.submitted"], async ({ payload }) => {
 		await sendNotificationToDiscord({
 			message:
-				payload.review.state === "APPROVED"
+				payload.review.state === "approved"
 					? ":approved:"
-					: payload.review.state === "REQUEST_CHANGES"
+					: payload.review.state === "changes_requested"
 						? ":changesrequest:"
 						: "コメントが追加されました",
 			prtitle: payload.pull_request.title,
