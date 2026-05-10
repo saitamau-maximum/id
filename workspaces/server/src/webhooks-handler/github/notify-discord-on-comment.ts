@@ -141,7 +141,7 @@ export const notifyDiscordOnComment = (
 
 	webhooks.on(["pull_request.review_requested"], async ({ payload }) => {
 		await sendNotificationToDiscord({
-			message: "Review Requested",
+			message: "レビューリクエストが届きました",
 			prtitle: payload.pull_request.title,
 			url: payload.pull_request.html_url,
 			assignees: listUserIds(payload.pull_request.assignees),
@@ -156,7 +156,7 @@ export const notifyDiscordOnComment = (
 		const isPR = payload.issue.pull_request !== undefined;
 
 		await sendNotificationToDiscord({
-			message: "New Comment",
+			message: "コメントが追加されました",
 			prtitle: payload.issue.title,
 			url: payload.comment.html_url,
 			assignees: listUserIds(payload.issue.assignees),
@@ -171,10 +171,10 @@ export const notifyDiscordOnComment = (
 		await sendNotificationToDiscord({
 			message:
 				payload.review.state === "APPROVED"
-					? "Review :approved:"
+					? ":approved:"
 					: payload.review.state === "REQUEST_CHANGES"
-						? "Review :changesrequest:"
-						: "Review Submitted",
+						? ":changesrequest:"
+						: "コメントが追加されました",
 			prtitle: payload.pull_request.title,
 			url: payload.review.html_url,
 			assignees: listUserIds(payload.pull_request.assignees),
