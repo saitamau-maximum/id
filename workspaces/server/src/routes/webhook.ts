@@ -5,10 +5,11 @@ import { notifyDiscordOnComment } from "../webhooks-handler/github/notify-discor
 const app = factory.createApp();
 
 const route = app.post("/github", async (c) => {
+	const secret = c.env.GITHUB_WEBHOOK_SECRET;
+	if (!secret) return c.text("GITHUB_WEBHOOK_SECRET is not set", 500);
+
 	// ここでしか使わないので、特に抽象化せず @octokit/webhooks を使う
-	const webhooks = new Webhooks({
-		secret: c.env.GITHUB_WEBHOOK_SECRET,
-	});
+	const webhooks = new Webhooks({ secret });
 
 	webhooks.on("ping", () => {
 		console.log("GitHub Webhook Received: ping -> pong");
@@ -33,11 +34,14 @@ const route = app.post("/github", async (c) => {
 			error instanceof Error
 				? error.message.toLowerCase()
 				: String(error).toLowerCase();
-		const status =
-			message.includes("signature") || message.includes("verification")
-				? 401
-				: 400;
-		return c.body("Invalid GitHub webhook request", status);
+		const isSignatureVerificationError =
+			message.includes("signature") || message.includes("verification");
+
+		if (isSignatureVerificationError)
+			return c.body("Invalid GitHub webhook request", 401);
+
+		console.error(error);
+		return c.body("Internal Server Error", 500);
 	}
 
 	return c.body(null, 204);
