@@ -172,9 +172,9 @@ export const notifyDiscordOnComment = (
 		await sendNotificationToDiscord({
 			message:
 				payload.review.state === "approved"
-					? ":approved:"
+					? "<:approved:1160109280201023549>" // そのまま :approved: だと絵文字として送信されないので ID 形式で指定
 					: payload.review.state === "changes_requested"
-						? ":changesrequest:"
+						? "<:changesrequest:1160109298643374121>"
 						: "コメントが追加されました",
 			prtitle: payload.pull_request.title,
 			url: payload.review.html_url,
