@@ -115,7 +115,7 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 
 - `CLIENT_REDIRECT_URL`: ログイン後にクライアント側にリダイレクトされる URL。
 - `CLIENT_ORIGIN`: クライアント側の URL。
-- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-auth) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
+- `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
 - `GITHUB_APP_INSTALLID`: GitHub App の Install ID。 GitHub の REST API を使って取得できます。 詳しくは [公式ドキュメント](https://docs.github.com/ja/apps/creating-github-apps/authenticating-with-a-github-app/authenticating-as-a-github-app-installation) を参照してください。
 
 > [!TIP]
