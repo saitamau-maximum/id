@@ -13,7 +13,7 @@ const onlyDevMiddleware = factory.createMiddleware(async (c, next) => {
 
 const route = app
 	.use(onlyDevMiddleware)
-	.get("/oauth/:clientId/:clientSecret", async (c) => {
+	.get("/oauth/:clientId/:clientSecret", (c) => {
 		const { clientId, clientSecret } = c.req.param();
 		const redirectTo = new URL(c.req.url);
 		redirectTo.pathname = "/oauth/authorize";
