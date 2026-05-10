@@ -1,5 +1,6 @@
 import { Webhooks } from "@octokit/webhooks";
 import { factory } from "../factory";
+import { notifyDiscordOnComment } from "../webhooks-handler/github/notify-discord-on-comment";
 
 const app = factory.createApp();
 
@@ -12,6 +13,9 @@ const route = app.post("/github", async (c) => {
 	webhooks.on("ping", () => {
 		console.log("GitHub Webhook Received: ping -> pong");
 	});
+
+	// --- handler 登録 --- //
+	notifyDiscordOnComment(c, webhooks);
 
 	await webhooks.verifyAndReceive({
 		id: c.req.header("x-github-delivery") ?? "",
