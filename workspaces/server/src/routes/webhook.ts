@@ -18,32 +18,21 @@ const route = app.post("/github", async (c) => {
 	// --- handler 登録 --- //
 	notifyDiscordOnComment(c, webhooks);
 
-	try {
-		const id = c.req.header("x-github-delivery");
-		const name = c.req.header("x-github-event");
-		const signature = c.req.header("x-hub-signature-256");
-		const payload = await c.req.text();
+	const id = c.req.header("x-github-delivery");
+	const name = c.req.header("x-github-event");
+	const signature = c.req.header("x-hub-signature-256");
+	const payload = await c.req.text();
 
-		if (!id || !name || !signature) {
-			return c.body("Missing required GitHub webhook headers", 400);
-		}
-
-		await webhooks.verifyAndReceive({ id, name, signature, payload });
-	} catch (error) {
-		const message =
-			error instanceof Error
-				? error.message.toLowerCase()
-				: String(error).toLowerCase();
-		const isSignatureVerificationError =
-			message.includes("signature") || message.includes("verification");
-
-		if (isSignatureVerificationError)
-			return c.body("Invalid GitHub webhook request", 401);
-
-		console.error(error);
-		return c.body("Internal Server Error", 500);
+	if (!id || !name || !signature) {
+		return c.body("Missing required GitHub webhook headers", 400);
 	}
 
+	if (!(await webhooks.verify(payload, signature))) {
+		return c.body("Invalid GitHub webhook signature", 401);
+	}
+
+	// receive だけだと型が合わずめんどくさいので、二重 verify してしまうが verifyAndReceive を呼ぶ
+	await webhooks.verifyAndReceive({ id, name, signature, payload });
 	return c.body(null, 204);
 });
 
