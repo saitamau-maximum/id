@@ -67,14 +67,19 @@ export const notifyDiscordOnComment = (
 			githubToDiscordIdMap[githubUserId] = discordConn.providerUserId;
 		}
 
-		const mentions = relatedGithubUserIds
-			.filter((id) => id !== sender) // 自分自身へのメンションは不要なので除外
-			.map((githubUserId) => {
-				const discordUserId = githubToDiscordIdMap[githubUserId];
-				return discordUserId ? `<@${discordUserId}>` : null;
-			})
-			.filter((val) => val !== null)
-			.join(" ");
+		const convertToMentions = (githubUserIds: number[]) => {
+			return githubUserIds
+				.map((id) => {
+					const discordUserId = githubToDiscordIdMap[id];
+					return discordUserId ? `<@${discordUserId}>` : null;
+				})
+				.filter((val) => val !== null)
+				.join(" ");
+		};
+
+		const mentions = convertToMentions(
+			relatedGithubUserIds.filter((id) => id !== sender), // 自分自身へのメンションは不要なので除外
+		);
 
 		// GitHub URL から "repo #no" の形にする
 		const pathname = new URL(url).pathname;
@@ -99,34 +104,22 @@ export const notifyDiscordOnComment = (
 							{
 								name: "Sender",
 								inline: true,
-								value: `<@${githubToDiscordIdMap[sender]}>`,
+								value: convertToMentions([sender]) || "Unknown",
 							},
 							{
 								name: "Assignees",
 								inline: true,
-								value:
-									assignees
-										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
-										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.join("\n") || "",
+								value: convertToMentions(assignees) || "",
 							},
 							{
 								name: "Reviewers",
 								inline: true,
-								value:
-									reviewers
-										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
-										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.join("\n") || "",
+								value: convertToMentions(reviewers) || "",
 							},
 							{
 								name: "Participants",
 								inline: true,
-								value:
-									participants
-										.filter((id) => githubToDiscordIdMap[id] !== undefined) // 連携されていないユーザーは除外
-										.map((id) => `<@${githubToDiscordIdMap[id]}>`)
-										.join("\n") || "",
+								value: convertToMentions(participants) || "",
 							},
 						].filter((field) => field.value !== ""), // value が空のフィールドは除外
 					},
