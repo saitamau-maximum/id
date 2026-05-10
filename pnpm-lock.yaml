@@ -146,6 +146,9 @@ importers:
       '@octokit/auth-app':
         specifier: ^8.2.0
         version: 8.2.0
+      '@octokit/webhooks':
+        specifier: ^14.2.0
+        version: 14.2.0
       discord-api-types:
         specifier: ^0.38.38
         version: 0.38.38
