@@ -39,25 +39,37 @@ export const notifyDiscordOnComment = (
 		);
 
 		// GitHub userId -> Discord userId の map
+		const githubDiscordIdsPair = await Promise.all(
+			relatedGithubUserIds.map(async (githubUserId) => {
+				const idpUserId =
+					await OAuthInternalRepository.fetchUserIdByProviderInfo(
+						githubUserId.toString(),
+						OAUTH_PROVIDER_IDS.GITHUB,
+					).catch(() => null); // 連携されていないユーザーは無視
+
+				if (!idpUserId) return null;
+
+				const oauthConns =
+					await OAuthInternalRepository.fetchOAuthConnectionsByUserId(
+						idpUserId,
+					);
+
+				const discordConn = oauthConns.find(
+					(conn) => conn.providerId === OAUTH_PROVIDER_IDS.DISCORD,
+				);
+
+				if (!discordConn) return null;
+
+				return {
+					githubUserId,
+					discordUserId: discordConn.providerUserId,
+				};
+			}),
+		);
 		const githubToDiscordIdMap: Record<number, string> = {};
-		for (const githubUserId of relatedGithubUserIds) {
-			const idpUserId = await OAuthInternalRepository.fetchUserIdByProviderInfo(
-				githubUserId.toString(),
-				OAUTH_PROVIDER_IDS.GITHUB,
-			).catch(() => null); // 連携されていないユーザーは無視
-
-			if (!idpUserId) continue;
-
-			const oauthConns =
-				await OAuthInternalRepository.fetchOAuthConnectionsByUserId(idpUserId);
-
-			const discordConn = oauthConns.find(
-				(conn) => conn.providerId === OAUTH_PROVIDER_IDS.DISCORD,
-			);
-
-			if (!discordConn) continue;
-
-			githubToDiscordIdMap[githubUserId] = discordConn.providerUserId;
+		for (const pair of githubDiscordIdsPair) {
+			if (!pair) continue;
+			githubToDiscordIdMap[pair.githubUserId] = pair.discordUserId;
 		}
 
 		const convertToMentions = (githubUserIds: number[]) => {
