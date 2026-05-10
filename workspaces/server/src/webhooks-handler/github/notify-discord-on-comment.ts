@@ -36,14 +36,6 @@ export const notifyDiscordOnComment = (
 			]),
 		);
 
-		if (
-			relatedGithubUserIds.length === 1 &&
-			relatedGithubUserIds[0] === sender
-		) {
-			// 自分自身への通知だけの場合はスルー
-			return;
-		}
-
 		// GitHub userId -> Discord userId の map
 		const githubToDiscordIdMap: Record<number, string> = {};
 		for (const githubUserId of relatedGithubUserIds) {
@@ -80,6 +72,11 @@ export const notifyDiscordOnComment = (
 		const mentions = convertToMentions(
 			relatedGithubUserIds.filter((id) => id !== sender), // 自分自身へのメンションは不要なので除外
 		);
+
+		if (mentions === "") {
+			// メンション対象がいない場合には送信しない
+			return;
+		}
 
 		// GitHub URL から "repo #no" の形にする
 		const pathname = new URL(url).pathname;

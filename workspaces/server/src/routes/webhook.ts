@@ -17,12 +17,28 @@ const route = app.post("/github", async (c) => {
 	// --- handler 登録 --- //
 	notifyDiscordOnComment(c, webhooks);
 
-	await webhooks.verifyAndReceive({
-		id: c.req.header("x-github-delivery") ?? "",
-		name: c.req.header("x-github-event") ?? "",
-		signature: c.req.header("x-hub-signature-256") ?? "",
-		payload: await c.req.text(),
-	});
+	try {
+		const id = c.req.header("x-github-delivery");
+		const name = c.req.header("x-github-event");
+		const signature = c.req.header("x-hub-signature-256");
+		const payload = await c.req.text();
+
+		if (!id || !name || !signature) {
+			return c.body("Missing required GitHub webhook headers", 400);
+		}
+
+		await webhooks.verifyAndReceive({ id, name, signature, payload });
+	} catch (error) {
+		const message =
+			error instanceof Error
+				? error.message.toLowerCase()
+				: String(error).toLowerCase();
+		const status =
+			message.includes("signature") || message.includes("verification")
+				? 401
+				: 400;
+		return c.body("Invalid GitHub webhook request", status);
+	}
 
 	return c.body(null, 204);
 });
