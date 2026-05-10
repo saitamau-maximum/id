@@ -7,6 +7,8 @@ export const notifyDiscordOnComment = (
 	c: Context<HonoEnv>,
 	webhooks: Webhooks,
 ) => {
+	const { OAuthInternalRepository, DiscordBotRepository } = c.var;
+
 	const sendNotificationToDiscord = async ({
 		message,
 		prtitle,
@@ -39,7 +41,6 @@ export const notifyDiscordOnComment = (
 		// GitHub userId -> Discord userId の map
 		const githubToDiscordIdMap: Record<number, string> = {};
 		for (const githubUserId of relatedGithubUserIds) {
-			const OAuthInternalRepository = c.get("OAuthInternalRepository");
 			const idpUserId = await OAuthInternalRepository.fetchUserIdByProviderInfo(
 				githubUserId.toString(),
 				OAUTH_PROVIDER_IDS.GITHUB,
@@ -86,7 +87,6 @@ export const notifyDiscordOnComment = (
 		const num = pathname.split("/")[4];
 
 		// 送信
-		const DiscordBotRepository = c.get("DiscordBotRepository");
 		await DiscordBotRepository.sendMessage(
 			c.env.DISCORD_GITHUB_NOTIFICATION_CHANNEL_ID,
 			{
