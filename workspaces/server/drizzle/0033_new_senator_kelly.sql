@@ -65,11 +65,12 @@ UPDATE `__new_user_profiles` SET department = CASE user_profiles.department
 	WHEN 'ヨーロッパ・アメリカ文化専修課程' THEN 104
 	WHEN '日本・アジア文化専修課程' THEN 105
   WHEN '共生構想専修課程' THEN 106
+	-- 組織再編したらしい、変更前はコース単位だった
 	WHEN '小学校コース' THEN 301
 	WHEN '中学校コース' THEN 302
-	WHEN '乳幼児教育コース' THEN 303
-	WHEN '特別支援教育コース' THEN 304
-	WHEN '養護教諭養成課程' THEN 305
+	WHEN '乳幼児教育コース' THEN 301
+	WHEN '特別支援教育コース' THEN 301
+	WHEN '養護教諭養成課程' THEN 303
 	WHEN '数学科' THEN 401
 	WHEN '物理学科' THEN 402
 	-- 正しくは「化学」だが変更前が「科学」になっていたのでマイグレーションは「科学」にする
