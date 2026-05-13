@@ -1,6 +1,7 @@
 import * as v from "valibot";
 import { Contributions } from "../entity/contribution";
-import { DEPARTMENT_BY_ID, FACULTY_IDS } from "../entity/department";
+import { DEPARTMENT_BY_ID } from "../entity/department";
+import { FACULTY_IDS } from "../entity/faculty";
 import { isOutsideGrade } from "../entity/grade";
 import { UserProfile } from "../entity/user";
 
@@ -91,7 +92,7 @@ export const UserProfileUpdateParams = v.config(
 					if (faculty && department) {
 						const departmentData = DEPARTMENT_BY_ID[department];
 						if (!departmentData) return false;
-						if (departmentData.faculty_id !== faculty) return false;
+						if (departmentData.facultyId !== faculty) return false;
 						return true;
 					}
 					return true;
