@@ -157,6 +157,6 @@ export const DEPARTMENT_BY_ID = {
 	[DEPARTMENT_IDS.ENVIRONMENT]: {
 		id: DEPARTMENT_IDS.ENVIRONMENT,
 		facultyId: FACULTY_IDS.ENGINEERING,
-		name: "環境・エネルギー工学科",
+		name: "環境社会デザイン学科",
 	},
 } as const satisfies Record<DepartmentId, Department>;
