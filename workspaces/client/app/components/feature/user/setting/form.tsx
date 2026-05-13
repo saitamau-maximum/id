@@ -275,7 +275,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 					error={errors.laboratory?.message}
 					placeholder="田中研究室"
 					{...register("laboratory", {
-						setValueAs: (value) => (!value ? undefined : value),
+						setValueAs: (value) => value || undefined,
 					})}
 				/>
 
@@ -286,7 +286,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							error={errors.graduateSchool?.message}
 							placeholder="理工学研究科"
 							{...register("graduateSchool", {
-								setValueAs: (value) => (!value ? undefined : value),
+								setValueAs: (value) => value || undefined,
 							})}
 						/>
 
@@ -295,7 +295,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							error={errors.specialization?.message}
 							placeholder="数理電子情報専攻"
 							{...register("specialization", {
-								setValueAs: (value) => (!value ? undefined : value),
+								setValueAs: (value) => value || undefined,
 							})}
 						/>
 					</>
@@ -309,7 +309,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							placeholder="00XX000"
 							required
 							{...register("studentId", {
-								setValueAs: (value) => (!value ? undefined : value),
+								setValueAs: (value) => value || undefined,
 							})}
 						/>
 
@@ -320,7 +320,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							required
 							type="email"
 							{...register("academicEmail", {
-								setValueAs: (value) => (!value ? undefined : value),
+								setValueAs: (value) => value || undefined,
 							})}
 						/>
 					</>
