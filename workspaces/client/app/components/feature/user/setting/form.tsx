@@ -218,7 +218,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 										key={faculty.id}
 										value={faculty.id}
 										label={faculty.name}
-										required
+										required={!isOutsideMember}
 										{...register("faculty")}
 									/>
 								);
@@ -254,7 +254,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 										key={dept.id}
 										value={dept.id}
 										label={dept.name}
-										required
+										required={!isOutsideMember}
 										{...register("department")}
 									/>
 								))
