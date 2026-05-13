@@ -1,7 +1,7 @@
 import * as v from "valibot";
 import { Contributions } from "../entity/contribution";
 import { DEPARTMENT_BY_ID, FACULTY_IDS } from "../entity/department";
-import { isGraduateGrade, isOutsideGrade } from "../entity/grade";
+import { isOutsideGrade } from "../entity/grade";
 import { UserProfile } from "../entity/user";
 
 export const UserProfileUpdateParams = v.config(
@@ -99,40 +99,6 @@ export const UserProfileUpdateParams = v.config(
 				"学部・学科の組み合わせが正しくありません",
 			),
 			["department"],
-		),
-		// M, D 以上は研究室・研究科・専攻必須
-		v.forward(
-			v.partialCheck(
-				[["grade"], ["laboratory"]],
-				({ grade, laboratory }) => {
-					if (isGraduateGrade(grade) && !laboratory) return false;
-					return true;
-				},
-				"研究室を選択してください",
-			),
-			["laboratory"],
-		),
-		v.forward(
-			v.partialCheck(
-				[["grade"], ["graduateSchool"]],
-				({ grade, graduateSchool }) => {
-					if (isGraduateGrade(grade) && !graduateSchool) return false;
-					return true;
-				},
-				"研究科を選択してください",
-			),
-			["graduateSchool"],
-		),
-		v.forward(
-			v.partialCheck(
-				[["grade"], ["specialization"]],
-				({ grade, specialization }) => {
-					if (isGraduateGrade(grade) && !specialization) return false;
-					return true;
-				},
-				"専攻を選択してください",
-			),
-			["specialization"],
 		),
 	),
 	// UX 的に、エラーが出て直したら別のエラーが出る...というのは避けたいので、エラー箇所はすべて表示する
