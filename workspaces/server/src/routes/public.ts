@@ -3,6 +3,11 @@ import type {
 	GetCertificationsResponse,
 	GetPublicMemberResponse,
 } from "@idp/schema/api/public";
+import {
+	GRADE_BY_ID,
+	isGraduateGrade,
+	isUndergraduateGrade,
+} from "@idp/schema/entity/grade";
 import { factory } from "../factory";
 
 const app = factory.createApp();
@@ -45,12 +50,14 @@ const route = app
 		const res: Record<string, number> = {};
 		for (const user of users) {
 			let key = "unknown";
-			if (user.grade?.startsWith("B")) {
+			if (!user.grade) continue; // 仮登録ユーザーは集計から除外する
+			if (isUndergraduateGrade(user.grade)) {
 				// B1, B2, B3, B4 の場合: B1-TI みたいな形式にする
-				if (user.studentId) key = `${user.grade}-${user.studentId.slice(2, 4)}`;
-			} else if (user.grade?.startsWith("M") || user.grade?.startsWith("D")) {
+				if (user.studentId)
+					key = `${GRADE_BY_ID[user.grade].name}-${user.studentId.slice(2, 4)}`;
+			} else if (isGraduateGrade(user.grade)) {
 				// 学年だけ
-				key = user.grade;
+				key = GRADE_BY_ID[user.grade].name;
 			}
 			res[key] = (res[key] || 0) + 1;
 		}

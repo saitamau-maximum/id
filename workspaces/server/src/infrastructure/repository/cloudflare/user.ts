@@ -1,3 +1,6 @@
+import { DepartmentId } from "@idp/schema/entity/department";
+import { FacultyId } from "@idp/schema/entity/faculty";
+import { GradeId } from "@idp/schema/entity/grade";
 import type { Member, PublicMember } from "@idp/schema/entity/member";
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_BY_ID, ROLE_IDS, RoleId } from "@idp/schema/entity/role";
@@ -131,9 +134,14 @@ export class CloudflareUserRepository implements IUserRepository {
 			academicEmail: user.profile.academicEmail ?? undefined,
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
-			grade: user.profile.grade ?? undefined,
-			faculty: user.profile.faculty ?? undefined,
-			department: user.profile.department ?? undefined,
+			// GradeId, FacultyId, DepartmentId に合わないものは値がセットされていても undefined として返す
+			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
+			faculty: v.is(FacultyId, user.profile.faculty)
+				? user.profile.faculty
+				: undefined,
+			department: v.is(DepartmentId, user.profile.department)
+				? user.profile.department
+				: undefined,
 			laboratory: user.profile.laboratory ?? undefined,
 			graduateSchool: user.profile.graduateSchool ?? undefined,
 			specialization: user.profile.specialization ?? undefined,
@@ -295,7 +303,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			initializedAt: user.initializedAt,
 			isProvisional: !!user.invitationId,
 			lastLoginAt: user.lastLoginAt ?? undefined,
-			grade: user.profile.grade ?? undefined,
+			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
 				.filter((roleId) => v.is(RoleId, roleId))
@@ -326,7 +334,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			realNameKana: user.profile.realNameKana ?? undefined,
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
-			grade: user.profile.grade ?? undefined,
+			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
 			bio: user.profile.bio ?? undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
@@ -375,7 +383,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			realNameKana: user.realNameKana ?? undefined,
 			displayId: user.displayId ?? undefined,
 			profileImageURL: user.profileImageURL ?? undefined,
-			grade: user.grade ?? undefined,
+			grade: v.is(GradeId, user.grade) ? user.grade : undefined,
 			bio: user.bio ?? undefined,
 			roles: user.user.roles
 				.map((role) => role.roleId)
@@ -431,7 +439,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			academicEmail: user.profile.academicEmail ?? undefined,
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
-			grade: user.profile.grade ?? undefined,
+			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
 				.filter((roleId) => v.is(RoleId, roleId))
@@ -533,7 +541,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			academicEmail: user.profile.academicEmail ?? undefined,
 			email: user.profile.email ?? undefined,
 			studentId: user.profile.studentId ?? undefined,
-			grade: user.profile.grade ?? undefined,
+			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
 				.filter((roleId) => v.is(RoleId, roleId))

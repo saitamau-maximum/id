@@ -1,3 +1,4 @@
+import { GradeId } from "@idp/schema/entity/grade";
 import type { Member } from "@idp/schema/entity/member";
 import { type Role, RoleId } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
@@ -5,7 +6,7 @@ import * as v from "valibot";
 
 export interface Filter {
 	keyword: string;
-	selectedGrades: string[];
+	selectedGrades: GradeId[];
 	selectedRoleIds: Role["id"][];
 }
 
@@ -48,7 +49,7 @@ export function useMembersFilter(
 			}
 
 			if (filter.selectedGrades.length > 0) {
-				if (!filter.selectedGrades.includes(member.grade ?? "")) {
+				if (!member.grade || !filter.selectedGrades.includes(member.grade)) {
 					return false;
 				}
 			}
@@ -69,7 +70,11 @@ export function useMembersFilter(
 
 	const handleGradeSelectChange = useCallback(
 		(event: React.ChangeEvent<HTMLInputElement>) => {
-			const value = event.target.value;
+			const { success, output: value } = v.safeParse(
+				v.pipe(v.string(), v.toNumber(), GradeId),
+				event.target.value,
+			);
+			if (!success) return;
 			setFilter((prev) => {
 				if (prev.selectedGrades.includes(value)) {
 					return {

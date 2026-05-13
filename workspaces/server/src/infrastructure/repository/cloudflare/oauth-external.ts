@@ -1,3 +1,4 @@
+import { GradeId } from "@idp/schema/entity/grade";
 import {
 	SCOPES_BY_ID,
 	type Scope,
@@ -467,7 +468,9 @@ export class CloudflareOAuthExternalRepository
 					academicEmail: user.profile.academicEmail ?? undefined,
 					email: user.profile.email ?? undefined,
 					studentId: user.profile.studentId ?? undefined,
-					grade: user.profile.grade ?? undefined,
+					grade: v.is(GradeId, user.profile.grade)
+						? user.profile.grade
+						: undefined,
 					bio: user.profile.bio ?? undefined,
 					updatedAt: user.profile.updatedAt ?? undefined,
 					realName: user.profile.realName ?? undefined,

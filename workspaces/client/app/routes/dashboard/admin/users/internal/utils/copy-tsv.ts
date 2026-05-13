@@ -1,5 +1,5 @@
+import { isOutsideGrade } from "@idp/schema/entity/grade";
 import type { User } from "@idp/schema/entity/user";
-import { OUTSIDE_GRADE } from "~/constant";
 
 type ExportableUser = Pick<User, "realName" | "studentId" | "grade">;
 
@@ -8,8 +8,7 @@ export const copyMembersTsv = (users: ExportableUser[]) => {
 		["学籍番号", "氏名"],
 		...users
 			.filter(
-				(user) =>
-					user.studentId && user.grade && !OUTSIDE_GRADE.includes(user.grade),
+				(user) => user.studentId && user.grade && !isOutsideGrade(user.grade),
 			)
 			.map((user) => [user.studentId ?? "", user.realName ?? ""]),
 	];
