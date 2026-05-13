@@ -72,13 +72,14 @@ UPDATE `__new_user_profiles` SET department = CASE user_profiles.department
 	WHEN '養護教諭養成課程' THEN 305
 	WHEN '数学科' THEN 401
 	WHEN '物理学科' THEN 402
+	-- 正しくは「化学」だが変更前が「科学」になっていたのでマイグレーションは「科学」にする
 	WHEN '基礎科学科' THEN 403
 	WHEN '分子生物学科' THEN 404
 	WHEN '生体制御学科' THEN 405
 	WHEN '機械工学・システムデザイン学科' THEN 501
 	WHEN '電気電子物理工学科' THEN 502
 	WHEN '情報工学科' THEN 503
-	WHEN '応用化学科' THEN 504
+	WHEN '応用科学科' THEN 504 -- 同上
 	WHEN '環境社会デザイン学科' THEN 505
 END
 FROM `user_profiles`
