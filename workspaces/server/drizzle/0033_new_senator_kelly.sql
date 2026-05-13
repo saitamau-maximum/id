@@ -40,7 +40,7 @@ UPDATE `__new_user_profiles` SET grade = CASE user_profiles.grade
 	WHEN 'D2' THEN 8
 	WHEN 'D3' THEN 9
 	WHEN '卒業生' THEN 10
-	WHEN 'その他' THEN 11
+	WHEN 'ゲスト' THEN 11
 	ELSE NULL
 END
 FROM `user_profiles`
