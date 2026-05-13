@@ -1,4 +1,5 @@
 import type { GetDiscordInfoResponse } from "@idp/schema/api/discord";
+import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import type { Member } from "@idp/schema/entity/member";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { css } from "styled-system/css";
@@ -153,7 +154,7 @@ export const ProfileCard: React.FC<Props> = ({
 									},
 								})}
 							>
-								{grade}
+								{GRADE_BY_ID[grade].name}
 							</span>
 						)}
 					</div>

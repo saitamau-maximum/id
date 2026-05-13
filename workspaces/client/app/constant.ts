@@ -1,89 +1,16 @@
-export const GRADE = [
-	{ label: "学部 (Bachelor)", identifier: ["B1", "B2", "B3", "B4"] },
-	{ label: "修士 (Master)", identifier: ["M1", "M2"] },
-	{ label: "博士 (Doctor)", identifier: ["D1", "D2", "D3"] },
-	{ label: "その他", identifier: ["卒業生", "ゲスト"] },
-];
+import { GRADE_IDS } from "@idp/schema/entity/grade";
 
-export const FACULTY = [
+export const GRADE_CATEGORIES = [
 	{
-		label: "学部",
-		identifier: ["教養学部", "経済学部", "教育学部", "理学部", "工学部"],
+		label: "学部 (Bachelor)",
+		identifier: [GRADE_IDS.B1, GRADE_IDS.B2, GRADE_IDS.B3, GRADE_IDS.B4],
 	},
-];
-
-export const FACULTY_OF_LIBERAL_ARTS = [
+	{ label: "修士 (Master)", identifier: [GRADE_IDS.M1, GRADE_IDS.M2] },
 	{
-		label: "教養学部",
-		identifier: [
-			"グローバル・ガバナンス専修課程",
-			"現代社会専修課程",
-			"哲学歴史専修課程",
-			"ヨーロッパ・アメリカ文化専修課程",
-			"日本・アジア文化専修課程",
-			"共生構想専修課程",
-		],
+		label: "博士 (Doctor)",
+		identifier: [GRADE_IDS.D1, GRADE_IDS.D2, GRADE_IDS.D3],
 	},
-];
-
-export const FACULTY_OF_ECONOMICS = [];
-
-export const FACULTY_OF_EDUCATION = [
-	{
-		label: "教育学部",
-		identifier: [
-			"小学校コース",
-			"中学校コース",
-			"乳幼児教育コース",
-			"特別支援教育コース",
-			"養護教諭養成課程",
-		],
-	},
-];
-
-export const FACULTY_OF_SCIENCE = [
-	{
-		label: "理学部",
-		identifier: [
-			"数学科",
-			"物理学科",
-			"基礎科学科",
-			"分子生物学科",
-			"生体制御学科",
-		],
-	},
-];
-
-export const FACULTY_OF_ENGINEERING = [
-	{
-		label: "工学部",
-		identifier: [
-			"機械工学・システムデザイン学科",
-			"電気電子物理工学科",
-			"情報工学科",
-			"応用科学科",
-			"環境社会デザイン学科",
-		],
-	},
-];
-
-export const ACADEMIC_EMAIL_DOMAIN = "ms.saitama-u.ac.jp";
-
-export const OUTSIDE_GRADE = ["卒業生", "ゲスト"];
-
-export const GRADUATE_GRADE = ["M1", "M2", "D1", "D2", "D3"];
-
-export const RESERVED_WORDS = [
-	"maximum",
-	"home",
-	"calendar",
-	"member",
-	"members",
-	"logout",
-	"login",
-	"meline",
-	"merin",
-	"idp",
+	{ label: "その他", identifier: [GRADE_IDS.ALUMNI, GRADE_IDS.GUEST] },
 ];
 
 export const SOCIAL_SERVICES_IDS = {

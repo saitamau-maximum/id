@@ -4,7 +4,6 @@ import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
 import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
 import {
 	GRADE_BY_ID,
-	GRADE_IDS,
 	type GradeId,
 	isOutsideGrade,
 } from "@idp/schema/entity/grade";
@@ -20,6 +19,7 @@ import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { PreviewableField } from "~/components/ui/form/previewable-field";
 import { IconButton } from "~/components/ui/icon-button";
 import { SocialIcon } from "~/components/ui/social-icon";
+import { GRADE_CATEGORIES } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { detectSocialService } from "~/utils/social-link";
 import { UserSettingCertificationRequest } from "./certification-request";
@@ -87,19 +87,6 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 			selectedFaculty &&
 			dept.facultyId === Number.parseInt(selectedFaculty, 10),
 	);
-
-	const GRADE_CATEGORIES = [
-		{
-			label: "学部 (Bachelor)",
-			identifier: [GRADE_IDS.B1, GRADE_IDS.B2, GRADE_IDS.B3, GRADE_IDS.B4],
-		},
-		{ label: "修士 (Master)", identifier: [GRADE_IDS.M1, GRADE_IDS.M2] },
-		{
-			label: "博士 (Doctor)",
-			identifier: [GRADE_IDS.D1, GRADE_IDS.D2, GRADE_IDS.D3],
-		},
-		{ label: "その他", identifier: [GRADE_IDS.ALUMNI, GRADE_IDS.GUEST] },
-	];
 
 	return (
 		<form
