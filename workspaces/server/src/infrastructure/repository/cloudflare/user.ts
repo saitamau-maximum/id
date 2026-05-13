@@ -242,15 +242,15 @@ export class CloudflareUserRepository implements IUserRepository {
 			realName: payload.realName,
 			realNameKana: payload.realNameKana,
 			profileImageURL: payload.profileImageURL,
-			academicEmail: payload.academicEmail,
+			academicEmail: payload.academicEmail ?? null, // undefined ではなく null をセットしないと更新されない
 			email: payload.email,
-			studentId: payload.studentId,
+			studentId: payload.studentId ?? null,
 			grade: payload.grade,
 			faculty: payload.faculty,
-			department: payload.department ?? null, // undefined ではなく null をセットしないと更新されない
-			laboratory: payload.laboratory,
-			graduateSchool: payload.graduateSchool,
-			specialization: payload.specialization,
+			department: payload.department ?? null,
+			laboratory: payload.laboratory ?? null,
+			graduateSchool: payload.graduateSchool ?? null,
+			specialization: payload.specialization ?? null,
 			bio: payload.bio,
 			updatedAt: new Date(),
 		};
