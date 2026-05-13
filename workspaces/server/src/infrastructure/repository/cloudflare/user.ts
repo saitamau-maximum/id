@@ -247,7 +247,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			studentId: payload.studentId,
 			grade: payload.grade,
 			faculty: payload.faculty,
-			department: payload.department,
+			department: payload.department ?? null, // undefined ではなく null をセットしないと更新されない
 			laboratory: payload.laboratory,
 			graduateSchool: payload.graduateSchool,
 			specialization: payload.specialization,

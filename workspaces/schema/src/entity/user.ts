@@ -123,7 +123,7 @@ export const UserProfile = v.object({
 		v.maxLength(5),
 	),
 	faculty: v.pipe(v.string(), v.toNumber(), FacultyId),
-	department: v.pipe(v.string(), v.toNumber(), DepartmentId),
+	department: v.optional(v.pipe(v.string(), v.toNumber(), DepartmentId)),
 	laboratory: v.string(),
 	graduateSchool: v.string(),
 	specialization: v.string(),

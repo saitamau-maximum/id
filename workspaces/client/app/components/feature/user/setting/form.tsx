@@ -44,6 +44,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 		register,
 		handleSubmit,
 		watch,
+		setValue,
 		control,
 		formState: { errors },
 	} = useForm<FormInputValues, unknown, FormOutputValues>({
@@ -219,7 +220,12 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 										value={faculty.id}
 										label={faculty.name}
 										required={!isOutsideMember}
-										{...register("faculty")}
+										{...register("faculty", {
+											onChange: () => {
+												// 学部を変えたら学科の選択をリセット
+												setValue("department", undefined);
+											},
+										})}
 									/>
 								);
 							})}
