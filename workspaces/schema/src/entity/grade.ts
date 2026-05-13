@@ -1,17 +1,17 @@
 import * as v from "valibot";
 
 export const GRADE_IDS = {
-	B1: 0,
-	B2: 1,
-	B3: 2,
-	B4: 3,
-	M1: 4,
-	M2: 5,
-	D1: 6,
-	D2: 7,
-	D3: 8,
-	ALUMNI: 9,
-	GUEST: 10,
+	B1: 1,
+	B2: 2,
+	B3: 3,
+	B4: 4,
+	M1: 5,
+	M2: 6,
+	D1: 7,
+	D2: 8,
+	D3: 9,
+	ALUMNI: 10,
+	GUEST: 11,
 } as const;
 
 // もし GRADE_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
