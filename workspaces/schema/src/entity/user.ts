@@ -97,7 +97,10 @@ export const UserProfile = v.object({
 			"学籍番号の形式が正しくありません、半角数字と半角英大文字で00XX000の形式で入力してください。",
 		),
 	),
-	grade: GradeId,
+	// radio は valueAsNumber や setValueAs などが使えないっぽいので string で受け取る
+	// ref: https://www.react-hook-form.com/api/useform/register/
+	//      """valueAsNumber: Only applicable and support to <input type="number" />"""
+	grade: v.pipe(v.string(), v.toNumber(), GradeId),
 	bio: v.pipe(
 		v.string(),
 		v.maxLength(
@@ -119,8 +122,8 @@ export const UserProfile = v.object({
 		),
 		v.maxLength(5),
 	),
-	faculty: FacultyId,
-	department: DepartmentId,
+	faculty: v.pipe(v.string(), v.toNumber(), FacultyId),
+	department: v.pipe(v.string(), v.toNumber(), DepartmentId),
 	laboratory: v.string(),
 	graduateSchool: v.string(),
 	specialization: v.string(),
