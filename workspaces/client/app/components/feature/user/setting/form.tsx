@@ -182,8 +182,6 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 				</form>
 			</FormProvider>
 			{/*
-				{!isOnboarding && <UserSettingCertificationRequest />}
-
 				{!isOnboarding && <UserSettingOAuthConnect />}
 			*/}
 		</>
