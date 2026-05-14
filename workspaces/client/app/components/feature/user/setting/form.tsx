@@ -148,8 +148,10 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 								let res = numError;
 								if (formMethods.formState.errors[field]) {
 									if (Array.isArray(formMethods.formState.errors[field])) {
-										// socialLinks のように配列のエラーがある場合は、すべてのエラーをカウントする
-										res += formMethods.formState.errors[field].length;
+										// socialLinks のように配列のエラーがある場合は、 empty を除いてカウントする
+										res += Object.values(
+											formMethods.formState.errors[field],
+										).filter(Boolean).length;
 									} else {
 										res += 1;
 									}

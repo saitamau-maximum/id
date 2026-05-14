@@ -100,99 +100,115 @@ export const UserSettingFormAcademic = ({
 				<ErrorDisplay error={getFormErrorMessage("grade")} />
 			</Form.FieldSet>
 
-			<Form.FieldSet>
-				<div
+			<Form.FieldSet
+				className={css({
+					display: "grid",
+					gap: "token(spacing.2) token(spacing.4)",
+					gridTemplateColumns: "auto 1fr",
+					gridTemplateRows: "auto auto",
+					alignItems: "center",
+					mdDown: { gridTemplateColumns: "1fr !important" },
+				})}
+			>
+				<legend
 					className={css({
-						display: "grid",
-						gap: "token(spacing.2) token(spacing.4)",
-						gridTemplateColumns: "auto 1fr",
-						alignItems: "center",
-						mdDown: { gridTemplateColumns: "1fr !important" },
+						gridColumn: "1 / -1",
+						gridRow: "1 / -1",
+						display: "contents",
 					})}
 				>
-					<div>
-						<legend>
-							<Form.LabelText>
-								学部
-								{!isOutsideMember && <RequiredIndicator />}
-							</Form.LabelText>
-						</legend>
-					</div>
-					<Form.RadioGroup>
-						{Object.values(FACULTY_IDS).map((id) => {
-							const faculty = FACULTY_BY_ID[id];
-							return (
-								<Form.Radio
-									key={faculty.id}
-									value={faculty.id}
-									label={faculty.name}
-									required={!isOutsideMember}
-									{...register("faculty", {
-										onChange: () => {
-											// 学部を変えたら学科の選択をリセットし、 validation を走らせる
-											setValue("department", undefined);
-											trigger(["faculty", "department"]);
-										},
-									})}
-								/>
-							);
-						})}
-					</Form.RadioGroup>
-				</div>
-				<ErrorDisplay error={getFormErrorMessage("faculty")} />
+					<Form.LabelText>
+						学部
+						{!isOutsideMember && <RequiredIndicator />}
+					</Form.LabelText>
+				</legend>
+				<Form.RadioGroup
+					className={css({ gridColumn: "2 / -1", gridRow: "1 / -1" })}
+				>
+					{Object.values(FACULTY_IDS).map((id) => {
+						const faculty = FACULTY_BY_ID[id];
+						return (
+							<Form.Radio
+								key={faculty.id}
+								value={faculty.id}
+								label={faculty.name}
+								required={!isOutsideMember}
+								{...register("faculty", {
+									onChange: () => {
+										// 学部を変えたら学科の選択をリセットし、 validation を走らせる
+										setValue("department", undefined);
+										trigger(["faculty", "department"]);
+									},
+								})}
+							/>
+						);
+					})}
+				</Form.RadioGroup>
+				<ErrorDisplay
+					error={getFormErrorMessage("faculty")}
+					className={css({ gridColumn: "2 / -1", gridRow: "2 / -1" })}
+				/>
 			</Form.FieldSet>
 
-			<Form.FieldSet>
-				<div
+			<Form.FieldSet
+				className={css({
+					display: "grid",
+					gap: "token(spacing.2) token(spacing.4)",
+					gridTemplateColumns: "auto 1fr",
+					gridTemplateRows: "auto auto",
+					alignItems: "center",
+					mdDown: { gridTemplateColumns: "1fr !important" },
+				})}
+			>
+				<legend
 					className={css({
-						display: "grid",
-						gap: "token(spacing.2) token(spacing.4)",
-						gridTemplateColumns: "auto 1fr",
-						alignItems: "center",
-						mdDown: { gridTemplateColumns: "1fr !important" },
+						gridColumn: "1 / -1",
+						gridRow: "1 / -1",
+						display: "contents",
 					})}
 				>
-					<div>
-						<legend>
-							<Form.LabelText>
-								学科
-								{!isOutsideMember && <RequiredIndicator />}
-							</Form.LabelText>
-						</legend>
-					</div>
-					<Form.RadioGroup>
-						{!selectedFaculty ? (
-							<p
-								className={css({
-									fontSize: "sm",
-									color: "gray.500",
-								})}
-							>
-								学部を選択してください
-							</p>
-						) : departmentBySelectedFaculty.length === 0 ? (
-							<p
-								className={css({
-									fontSize: "sm",
-									color: "gray.500",
-								})}
-							>
-								この学部には学科がありません
-							</p>
-						) : (
-							departmentBySelectedFaculty.map((dept) => (
-								<Form.Radio
-									key={dept.id}
-									value={dept.id}
-									label={dept.name}
-									required={!isOutsideMember}
-									{...register("department")}
-								/>
-							))
-						)}
-					</Form.RadioGroup>
-				</div>
-				<ErrorDisplay error={getFormErrorMessage("department")} />
+					<Form.LabelText>
+						学科
+						{!isOutsideMember && <RequiredIndicator />}
+					</Form.LabelText>
+				</legend>
+				<Form.RadioGroup
+					className={css({ gridColumn: "2 / -1", gridRow: "1 / -1" })}
+				>
+					{!selectedFaculty ? (
+						<p
+							className={css({
+								fontSize: "sm",
+								color: "gray.500",
+							})}
+						>
+							学部を選択してください
+						</p>
+					) : departmentBySelectedFaculty.length === 0 ? (
+						<p
+							className={css({
+								fontSize: "sm",
+								color: "gray.500",
+							})}
+						>
+							この学部には学科がありません
+						</p>
+					) : (
+						departmentBySelectedFaculty.map((dept) => (
+							<Form.Radio
+								key={dept.id}
+								value={dept.id}
+								label={dept.name}
+								required={!isOutsideMember}
+								{...register("department")}
+							/>
+						))
+					)}
+				</Form.RadioGroup>
+				<ErrorDisplay
+					error={getFormErrorMessage("department")}
+					className={css({ gridColumn: "2 / -1", gridRow: "2 / -1" })}
+				/>
 			</Form.FieldSet>
 
 			<Form.Field.TextInput
