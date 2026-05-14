@@ -1,5 +1,4 @@
 import { useFormContext } from "react-hook-form";
-import { css } from "styled-system/css";
 import { Form } from "~/components/ui/form";
 import type {
 	ChildFormProps,
@@ -19,21 +18,19 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 
 	return (
 		<>
-			<Form.FieldSet>
-				<Form.Field.TextInput
-					label="ID"
-					error={errors.displayId?.message}
-					placeholder="maximum_taro"
-					required
-					readOnly={!isOnboarding}
-					{...register("displayId")}
-				/>
-				<p className={css({ color: "gray.500", fontSize: "sm" })}>
-					半角英小文字、半角数字、アンダースコア (_) を使用できます。 3 文字以上
-					16 文字以下で入力してください。
-					{cannotChangeIndicator}
-				</p>
-			</Form.FieldSet>
+			<Form.Field.TextInput
+				label="ID"
+				error={errors.displayId?.message}
+				placeholder="maximum_taro"
+				additionalInfo={`
+					半角英小文字、半角数字、アンダースコア (_) を使用できます。
+					3 文字以上 16 文字以下で入力してください。
+					${cannotChangeIndicator}
+				`}
+				required
+				readOnly={!isOnboarding}
+				{...register("displayId")}
+			/>
 
 			<Form.Field.TextInput
 				label="ユーザー名"
@@ -43,36 +40,32 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 				{...register("displayName")}
 			/>
 
-			<Form.FieldSet>
-				<Form.Field.TextInput
-					label="氏名 (漢字 or カタカナ)"
-					error={errors.realName?.message}
-					placeholder="山田 太郎"
-					required
-					readOnly={!isOnboarding}
-					{...register("realName")}
-				/>
-				<p className={css({ color: "gray.500", fontSize: "sm" })}>
+			<Form.Field.TextInput
+				label="氏名 (漢字 or カタカナ)"
+				error={errors.realName?.message}
+				placeholder="山田 太郎"
+				additionalInfo={`
 					大学に届け出る書類に必要となるため、学生証に記載の通りに入力してください。
 					名字・名前はスペースで区切ってください。
-					{cannotChangeIndicator}
-				</p>
-			</Form.FieldSet>
+					${cannotChangeIndicator}
+				`}
+				required
+				readOnly={!isOnboarding}
+				{...register("realName")}
+			/>
 
-			<Form.FieldSet>
-				<Form.Field.TextInput
-					label="氏名 (カナ)"
-					error={errors.realNameKana?.message}
-					placeholder="ヤマダ タロウ"
-					required
-					readOnly={!isOnboarding}
-					{...register("realNameKana")}
-				/>
-				<p className={css({ color: "gray.500", fontSize: "sm" })}>
+			<Form.Field.TextInput
+				label="氏名 (カナ)"
+				error={errors.realNameKana?.message}
+				additionalInfo={`
 					名字・名前はスペースで区切ってください。
-					{cannotChangeIndicator}
-				</p>
-			</Form.FieldSet>
+					${cannotChangeIndicator}
+				`}
+				placeholder="ヤマダ タロウ"
+				required
+				readOnly={!isOnboarding}
+				{...register("realNameKana")}
+			/>
 		</>
 	);
 };
