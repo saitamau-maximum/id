@@ -392,28 +392,6 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 
 				{!isOnboarding && <UserSettingCertificationRequest />}
 
-				{!isOnboarding && (
-					<Form.FieldSet>
-						<div
-							className={css({
-								display: "flex",
-								justifyContent: "space-between",
-							})}
-						>
-							<Form.LabelText>自己紹介（10行以内）</Form.LabelText>
-							<ErrorDisplay error={errors.bio?.message} />
-						</div>
-						<PreviewableField
-							register={register}
-							watch={watch}
-							name="bio"
-							placeholder={`自己紹介を${BIO_MAX_LENGTH}文字以内で入力してください（Markdown使用可能）`}
-							maxLines={BIO_MAX_LINES}
-							maxLength={BIO_MAX_LENGTH}
-						/>
-					</Form.FieldSet>
-				)}
-
 				{!isOnboarding && <UserSettingOAuthConnect />}
 
 				{!isOnboarding && (

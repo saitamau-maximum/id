@@ -1,5 +1,9 @@
+import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
 import { useFormContext } from "react-hook-form";
+import { css } from "styled-system/css";
 import { Form } from "~/components/ui/form";
+import { ErrorDisplay } from "~/components/ui/form/error-display";
+import { PreviewableField } from "~/components/ui/form/previewable-field";
 import type {
 	ChildFormProps,
 	FormInputValues,
@@ -14,7 +18,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 
 	const cannotChangeIndicator = isOnboarding
 		? "後から変更できません。"
-		: "変更するには Admin に連絡してください。";
+		: "変更したい場合は Admin に連絡してください。";
 
 	return (
 		<>
@@ -66,6 +70,33 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 				readOnly={!isOnboarding}
 				{...register("realNameKana")}
 			/>
+
+			<Form.FieldSet>
+				<Form.LabelText>自己紹介</Form.LabelText>
+				<PreviewableField<FormInputValues>
+					name="bio"
+					placeholder={`
+						こんにちは！ ○○ が好きです！ △△ に興味があって Maximum に入りました！ ...など、自由に書いてください！
+
+						[リンク](https://example.com) や **太字**、*斜体*、 \`inline code\` などが使えます。
+					`
+						.replaceAll("\t", "")
+						.trim()}
+					maxLines={BIO_MAX_LINES}
+					maxLength={BIO_MAX_LENGTH}
+				/>
+				<p
+					className={css({
+						fontSize: "sm",
+						color: "gray.500",
+					})}
+				>
+					自己紹介はプロフィールページに表示されます。 最大 {BIO_MAX_LENGTH}{" "}
+					文字、 {BIO_MAX_LINES} 行まで入力できます。 Markdown
+					形式で記述できます。
+				</p>
+				<ErrorDisplay error={errors.bio?.message} />
+			</Form.FieldSet>
 		</>
 	);
 };
