@@ -97,6 +97,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 
 	const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UserProfileUpdateParams),
+		mode: "onChange",
 		defaultValues: {
 			// onboarding の場合 socialLinks, bio は使わないが、セットしても問題ないのでセットしてしまう
 			displayName: user?.displayName,
@@ -116,6 +117,8 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
 		},
 	});
+
+	const canSubmit = formMethods.formState.isValid && !isPending;
 
 	// const {
 	// 	fields: socialLinks,
@@ -177,11 +180,23 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						return <Component isOnboarding={isOnboarding} key={tab.hash} />;
 					})}
 
-					<button type="submit" disabled={isPending}>
-						<ButtonLike variant="primary" disabled={isPending}>
+					<button type="submit" disabled={!canSubmit}>
+						<ButtonLike variant="primary" disabled={!canSubmit}>
 							{isOnboarding ? "はじめる" : "更新"}
 						</ButtonLike>
 					</button>
+					<p
+						className={css({
+							fontSize: "sm",
+							color: "gray.500",
+						})}
+					>
+						{settingsTabs
+							.filter((tab) => (isOnboarding ? tab.displayInOnboarding : true))
+							.map((tab) => `「${tab.label}」`)
+							.join("")}
+						のすべての入力内容にエラーがない場合に、ボタンが有効になります。
+					</p>
 				</form>
 			</FormProvider>
 			{/*
