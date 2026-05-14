@@ -84,7 +84,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 	const location = useLocation();
 
 	useEffect(() => {
-		if (location.hash === "") navigate("#me");
+		if (location.hash === "") navigate("#me", { replace: true });
 	}, [navigate, location.hash]);
 
 	const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
@@ -145,7 +145,16 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							isActive={(location) => location.hash === tab.hash}
 							notification={tab.formFields?.reduce((numError, field) => {
 								// エラーのあるフィールドの数をカウントして表示する
-								return numError + (formMethods.formState.errors[field] ? 1 : 0);
+								let res = numError;
+								if (formMethods.formState.errors[field]) {
+									if (Array.isArray(formMethods.formState.errors[field])) {
+										// socialLinks のように配列のエラーがある場合は、すべてのエラーをカウントする
+										res += formMethods.formState.errors[field].length;
+									} else {
+										res += 1;
+									}
+								}
+								return res;
 							}, 0)}
 						>
 							{tab.label}

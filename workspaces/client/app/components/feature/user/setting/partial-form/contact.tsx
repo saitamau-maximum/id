@@ -96,9 +96,9 @@ export const UserSettingFormContact = ({
 										// socialLink[index] が string[] と型付けされているため value が存在しないといわれてしまうので型アサーション
 										(
 											errors.socialLinks?.[index] as
-												| { value: FieldError }
+												| { value?: FieldError }
 												| undefined
-										)?.value.message
+										)?.value?.message
 									}
 								/>
 							</li>
