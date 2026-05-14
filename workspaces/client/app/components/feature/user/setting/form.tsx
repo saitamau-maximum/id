@@ -37,8 +37,6 @@ import type {
 	FormOutputValues,
 } from "./types";
 
-// import { UserSettingOAuthConnect } from "./oauth-connect";
-
 interface Props {
 	type: "onboarding" | "update";
 	isPending: boolean;
@@ -50,6 +48,7 @@ interface SettingsTabItem {
 	hash: string;
 	component: (props: ChildFormProps) => ReactElement;
 	displayInOnboarding: boolean;
+	formFields?: (keyof FormInputValues)[];
 }
 
 const settingsTabs = [
@@ -58,18 +57,30 @@ const settingsTabs = [
 		hash: "#me",
 		component: UserSettingFormAboutMe,
 		displayInOnboarding: true,
+		formFields: ["displayId", "displayName", "realName", "realNameKana", "bio"],
 	},
 	{
 		label: "連絡先",
 		hash: "#contact",
 		component: UserSettingFormContact,
 		displayInOnboarding: true,
+		formFields: ["email", "socialLinks"],
 	},
 	{
 		label: "学籍情報",
 		hash: "#academic",
 		component: UserSettingFormAcademic,
 		displayInOnboarding: true,
+		formFields: [
+			"studentId",
+			"grade",
+			"faculty",
+			"department",
+			"laboratory",
+			"graduateSchool",
+			"specialization",
+			"academicEmail",
+		],
 	},
 	{
 		label: "資格・試験",
@@ -120,6 +131,27 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 
 	const canSubmit = formMethods.formState.isValid && !isPending;
 
+	// mount 時に validation を走らせて、タブに「残り ○ 個」表示をする
+	// ただし、フォームがエラーで真っ赤になっちゃうので、子フォームで touchedFields を見てエラー表示するかどうかを判断する
+	useEffect(() => {
+		formMethods.trigger();
+	}, [formMethods]);
+
+	const getFormErrorMessage = (field: keyof FormInputValues) => {
+		const { errors, touchedFields, dirtyFields } = formMethods.formState;
+		// もしエラーがあって、 フォームが変更された OR ユーザーが触った OR 値がある場合はエラーを表示する
+		if (errors[field]) {
+			if (
+				dirtyFields[field] ||
+				touchedFields[field] ||
+				formMethods.watch(field)
+			) {
+				return errors[field]?.message;
+			}
+		}
+		return undefined;
+	};
+
 	return (
 		<>
 			<Tab.List>
@@ -130,6 +162,10 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 							key={tab.hash}
 							to={tab.hash}
 							isActive={(location) => location.hash === tab.hash}
+							notification={tab.formFields?.reduce((numError, field) => {
+								// エラーのあるフィールドの数をカウントして表示する
+								return numError + (formMethods.formState.errors[field] ? 1 : 0);
+							}, 0)}
 						>
 							{tab.label}
 						</Tab.Item>
@@ -152,7 +188,13 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						if (isOnboarding && !tab.displayInOnboarding) return null;
 						if (location.hash !== tab.hash) return null;
 						const Component = tab.component;
-						return <Component isOnboarding={isOnboarding} key={tab.hash} />;
+						return (
+							<Component
+								key={tab.hash}
+								isOnboarding={isOnboarding}
+								getFormErrorMessage={getFormErrorMessage}
+							/>
+						);
 					})}
 
 					<hr
@@ -174,16 +216,14 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						})}
 					>
 						{settingsTabs
-							.filter((tab) => (isOnboarding ? tab.displayInOnboarding : true))
+							// 資格試験・OAuth は関係ないので除外
+							.filter((tab) => tab.displayInOnboarding)
 							.map((tab) => `「${tab.label}」`)
 							.join("")}
 						のすべての入力内容にエラーがない場合に、ボタンが有効になります。
 					</p>
 				</form>
 			</FormProvider>
-			{/*
-				{!isOnboarding && <UserSettingOAuthConnect />}
-			*/}
 		</>
 	);
 };

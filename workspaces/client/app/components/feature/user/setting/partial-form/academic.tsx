@@ -13,15 +13,20 @@ import { Form } from "~/components/ui/form";
 import { ErrorDisplay } from "~/components/ui/form/error-display";
 import { RequiredIndicator } from "~/components/ui/form/required-indicator";
 import { GRADE_CATEGORIES } from "~/constant";
-import type { FormInputValues, FormOutputValues } from "../types";
+import type {
+	ChildFormProps,
+	FormInputValues,
+	FormOutputValues,
+} from "../types";
 
-export const UserSettingFormAcademic = () => {
-	const {
-		register,
-		watch,
-		setValue,
-		formState: { errors },
-	} = useFormContext<FormInputValues, unknown, FormOutputValues>();
+export const UserSettingFormAcademic = ({
+	getFormErrorMessage,
+}: ChildFormProps) => {
+	const { register, watch, setValue, trigger } = useFormContext<
+		FormInputValues,
+		unknown,
+		FormOutputValues
+	>();
 
 	const isOutsideMember = ((val?: string) => {
 		if (!val) return false;
@@ -83,109 +88,119 @@ export const UserSettingFormAcademic = () => {
 										value={identifier}
 										label={GRADE_BY_ID[identifier].name}
 										required
-										{...register("grade")}
+										{...register("grade", {
+											onChange: () => {
+												// 学年を変えたらほかの required 状態が変化するので、 validation を走らせる
+												trigger();
+											},
+										})}
 									/>
 								))}
 							</Form.RadioGroup>
 						</Fragment>
 					))}
 				</div>
-				<ErrorDisplay error={errors.grade?.message} />
+				<ErrorDisplay error={getFormErrorMessage("grade")} />
 			</Form.FieldSet>
 
-			<Form.FieldSet
-				className={css({
-					display: "grid",
-					gap: "token(spacing.2) token(spacing.4)",
-					gridTemplateColumns: "auto 1fr",
-					alignItems: "center",
-					mdDown: { gridTemplateColumns: "1fr !important" },
-				})}
-			>
-				<div>
-					<legend>
-						<Form.LabelText>
-							学部
-							{!isOutsideMember && <RequiredIndicator />}
-						</Form.LabelText>
-					</legend>
-				</div>
-				<Form.RadioGroup>
-					{Object.values(FACULTY_IDS).map((id) => {
-						const faculty = FACULTY_BY_ID[id];
-						return (
-							<Form.Radio
-								key={faculty.id}
-								value={faculty.id}
-								label={faculty.name}
-								required={!isOutsideMember}
-								{...register("faculty", {
-									onChange: () => {
-										// 学部を変えたら学科の選択をリセット
-										setValue("department", undefined);
-									},
-								})}
-							/>
-						);
+			<Form.FieldSet>
+				<div
+					className={css({
+						display: "grid",
+						gap: "token(spacing.2) token(spacing.4)",
+						gridTemplateColumns: "auto 1fr",
+						alignItems: "center",
+						mdDown: { gridTemplateColumns: "1fr !important" },
 					})}
-				</Form.RadioGroup>
-				<ErrorDisplay error={errors.faculty?.message} />
+				>
+					<div>
+						<legend>
+							<Form.LabelText>
+								学部
+								{!isOutsideMember && <RequiredIndicator />}
+							</Form.LabelText>
+						</legend>
+					</div>
+					<Form.RadioGroup>
+						{Object.values(FACULTY_IDS).map((id) => {
+							const faculty = FACULTY_BY_ID[id];
+							return (
+								<Form.Radio
+									key={faculty.id}
+									value={faculty.id}
+									label={faculty.name}
+									required={!isOutsideMember}
+									{...register("faculty", {
+										onChange: () => {
+											// 学部を変えたら学科の選択をリセットし、 validation を走らせる
+											setValue("department", undefined);
+											trigger(["faculty", "department"]);
+										},
+									})}
+								/>
+							);
+						})}
+					</Form.RadioGroup>
+				</div>
+				<ErrorDisplay error={getFormErrorMessage("faculty")} />
 			</Form.FieldSet>
 
-			<Form.FieldSet
-				className={css({
-					display: "grid",
-					gap: "token(spacing.2) token(spacing.4)",
-					gridTemplateColumns: "auto 1fr",
-					alignItems: "center",
-					mdDown: { gridTemplateColumns: "1fr !important" },
-				})}
-			>
-				<div>
-					<legend>
-						<Form.LabelText>
-							学科
-							{!isOutsideMember && <RequiredIndicator />}
-						</Form.LabelText>
-					</legend>
+			<Form.FieldSet>
+				<div
+					className={css({
+						display: "grid",
+						gap: "token(spacing.2) token(spacing.4)",
+						gridTemplateColumns: "auto 1fr",
+						alignItems: "center",
+						mdDown: { gridTemplateColumns: "1fr !important" },
+					})}
+				>
+					<div>
+						<legend>
+							<Form.LabelText>
+								学科
+								{!isOutsideMember && <RequiredIndicator />}
+							</Form.LabelText>
+						</legend>
+					</div>
+					<Form.RadioGroup>
+						{!selectedFaculty ? (
+							<p
+								className={css({
+									fontSize: "sm",
+									color: "gray.500",
+								})}
+							>
+								学部を選択してください
+							</p>
+						) : departmentBySelectedFaculty.length === 0 ? (
+							<p
+								className={css({
+									fontSize: "sm",
+									color: "gray.500",
+								})}
+							>
+								この学部には学科がありません
+							</p>
+						) : (
+							departmentBySelectedFaculty.map((dept) => (
+								<Form.Radio
+									key={dept.id}
+									value={dept.id}
+									label={dept.name}
+									required={!isOutsideMember}
+									{...register("department")}
+								/>
+							))
+						)}
+					</Form.RadioGroup>
 				</div>
-				<Form.RadioGroup>
-					{!selectedFaculty ? (
-						<p
-							className={css({
-								fontSize: "sm",
-								color: "gray.500",
-							})}
-						>
-							学部を選択してください
-						</p>
-					) : departmentBySelectedFaculty.length === 0 ? (
-						<p
-							className={css({
-								fontSize: "sm",
-								color: "gray.500",
-							})}
-						>
-							この学部には学科がありません
-						</p>
-					) : (
-						departmentBySelectedFaculty.map((dept) => (
-							<Form.Radio
-								key={dept.id}
-								value={dept.id}
-								label={dept.name}
-								required={!isOutsideMember}
-								{...register("department")}
-							/>
-						))
-					)}
-				</Form.RadioGroup>
-				<ErrorDisplay error={errors.faculty?.message} />
+				<ErrorDisplay error={getFormErrorMessage("department")} />
 			</Form.FieldSet>
 
 			<Form.Field.TextInput
 				label="研究室"
-				error={errors.laboratory?.message}
+				error={getFormErrorMessage("laboratory")}
 				placeholder="田中研究室"
 				{...register("laboratory", {
 					setValueAs: (value) => value || undefined,
@@ -196,7 +211,7 @@ export const UserSettingFormAcademic = () => {
 				<>
 					<Form.Field.TextInput
 						label="研究科"
-						error={errors.graduateSchool?.message}
+						error={getFormErrorMessage("graduateSchool")}
 						placeholder="理工学研究科"
 						{...register("graduateSchool", {
 							setValueAs: (value) => value || undefined,
@@ -205,7 +220,7 @@ export const UserSettingFormAcademic = () => {
 
 					<Form.Field.TextInput
 						label="専攻"
-						error={errors.specialization?.message}
+						error={getFormErrorMessage("specialization")}
 						placeholder="数理電子情報専攻"
 						{...register("specialization", {
 							setValueAs: (value) => value || undefined,
@@ -216,7 +231,7 @@ export const UserSettingFormAcademic = () => {
 
 			<Form.Field.TextInput
 				label="学籍番号"
-				error={errors.studentId?.message}
+				error={getFormErrorMessage("studentId")}
 				additionalInfo={`
 					大学に届け出る書類に必要となるため、正しく入力してください。
 				`}
@@ -229,7 +244,7 @@ export const UserSettingFormAcademic = () => {
 
 			<Form.Field.TextInput
 				label="大学のメールアドレス"
-				error={errors.academicEmail?.message}
+				error={getFormErrorMessage("academicEmail")}
 				additionalInfo="~@ms.saitama-u.ac.jp のメールアドレスを入力してください。"
 				placeholder="student@ms.saitama-u.ac.jp"
 				required={!isOutsideMember}

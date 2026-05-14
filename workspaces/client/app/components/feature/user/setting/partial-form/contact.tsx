@@ -17,7 +17,10 @@ import type {
 	FormOutputValues,
 } from "../types";
 
-export const UserSettingFormContact = ({ isOnboarding }: ChildFormProps) => {
+export const UserSettingFormContact = ({
+	isOnboarding,
+	getFormErrorMessage,
+}: ChildFormProps) => {
 	const {
 		register,
 		control,
@@ -38,7 +41,7 @@ export const UserSettingFormContact = ({ isOnboarding }: ChildFormProps) => {
 		<>
 			<Form.Field.TextInput
 				label="連絡の取れるメールアドレス"
-				error={errors.email?.message}
+				error={getFormErrorMessage("email")}
 				additionalInfo={`
 					大学のメールアドレス (~@ms.saitama-u.ac.jp) 以外のものを入力してください。
 					「Maximum IdP でログイン」を利用したサービスで使われることがあります。

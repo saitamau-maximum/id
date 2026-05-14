@@ -11,11 +11,15 @@ import type {
 	FormOutputValues,
 } from "../types";
 
-export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
-	const {
-		register,
-		formState: { errors },
-	} = useFormContext<FormInputValues, unknown, FormOutputValues>();
+export const UserSettingFormAboutMe = ({
+	isOnboarding,
+	getFormErrorMessage,
+}: ChildFormProps) => {
+	const { register } = useFormContext<
+		FormInputValues,
+		unknown,
+		FormOutputValues
+	>();
 
 	const cannotChangeIndicator = isOnboarding
 		? "後から変更できません。"
@@ -45,7 +49,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 			>
 				<Form.Field.TextInput
 					label="ID"
-					error={errors.displayId?.message}
+					error={getFormErrorMessage("displayId")}
 					placeholder="maximum_taro"
 					additionalInfo={`
 					半角英小文字、半角数字、アンダースコア (_) を使用できます。
@@ -59,7 +63,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 
 				<Form.Field.TextInput
 					label="ユーザー名"
-					error={errors.displayName?.message}
+					error={getFormErrorMessage("displayName")}
 					placeholder="Maximum"
 					required
 					{...register("displayName")}
@@ -67,7 +71,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 
 				<Form.Field.TextInput
 					label="氏名 (漢字 or カタカナ)"
-					error={errors.realName?.message}
+					error={getFormErrorMessage("realName")}
 					placeholder="山田 太郎"
 					additionalInfo={`
 					大学に届け出る書類に必要となるため、学生証に記載の通りに入力してください。
@@ -81,7 +85,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 
 				<Form.Field.TextInput
 					label="氏名 (カナ)"
-					error={errors.realNameKana?.message}
+					error={getFormErrorMessage("realNameKana")}
 					additionalInfo={`
 					名字・名前はスペースで区切ってください。
 					${cannotChangeIndicator}
@@ -116,7 +120,7 @@ export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
 						文字、 {BIO_MAX_LINES} 行まで入力できます。 Markdown
 						形式で記述できます。
 					</p>
-					<ErrorDisplay error={errors.bio?.message} />
+					<ErrorDisplay error={getFormErrorMessage("bio")} />
 				</Form.FieldSet>
 			</div>
 		</div>
