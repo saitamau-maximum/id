@@ -5,19 +5,22 @@ export const RHFableArray = <
 >(
 	schema: T,
 ) =>
-	v.union([
-		// 非 RHF からのデータ向け
-		v.array(schema),
-
-		// RHF からのデータ向け
-		// FieldArray は { value: T } の形をしている
+	v.array(
 		v.pipe(
-			v.array(
+			v.union([
+				// 非 RHF からのデータ向け
+				schema,
+				// RHF からのデータ向け
+				// FieldArray は { value: T } の形をしている
 				v.object({
 					value: schema,
 				}),
-			),
-			// { value: T } の形から T の形に変換
-			v.transform((arr) => arr.map((item) => item.value as v.InferOutput<T>)),
+			]),
+			v.transform((val) => {
+				if (typeof val === "object" && val !== null && "value" in val) {
+					return val.value as v.InferOutput<T>;
+				}
+				return val as v.InferOutput<T>;
+			}),
 		),
-	]);
+	);
