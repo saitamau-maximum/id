@@ -1,5 +1,78 @@
-import type { ChildFormProps } from "../types";
+import { useFormContext } from "react-hook-form";
+import { css } from "styled-system/css";
+import { Form } from "~/components/ui/form";
+import type {
+	ChildFormProps,
+	FormInputValues,
+	FormOutputValues,
+} from "../types";
 
 export const UserSettingFormAboutMe = ({ isOnboarding }: ChildFormProps) => {
-	return <div>me</div>;
+	const {
+		register,
+		formState: { errors },
+	} = useFormContext<FormInputValues, unknown, FormOutputValues>();
+
+	const cannotChangeIndicator = isOnboarding
+		? "後から変更できません。"
+		: "変更するには Admin に連絡してください。";
+
+	return (
+		<>
+			<Form.FieldSet>
+				<Form.Field.TextInput
+					label="ID"
+					error={errors.displayId?.message}
+					placeholder="maximum_taro"
+					required
+					readOnly={!isOnboarding}
+					{...register("displayId")}
+				/>
+				<p className={css({ color: "gray.500", fontSize: "sm" })}>
+					半角英小文字、半角数字、アンダースコア (_) を使用できます。 3 文字以上
+					16 文字以下で入力してください。
+					{cannotChangeIndicator}
+				</p>
+			</Form.FieldSet>
+
+			<Form.Field.TextInput
+				label="ユーザー名"
+				error={errors.displayName?.message}
+				placeholder="Maximum"
+				required
+				{...register("displayName")}
+			/>
+
+			<Form.FieldSet>
+				<Form.Field.TextInput
+					label="氏名 (漢字 or カタカナ)"
+					error={errors.realName?.message}
+					placeholder="山田 太郎"
+					required
+					readOnly={!isOnboarding}
+					{...register("realName")}
+				/>
+				<p className={css({ color: "gray.500", fontSize: "sm" })}>
+					大学に届け出る書類に必要となるため、学生証に記載の通りに入力してください。
+					名字・名前はスペースで区切ってください。
+					{cannotChangeIndicator}
+				</p>
+			</Form.FieldSet>
+
+			<Form.FieldSet>
+				<Form.Field.TextInput
+					label="氏名 (カナ)"
+					error={errors.realNameKana?.message}
+					placeholder="ヤマダ タロウ"
+					required
+					readOnly={!isOnboarding}
+					{...register("realNameKana")}
+				/>
+				<p className={css({ color: "gray.500", fontSize: "sm" })}>
+					名字・名前はスペースで区切ってください。
+					{cannotChangeIndicator}
+				</p>
+			</Form.FieldSet>
+		</>
+	);
 };

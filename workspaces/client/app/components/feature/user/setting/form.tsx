@@ -174,11 +174,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						if (isOnboarding && !tab.displayInOnboarding) return null;
 						if (location.hash !== tab.hash) return null;
 						const Component = tab.component;
-						return (
-							<div key={tab.hash}>
-								<Component isOnboarding={isOnboarding} />
-							</div>
-						);
+						return <Component isOnboarding={isOnboarding} key={tab.hash} />;
 					})}
 
 					<button type="submit" disabled={isPending}>
@@ -240,46 +236,6 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 					</div>
 					<ErrorDisplay error={errors.grade?.message} />
 				</Form.FieldSet>
-
-				{isOnboarding && (
-					<Form.Field.TextInput
-						label="ID (半角英小文字、半角数字、アンダースコア(_)で3文字以上16文字以下)"
-						error={errors.displayId?.message}
-						placeholder="maximum_taro"
-						required
-						{...register("displayId")}
-					/>
-				)}
-
-				{isOnboarding && (
-					<Form.Field.TextInput
-						label="ユーザー名"
-						error={errors.displayName?.message}
-						placeholder="Maximum"
-						required
-						{...register("displayName")}
-					/>
-				)}
-
-				{isOnboarding && (
-					<Form.Field.TextInput
-						label={`本名 ${isOutsideMember ? "" : "(学生証に記載のもの)"}`}
-						error={errors.realName?.message}
-						placeholder="山田 太郎"
-						required
-						{...register("realName")}
-					/>
-				)}
-
-				{isOnboarding && (
-					<Form.Field.TextInput
-						label="本名 (カナ)"
-						error={errors.realNameKana?.message}
-						placeholder="ヤマダ タロウ"
-						required
-						{...register("realNameKana")}
-					/>
-				)}
 
 				<Form.FieldSet>
 					<div
