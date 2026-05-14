@@ -1,32 +1,13 @@
 import { valibotResolver } from "@hookform/resolvers/valibot";
 import { UserProfileUpdateParams } from "@idp/schema/api/user";
-// import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
-// import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
-// import {
-// 	GRADE_BY_ID,
-// 	type GradeId,
-// 	isGraduateGrade,
-// 	isOutsideGrade,
-// } from "@idp/schema/entity/grade";
-// import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
-// import { Fragment, type ReactElement, useEffect } from "react";
 import { type ReactElement, useEffect } from "react";
-// import { Plus, X } from "react-feather";
 import { FormProvider, useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
-// import { Form } from "~/components/ui/form";
-// import { ErrorDisplay } from "~/components/ui/form/error-display";
-// import { PreviewableField } from "~/components/ui/form/previewable-field";
-// import { IconButton } from "~/components/ui/icon-button";
-// import { SocialIcon } from "~/components/ui/social-icon";
 import { Tab } from "~/components/ui/tab";
-// import { GRADE_CATEGORIES } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
 import { UserSettingFormAboutMe } from "./partial-form/about-me";
-// import { detectSocialService } from "~/utils/social-link";
-// import { UserSettingCertificationRequest } from "./certification-request";
 import { UserSettingFormAcademic } from "./partial-form/academic";
 import { UserSettingFormCertification } from "./partial-form/certification";
 import { UserSettingFormContact } from "./partial-form/contact";
