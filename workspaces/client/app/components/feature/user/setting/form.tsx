@@ -1,6 +1,5 @@
-// import { valibotResolver } from "@hookform/resolvers/valibot";
-// import { UserProfileUpdateParams } from "@idp/schema/api/user";
-import type { UserProfileUpdateParams } from "@idp/schema/api/user";
+import { valibotResolver } from "@hookform/resolvers/valibot";
+import { UserProfileUpdateParams } from "@idp/schema/api/user";
 // import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
 // import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
 // import {
@@ -13,11 +12,11 @@ import type { UserProfileUpdateParams } from "@idp/schema/api/user";
 // import { Fragment, type ReactElement, useEffect } from "react";
 import { type ReactElement, useEffect } from "react";
 // import { Plus, X } from "react-feather";
-// import { useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
-// import { css } from "styled-system/css";
+import { css } from "styled-system/css";
 import type * as v from "valibot";
-// import { ButtonLike } from "~/components/ui/button-like";
+import { ButtonLike } from "~/components/ui/button-like";
 // import { Form } from "~/components/ui/form";
 // import { ErrorDisplay } from "~/components/ui/form/error-display";
 // import { PreviewableField } from "~/components/ui/form/previewable-field";
@@ -25,7 +24,7 @@ import type * as v from "valibot";
 // import { SocialIcon } from "~/components/ui/social-icon";
 import { Tab } from "~/components/ui/tab";
 // import { GRADE_CATEGORIES } from "~/constant";
-// import { useAuth } from "~/hooks/use-auth";
+import { useAuth } from "~/hooks/use-auth";
 // import { detectSocialService } from "~/utils/social-link";
 // import { UserSettingCertificationRequest } from "./certification-request";
 import { UserSettingFormAcademic } from "./form-academic";
@@ -36,7 +35,7 @@ import { UserSettingFormOAuth } from "./form-oauth";
 
 // import { UserSettingOAuthConnect } from "./oauth-connect";
 
-// type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
+type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 interface Props {
@@ -85,7 +84,7 @@ const settingsTabs = [
 
 export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 	const isOnboarding = type === "onboarding";
-	// const { user } = useAuth();
+	const { user } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -93,27 +92,27 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 		if (location.hash === "") navigate("#me");
 	}, [navigate, location.hash]);
 
-	// const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
-	// 	resolver: valibotResolver(UserProfileUpdateParams),
-	// 	defaultValues: {
-	// 		// onboarding の場合 socialLinks, bio は使わないが、セットしても問題ないのでセットしてしまう
-	// 		displayName: user?.displayName,
-	// 		realName: user?.realName,
-	// 		realNameKana: user?.realNameKana,
-	// 		displayId: user?.displayId,
-	// 		email: user?.email,
-	// 		academicEmail: user?.academicEmail,
-	// 		studentId: user?.studentId,
-	// 		grade: user?.grade?.toString(),
-	// 		faculty: user?.faculty?.toString(),
-	// 		department: user?.department?.toString(),
-	// 		laboratory: user?.laboratory,
-	// 		graduateSchool: user?.graduateSchool,
-	// 		specialization: user?.specialization,
-	// 		bio: user?.bio,
-	// 		socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
-	// 	},
-	// });
+	const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
+		resolver: valibotResolver(UserProfileUpdateParams),
+		defaultValues: {
+			// onboarding の場合 socialLinks, bio は使わないが、セットしても問題ないのでセットしてしまう
+			displayName: user?.displayName,
+			realName: user?.realName,
+			realNameKana: user?.realNameKana,
+			displayId: user?.displayId,
+			email: user?.email,
+			academicEmail: user?.academicEmail,
+			studentId: user?.studentId,
+			grade: user?.grade?.toString(),
+			faculty: user?.faculty?.toString(),
+			department: user?.department?.toString(),
+			laboratory: user?.laboratory,
+			graduateSchool: user?.graduateSchool,
+			specialization: user?.specialization,
+			bio: user?.bio,
+			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
+		},
+	});
 
 	// const {
 	// 	fields: socialLinks,
@@ -157,27 +156,36 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 				})}
 			</Tab.List>
 
-			{settingsTabs.map((tab) => {
-				if (isOnboarding && !tab.displayInOnboarding) return null;
-				if (location.hash !== tab.hash) return null;
-				const Component = tab.component;
-				return (
-					<div key={tab.hash}>
-						<Component />
-					</div>
-				);
-			})}
+			<FormProvider {...formMethods}>
+				<form
+					onSubmit={formMethods.handleSubmit(onSubmit)}
+					className={css({
+						width: "100%",
+						display: "flex",
+						flexDirection: "column",
+						gap: 6,
+						alignItems: "center",
+					})}
+				>
+					{settingsTabs.map((tab) => {
+						if (isOnboarding && !tab.displayInOnboarding) return null;
+						if (location.hash !== tab.hash) return null;
+						const Component = tab.component;
+						return (
+							<div key={tab.hash}>
+								<Component />
+							</div>
+						);
+					})}
+
+					<button type="submit" disabled={isPending}>
+						<ButtonLike variant="primary" disabled={isPending}>
+							{isOnboarding ? "はじめる" : "更新"}
+						</ButtonLike>
+					</button>
+				</form>
+			</FormProvider>
 			{/*
-			<form
-				onSubmit={handleSubmit(onSubmit)}
-				className={css({
-					width: "100%",
-					display: "flex",
-					flexDirection: "column",
-					gap: 6,
-					alignItems: "center",
-				})}
-			>
 				<Form.FieldSet>
 					<h2
 						className={css({
@@ -493,13 +501,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						</ul>
 					</Form.FieldSet>
 				)}
-
-				<button type="submit" disabled={isPending}>
-					<ButtonLike variant="primary" disabled={isPending}>
-						{isOnboarding ? "はじめる" : "更新"}
-					</ButtonLike>
-				</button>
-			</form> */}
+			*/}
 		</>
 	);
 };
