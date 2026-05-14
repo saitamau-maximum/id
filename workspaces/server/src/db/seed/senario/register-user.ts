@@ -1,3 +1,4 @@
+import { GRADE_IDS } from "@idp/schema/entity/grade";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import type { DrizzleD1Database } from "drizzle-orm/d1";
@@ -38,7 +39,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			academicEmail: "user1@academic.edu",
 			email: "user1@example.com",
 			studentId: "12AB001",
-			grade: "B1",
+			grade: GRADE_IDS.B1,
 			bio: "Hello, I'm User One!",
 		},
 		roles: [ROLE_IDS.ADMIN, ROLE_IDS.MEMBER],
@@ -56,7 +57,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			academicEmail: "user2@academic.edu",
 			email: "user2@example.com",
 			studentId: "12AC002",
-			grade: "B2",
+			grade: GRADE_IDS.B2,
 			bio: "Hello, I'm User Two!",
 		},
 		roles: [ROLE_IDS.MEMBER],
@@ -74,7 +75,7 @@ export const DUMMY_INITIALIZED_USERS = [
 			academicEmail: "user3@academic.edu",
 			email: "user3@example.com",
 			studentId: "12AD003",
-			grade: "B3",
+			grade: GRADE_IDS.B3,
 			bio: "Hello, I'm User Three!",
 		},
 		roles: [ROLE_IDS.MEMBER],

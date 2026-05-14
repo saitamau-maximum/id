@@ -1,3 +1,4 @@
+import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
 import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
@@ -252,7 +253,7 @@ const UserTableRow = ({
 							whiteSpace: "nowrap",
 						})}
 					>
-						{user.grade}
+						{GRADE_BY_ID[user.grade].name}
 					</code>
 				)}
 			</Table.Td>

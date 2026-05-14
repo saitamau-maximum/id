@@ -1,8 +1,9 @@
+import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { useId } from "react";
 import { css } from "styled-system/css";
 import { Form } from "~/components/ui/form";
-import { GRADE } from "~/constant";
+import { GRADE_CATEGORIES } from "~/constant";
 import type { Filter } from "../hooks/use-members-filter";
 
 type Props = {
@@ -59,7 +60,7 @@ export const FilterForm = ({
 						flexWrap: "wrap",
 					})}
 				>
-					{GRADE.map((grade) => (
+					{GRADE_CATEGORIES.map((grade) => (
 						<div
 							key={grade.label}
 							className={css({
@@ -74,7 +75,7 @@ export const FilterForm = ({
 									<Form.Select
 										key={id}
 										value={id}
-										label={id}
+										label={GRADE_BY_ID[id].name}
 										checked={filter.selectedGrades.includes(id)}
 										onChange={handleGradeSelectChange}
 									/>

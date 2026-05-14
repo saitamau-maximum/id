@@ -1,3 +1,4 @@
+import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import type { Member } from "@idp/schema/entity/member";
 import { Link } from "react-router";
 import { css } from "styled-system/css";
@@ -101,7 +102,7 @@ export const MemberCard: React.FC<Props> = ({
 								},
 							})}
 						>
-							{grade}
+							{GRADE_BY_ID[grade].name}
 						</span>
 					)}
 					{roles.length > 0 && (

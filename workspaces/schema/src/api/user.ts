@@ -1,10 +1,9 @@
 import * as v from "valibot";
 import { Contributions } from "../entity/contribution";
+import { DEPARTMENT_BY_ID } from "../entity/department";
+import { FACULTY_IDS } from "../entity/faculty";
+import { isOutsideGrade } from "../entity/grade";
 import { UserProfile } from "../entity/user";
-
-// TODO: 文字列ではなく enum-like で管理したい
-const OUTSIDE_GRADE = ["卒業生", "ゲスト"];
-const GRADUATE_GRADE = ["M1", "M2", "D1", "D2", "D3"];
 
 export const UserProfileUpdateParams = v.config(
 	v.pipe(
@@ -38,7 +37,7 @@ export const UserProfileUpdateParams = v.config(
 			v.partialCheck(
 				[["grade"], ["studentId"]],
 				({ grade, studentId }) => {
-					if (!OUTSIDE_GRADE.includes(grade) && !studentId) return false;
+					if (!isOutsideGrade(grade) && !studentId) return false;
 					return true;
 				},
 				"学籍番号は必須です",
@@ -49,7 +48,7 @@ export const UserProfileUpdateParams = v.config(
 			v.partialCheck(
 				[["grade"], ["academicEmail"]],
 				({ grade, academicEmail }) => {
-					if (!OUTSIDE_GRADE.includes(grade) && !academicEmail) return false;
+					if (!isOutsideGrade(grade) && !academicEmail) return false;
 					return true;
 				},
 				"大学メールアドレスは必須です",
@@ -60,8 +59,8 @@ export const UserProfileUpdateParams = v.config(
 			v.partialCheck(
 				[["grade"], ["faculty"]],
 				({ grade, faculty }) => {
-					// B1-D2 は学部必須
-					if (!OUTSIDE_GRADE.includes(grade) && !faculty) return false;
+					// B1-D3 は学部必須
+					if (!isOutsideGrade(grade) && !faculty) return false;
 					return true;
 				},
 				"学部を選択してください",
@@ -72,11 +71,10 @@ export const UserProfileUpdateParams = v.config(
 			v.partialCheck(
 				[["grade"], ["faculty"], ["department"]],
 				({ grade, faculty, department }) => {
-					// B1-D2 の経済学部以外は学科必須
+					// B1-D3 の経済学部以外は学科必須
 					if (
-						!OUTSIDE_GRADE.includes(grade) &&
-						!GRADUATE_GRADE.includes(grade) &&
-						faculty !== "経済学部" &&
+						!isOutsideGrade(grade) &&
+						faculty !== FACULTY_IDS.ECONOMICS &&
 						!department
 					)
 						return false;
@@ -86,39 +84,22 @@ export const UserProfileUpdateParams = v.config(
 			),
 			["department"],
 		),
-		// M, D 以上は研究室・研究科・専攻必須
 		v.forward(
 			v.partialCheck(
-				[["grade"], ["laboratory"]],
-				({ grade, laboratory }) => {
-					if (GRADUATE_GRADE.includes(grade) && !laboratory) return false;
+				[["faculty"], ["department"]],
+				({ faculty, department }) => {
+					// データが正しいことを確認
+					if (faculty && department) {
+						const departmentData = DEPARTMENT_BY_ID[department];
+						if (!departmentData) return false;
+						if (departmentData.facultyId !== faculty) return false;
+						return true;
+					}
 					return true;
 				},
-				"研究室を選択してください",
+				"学部・学科の組み合わせが正しくありません",
 			),
-			["laboratory"],
-		),
-		v.forward(
-			v.partialCheck(
-				[["grade"], ["graduateSchool"]],
-				({ grade, graduateSchool }) => {
-					if (GRADUATE_GRADE.includes(grade) && !graduateSchool) return false;
-					return true;
-				},
-				"研究科を選択してください",
-			),
-			["graduateSchool"],
-		),
-		v.forward(
-			v.partialCheck(
-				[["grade"], ["specialization"]],
-				({ grade, specialization }) => {
-					if (GRADUATE_GRADE.includes(grade) && !specialization) return false;
-					return true;
-				},
-				"専攻を選択してください",
-			),
-			["specialization"],
+			["department"],
 		),
 	),
 	// UX 的に、エラーが出て直したら別のエラーが出る...というのは避けたいので、エラー箇所はすべて表示する

@@ -1,3 +1,4 @@
+import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
@@ -118,7 +119,7 @@ const UserTableRow = ({
 				</div>
 			</Table.Td>
 			<Table.Td>{user.studentId}</Table.Td>
-			<Table.Td>{user.grade}</Table.Td>
+			<Table.Td>{user.grade && GRADE_BY_ID[user.grade].name}</Table.Td>
 			<Table.Td>
 				<div>
 					<code

@@ -1,3 +1,6 @@
+import { DEPARTMENT_IDS } from "@idp/schema/entity/department";
+import { FACULTY_IDS } from "@idp/schema/entity/faculty";
+import { GRADE_IDS } from "@idp/schema/entity/grade";
 import { ROLE_IDS } from "@idp/schema/entity/role";
 import { Hono } from "hono";
 import { createMiddleware } from "hono/factory";
@@ -20,9 +23,9 @@ const DEFAULT_USER_PROFILE_FOR_REGISTER = {
 	email: "foo@bar.test",
 	academicEmail: "invalid@ms.saitama-u.ac.jp",
 	studentId: "12AB345",
-	grade: "B1",
-	faculty: "工学部",
-	department: "情報工学科",
+	grade: GRADE_IDS.B1,
+	faculty: FACULTY_IDS.ENGINEERING,
+	department: DEPARTMENT_IDS.INFORMATION,
 	laboratory: "テスト研究室",
 	graduateSchool: "テスト大学院",
 	specialization: "テスト専攻",
@@ -79,16 +82,36 @@ const VALID_PAYLOADS_FOR_UPDATE = [
 const VALID_PAYLOADS_FOR_BOTH = [
 	[
 		"no academicEmail and studentId for Guest",
-		{ grade: "ゲスト", academicEmail: undefined, studentId: undefined },
+		{ grade: GRADE_IDS.GUEST, academicEmail: undefined, studentId: undefined },
 	],
 	[
 		"no academicEmail and studentId for Graduate",
-		{ grade: "卒業生", academicEmail: undefined, studentId: undefined },
+		{ grade: GRADE_IDS.ALUMNI, academicEmail: undefined, studentId: undefined },
 	],
 ] satisfies ProfilePayloadTestcases;
 
 const createJWT = async (userId: string) => {
 	return await sign({ userId: userId }, TEST_SECRET, JWT_ALG);
+};
+
+/**
+ * フォームでの送信を模擬する関数
+ * @param payload - userRepository.updateUser に渡されるべき文字列
+ * @returns JSON 文字列
+ */
+const convertPayload = (payload: Record<string, unknown>): string => {
+	const number2stringKeys = ["grade", "faculty", "department"];
+
+	return JSON.stringify({
+		...Object.fromEntries(
+			Object.entries(payload).map(([key, value]) => {
+				if (number2stringKeys.includes(key) && typeof value === "number") {
+					return [key, String(value)];
+				}
+				return [key, value];
+			}),
+		),
+	});
 };
 
 describe("User Handler", () => {
@@ -127,7 +150,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify(DEFAULT_USER_PROFILE_FOR_REGISTER),
+				body: convertPayload(DEFAULT_USER_PROFILE_FOR_REGISTER),
 			});
 
 			expect(response.status).toBe(201);
@@ -144,7 +167,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer invalid-token`,
 				},
-				body: JSON.stringify(DEFAULT_USER_PROFILE_FOR_REGISTER),
+				body: convertPayload(DEFAULT_USER_PROFILE_FOR_REGISTER),
 			});
 
 			expect(response.status).toBe(401);
@@ -162,7 +185,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({
+				body: convertPayload({
 					...DEFAULT_USER_PROFILE_FOR_REGISTER,
 					...invalidPayload,
 				}),
@@ -183,7 +206,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({
+				body: convertPayload({
 					...DEFAULT_USER_PROFILE_FOR_REGISTER,
 					...validPayload,
 				}),
@@ -211,7 +234,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify(DEFAULT_USER_PROFILE_FOR_UPDATE),
+				body: convertPayload(DEFAULT_USER_PROFILE_FOR_UPDATE),
 			});
 
 			expect(response.status).toBe(204);
@@ -228,7 +251,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer invalid-token`,
 				},
-				body: JSON.stringify(DEFAULT_USER_PROFILE_FOR_REGISTER),
+				body: convertPayload(DEFAULT_USER_PROFILE_FOR_REGISTER),
 			});
 
 			expect(response.status).toBe(401);
@@ -245,7 +268,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify(DEFAULT_USER_PROFILE_FOR_UPDATE),
+				body: convertPayload(DEFAULT_USER_PROFILE_FOR_UPDATE),
 			});
 
 			expect(response.status).toBe(403);
@@ -263,7 +286,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({
+				body: convertPayload({
 					...DEFAULT_USER_PROFILE_FOR_UPDATE,
 					...invalidPayload,
 				}),
@@ -284,7 +307,7 @@ describe("User Handler", () => {
 					"Content-Type": "application/json",
 					Authorization: `Bearer ${token}`,
 				},
-				body: JSON.stringify({
+				body: convertPayload({
 					...DEFAULT_USER_PROFILE_FOR_UPDATE,
 					...validPayload,
 				}),

@@ -2,6 +2,9 @@ import * as v from "valibot";
 import { MaxLines } from "../common/max-lines";
 import { RHFableArray } from "../common/rhf-array";
 import { UserCertification } from "./certification";
+import { DepartmentId } from "./department";
+import { FacultyId } from "./faculty";
+import { GradeId } from "./grade";
 import { ExportableOAuthConnection } from "./oauth-internal/oauth-connection";
 import { Role } from "./role";
 
@@ -94,7 +97,10 @@ export const UserProfile = v.object({
 			"学籍番号の形式が正しくありません、半角数字と半角英大文字で00XX000の形式で入力してください。",
 		),
 	),
-	grade: v.pipe(v.string(), v.nonEmpty("学年を選択してください")),
+	// radio は valueAsNumber や setValueAs などが使えないっぽいので string で受け取る
+	// ref: https://www.react-hook-form.com/api/useform/register/
+	//      """valueAsNumber: Only applicable and support to <input type="number" />"""
+	grade: v.pipe(v.string(), v.toNumber(), GradeId),
 	bio: v.pipe(
 		v.string(),
 		v.maxLength(
@@ -116,28 +122,11 @@ export const UserProfile = v.object({
 		),
 		v.maxLength(5),
 	),
-	faculty: v.pipe(
-		v.string(),
-		v.nonEmpty("学部を入力してください"),
-		v.maxLength(32, "学部は32文字以下で入力してください"),
-	),
-	department: v.pipe(
-		v.string(),
-		v.nonEmpty("学科を入力してください"),
-		v.maxLength(32, "学科は32文字以下で入力してください"),
-	),
-	laboratory: v.pipe(
-		v.string(),
-		v.maxLength(16, "研究室は16文字以下で入力してください"),
-	),
-	graduateSchool: v.pipe(
-		v.string(),
-		v.maxLength(64, "研究科は64文字以下で入力してください"),
-	),
-	specialization: v.pipe(
-		v.string(),
-		v.maxLength(64, "専攻は64文字以下で入力してください"),
-	),
+	faculty: v.pipe(v.string(), v.toNumber(), FacultyId),
+	department: v.optional(v.pipe(v.string(), v.toNumber(), DepartmentId)),
+	laboratory: v.string(),
+	graduateSchool: v.string(),
+	specialization: v.string(),
 	updatedAt: v.date(),
 });
 
