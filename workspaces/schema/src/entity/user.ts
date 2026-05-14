@@ -114,10 +114,19 @@ export const UserProfile = v.object({
 	),
 	socialLinks: v.pipe(
 		RHFableArray(
-			v.pipe(
-				v.string(),
-				v.nonEmpty("ソーシャルリンクを入力してください"),
-				v.url("URL が正しくありません"),
+			v.config(
+				v.pipe(
+					v.string(),
+					v.nonEmpty("ソーシャルリンクを入力してください"),
+					v.check((value) => {
+						return URL.canParse(value);
+					}, "URL が正しくありません"),
+					v.check((value) => {
+						const url = new URL(value);
+						return url.protocol === "http:" || url.protocol === "https:";
+					}, "http または https から始まる URL を入力してください"),
+				),
+				{ abortPipeEarly: true },
 			),
 		),
 		v.maxLength(5),

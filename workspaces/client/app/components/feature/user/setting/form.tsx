@@ -120,15 +120,6 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 
 	const canSubmit = formMethods.formState.isValid && !isPending;
 
-	// const {
-	// 	fields: socialLinks,
-	// 	append: appendSocialLink,
-	// 	remove: removeSocialLink,
-	// } = useFieldArray({
-	// 	control,
-	// 	name: "socialLinks",
-	// });
-
 	// const isOutsideMember = ((val?: string) => {
 	// 	if (!val) return false;
 	// 	return isOutsideGrade(Number.parseInt(val, 10) as GradeId);
@@ -389,77 +380,9 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 					)}
 				</Form.FieldSet>
 
-				<Form.Field.TextInput
-					label={`${isOutsideMember ? "" : "大学以外で"}連絡の取れるメールアドレス`}
-					error={errors.email?.message}
-					placeholder="member@maximum.vc"
-					required
-					{...register("email")}
-				/>
-
 				{!isOnboarding && <UserSettingCertificationRequest />}
 
 				{!isOnboarding && <UserSettingOAuthConnect />}
-
-				{!isOnboarding && (
-					<Form.FieldSet>
-						<legend>
-							<Form.LabelText>ソーシャルリンク (最大5つ)</Form.LabelText>
-						</legend>
-						<ul
-							className={css({
-								display: "flex",
-								flexDirection: "column",
-								gap: 2,
-								marginTop: 2,
-							})}
-						>
-							{socialLinks.map((field, index) => (
-								<li className={css({ listStyle: "none" })} key={field.id}>
-									<ErrorDisplay error={errors.socialLinks?.[index]?.message} />
-									<div
-										className={css({
-											display: "flex",
-											gap: 4,
-											placeItems: "center",
-										})}
-									>
-										<SocialIcon
-											service={detectSocialService(
-												watch(`socialLinks.${index}.value`) ?? "",
-											)}
-											size={24}
-										/>
-										<Form.Input
-											placeholder="https://example.com"
-											{...register(`socialLinks.${index}.value`)}
-										/>
-										<IconButton
-											label="Remove social link"
-											onClick={() => removeSocialLink(index)}
-										>
-											<X size={16} />
-										</IconButton>
-									</div>
-								</li>
-							))}
-							<button
-								type="button"
-								onClick={() => appendSocialLink({ value: "" })}
-								disabled={socialLinks.length >= 5}
-							>
-								<ButtonLike
-									variant="text"
-									size="sm"
-									disabled={socialLinks.length >= 5}
-								>
-									<Plus size={16} />
-									Add
-								</ButtonLike>
-							</button>
-						</ul>
-					</Form.FieldSet>
-				)}
 			*/}
 		</>
 	);
