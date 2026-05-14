@@ -180,6 +180,13 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						return <Component isOnboarding={isOnboarding} key={tab.hash} />;
 					})}
 
+					<hr
+						className={css({
+							width: "100%",
+							borderColor: "gray.300",
+						})}
+					/>
+
 					<button type="submit" disabled={!canSubmit}>
 						<ButtonLike variant="primary" disabled={!canSubmit}>
 							{isOnboarding ? "はじめる" : "更新"}
