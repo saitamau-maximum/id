@@ -15,7 +15,6 @@ import { type ReactElement, useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
 import { css } from "styled-system/css";
-import type * as v from "valibot";
 import { ButtonLike } from "~/components/ui/button-like";
 // import { Form } from "~/components/ui/form";
 // import { ErrorDisplay } from "~/components/ui/form/error-display";
@@ -25,18 +24,20 @@ import { ButtonLike } from "~/components/ui/button-like";
 import { Tab } from "~/components/ui/tab";
 // import { GRADE_CATEGORIES } from "~/constant";
 import { useAuth } from "~/hooks/use-auth";
+import { UserSettingFormAboutMe } from "./partial-form/about-me";
 // import { detectSocialService } from "~/utils/social-link";
 // import { UserSettingCertificationRequest } from "./certification-request";
-import { UserSettingFormAcademic } from "./form-academic";
-import { UserSettingFormCertification } from "./form-certification";
-import { UserSettingFormContact } from "./form-contact";
-import { UserSettingFormMe } from "./form-me";
-import { UserSettingFormOAuth } from "./form-oauth";
+import { UserSettingFormAcademic } from "./partial-form/academic";
+import { UserSettingFormCertification } from "./partial-form/certification";
+import { UserSettingFormContact } from "./partial-form/contact";
+import { UserSettingFormOAuth } from "./partial-form/oauth";
+import type {
+	ChildFormProps,
+	FormInputValues,
+	FormOutputValues,
+} from "./types";
 
 // import { UserSettingOAuthConnect } from "./oauth-connect";
-
-type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
-type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 interface Props {
 	type: "onboarding" | "update";
@@ -44,11 +45,18 @@ interface Props {
 	onSubmit: (data: FormOutputValues) => void;
 }
 
+interface SettingsTabItem {
+	label: string;
+	hash: string;
+	component: (props: ChildFormProps) => ReactElement;
+	displayInOnboarding: boolean;
+}
+
 const settingsTabs = [
 	{
 		label: "自分の情報",
 		hash: "#me",
-		component: UserSettingFormMe,
+		component: UserSettingFormAboutMe,
 		displayInOnboarding: true,
 	},
 	{
@@ -75,12 +83,7 @@ const settingsTabs = [
 		component: UserSettingFormOAuth,
 		displayInOnboarding: false,
 	},
-] satisfies {
-	label: string;
-	hash: string;
-	component: () => ReactElement;
-	displayInOnboarding: boolean;
-}[];
+] satisfies SettingsTabItem[];
 
 export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 	const isOnboarding = type === "onboarding";
@@ -173,7 +176,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						const Component = tab.component;
 						return (
 							<div key={tab.hash}>
-								<Component />
+								<Component isOnboarding={isOnboarding} />
 							</div>
 						);
 					})}
