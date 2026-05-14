@@ -1,39 +1,42 @@
-import { valibotResolver } from "@hookform/resolvers/valibot";
-import { UserProfileUpdateParams } from "@idp/schema/api/user";
-import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
-import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
-import {
-	GRADE_BY_ID,
-	type GradeId,
-	isGraduateGrade,
-	isOutsideGrade,
-} from "@idp/schema/entity/grade";
-import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
-import { Fragment, type ReactElement, useEffect } from "react";
-import { Plus, X } from "react-feather";
-import { useFieldArray, useForm } from "react-hook-form";
+// import { valibotResolver } from "@hookform/resolvers/valibot";
+// import { UserProfileUpdateParams } from "@idp/schema/api/user";
+import type { UserProfileUpdateParams } from "@idp/schema/api/user";
+// import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
+// import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
+// import {
+// 	GRADE_BY_ID,
+// 	type GradeId,
+// 	isGraduateGrade,
+// 	isOutsideGrade,
+// } from "@idp/schema/entity/grade";
+// import { BIO_MAX_LENGTH, BIO_MAX_LINES } from "@idp/schema/entity/user";
+// import { Fragment, type ReactElement, useEffect } from "react";
+import { type ReactElement, useEffect } from "react";
+// import { Plus, X } from "react-feather";
+// import { useFieldArray, useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router";
-import { css } from "styled-system/css";
+// import { css } from "styled-system/css";
 import type * as v from "valibot";
-import { ButtonLike } from "~/components/ui/button-like";
-import { Form } from "~/components/ui/form";
-import { ErrorDisplay } from "~/components/ui/form/error-display";
-import { PreviewableField } from "~/components/ui/form/previewable-field";
-import { IconButton } from "~/components/ui/icon-button";
-import { SocialIcon } from "~/components/ui/social-icon";
+// import { ButtonLike } from "~/components/ui/button-like";
+// import { Form } from "~/components/ui/form";
+// import { ErrorDisplay } from "~/components/ui/form/error-display";
+// import { PreviewableField } from "~/components/ui/form/previewable-field";
+// import { IconButton } from "~/components/ui/icon-button";
+// import { SocialIcon } from "~/components/ui/social-icon";
 import { Tab } from "~/components/ui/tab";
-import { GRADE_CATEGORIES } from "~/constant";
-import { useAuth } from "~/hooks/use-auth";
-import { detectSocialService } from "~/utils/social-link";
-import { UserSettingCertificationRequest } from "./certification-request";
+// import { GRADE_CATEGORIES } from "~/constant";
+// import { useAuth } from "~/hooks/use-auth";
+// import { detectSocialService } from "~/utils/social-link";
+// import { UserSettingCertificationRequest } from "./certification-request";
 import { UserSettingFormAcademic } from "./form-academic";
 import { UserSettingFormCertification } from "./form-certification";
 import { UserSettingFormContact } from "./form-contact";
 import { UserSettingFormMe } from "./form-me";
 import { UserSettingFormOAuth } from "./form-oauth";
-import { UserSettingOAuthConnect } from "./oauth-connect";
 
-type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
+// import { UserSettingOAuthConnect } from "./oauth-connect";
+
+// type FormInputValues = v.InferInput<typeof UserProfileUpdateParams>;
 type FormOutputValues = v.InferOutput<typeof UserProfileUpdateParams>;
 
 interface Props {
@@ -82,7 +85,7 @@ const settingsTabs = [
 
 export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 	const isOnboarding = type === "onboarding";
-	const { user } = useAuth();
+	// const { user } = useAuth();
 	const navigate = useNavigate();
 	const location = useLocation();
 
@@ -90,59 +93,52 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 		if (location.hash === "") navigate("#me");
 	}, [navigate, location.hash]);
 
-	const {
-		register,
-		handleSubmit,
-		watch,
-		setValue,
-		control,
-		formState: { errors },
-	} = useForm<FormInputValues, unknown, FormOutputValues>({
-		resolver: valibotResolver(UserProfileUpdateParams),
-		defaultValues: {
-			// onboarding の場合 socialLinks, bio は使わないが、セットしても問題ないのでセットしてしまう
-			displayName: user?.displayName,
-			realName: user?.realName,
-			realNameKana: user?.realNameKana,
-			displayId: user?.displayId,
-			email: user?.email,
-			academicEmail: user?.academicEmail,
-			studentId: user?.studentId,
-			grade: user?.grade?.toString(),
-			faculty: user?.faculty?.toString(),
-			department: user?.department?.toString(),
-			laboratory: user?.laboratory,
-			graduateSchool: user?.graduateSchool,
-			specialization: user?.specialization,
-			bio: user?.bio,
-			socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
-		},
-	});
+	// const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
+	// 	resolver: valibotResolver(UserProfileUpdateParams),
+	// 	defaultValues: {
+	// 		// onboarding の場合 socialLinks, bio は使わないが、セットしても問題ないのでセットしてしまう
+	// 		displayName: user?.displayName,
+	// 		realName: user?.realName,
+	// 		realNameKana: user?.realNameKana,
+	// 		displayId: user?.displayId,
+	// 		email: user?.email,
+	// 		academicEmail: user?.academicEmail,
+	// 		studentId: user?.studentId,
+	// 		grade: user?.grade?.toString(),
+	// 		faculty: user?.faculty?.toString(),
+	// 		department: user?.department?.toString(),
+	// 		laboratory: user?.laboratory,
+	// 		graduateSchool: user?.graduateSchool,
+	// 		specialization: user?.specialization,
+	// 		bio: user?.bio,
+	// 		socialLinks: user?.socialLinks?.map((link) => ({ value: link })) ?? [],
+	// 	},
+	// });
 
-	const {
-		fields: socialLinks,
-		append: appendSocialLink,
-		remove: removeSocialLink,
-	} = useFieldArray({
-		control,
-		name: "socialLinks",
-	});
+	// const {
+	// 	fields: socialLinks,
+	// 	append: appendSocialLink,
+	// 	remove: removeSocialLink,
+	// } = useFieldArray({
+	// 	control,
+	// 	name: "socialLinks",
+	// });
 
-	const isOutsideMember = ((val?: string) => {
-		if (!val) return false;
-		return isOutsideGrade(Number.parseInt(val, 10) as GradeId);
-	})(watch("grade"));
-	const isGraduateStudent = ((val?: string) => {
-		if (!val) return false;
-		return isGraduateGrade(Number.parseInt(val, 10) as GradeId);
-	})(watch("grade"));
+	// const isOutsideMember = ((val?: string) => {
+	// 	if (!val) return false;
+	// 	return isOutsideGrade(Number.parseInt(val, 10) as GradeId);
+	// })(watch("grade"));
+	// const isGraduateStudent = ((val?: string) => {
+	// 	if (!val) return false;
+	// 	return isGraduateGrade(Number.parseInt(val, 10) as GradeId);
+	// })(watch("grade"));
 
-	const selectedFaculty = watch("faculty");
-	const departmentBySelectedFaculty = Object.values(DEPARTMENT_BY_ID).filter(
-		(dept) =>
-			selectedFaculty &&
-			dept.facultyId === Number.parseInt(selectedFaculty, 10),
-	);
+	// const selectedFaculty = watch("faculty");
+	// const departmentBySelectedFaculty = Object.values(DEPARTMENT_BY_ID).filter(
+	// 	(dept) =>
+	// 		selectedFaculty &&
+	// 		dept.facultyId === Number.parseInt(selectedFaculty, 10),
+	// );
 
 	return (
 		<>
@@ -171,7 +167,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 					</div>
 				);
 			})}
-
+			{/*
 			<form
 				onSubmit={handleSubmit(onSubmit)}
 				className={css({
@@ -503,7 +499,7 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						{isOnboarding ? "はじめる" : "更新"}
 					</ButtonLike>
 				</button>
-			</form>
+			</form> */}
 		</>
 	);
 };
