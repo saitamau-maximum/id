@@ -1,10 +1,14 @@
 import { DEPARTMENT_BY_ID } from "@idp/schema/entity/department";
-import { FACULTY_BY_ID, FACULTY_IDS } from "@idp/schema/entity/faculty";
+import {
+	FACULTY_BY_ID,
+	FACULTY_IDS,
+	toFacultyId,
+} from "@idp/schema/entity/faculty";
 import {
 	GRADE_BY_ID,
-	type GradeId,
 	isGraduateGrade,
 	isOutsideGrade,
+	toGradeId,
 } from "@idp/schema/entity/grade";
 import { Fragment } from "react";
 import { useFormContext } from "react-hook-form";
@@ -28,20 +32,13 @@ export const UserSettingFormAcademic = ({
 		FormOutputValues
 	>();
 
-	const isOutsideMember = ((val?: string) => {
-		if (!val) return false;
-		return isOutsideGrade(Number.parseInt(val, 10) as GradeId);
-	})(watch("grade"));
-	const isGraduateStudent = ((val?: string) => {
-		if (!val) return false;
-		return isGraduateGrade(Number.parseInt(val, 10) as GradeId);
-	})(watch("grade"));
+	const isOutsideMember = isOutsideGrade(toGradeId(watch("grade")));
+	const isGraduateStudent = isGraduateGrade(toGradeId(watch("grade")));
 
 	const selectedFaculty = watch("faculty");
 	const departmentBySelectedFaculty = Object.values(DEPARTMENT_BY_ID).filter(
 		(dept) =>
-			selectedFaculty &&
-			dept.facultyId === Number.parseInt(selectedFaculty, 10),
+			selectedFaculty && dept.facultyId === toFacultyId(selectedFaculty),
 	);
 
 	return (
