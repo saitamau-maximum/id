@@ -1,6 +1,5 @@
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
-import { CertificationRequestDialog } from "~/components/feature/user/setting/certification-request-dialog";
 import { ProfileUpdateForm } from "./internal/components/form";
 
 export const meta: MetaFunction = () => {
@@ -30,8 +29,6 @@ export default function Settings() {
 			</div>
 
 			<ProfileUpdateForm />
-
-			<CertificationRequestDialog.Root />
 		</div>
 	);
 }
