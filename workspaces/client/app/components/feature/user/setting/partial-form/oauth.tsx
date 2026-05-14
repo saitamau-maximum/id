@@ -52,32 +52,24 @@ const OAuthConnRow = ({
 			</Table.Td>
 			<Table.Td>{conn && <OAuthUserBadge conn={conn} />}</Table.Td>
 			<Table.Td>
-				{OAUTH_PROVIDERS[providerId].required && (
-					<span>連携の解除はできません</span>
-				)}
-				{!OAUTH_PROVIDERS[providerId].required && !conn && (
-					<a
-						href={`${env("SERVER_HOST")}${OAUTH_PROVIDERS[providerId].loginPath}?${loginSearchParams.toString()}`}
-					>
-						<AnchorLike>連携する</AnchorLike>
-					</a>
+				<a
+					href={`${env("SERVER_HOST")}${OAUTH_PROVIDERS[providerId].loginPath}?${loginSearchParams.toString()}`}
+				>
+					<AnchorLike>{conn && "再"}連携する</AnchorLike>
+				</a>
+			</Table.Td>
+			<Table.Td>
+				{OAUTH_PROVIDERS[providerId].required && conn && (
+					<span>連携解除できません</span>
 				)}
 				{!OAUTH_PROVIDERS[providerId].required && conn && (
-					<>
-						<a
-							href={`${env("SERVER_HOST")}${OAUTH_PROVIDERS[providerId].loginPath}?${loginSearchParams.toString()}`}
-						>
-							<AnchorLike>再連携する</AnchorLike>
-						</a>
-						{" / "}
-						<button
-							onClick={handleDelete}
-							type="button"
-							className={css({ cursor: "pointer" })}
-						>
-							<AnchorLike>連携を解除する</AnchorLike>
-						</button>
-					</>
+					<button
+						onClick={handleDelete}
+						type="button"
+						className={css({ cursor: "pointer" })}
+					>
+						<AnchorLike>連携を解除する</AnchorLike>
+					</button>
 				)}
 			</Table.Td>
 		</Table.Tr>
@@ -102,6 +94,7 @@ export const UserSettingFormOAuth = () => {
 					<Table.Th>サービス</Table.Th>
 					<Table.Th>アカウント</Table.Th>
 					<Table.Th>連携</Table.Th>
+					<Table.Th>連携解除</Table.Th>
 				</Table.Tr>
 				{Object.values(OAUTH_PROVIDER_IDS).map((providerId) => (
 					<OAuthConnRow
