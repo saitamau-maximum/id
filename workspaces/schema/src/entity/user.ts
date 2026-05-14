@@ -131,8 +131,10 @@ export const UserProfile = v.object({
 		),
 		v.maxLength(5),
 	),
-	faculty: v.pipe(v.string(), v.toNumber(), FacultyId),
-	department: v.optional(v.pipe(v.string(), v.toNumber(), DepartmentId)),
+	// radio なので setValueAs 使えないが、無選択状態で null が返ってきてしまう
+	// そのため、 nullish (null, undefined 許容) を使う
+	faculty: v.nullish(v.pipe(v.string(), v.toNumber(), FacultyId)),
+	department: v.nullish(v.pipe(v.string(), v.toNumber(), DepartmentId)),
 	laboratory: v.string(),
 	graduateSchool: v.string(),
 	specialization: v.string(),
