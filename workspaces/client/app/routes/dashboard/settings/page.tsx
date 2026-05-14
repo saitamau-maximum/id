@@ -29,6 +29,9 @@ export default function Settings() {
 					プロフィール情報を変更することができます
 				</span>
 			</div>
+
+			<ProfileUpdateForm />
+
 			<div
 				className={css({
 					width: "100%",
@@ -42,7 +45,6 @@ export default function Settings() {
 				})}
 			>
 				<ProfileImageEditor />
-				<ProfileUpdateForm />
 			</div>
 			<CertificationRequestDialog.Root />
 		</div>

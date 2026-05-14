@@ -19,6 +19,7 @@ export default function Onboarding() {
 	useEffect(() => {
 		if (!shouldProceed) {
 			navigate("/");
+			return;
 		}
 	}, [shouldProceed, navigate]);
 
@@ -55,19 +56,31 @@ export default function Onboarding() {
 						},
 					})}
 				>
-					{isProvisional && <Progress steps={registrationSteps} />}
-					<h1
-						className={css({
-							fontSize: "2xl",
-							fontWeight: "bold",
-							color: "gray.700",
-							textAlign: "center",
-							marginTop: isProvisional ? 8 : undefined,
-							marginBottom: 8,
-						})}
-					>
-						Maximum IdP 初期設定
-					</h1>
+					<div className={css({ marginBottom: 8 })}>
+						{isProvisional && <Progress steps={registrationSteps} />}
+						<h1
+							className={css({
+								fontSize: "2xl",
+								fontWeight: "bold",
+								color: "gray.700",
+								textAlign: "center",
+								marginTop: isProvisional ? 8 : undefined,
+								marginBottom: 8,
+							})}
+						>
+							Maximum IdP 初期設定
+						</h1>
+						<span
+							className={css({
+								color: "gray.500",
+								fontSize: "md",
+							})}
+						>
+							以下のフォームに必要事項を入力して、初期設定を完了させましょう！
+							ID と氏名以外の情報は、後から更新できます。
+						</span>
+					</div>
+
 					<UserSettingForm
 						type="onboarding"
 						onSubmit={mutate}
