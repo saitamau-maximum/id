@@ -11,7 +11,7 @@ import { OAuthServiceProviderBadge } from "~/components/feature/oauth-internal/s
 import { OAuthUserBadge } from "~/components/feature/oauth-internal/user-badge";
 import { ConfirmDialog } from "~/components/logic/callable/confirm";
 import { AnchorLike } from "~/components/ui/anchor-like";
-import { Form } from "~/components/ui/form";
+import { Details } from "~/components/ui/details";
 import { Table } from "~/components/ui/table";
 import { useAuth } from "~/hooks/use-auth";
 import { env } from "~/utils/env";
@@ -85,15 +85,19 @@ const OAuthConnRow = ({
 };
 
 export const UserSettingFormOAuth = () => {
-	const { user } = useAuth();
+	const { user, isLoading } = useAuth();
 
 	return (
-		<Form.FieldSet>
-			<legend>
-				<Form.LabelText>OAuth を使ったログイン</Form.LabelText>
-			</legend>
+		<>
+			<p
+				className={css({ color: "gray.600", textAlign: "left", width: "100%" })}
+			>
+				外部サービスのアカウントと連携することで、 OAuth
+				を使ったログインが可能になります。 また、 IdP
+				の情報をもとに、連携先のサービスを便利に利用できるようになります。
+			</p>
 
-			<Table.Root>
+			<Table.Root loading={isLoading}>
 				<Table.Tr>
 					<Table.Th>サービス</Table.Th>
 					<Table.Th>アカウント</Table.Th>
@@ -107,6 +111,16 @@ export const UserSettingFormOAuth = () => {
 					/>
 				))}
 			</Table.Root>
-		</Form.FieldSet>
+
+			<Details summary="なぜ連携解除できないサービスがあるの？">
+				これらのサービスが提供する機能やデータが、 Maximum
+				での活動に不可欠であるためです。
+				これらのサービスとの連携があることにより、 Maximum
+				ではメンバーの一元管理や、活動の可視化、コミュニケーションの円滑化などが実現されています。
+				また、これらのアカウントによる Maximum
+				サービスへのログインも可能になります。
+				「いつの間にか勝手に投稿されてた！」のようなことはないので安心してください。
+			</Details>
+		</>
 	);
 };
