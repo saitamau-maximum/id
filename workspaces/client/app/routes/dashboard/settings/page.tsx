@@ -2,7 +2,6 @@ import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
 import { CertificationRequestDialog } from "~/components/feature/user/setting/certification-request-dialog";
 import { ProfileUpdateForm } from "./internal/components/form";
-import { ProfileImageEditor } from "./internal/components/profile-image-editor";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Settings | Maximum IdP" }];
@@ -32,20 +31,6 @@ export default function Settings() {
 
 			<ProfileUpdateForm />
 
-			<div
-				className={css({
-					width: "100%",
-					height: "100%",
-					gap: 8,
-					display: "flex",
-
-					lgDown: {
-						flexDirection: "column",
-					},
-				})}
-			>
-				<ProfileImageEditor />
-			</div>
 			<CertificationRequestDialog.Root />
 		</div>
 	);
