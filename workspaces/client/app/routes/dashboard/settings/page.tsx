@@ -1,12 +1,15 @@
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
-import { ProfileUpdateForm } from "./internal/components/form";
+import { UserSettingForm } from "~/components/feature/user/setting/form";
+import { useUpdateProfile } from "./internal/hooks/use-update-profile";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Settings | Maximum IdP" }];
 };
 
 export default function Settings() {
+	const { mutate, isPending } = useUpdateProfile();
+
 	return (
 		<div>
 			<div
@@ -28,7 +31,7 @@ export default function Settings() {
 				</span>
 			</div>
 
-			<ProfileUpdateForm />
+			<UserSettingForm type="update" isPending={isPending} onSubmit={mutate} />
 		</div>
 	);
 }
