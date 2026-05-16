@@ -86,7 +86,7 @@ export const generateIdToken = async ({
 	nonce,
 	accessToken,
 	privateKey,
-	...rest
+	...claims
 }: Param) => {
 	const {
 		key,
@@ -104,7 +104,7 @@ export const generateIdToken = async ({
 		exp: exp,
 		iat: nowUnixS,
 		at_hash: atHash,
-		...rest,
+		...claims,
 	};
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
