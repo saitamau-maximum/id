@@ -166,6 +166,8 @@ const route = app
 						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
 							? {
 									name: userInfo.realName,
+									nickname: userInfo.displayName,
+									preferred_username: userInfo.displayId,
 									picture: userInfo.profileImageURL,
 								}
 							: {}),
