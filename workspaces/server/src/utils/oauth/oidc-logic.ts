@@ -1,8 +1,14 @@
+import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
 import { iss } from "./constant";
 import { binaryToBase64Url } from "./convert-bin-base64";
 import { importKey, sign } from "./key";
 
-interface OidcIdTokenPayload {
+type OidcIdTokenClaims = Pick<
+	OIDCUserInfo,
+	"name" | "nickname" | "preferred_username" | "picture" | "email"
+>;
+
+interface OidcIdTokenPayloadBase {
 	iss: string;
 	sub: string;
 	aud: string[];
@@ -12,13 +18,10 @@ interface OidcIdTokenPayload {
 	nonce?: string;
 	// acr, amr, azp は使わないので省略
 	at_hash: string;
-	// 必要最低限のフィールドは id_token に含める
-	name?: string;
-	picture?: string;
-	email?: string;
 }
+type OidcIdTokenPayload = OidcIdTokenPayloadBase & OidcIdTokenClaims;
 
-interface Param {
+interface ParamBase {
 	clientId: string;
 	userId: string;
 	exp: number;
@@ -27,11 +30,8 @@ interface Param {
 	accessToken: string;
 	privateKey: string;
 	keyId?: string;
-	// 必要最低限のフィールドは id_token に含める
-	name?: string;
-	picture?: string;
-	email?: string;
 }
+type Param = ParamBase & OidcIdTokenClaims;
 
 const signJWT = async (
 	payload: OidcIdTokenPayload,
@@ -87,9 +87,7 @@ export const generateIdToken = async ({
 	nonce,
 	accessToken,
 	privateKey,
-	name,
-	picture,
-	email,
+	...rest
 }: Param) => {
 	const {
 		key,
@@ -107,12 +105,10 @@ export const generateIdToken = async ({
 		exp: exp,
 		iat: nowUnixS,
 		at_hash: atHash,
+		...rest,
 	};
 	if (nonce) payload.nonce = nonce;
 	if (authTime) payload.auth_time = authTime;
-	if (name) payload.name = name;
-	if (picture) payload.picture = picture;
-	if (email) payload.email = email;
 
 	const idToken = await signJWT(payload, key, kid);
 
