@@ -49,6 +49,7 @@ const route = app
 	.get("/roles", async (c) => {
 		return c.json(
 			Object.values(ROLE_BY_ID).map((r) => ({
+				id: r.id,
 				name: r.name,
 				slug: r.slug,
 			})),
