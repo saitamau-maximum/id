@@ -59,6 +59,7 @@ export type RoleId = v.InferOutput<typeof RoleId>;
 export const Role = v.object({
 	id: RoleId,
 	name: v.string(),
+	slug: v.string(),
 	color: v.pipe(
 		v.string(),
 		// v.hexColor は rgba も許容してしまうため、正規表現でチェックする
@@ -72,66 +73,79 @@ export const ROLE_BY_ID = {
 	[ROLE_IDS.ADMIN]: {
 		id: ROLE_IDS.ADMIN,
 		name: "Admin",
+		slug: "admin",
 		color: "#FF6B08",
 	},
 	[ROLE_IDS.MEMBER]: {
 		id: ROLE_IDS.MEMBER,
 		name: "Member",
+		slug: "member",
 		color: "#3BAC8C",
 	},
 	[ROLE_IDS.ACCOUNTANT]: {
 		id: ROLE_IDS.ACCOUNTANT,
 		name: "会計",
+		slug: "accountant",
 		color: "#548800",
 	},
 	[ROLE_IDS.PR]: {
 		id: ROLE_IDS.PR,
 		name: "広報",
+		slug: "pr",
 		color: "#5B00D3",
 	},
 	[ROLE_IDS.CALENDAR_EDITOR]: {
 		id: ROLE_IDS.CALENDAR_EDITOR,
 		name: "カレンダー編集者",
+		slug: "calendar-editor",
 		color: "#0E8A16",
 	},
 	[ROLE_IDS.CP]: {
 		id: ROLE_IDS.CP,
 		name: "競プロ",
+		slug: "cp",
 		color: "#C8AA00",
 	},
 	[ROLE_IDS.WEB]: {
 		id: ROLE_IDS.WEB,
 		name: "Web",
+		slug: "web",
 		color: "#FF1493",
 	},
 	[ROLE_IDS.AI]: {
 		id: ROLE_IDS.AI,
 		name: "広義AI",
+		slug: "ai",
 		color: "#00BFFF",
 	},
 	[ROLE_IDS.CTF]: {
 		id: ROLE_IDS.CTF,
 		name: "CTF",
+		slug: "ctf",
 		color: "#800080",
 	},
 	[ROLE_IDS.ANIMATION]: {
 		id: ROLE_IDS.ANIMATION,
 		name: "アニメーション",
+		slug: "animation",
 		color: "#1F0084",
 	},
 	[ROLE_IDS.GAME]: {
 		id: ROLE_IDS.GAME,
 		name: "ゲーム開発",
+		slug: "game",
 		color: "#FF69B4",
 	},
 	[ROLE_IDS.INFRA]: {
 		id: ROLE_IDS.INFRA,
 		name: "インフラ",
+		slug: "infra",
 		color: "#008000",
 	},
 	[ROLE_IDS.DEV]: {
 		id: ROLE_IDS.DEV,
 		name: "開発",
+		slug: "dev",
 		color: "#0000FF",
 	},
 } as const satisfies Record<RoleId, Role>;
