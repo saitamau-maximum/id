@@ -21,6 +21,15 @@ export const Input = ({ className, ...props }: Props) => {
 					"&:focus": {
 						borderColor: "green",
 					},
+					_readOnly: {
+						backgroundColor: "gray.100",
+						borderColor: "gray.300",
+						color: "gray.500",
+						cursor: "not-allowed",
+						"&:focus": {
+							borderColor: "gray.300",
+						},
+					},
 				}),
 				className,
 			)}

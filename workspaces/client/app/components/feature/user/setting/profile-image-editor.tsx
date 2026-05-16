@@ -1,27 +1,24 @@
-import type React from "react";
+import type { ChangeEvent } from "react";
 import { useCallback, useState } from "react";
 
 import { css } from "styled-system/css";
 import { ImageCropper } from "~/components/ui/image-cropper";
 import { SkeletonOverlay } from "~/components/ui/skeleton-overlay";
 import { useAuth } from "~/hooks/use-auth";
-import { useUpdateProfileImage } from "../hooks/use-update-profile-image";
+import { useUpdateProfileImage } from "./hooks/use-update-profile-image";
 
 export const ProfileImageEditor = () => {
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
 	const [isDialogOpen, setDialogOpen] = useState(false);
 
-	const handleSelectFile = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const file = e.target.files?.[0];
-			if (!file) return;
+	const handleSelectFile = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
 
-			setSelectedFile(file);
-			setDialogOpen(true);
-		},
-		[],
-	);
+		setSelectedFile(file);
+		setDialogOpen(true);
+	}, []);
 
 	const { mutate: updateProfileImage, isPending } = useUpdateProfileImage();
 

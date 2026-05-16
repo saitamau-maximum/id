@@ -26,7 +26,7 @@ const ACADEMIC_EMAIL_DOMAIN = "ms.saitama-u.ac.jp";
 export const BIO_MAX_LENGTH = 255; // Bioは255文字まで許容
 export const BIO_MAX_LINES = 10; // Bioは10行まで許容
 
-// 本名を表す文字列において、苗字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
+// 本名を表す文字列において、名字、名前、ミドルネーム等が1つ以上の空文字で区切られている場合に受理される
 const REALNAME_REGEX = /^(?=.*\S(?:[\s　]+)\S).+$/;
 
 /**
@@ -42,7 +42,7 @@ export const UserProfile = v.object({
 		v.string(),
 		v.regex(
 			REALNAME_REGEX,
-			"苗字、名前、ミドルネーム等はスペースで区切って入力してください",
+			"名字、名前、ミドルネーム等はスペースで区切って入力してください",
 		),
 		v.nonEmpty("本名を入力してください"),
 	),
@@ -50,7 +50,7 @@ export const UserProfile = v.object({
 		v.string(),
 		v.regex(
 			REALNAME_REGEX,
-			"苗字、名前、ミドルネーム等はスペースで区切って入力してください",
+			"名字、名前、ミドルネーム等はスペースで区切って入力してください",
 		),
 		v.nonEmpty("本名を入力してください"),
 	),
@@ -114,16 +114,27 @@ export const UserProfile = v.object({
 	),
 	socialLinks: v.pipe(
 		RHFableArray(
-			v.pipe(
-				v.string(),
-				v.nonEmpty("ソーシャルリンクを入力してください"),
-				v.url("URL が正しくありません"),
+			v.config(
+				v.pipe(
+					v.string(),
+					v.nonEmpty("ソーシャルリンクを入力してください"),
+					v.check((value) => {
+						return URL.canParse(value);
+					}, "URL が正しくありません"),
+					v.check((value) => {
+						const url = new URL(value);
+						return url.protocol === "http:" || url.protocol === "https:";
+					}, "http または https から始まる URL を入力してください"),
+				),
+				{ abortPipeEarly: true },
 			),
 		),
 		v.maxLength(5),
 	),
-	faculty: v.pipe(v.string(), v.toNumber(), FacultyId),
-	department: v.optional(v.pipe(v.string(), v.toNumber(), DepartmentId)),
+	// radio なので setValueAs 使えないが、無選択状態で null が返ってきてしまう
+	// そのため、 nullish (null, undefined 許容) を使う
+	faculty: v.nullish(v.pipe(v.string(), v.toNumber(), FacultyId)),
+	department: v.nullish(v.pipe(v.string(), v.toNumber(), DepartmentId)),
 	laboratory: v.string(),
 	graduateSchool: v.string(),
 	specialization: v.string(),

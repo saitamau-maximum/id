@@ -1,4 +1,5 @@
 import type { User } from "@idp/schema/entity/user";
+import type { ComponentProps } from "react";
 import { Outlet } from "react-router";
 import { Tab } from "~/components/ui/tab";
 import { useAuth } from "~/hooks/use-auth";
@@ -14,14 +15,14 @@ const NAVIGATION = [
 	{
 		label: "Home",
 		to: "/admin",
-		isActive: (location: string) => location === "/admin",
+		isActive: (location) => location.pathname === "/admin",
 	},
 	{
 		shouldDisplay: (user: User) =>
 			user.roles.some((r) => (USER_ALLOWED_ROLES as number[]).includes(r.id)),
 		label: "Users",
 		to: "/admin/users",
-		isActive: (location: string) => location.startsWith("/admin/users"),
+		isActive: (location) => location.pathname.startsWith("/admin/users"),
 	},
 	{
 		shouldDisplay: (user: User) =>
@@ -30,7 +31,7 @@ const NAVIGATION = [
 			),
 		label: "Invites",
 		to: "/admin/invites",
-		isActive: (location: string) => location.startsWith("/admin/invites"),
+		isActive: (location) => location.pathname.startsWith("/admin/invites"),
 	},
 	{
 		shouldDisplay: (user: User) =>
@@ -39,15 +40,15 @@ const NAVIGATION = [
 			),
 		label: "Certifications",
 		to: "/admin/certifications",
-		isActive: (location: string) =>
-			location.startsWith("/admin/certifications"),
+		isActive: (location) =>
+			location.pathname.startsWith("/admin/certifications"),
 	},
 	{
 		shouldDisplay: (user: User) =>
 			user.roles.some((r) => (EVENTS_ALLOWED_ROLES as number[]).includes(r.id)),
 		label: "Events",
 		to: "/admin/events",
-		isActive: (location: string) => location.startsWith("/admin/events"),
+		isActive: (location) => location.pathname.startsWith("/admin/events"),
 	},
 	{
 		shouldDisplay: (user: User) =>
@@ -56,9 +57,12 @@ const NAVIGATION = [
 			),
 		label: "Equipments",
 		to: "/admin/equipments",
-		isActive: (location: string) => location.startsWith("/admin/equipments"),
+		isActive: (location) => location.pathname.startsWith("/admin/equipments"),
 	},
-];
+] satisfies ({
+	shouldDisplay?: (user: User) => boolean;
+	label: string;
+} & Omit<ComponentProps<typeof Tab.Item>, "children" | "notification">)[];
 
 export default function AdminLayout() {
 	const { user } = useAuth();

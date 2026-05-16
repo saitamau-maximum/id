@@ -35,3 +35,23 @@ export const FACULTY_BY_ID = {
 	[FACULTY_IDS.SCIENCE]: { id: FACULTY_IDS.SCIENCE, name: "理学部" },
 	[FACULTY_IDS.ENGINEERING]: { id: FACULTY_IDS.ENGINEERING, name: "工学部" },
 } as const satisfies Record<FacultyId, Faculty>;
+
+export function toFacultyId(val: number | string): FacultyId;
+export function toFacultyId(val: undefined | null): undefined;
+export function toFacultyId(
+	val: number | string | undefined | null,
+): FacultyId | undefined;
+export function toFacultyId(
+	val: number | string | undefined | null,
+): FacultyId | undefined {
+	if (typeof val === "number") {
+		return v.parse(FacultyId, val);
+	}
+	if (typeof val === "string") {
+		return v.parse(v.pipe(v.string(), v.toNumber(), FacultyId), val);
+	}
+	if (val === undefined || val === null) {
+		return undefined;
+	}
+	throw new Error("not implemented");
+}

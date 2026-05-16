@@ -91,16 +91,20 @@ export const Radio = ({ className, label, ...props }: RadioProps) => {
 
 interface RadioGroupProps {
 	children: React.ReactNode;
+	className?: string;
 }
 
-export const RadioGroup = ({ children }: RadioGroupProps) => {
+export const RadioGroup = ({ children, className }: RadioGroupProps) => {
 	return (
 		<div
-			className={css({
-				display: "flex",
-				gap: "token(spacing.2)",
-				flexWrap: "wrap",
-			})}
+			className={cx(
+				css({
+					display: "flex",
+					gap: "token(spacing.2)",
+					flexWrap: "wrap",
+				}),
+				className,
+			)}
 		>
 			{children}
 		</div>

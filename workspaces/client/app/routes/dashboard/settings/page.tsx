@@ -1,14 +1,15 @@
 import type { MetaFunction } from "react-router";
 import { css } from "styled-system/css";
-import { CertificationRequestDialog } from "~/components/feature/user/setting/certification-request-dialog";
-import { ProfileUpdateForm } from "./internal/components/form";
-import { ProfileImageEditor } from "./internal/components/profile-image-editor";
+import { UserSettingForm } from "~/components/feature/user/setting/form";
+import { useUpdateProfile } from "./internal/hooks/use-update-profile";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "Settings | Maximum IdP" }];
 };
 
 export default function Settings() {
+	const { mutate, isPending } = useUpdateProfile();
+
 	return (
 		<div>
 			<div
@@ -29,22 +30,8 @@ export default function Settings() {
 					プロフィール情報を変更することができます
 				</span>
 			</div>
-			<div
-				className={css({
-					width: "100%",
-					height: "100%",
-					gap: 8,
-					display: "flex",
 
-					lgDown: {
-						flexDirection: "column",
-					},
-				})}
-			>
-				<ProfileImageEditor />
-				<ProfileUpdateForm />
-			</div>
-			<CertificationRequestDialog.Root />
+			<UserSettingForm type="update" isPending={isPending} onSubmit={mutate} />
 		</div>
 	);
 }
