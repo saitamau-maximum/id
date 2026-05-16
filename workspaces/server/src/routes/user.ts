@@ -80,9 +80,10 @@ const route = app
 
 			const {
 				displayName,
-				realName,
-				realNameKana,
-				displayId,
+				// ここは変更不可なので、 payload に含まれていても無視する
+				// realName,
+				// realNameKana,
+				// displayId,
 				academicEmail,
 				email,
 				studentId,
@@ -97,14 +98,9 @@ const route = app
 			} = c.req.valid("json");
 
 			const normalizedDisplayName = normalizeRealName(displayName);
-			const normalizedRealName = normalizeRealName(realName);
-			const normalizedRealNameKana = normalizeRealName(realNameKana);
 
 			await UserRepository.updateUser(payload.userId, {
 				displayName: normalizedDisplayName,
-				displayId,
-				realName: normalizedRealName,
-				realNameKana: normalizedRealNameKana,
 				academicEmail,
 				email,
 				studentId,
