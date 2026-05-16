@@ -52,6 +52,7 @@ const route = app
 				id: r.id,
 				slug: r.slug,
 				name: r.name,
+				color: r.color,
 			})),
 		);
 	})
