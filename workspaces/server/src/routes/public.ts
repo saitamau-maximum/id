@@ -8,6 +8,7 @@ import {
 	isGraduateGrade,
 	isUndergraduateGrade,
 } from "@idp/schema/entity/grade";
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { factory } from "../factory";
 
 const app = factory.createApp();
@@ -43,6 +44,14 @@ const route = app
 	.get("/certifications", async (c) => {
 		return c.json<GetCertificationsResponse>(
 			await c.var.CertificationRepository.getCertificationsSummary(),
+		);
+	})
+	.get("/roles", async (c) => {
+		return c.json(
+			Object.values(ROLE_BY_ID).map((r) => ({
+				name: r.name,
+				slug: r.slug,
+			})),
 		);
 	})
 	.get("/affiliations-summary", async (c) => {
