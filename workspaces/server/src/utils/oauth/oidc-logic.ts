@@ -29,7 +29,6 @@ interface ParamBase {
 	nonce?: string;
 	accessToken: string;
 	privateKey: string;
-	keyId?: string;
 }
 type Param = ParamBase & OidcIdTokenClaims;
 
