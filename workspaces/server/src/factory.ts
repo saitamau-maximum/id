@@ -6,6 +6,8 @@ import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
 import type { IDiscordBotRepository } from "./repository/discord-bot";
 import type { IEquipmentRepository } from "./repository/equipment";
+import type { IExternalRoleRepository } from "./repository/external-role";
+import type { IExternalRoleConditionRepository } from "./repository/external-role-condition";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -37,6 +39,9 @@ export type HonoEnv = {
 		EquipmentRepository: IEquipmentRepository;
 		// 招待
 		InviteRepository: IInviteRepository;
+		// 外部ロール同期
+		ExternalRoleRepository: IExternalRoleRepository;
+		ExternalRoleConditionRepository: IExternalRoleConditionRepository;
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		OAuthInternalRepository: IOAuthInternalRepository;

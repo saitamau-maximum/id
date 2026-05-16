@@ -239,6 +239,13 @@
 			"when": 1778645607653,
 			"tag": "0033_new_senator_kelly",
 			"breakpoints": true
+		},
+		{
+			"idx": 34,
+			"version": "6",
+			"when": 1778913699117,
+			"tag": "0034_thick_venus",
+			"breakpoints": true
 		}
 	]
 }
