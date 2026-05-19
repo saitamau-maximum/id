@@ -4,6 +4,10 @@ import {
 	ALLOWED_RESPONSE_TYPES,
 	OAUTH_SCOPE_REGEX,
 } from "../../constants/oauth-external";
+import {
+	PkceCodeChallenge,
+	PkceCodeChallengeMethod,
+} from "../../entity/oauth-external/pkce";
 
 export const OAuthCallbackRequestParams = v.object({
 	// hidden fields
@@ -15,16 +19,8 @@ export const OAuthCallbackRequestParams = v.object({
 	state: v.optional(v.string()),
 	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	oidc_auth_time: v.optional(v.pipe(v.string(), v.digits(), v.toNumber())),
-	code_challenge: v.optional(
-		v.pipe(
-			v.string(),
-			// RFC 7636 Section 4.2: https://www.rfc-editor.org/rfc/rfc7636#section-4.2
-			v.minLength(43),
-			v.maxLength(128),
-			v.regex(/^[A-Za-z0-9._~-]+$/),
-		),
-	),
-	code_challenge_method: v.optional(v.literal("S256")),
+	code_challenge: v.optional(PkceCodeChallenge),
+	code_challenge_method: v.optional(PkceCodeChallengeMethod),
 
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits(), v.toNumber()),

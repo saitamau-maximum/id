@@ -1,3 +1,4 @@
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import { type FC, Fragment } from "hono/jsx";
 import { _Button } from "./button";
 
@@ -18,7 +19,7 @@ interface AuthorizeProps {
 		oidcNonce?: string;
 		oidcAuthTime?: number;
 		codeChallenge?: string;
-		codeChallengeMethod?: "S256";
+		codeChallengeMethod?: PkceCodeChallengeMethod;
 		token: string;
 		nowUnixMs: number;
 	};

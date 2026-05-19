@@ -4,6 +4,7 @@ import type {
 	ClientSecret,
 	ClientToken,
 } from "@idp/schema/entity/oauth-external/client";
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import type { Scope, ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import type { Role } from "@idp/schema/entity/role";
 import type { User, UserBasicInfo, UserProfile } from "@idp/schema/entity/user";
@@ -79,7 +80,7 @@ export type IOAuthExternalRepository = {
 		accessToken: string,
 		scopes: Scope[],
 		codeChallenge?: string,
-		codeChallengeMethod?: "S256",
+		codeChallengeMethod?: PkceCodeChallengeMethod,
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) => Promise<void>;

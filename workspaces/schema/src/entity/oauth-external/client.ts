@@ -1,5 +1,6 @@
 import * as v from "valibot";
 import { User } from "../user";
+import { PkceCodeChallengeMethod } from "./pkce";
 import { ScopeId } from "./scope";
 
 export const Client = v.object({
@@ -57,7 +58,7 @@ export const ClientToken = v.object({
 	codeUsed: v.boolean(),
 	redirectUri: v.nullable(v.pipe(v.string(), v.url())),
 	codeChallenge: v.nullable(v.string()),
-	codeChallengeMethod: v.nullable(v.literal("S256")),
+	codeChallengeMethod: v.nullable(PkceCodeChallengeMethod),
 	accessToken: v.string(),
 	accessTokenExpiresAt: v.date(),
 });

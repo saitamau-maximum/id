@@ -151,17 +151,10 @@ const route = app
 						401,
 					);
 				}
-				if (tokenInfo.codeChallengeMethod !== "S256") {
-					return c.json(
-						{
-							error: "invalid_grant",
-							error_description: "Unsupported code_challenge_method",
-							error_uri: OAUTH_ERROR_URI,
-						},
-						401,
-					);
-				}
-				const codeChallenge = await generateCodeChallenge(code_verifier);
+				const codeChallenge =
+					tokenInfo.codeChallengeMethod === "S256"
+						? await generateCodeChallenge(code_verifier)
+						: code_verifier;
 				if (codeChallenge !== tokenInfo.codeChallenge) {
 					return c.json(
 						{

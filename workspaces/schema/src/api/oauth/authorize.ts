@@ -5,6 +5,10 @@ import {
 	ALLOWED_RESPONSE_TYPES,
 	OAUTH_SCOPE_REGEX,
 } from "../../constants/oauth-external";
+import {
+	PkceCodeChallenge,
+	PkceCodeChallengeMethod,
+} from "../../entity/oauth-external/pkce";
 import { SCOPES_BY_ID } from "../../entity/oauth-external/scope";
 
 // IdP 内部では使われていないが、 OAuth Client が使うかもしれないので定義
@@ -55,16 +59,8 @@ export const OAuthAuthorizeRequestParams = v.object({
 	response_mode: v.optional(v.picklist(ALLOWED_RESPONSE_MODES)),
 
 	// PKCE parameters
-	code_challenge: v.optional(
-		v.pipe(
-			v.string(),
-			// RFC 7636 Section 4.2: https://www.rfc-editor.org/rfc/rfc7636#section-4.2
-			v.minLength(43),
-			v.maxLength(128),
-			v.regex(/^[A-Za-z0-9._~-]+$/),
-		),
-	),
-	code_challenge_method: v.optional(v.literal("S256")),
+	code_challenge: v.optional(PkceCodeChallenge),
+	code_challenge_method: v.optional(PkceCodeChallengeMethod),
 });
 export type OAuthAuthorizeRequestParams = v.InferOutput<
 	typeof OAuthAuthorizeRequestParams

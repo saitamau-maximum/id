@@ -1,4 +1,5 @@
 import { GradeId } from "@idp/schema/entity/grade";
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import {
 	SCOPES_BY_ID,
 	type Scope,
@@ -364,7 +365,7 @@ export class CloudflareOAuthExternalRepository
 		accessToken: string,
 		scopes: Scope[],
 		codeChallenge?: string,
-		codeChallengeMethod?: "S256",
+		codeChallengeMethod?: PkceCodeChallengeMethod,
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) {

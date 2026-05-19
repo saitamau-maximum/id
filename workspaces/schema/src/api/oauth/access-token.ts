@@ -1,4 +1,5 @@
 import * as v from "valibot";
+import { PkceCodeVerifier } from "../../entity/oauth-external/pkce";
 
 export const AccessTokenRequestParams = v.object({
 	grant_type: v.pipe(v.string(), v.nonEmpty()),
@@ -6,15 +7,7 @@ export const AccessTokenRequestParams = v.object({
 	redirect_uri: v.optional(v.pipe(v.string(), v.nonEmpty(), v.url())),
 	client_id: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	client_secret: v.optional(v.pipe(v.string(), v.nonEmpty())),
-	code_verifier: v.optional(
-		v.pipe(
-			v.string(),
-			// RFC 7636 Section 4.1: https://www.rfc-editor.org/rfc/rfc7636#section-4.1
-			v.minLength(43),
-			v.maxLength(128),
-			v.regex(/^[A-Za-z0-9._~-]+$/),
-		),
-	),
+	code_verifier: v.optional(PkceCodeVerifier),
 });
 export type AccessTokenRequestParams = v.InferOutput<
 	typeof AccessTokenRequestParams

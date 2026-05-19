@@ -4,6 +4,10 @@ import {
 	ALLOWED_RESPONSE_TYPES,
 	OAUTH_SCOPE_REGEX,
 } from "@idp/schema/constants/oauth-external";
+import {
+	PkceCodeChallenge,
+	PkceCodeChallengeMethod,
+} from "@idp/schema/entity/oauth-external/pkce";
 import type { Context } from "hono";
 import { deleteCookie, getSignedCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
@@ -132,17 +136,17 @@ const route = app
 			};
 
 			const { output: responseType, success: success4 } = v.safeParse(
-				v.optional(v.picklist(ALLOWED_RESPONSE_TYPES)),
+				v.pipe(v.string(), v.nonEmpty()),
 				query.response_type,
 			);
-			if (!success4 || (query.response_type && !responseType)) {
+			if (!success4) {
+				return errorRedirect("invalid_request", "response_type required");
+			}
+			if (!v.is(v.picklist(ALLOWED_RESPONSE_TYPES), responseType)) {
 				return errorRedirect(
 					"unsupported_response_type",
 					`supported response_type is ${ALLOWED_RESPONSE_TYPES.join(", ")}`,
 				);
-			}
-			if (!responseType) {
-				return errorRedirect("invalid_request", "response_type required");
 			}
 
 			const { output: scope, success: success5 } = v.safeParse(
@@ -226,21 +230,14 @@ const route = app
 			}
 
 			const { output: codeChallenge, success: success10 } = v.safeParse(
-				v.optional(
-					v.pipe(
-						v.string(),
-						v.minLength(43),
-						v.maxLength(128),
-						v.regex(/^[A-Za-z0-9._~-]+$/),
-					),
-				),
+				v.optional(PkceCodeChallenge),
 				query.code_challenge,
 			);
 			if (!success10) {
 				return errorRedirect("invalid_request", "invalid code_challenge");
 			}
 			const { output: codeChallengeMethod, success: success11 } = v.safeParse(
-				v.optional(v.literal("S256")),
+				v.optional(PkceCodeChallengeMethod),
 				query.code_challenge_method,
 			);
 			if (!success11) {
@@ -255,12 +252,10 @@ const route = app
 					"code_challenge required when code_challenge_method is specified",
 				);
 			}
-			if (codeChallenge && !codeChallengeMethod) {
-				return errorRedirect(
-					"invalid_request",
-					"code_challenge_method=S256 required when code_challenge is specified",
-				);
-			}
+			const storedCodeChallengeMethod = codeChallenge
+				? // RFC 7636 Section 4.3 defaults omitted code_challenge_method to plain.
+					(codeChallengeMethod ?? "plain")
+				: undefined;
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
 
@@ -390,7 +385,7 @@ const route = app
 				oidcNonce: nonce,
 				oidcAuthTime: loggedInAt,
 				codeChallenge,
-				codeChallengeMethod,
+				codeChallengeMethod: storedCodeChallengeMethod,
 				clientInfo: client,
 			};
 		}),

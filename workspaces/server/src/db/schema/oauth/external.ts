@@ -89,7 +89,7 @@ export const oauthTokens = sqliteTable(
 		redirectUri: text("redirect_uri"),
 		codeChallenge: text("code_challenge"),
 		codeChallengeMethod: text("code_challenge_method", {
-			enum: ["S256"],
+			enum: ["plain", "S256"],
 		}),
 		oidcNonce: text("oidc_nonce"),
 		oidcAuthTime: int("oidc_auth_time"), // int のままにしたほうが使い勝手がいいので、 timestamp としては扱わない
