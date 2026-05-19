@@ -55,9 +55,7 @@ const route = app
 				secrets.map(async (secret) => ({
 					...secret,
 					// secret は 8bit * 39 = 312bit = 6bit * 52 -> 52 文字
-					secret: secret.secret.startsWith("******")
-						? secret.secret
-						: maskClientSecret(secret.secret),
+					secret: maskClientSecret(secret.secretSuffix ?? secret.secret),
 					// こうしてしまうと削除時などに secret が特定できないので、 hash を生成
 					secretHash:
 						secret.secretHash ??
