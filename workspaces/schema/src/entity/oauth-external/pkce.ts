@@ -3,6 +3,7 @@ import * as v from "valibot";
 // RFC 7636: https://www.rfc-editor.org/rfc/rfc7636
 export const PKCE_CODE_CHALLENGE_METHODS = ["plain", "S256"] as const;
 
+// Section 4.2
 export const PkceCodeChallenge = v.pipe(
 	v.string(),
 	v.minLength(43),
@@ -16,6 +17,7 @@ export type PkceCodeChallengeMethod = v.InferOutput<
 	typeof PkceCodeChallengeMethod
 >;
 
+// Section 4.1
 export const PkceCodeVerifier = v.pipe(
 	v.string(),
 	v.minLength(43),
