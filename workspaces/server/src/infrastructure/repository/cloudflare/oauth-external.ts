@@ -6,11 +6,15 @@ import {
 	ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
+import {
+	generateClientSecretHash,
+	maskClientSecret,
+} from "../../../utils/oauth/client-secret";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
 
@@ -43,18 +47,6 @@ const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	displayName: user.profile.displayName ?? undefined,
 	profileImageURL: user.profile.profileImageURL ?? undefined,
 });
-
-const generateSecretHash = async (secret: string) => {
-	const hashBuffer = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(secret),
-	);
-	return Array.from(new Uint8Array(hashBuffer))
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
-};
-
-const maskSecret = (secret: string) => `******${secret.slice(-6)}`;
 
 export class CloudflareOAuthExternalRepository
 	implements IOAuthExternalRepository
@@ -94,7 +86,7 @@ export class CloudflareOAuthExternalRepository
 			secrets: client.secrets.map((secret) => ({
 				...secret,
 				secret: secret.secretHash
-					? maskSecret(secret.secretSuffix ?? secret.secret)
+					? maskClientSecret(secret.secretSuffix ?? secret.secret)
 					: secret.secret,
 			})),
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
@@ -156,7 +148,7 @@ export class CloudflareOAuthExternalRepository
 
 	async generateClientSecret(clientId: string, userId: string) {
 		const secret = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
-		const secretHash = await generateSecretHash(secret);
+		const secretHash = await generateClientSecretHash(secret);
 
 		const res = await this.client.insert(schema.oauthClientSecrets).values({
 			clientId,
@@ -176,7 +168,7 @@ export class CloudflareOAuthExternalRepository
 		const secrets = await this.client.query.oauthClientSecrets.findMany({
 			where: (clientSecret, { eq }) => eq(clientSecret.clientId, clientId),
 		});
-		const secretHash = await generateSecretHash(secret);
+		const secretHash = await generateClientSecretHash(secret);
 		return secrets.some((clientSecret) => {
 			if (clientSecret.secretHash)
 				return clientSecret.secretHash === secretHash;
@@ -195,10 +187,7 @@ export class CloudflareOAuthExternalRepository
 			.where(
 				and(
 					eq(schema.oauthClientSecrets.clientId, clientId),
-					or(
-						eq(schema.oauthClientSecrets.secret, secret),
-						eq(schema.oauthClientSecrets.secretHash, secret),
-					),
+					eq(schema.oauthClientSecrets.secret, secret),
 				),
 			);
 
@@ -211,10 +200,7 @@ export class CloudflareOAuthExternalRepository
 			.where(
 				and(
 					eq(schema.oauthClientSecrets.clientId, clientId),
-					or(
-						eq(schema.oauthClientSecrets.secret, secret),
-						eq(schema.oauthClientSecrets.secretHash, secret),
-					),
+					eq(schema.oauthClientSecrets.secret, secret),
 				),
 			);
 

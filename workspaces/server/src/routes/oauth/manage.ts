@@ -6,20 +6,12 @@ import { optimizeImage } from "wasm-image-optimization";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 import { vValidatorForFormdata } from "../../middleware/v-validator";
+import {
+	generateClientSecretHash,
+	maskClientSecret,
+} from "../../utils/oauth/client-secret";
 
 const app = factory.createApp();
-
-const generateHash = async (secret: string) => {
-	const hashBuffer = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(secret),
-	);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
-	return hashHex;
-};
 
 const verifyOAuthClientMiddleware = factory.createMiddleware(
 	async (c, next) => {
@@ -65,9 +57,11 @@ const route = app
 					// secret は 8bit * 39 = 312bit = 6bit * 52 -> 52 文字
 					secret: secret.secret.startsWith("******")
 						? secret.secret
-						: `******${secret.secret.slice(-6)}`,
+						: maskClientSecret(secret.secret),
 					// こうしてしまうと削除時などに secret が特定できないので、 hash を生成
-					secretHash: secret.secretHash ?? (await generateHash(secret.secret)),
+					secretHash:
+						secret.secretHash ??
+						(await generateClientSecretHash(secret.secret)),
 				})),
 			),
 		});
@@ -247,7 +241,7 @@ const route = app
 
 			return c.json({
 				secret,
-				secretHash: await generateHash(secret),
+				secretHash: await generateClientSecretHash(secret),
 			});
 		},
 	)
@@ -266,7 +260,7 @@ const route = app
 
 			for (const secret of client.secrets) {
 				const knownSecretHash =
-					secret.secretHash ?? (await generateHash(secret.secret));
+					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
 				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.updateClientSecretDescription(
 						clientId,
@@ -291,7 +285,7 @@ const route = app
 
 			for (const secret of client.secrets) {
 				const knownSecretHash =
-					secret.secretHash ?? (await generateHash(secret.secret));
+					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
 				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.deleteClientSecret(
 						clientId,
