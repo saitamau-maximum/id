@@ -22,7 +22,7 @@ export const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 export const TOKEN_ENDPOINT = "/oauth/access-token";
 
 const JWT_EXPIRATION = 300;
-const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
+export const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 const TEST_SECRET = "test-secret";
 
 export const generateCodeChallenge = async (codeVerifier: string) => {
@@ -60,9 +60,13 @@ export const createOAuthTestContext = async () => {
 		.route("/.well-known", wellKnownRoute);
 
 	const setup = async (scopes?: ScopeId[], callbackUrls?: string[]) => {
+		// ユーザー作成
+		// ユーザーが存在しないと OAuth App を登録できない
 		const userId = await userRepository.createUser({});
+		// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
 		await userRepository.registerUser(userId, {});
 
+		// Cookie 生成
 		const now = Math.floor(Date.now() / 1000);
 		const jwt = await sign(
 			{
@@ -73,10 +77,12 @@ export const createOAuthTestContext = async () => {
 			TEST_SECRET,
 			JWT_ALG,
 		);
+		// "key=value; Path=/; ..." になっているので key=value だけ取り出す
 		const cookie = (
 			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, TEST_SECRET)
 		).split(";")[0];
 
+		// OAuth Client 登録
 		const clientId = crypto.randomUUID();
 		await oauthExternalRepository.registerClient(
 			clientId,
@@ -91,6 +97,11 @@ export const createOAuthTestContext = async () => {
 		return { userId, cookie, clientId };
 	};
 
+	/**
+	 * 認可画面で「承認する」を押してリダイレクトされるまでの処理を模擬する
+	 * @param html - Authorization Endpoint のレスポンス HTML
+	 * @returns リダイレクト先 URL (redirect_uri)
+	 */
 	const authorize = async (html: string, cookie: string): Promise<URL> => {
 		const postTo = html.match(/<form .*? action="(.*?)"/)?.[1];
 		const inputs = Object.fromEntries(
@@ -114,6 +125,12 @@ export const createOAuthTestContext = async () => {
 		return new URL(redirectUrl);
 	};
 
+	/**
+	 * Authorization Code Grant の code 取得までを実行する
+	 * 1. ユーザー作成 / OAuth App 登録
+	 * 2. Authorization Endpoint にリクエストし、認可する
+	 * 3. Redirect URI に返ってくる
+	 */
 	const doAuthFlow = async (scopes?: ScopeId[], redirectUris?: string[]) => {
 		const { userId, cookie, clientId } = await setup(scopes, redirectUris);
 		const params = new URLSearchParams({
@@ -154,6 +171,7 @@ export const createOAuthTestContext = async () => {
 		app,
 		oauthExternalRepository,
 		setup,
+		authorize,
 		doAuthFlow,
 		doAuthFlowWithParams,
 	};

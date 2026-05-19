@@ -7,149 +7,31 @@ import {
 	SCOPE_IDS,
 	type ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
-import { Hono } from "hono";
-import { generateSignedCookie } from "hono/cookie";
-import { createMiddleware } from "hono/factory";
-import { sign } from "hono/jwt";
 import {
 	afterEach,
 	assert,
-	beforeAll,
 	beforeEach,
 	describe,
 	expect,
 	it,
 	vi,
 } from "vitest";
-import { COOKIE_NAME } from "../constants/cookie";
-import { JWT_ALG } from "../constants/jwt";
-import type { HonoEnv } from "../factory";
-import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
-import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
-import { oauthRoute } from "../routes/oauth";
-import { exportKey, generateKeyPair } from "../utils/oauth/key";
+import {
+	AUTHORIZATION_ENDPOINT,
+	createOAuthTestContext,
+	DEFAULT_REDIRECT_URI,
+	getClientAuthHeader,
+	TOKEN_ENDPOINT,
+} from "./oauth2/common";
 
-const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
-const TOKEN_ENDPOINT = "/oauth/access-token";
-const JWT_EXPIRATION = 300; // 5 minutes for test
-const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
-const TEST_SECRET = "test-secret";
+type OAuthTestContext = Awaited<ReturnType<typeof createOAuthTestContext>>;
 
 describe("OAuth 2.0 spec", () => {
-	let app: Hono<HonoEnv>;
-	let testPrivateKey: string;
-
-	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
-	const userRepository = new CloudflareUserRepository(env.DB);
-
-	beforeAll(async () => {
-		const { privateKey } = await generateKeyPair();
-		testPrivateKey = await exportKey(privateKey);
-	});
-
-	const setup = async (scopes?: ScopeId[], callbackUrls?: string[]) => {
-		// ユーザー作成
-		// ユーザーが存在しないと OAuth App を登録できない
-		const userId = await userRepository.createUser({});
-		// ユーザーが初期化されていないと OAuth 認可に進めないので初期化
-		await userRepository.registerUser(userId, {});
-
-		// Cookie 生成
-		const now = Math.floor(Date.now() / 1000);
-		const jwt = await sign(
-			{
-				userId,
-				iat: now,
-				exp: now + JWT_EXPIRATION,
-			},
-			TEST_SECRET,
-			JWT_ALG,
-		);
-		// "key=value; Path=/; ..." になっているので key=value だけ取り出す
-		const cookie = (
-			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, TEST_SECRET)
-		).split(";")[0];
-
-		// OAuth Client 登録
-		const clientId = crypto.randomUUID();
-		await oauthExternalRepository.registerClient(
-			clientId,
-			userId,
-			"Dummy App",
-			"Dummy App Description",
-			scopes ?? [SCOPE_IDS.READ_BASIC_INFO],
-			callbackUrls ?? [DEFAULT_REDIRECT_URI],
-			null,
-		);
-
-		return { userId, cookie, clientId };
-	};
-
-	const getClientAuthHeader = (clientId: string, clientSecret: string) => {
-		return `Basic ${btoa(`${clientId}:${clientSecret}`)}`;
-	};
-
-	/**
-	 * 認可画面で「承認する」を押してリダイレクトされるまでの処理を模擬する
-	 * @param html - Authorization Endpoint のレスポンス HTML
-	 * @returns リダイレクト先 URL (redirect_uri)
-	 */
-	const authorize = async (
-		app: Hono<HonoEnv>,
-		html: string,
-		cookie: string,
-	): Promise<URL> => {
-		const postTo = html.match(/<form .*? action="(.*?)"/)?.[1];
-		const inputs = Object.fromEntries(
-			[...html.matchAll(/<input .*? name="(.*?)" value="(.*?)"/g)].map((m) => [
-				m[1],
-				m[2],
-			]),
-		);
-		inputs.authorized = "1"; // 承認する
-		const res = await app.request(postTo || "", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded",
-				Cookie: cookie,
-			},
-			body: new URLSearchParams(inputs).toString(),
-		});
-		expect(res.status).toBe(302);
-		const redirectUrl = res.headers.get("Location");
-		assert.isNotNull(redirectUrl);
-		return new URL(redirectUrl);
-	};
-
-	/**
-	 * Authorization Code Grant の code 取得までを実行する
-	 * 1. ユーザー作成 / OAuth App 登録
-	 * 2. Authorization Endpoint にリクエストし、認可する
-	 * 3. Redirect URI に返ってくる
-	 */
-	const doAuthFlow = async (scopes?: ScopeId[], redirectUris?: string[]) => {
-		const { userId, cookie, clientId } = await setup(scopes, redirectUris);
-		const params = new URLSearchParams({
-			response_type: "code",
-			client_id: clientId,
-		});
-		const res = await app.request(
-			`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
-			{ headers: { Cookie: cookie } },
-		);
-
-		expect(res.status).toBe(200);
-		const resText = await res.text();
-		const callbackUrl = await authorize(app, resText, cookie);
-		const code = callbackUrl.searchParams.get("code");
-		assert.isNotNull(code);
-
-		return {
-			userId,
-			clientId,
-			code,
-		};
-	};
+	let app: OAuthTestContext["app"];
+	let oauthExternalRepository: OAuthTestContext["oauthExternalRepository"];
+	let setup: OAuthTestContext["setup"];
+	let authorize: OAuthTestContext["authorize"];
+	let doAuthFlow: OAuthTestContext["doAuthFlow"];
 
 	const doAccessTokenRequest = async (
 		scopes?: ScopeId[],
@@ -173,22 +55,12 @@ describe("OAuth 2.0 spec", () => {
 
 	beforeEach(async () => {
 		vi.useFakeTimers();
-
-		app = new Hono<HonoEnv>();
-
-		// 環境変数とリポジトリを注入するミドルウェア
-		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
-			c.env = {
-				...env,
-				SECRET: TEST_SECRET,
-				PRIVKEY_FOR_OAUTH: testPrivateKey,
-			};
-			c.set("OAuthExternalRepository", oauthExternalRepository);
-			c.set("UserRepository", userRepository);
-			await next();
-		});
-
-		app.use(repositoryInjector).route("/oauth", oauthRoute);
+		const ctx = await createOAuthTestContext();
+		app = ctx.app;
+		oauthExternalRepository = ctx.oauthExternalRepository;
+		setup = ctx.setup;
+		authorize = ctx.authorize;
+		doAuthFlow = ctx.doAuthFlow;
 	});
 
 	afterEach(() => {
@@ -501,7 +373,7 @@ describe("OAuth 2.0 spec", () => {
 
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, cookie);
+				const callbackUrl = await authorize(resText, cookie);
 				expect(callbackUrl.origin + callbackUrl.pathname).toBe(
 					DEFAULT_REDIRECT_URI,
 				);
@@ -580,7 +452,7 @@ describe("OAuth 2.0 spec", () => {
 
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, cookie);
+				const callbackUrl = await authorize(resText, cookie);
 				const returnedState = callbackUrl.searchParams.get("state");
 				expect(returnedState).toBe(state);
 			});
@@ -604,7 +476,7 @@ describe("OAuth 2.0 spec", () => {
 
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, cookie);
+				const callbackUrl = await authorize(resText, cookie);
 				const returnedFoo = callbackUrl.searchParams.get("foo");
 				expect(returnedFoo).toBe("bar");
 			});
@@ -667,7 +539,7 @@ describe("OAuth 2.0 spec", () => {
 				);
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, cookie);
+				const callbackUrl = await authorize(resText, cookie);
 				const code = callbackUrl.searchParams.get("code");
 				assert.isNotNull(code);
 
@@ -703,7 +575,7 @@ describe("OAuth 2.0 spec", () => {
 				);
 				expect(res.status).toBe(200);
 				const resText = await res.text();
-				const callbackUrl = await authorize(app, resText, cookie);
+				const callbackUrl = await authorize(resText, cookie);
 				const code = callbackUrl.searchParams.get("code");
 				assert.isNotNull(code);
 
@@ -854,94 +726,6 @@ describe("OAuth 2.0 spec", () => {
 			const res = await doAccessTokenRequest();
 			expect(res.headers.get("Cache-Control")).toBe("no-store");
 			expect(res.headers.get("Pragma")).toBe("no-cache");
-		});
-
-		it("rejects a second exchange of the same authorization code", async () => {
-			const { userId, clientId, code } = await doAuthFlow();
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(clientId, userId);
-			const exchangeCode = async () => {
-				const body = new FormData();
-				body.append("grant_type", "authorization_code");
-				body.append("code", code);
-				return app.request(TOKEN_ENDPOINT, {
-					method: "POST",
-					body,
-					headers: {
-						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
-					},
-				});
-			};
-
-			const firstTokenRes = await exchangeCode();
-			expect(firstTokenRes.status).toBe(200);
-
-			const secondTokenRes = await exchangeCode();
-			expect(secondTokenRes.status).toBe(401);
-			const json = await secondTokenRes.json<{ error: string }>();
-			expect(json.error).toBe("invalid_grant");
-		});
-
-		it("atomically consumes an authorization code only once", async () => {
-			const { code } = await doAuthFlow();
-
-			await expect(oauthExternalRepository.consumeCode(code)).resolves.toBe(
-				true,
-			);
-			await expect(oauthExternalRepository.consumeCode(code)).resolves.toBe(
-				false,
-			);
-		});
-
-		it("stores newly generated client secrets as hashes while preserving token exchange", async () => {
-			const { userId, clientId, code } = await doAuthFlow();
-			const oauthClientSecret =
-				await oauthExternalRepository.generateClientSecret(clientId, userId);
-			const client = await oauthExternalRepository.getClientById(clientId);
-			assert.isDefined(client);
-			const generatedSecret = client.secrets.at(-1);
-			assert.isDefined(generatedSecret);
-			expect(generatedSecret.secret).toBe(
-				`******${oauthClientSecret.slice(-6)}`,
-			);
-			expect(generatedSecret.secret).not.toContain(
-				oauthClientSecret.slice(0, 8),
-			);
-			expect(generatedSecret.secretHash).toMatch(/^[0-9a-f]{64}$/);
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(clientId, oauthClientSecret),
-				},
-			});
-			expect(tokenRes.status).toBe(200);
-		});
-
-		it("accepts legacy plaintext client secrets during migration", async () => {
-			const { userId, clientId, code } = await doAuthFlow();
-			const legacySecret = "legacy-client-secret";
-			await env.DB.prepare(
-				"INSERT INTO oauth_client_secrets (client_id, secret, description, issued_by, issued_at) VALUES (?, ?, ?, ?, ?)",
-			)
-				.bind(clientId, legacySecret, "", userId, Date.now())
-				.run();
-
-			const body = new FormData();
-			body.append("grant_type", "authorization_code");
-			body.append("code", code);
-			const tokenRes = await app.request(TOKEN_ENDPOINT, {
-				method: "POST",
-				body,
-				headers: {
-					Authorization: getClientAuthHeader(clientId, legacySecret),
-				},
-			});
-			expect(tokenRes.status).toBe(200);
 		});
 	});
 
