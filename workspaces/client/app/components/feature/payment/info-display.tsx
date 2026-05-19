@@ -20,18 +20,22 @@ export const PaymentInfoDisplay = () => {
 
 	if (!user || !user.initializedAt) return null;
 
-	// 今年度登録したユーザーは、 3 月までの残り月数から会費を計算する
+	// 招待リンクの発行日時を基準に会費を計算する
+	// inviteIssuedAt がない場合（招待リンク発行日時記録前に登録したユーザー）は initializedAt にフォールバック
+	const baseDate = user.inviteIssuedAt ?? user.initializedAt;
+
+	// 今年度に招待されたユーザーは、 3 月までの残り月数から会費を計算する
 	// そうでない場合、会費は 1 年分とする
 	const remainingMonth =
-		getFiscalYear(user.initializedAt) === getFiscalYear(new Date())
-			? 12 - ((user.initializedAt.getMonth() - 3 + 12) % 12)
+		getFiscalYear(baseDate) === getFiscalYear(new Date())
+			? 12 - ((baseDate.getMonth() - 3 + 12) % 12)
 			: 12;
 
-	// 4 月登録: 12 - (3 - 3 + 12) % 12 = 12
-	// 5 月登録: 12 - (4 - 3 + 12) % 12 = 11
+	// 4 月招待: 12 - (3 - 3 + 12) % 12 = 12
+	// 5 月招待: 12 - (4 - 3 + 12) % 12 = 11
 	// ...
-	// 2 月登録: 12 - (1 - 3 + 12) % 12 = 2
-	// 3 月登録: 12 - (2 - 3 + 12) % 12 = 1
+	// 2 月招待: 12 - (1 - 3 + 12) % 12 = 2
+	// 3 月招待: 12 - (2 - 3 + 12) % 12 = 1
 
 	const membershipPrice = remainingMonth * 250;
 

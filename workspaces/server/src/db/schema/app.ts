@@ -32,6 +32,8 @@ export const users = sqliteTable("users", {
 	}),
 	/* 最終ログイン日時 */
 	lastLoginAt: integer("last_login_at", { mode: "timestamp" }),
+	/* 招待リンクが発行された日時。会費計算の基準に使用する。 */
+	inviteIssuedAt: integer("invite_issued_at", { mode: "timestamp" }),
 });
 
 export const usersRelations = relations(users, ({ one, many }) => ({

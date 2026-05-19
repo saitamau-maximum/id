@@ -1,0 +1,1 @@
+ALTER TABLE `users` ADD `invite_issued_at` integer;

@@ -239,6 +239,13 @@
 			"when": 1778645607653,
 			"tag": "0033_new_senator_kelly",
 			"breakpoints": true
+		},
+		{
+			"idx": 34,
+			"version": "6",
+			"when": 1779186910735,
+			"tag": "0034_sudden_nomad",
+			"breakpoints": true
 		}
 	]
 }
