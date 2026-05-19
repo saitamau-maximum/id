@@ -9,7 +9,6 @@ import { factory } from "../factory";
 import { claimsSupported, iss } from "../utils/oauth/constant";
 
 const app = factory.createApp();
-app.use(cors());
 
 const scopesSupported = Object.values(SCOPES_BY_ID).map((scope) => scope.name);
 
@@ -70,6 +69,7 @@ const openidProviderMetadata = {
 } as const;
 
 const route = app
+	.use(cors())
 	.get("/openid-configuration", (c) => {
 		return c.json(openidProviderMetadata, 200);
 	})
