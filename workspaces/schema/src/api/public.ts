@@ -1,6 +1,7 @@
 import * as v from "valibot";
 import { CertificationSummary } from "../entity/certification";
 import { PublicMember } from "../entity/member";
+import { Role } from "../entity/role";
 
 export const GetPublicMemberResponse = v.union([
 	v.object({
@@ -23,12 +24,7 @@ export type GetCertificationsResponse = v.InferOutput<
 >;
 
 export const GetRolesResponse = v.array(
-	v.object({
-		id: v.number(),
-		slug: v.string(),
-		name: v.string(),
-		color: v.string(),
-	}),
+	v.pick(Role, ["id", "slug", "name", "color"]),
 );
 export type GetRolesResponse = v.InferOutput<typeof GetRolesResponse>;
 
