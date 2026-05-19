@@ -204,6 +204,7 @@ const route = app
 								email: userInfo.email,
 							}
 						: {}),
+					roles: userInfo.roles.map((r) => r.slug),
 				});
 			}
 

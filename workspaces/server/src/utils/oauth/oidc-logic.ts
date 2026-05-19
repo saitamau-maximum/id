@@ -8,6 +8,10 @@ type OidcIdTokenClaims = Pick<
 	"name" | "nickname" | "preferred_username" | "picture" | "email"
 >;
 
+type OidcIdTokenCustomClaims = {
+	roles: string[];
+};
+
 interface OidcIdTokenPayloadBase {
 	iss: string;
 	sub: string;
@@ -19,7 +23,9 @@ interface OidcIdTokenPayloadBase {
 	// acr, amr, azp は使わないので省略
 	at_hash: string;
 }
-type OidcIdTokenPayload = OidcIdTokenPayloadBase & OidcIdTokenClaims;
+type OidcIdTokenPayload = OidcIdTokenPayloadBase &
+	OidcIdTokenClaims &
+	OidcIdTokenCustomClaims;
 
 interface ParamBase {
 	clientId: string;
@@ -30,7 +36,7 @@ interface ParamBase {
 	accessToken: string;
 	privateKey: string;
 }
-type Param = ParamBase & OidcIdTokenClaims;
+type Param = ParamBase & OidcIdTokenClaims & OidcIdTokenCustomClaims;
 
 const signJWT = async (
 	payload: OidcIdTokenPayload,

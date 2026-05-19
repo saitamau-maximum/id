@@ -176,6 +176,8 @@ const route = app
 									email: userInfo.email,
 								}
 							: {}),
+						// Custom Claim
+						roles: userInfo.roles.map((r) => r.slug),
 					});
 
 					res.append("id_token", id_token);
