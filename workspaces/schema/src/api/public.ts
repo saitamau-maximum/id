@@ -22,6 +22,16 @@ export type GetCertificationsResponse = v.InferOutput<
 	typeof GetCertificationsResponse
 >;
 
+export const GetRolesResponse = v.array(
+	v.object({
+		id: v.number(),
+		slug: v.string(),
+		name: v.string(),
+		color: v.string(),
+	}),
+);
+export type GetRolesResponse = v.InferOutput<typeof GetRolesResponse>;
+
 export const GetAffiliationsSummaryResponse = v.record(
 	v.string(),
 	v.pipe(v.number(), v.integer(), v.minValue(0)),
