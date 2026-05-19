@@ -2,12 +2,14 @@ import {
 	ALLOWED_RESPONSE_MODES,
 	ALLOWED_RESPONSE_TYPES,
 } from "@idp/schema/constants/oauth-external";
+import { PKCE_CODE_CHALLENGE_METHODS } from "@idp/schema/entity/oauth-external/pkce";
 import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
 import { cors } from "hono/cors";
 import { factory } from "../factory";
 import { claimsSupported, iss } from "../utils/oauth/constant";
 
 const app = factory.createApp();
+app.use(cors());
 
 const scopesSupported = Object.values(SCOPES_BY_ID).map((scope) => scope.name);
 
@@ -26,10 +28,20 @@ const oauthAuthorizationServerMetadata = {
 		"client_secret_basic",
 		"client_secret_post",
 	],
-	code_challenge_methods_supported: ["S256"],
+	// token_endpoint_auth_signing_alg_values_supported: [], // 未実装
 	service_documentation:
 		"https://github.com/saitamau-maximum/id/wiki/oauth-docs",
 	ui_locales_supported: ["ja-JP"],
+	// 以下未実装
+	// op_policy_uri: "",
+	// op_tos_uri: "",
+	// revocation_endpoint: "",
+	// revocation_endpoint_auth_methods_supported: [],
+	// revocation_endpoint_auth_signing_alg_values_supported: [],
+	// introspection_endpoint: "",
+	// introspection_endpoint_auth_methods_supported: [],
+	// introspection_endpoint_auth_signing_alg_values_supported: [],
+	code_challenge_methods_supported: PKCE_CODE_CHALLENGE_METHODS,
 } as const;
 
 // OpenID Connect Discovery Section 3: https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderMetadata
@@ -55,16 +67,14 @@ const openidProviderMetadata = {
 	request_parameter_supported: false, // request parameter (OIDC Core section 6) は未実装
 	request_uri_parameter_supported: false, // request_uri parameter (OIDC Core section 6) は未実装
 	// require_request_uri_registration: false,
-	// op_policy_uri: "", // OIDC Client 向けの IdP のプライバシーポリシーなんて存在しない
-	// op_tos_uri: "", // OIDC Client 向けの IdP の利用規約なんて存在しない
 } as const;
 
 const route = app
-	.get("/openid-configuration", cors(), (c) => {
+	.get("/openid-configuration", (c) => {
 		return c.json(openidProviderMetadata, 200);
 	})
 	// RFC 8414 Section 3.1: https://www.rfc-editor.org/rfc/rfc8414#section-3.1
-	.get("/oauth-authorization-server", cors(), (c) => {
+	.get("/oauth-authorization-server", (c) => {
 		return c.json(oauthAuthorizationServerMetadata, 200);
 	});
 
