@@ -2,6 +2,7 @@ import type {
 	GetAffiliationsSummaryResponse,
 	GetCertificationsResponse,
 	GetPublicMemberResponse,
+	GetRolesResponse,
 } from "@idp/schema/api/public";
 import {
 	GRADE_BY_ID,
@@ -47,7 +48,7 @@ const route = app
 		);
 	})
 	.get("/roles", async (c) => {
-		return c.json(
+		return c.json<GetRolesResponse>(
 			Object.values(ROLE_BY_ID).map((r) => ({
 				id: r.id,
 				slug: r.slug,
