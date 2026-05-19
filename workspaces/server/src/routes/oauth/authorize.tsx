@@ -253,7 +253,7 @@ const route = app
 				);
 			}
 			const storedCodeChallengeMethod = codeChallenge
-				? // RFC 7636 Section 4.3 defaults omitted code_challenge_method to plain.
+				? // code_challenge_method のデフォルト値は plain
 					(codeChallengeMethod ?? "plain")
 				: undefined;
 			// TODO: その他のパラメータもチェックする

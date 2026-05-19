@@ -7,7 +7,7 @@ import {
 	TOKEN_ENDPOINT,
 } from "./common";
 
-describe("RFC 7636 PKCE", () => {
+describe("RFC 7636: PKCE", () => {
 	let ctx: Awaited<ReturnType<typeof createOAuthTestContext>>;
 
 	beforeEach(async () => {
@@ -128,6 +128,34 @@ describe("RFC 7636 PKCE", () => {
 			new URLSearchParams({
 				code_challenge: codeChallenge,
 				code_challenge_method: "S256",
+			}),
+		);
+		const oauthClientSecret =
+			await ctx.oauthExternalRepository.generateClientSecret(clientId, userId);
+
+		const body = new FormData();
+		body.append("grant_type", "authorization_code");
+		body.append("code", code);
+		body.append(
+			"code_verifier",
+			"wrong56789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+		);
+		const tokenRes = await ctx.app.request(TOKEN_ENDPOINT, {
+			method: "POST",
+			body,
+			headers: {
+				Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+			},
+		});
+		expect(tokenRes.status).toBe(401);
+	});
+
+	it("rejects a plain PKCE-protected code when code_verifier does not match", async () => {
+		const codeVerifier = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN";
+		const { userId, clientId, code } = await ctx.doAuthFlowWithParams(
+			new URLSearchParams({
+				code_challenge: codeVerifier,
+				code_challenge_method: "plain",
 			}),
 		);
 		const oauthClientSecret =
