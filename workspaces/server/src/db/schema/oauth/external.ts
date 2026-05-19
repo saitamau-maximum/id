@@ -40,6 +40,8 @@ export const oauthClientSecrets = sqliteTable(
 			.notNull()
 			.references(() => oauthClients.id),
 		secret: text("secret").notNull(),
+		secretHash: text("secret_hash"),
+		secretSuffix: text("secret_suffix"),
 		description: text("description"),
 		issuedBy: text("issued_by")
 			.notNull()
@@ -85,6 +87,10 @@ export const oauthTokens = sqliteTable(
 		codeExpiresAt: int("code_expires_at", { mode: "timestamp_ms" }).notNull(),
 		codeUsed: int("code_used", { mode: "boolean" }).notNull(),
 		redirectUri: text("redirect_uri"),
+		codeChallenge: text("code_challenge"),
+		codeChallengeMethod: text("code_challenge_method", {
+			enum: ["S256"],
+		}),
 		oidcNonce: text("oidc_nonce"),
 		oidcAuthTime: int("oidc_auth_time"), // int のままにしたほうが使い勝手がいいので、 timestamp としては扱わない
 		accessToken: text("access_token").notNull().unique(),

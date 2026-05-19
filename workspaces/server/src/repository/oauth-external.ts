@@ -44,6 +44,7 @@ export type IOAuthExternalRepository = {
 	getClients: () => Promise<GetClientsRes[]>;
 	updateManagers: (clientId: string, userIds: string[]) => Promise<void>;
 	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
+	verifyClientSecret: (clientId: string, secret: string) => Promise<boolean>;
 	updateClientSecretDescription: (
 		clientId: string,
 		secret: string,
@@ -77,12 +78,14 @@ export type IOAuthExternalRepository = {
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		codeChallenge?: string,
+		codeChallengeMethod?: "S256",
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;
-	setCodeUsed: (code: string) => Promise<void>;
+	consumeCode: (code: string) => Promise<boolean>;
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;

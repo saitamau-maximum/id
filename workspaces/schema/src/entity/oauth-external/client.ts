@@ -14,6 +14,8 @@ export type Client = v.InferOutput<typeof Client>;
 export const ClientSecret = v.object({
 	clientId: Client.entries.id,
 	secret: v.string(),
+	secretHash: v.nullable(v.string()),
+	secretSuffix: v.nullable(v.string()),
 	description: v.nullable(v.string()),
 	issuedBy: User.entries.id,
 	issuedAt: v.date(),
@@ -54,6 +56,8 @@ export const ClientToken = v.object({
 	codeExpiresAt: v.date(),
 	codeUsed: v.boolean(),
 	redirectUri: v.nullable(v.pipe(v.string(), v.url())),
+	codeChallenge: v.nullable(v.string()),
+	codeChallengeMethod: v.nullable(v.literal("S256")),
 	accessToken: v.string(),
 	accessTokenExpiresAt: v.date(),
 });

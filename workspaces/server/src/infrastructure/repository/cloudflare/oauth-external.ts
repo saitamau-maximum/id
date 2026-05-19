@@ -5,7 +5,7 @@ import {
 	ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
@@ -43,6 +43,18 @@ const USER_BASIC_INFO_TRANSFORMER = (user: UserBasicInfoRawData) => ({
 	profileImageURL: user.profile.profileImageURL ?? undefined,
 });
 
+const generateSecretHash = async (secret: string) => {
+	const hashBuffer = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(secret),
+	);
+	return Array.from(new Uint8Array(hashBuffer))
+		.map((b) => b.toString(16).padStart(2, "0"))
+		.join("");
+};
+
+const maskSecret = (secret: string) => `******${secret.slice(-6)}`;
+
 export class CloudflareOAuthExternalRepository
 	implements IOAuthExternalRepository
 {
@@ -78,6 +90,12 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...client,
+			secrets: client.secrets.map((secret) => ({
+				...secret,
+				secret: secret.secretHash
+					? maskSecret(secret.secretSuffix ?? secret.secret)
+					: secret.secret,
+			})),
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes
 				.map((clientScope) => clientScope.scopeId) // 型ガードを通すため scopeId で map し filter する
@@ -137,10 +155,13 @@ export class CloudflareOAuthExternalRepository
 
 	async generateClientSecret(clientId: string, userId: string) {
 		const secret = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
+		const secretHash = await generateSecretHash(secret);
 
 		const res = await this.client.insert(schema.oauthClientSecrets).values({
 			clientId,
-			secret,
+			secret: secretHash,
+			secretHash,
+			secretSuffix: secret.slice(-6),
 			description: "",
 			issuedAt: new Date(),
 			issuedBy: userId,
@@ -148,6 +169,18 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res.success) throw new Error("Failed to insert secret");
 		return secret;
+	}
+
+	async verifyClientSecret(clientId: string, secret: string) {
+		const secrets = await this.client.query.oauthClientSecrets.findMany({
+			where: (clientSecret, { eq }) => eq(clientSecret.clientId, clientId),
+		});
+		const secretHash = await generateSecretHash(secret);
+		return secrets.some((clientSecret) => {
+			if (clientSecret.secretHash)
+				return clientSecret.secretHash === secretHash;
+			return clientSecret.secret === secret;
+		});
 	}
 
 	async updateClientSecretDescription(
@@ -161,7 +194,10 @@ export class CloudflareOAuthExternalRepository
 			.where(
 				and(
 					eq(schema.oauthClientSecrets.clientId, clientId),
-					eq(schema.oauthClientSecrets.secret, secret),
+					or(
+						eq(schema.oauthClientSecrets.secret, secret),
+						eq(schema.oauthClientSecrets.secretHash, secret),
+					),
 				),
 			);
 
@@ -174,7 +210,10 @@ export class CloudflareOAuthExternalRepository
 			.where(
 				and(
 					eq(schema.oauthClientSecrets.clientId, clientId),
-					eq(schema.oauthClientSecrets.secret, secret),
+					or(
+						eq(schema.oauthClientSecrets.secret, secret),
+						eq(schema.oauthClientSecrets.secretHash, secret),
+					),
 				),
 			);
 
@@ -324,6 +363,8 @@ export class CloudflareOAuthExternalRepository
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		codeChallenge?: string,
+		codeChallengeMethod?: "S256",
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) {
@@ -339,6 +380,8 @@ export class CloudflareOAuthExternalRepository
 				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
+				codeChallenge,
+				codeChallengeMethod,
 				oidcNonce,
 				oidcAuthTime,
 				accessToken,
@@ -415,15 +458,19 @@ export class CloudflareOAuthExternalRepository
 		}
 	}
 
-	async setCodeUsed(code: string) {
+	async consumeCode(code: string) {
 		const res = await this.client
 			.update(schema.oauthTokens)
 			.set({ codeUsed: true })
-			.where(eq(schema.oauthTokens.code, code));
+			.where(
+				and(
+					eq(schema.oauthTokens.code, code),
+					eq(schema.oauthTokens.codeUsed, false),
+				),
+			)
+			.returning({ id: schema.oauthTokens.id });
 
-		if (!res.success) {
-			throw new Error("Failed to set code used");
-		}
+		return res.length === 1;
 	}
 
 	async getTokenByAccessToken(accessToken: string) {

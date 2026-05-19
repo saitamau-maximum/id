@@ -5,6 +5,7 @@ import { env } from "cloudflare:test";
 import type { AccessTokenResponse } from "@idp/schema/api/oauth/access-token";
 import {
 	SCOPE_IDS,
+	SCOPES_BY_ID,
 	type ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { Hono } from "hono";
@@ -14,6 +15,7 @@ import { sign } from "hono/jwt";
 import {
 	afterEach,
 	assert,
+	beforeAll,
 	beforeEach,
 	describe,
 	expect,
@@ -26,17 +28,35 @@ import type { HonoEnv } from "../factory";
 import { CloudflareOAuthExternalRepository } from "../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../infrastructure/repository/cloudflare/user";
 import { oauthRoute } from "../routes/oauth";
+import { wellKnownRoute } from "../routes/well-known";
+import { binaryToBase64Url } from "../utils/oauth/convert-bin-base64";
+import { exportKey, generateKeyPair } from "../utils/oauth/key";
 
 const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
 const TOKEN_ENDPOINT = "/oauth/access-token";
 const JWT_EXPIRATION = 300; // 5 minutes for test
 const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
+const TEST_SECRET = "test-secret";
+
+const generateCodeChallenge = async (codeVerifier: string) => {
+	const hash = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(codeVerifier),
+	);
+	return binaryToBase64Url(new Uint8Array(hash));
+};
 
 describe("OAuth 2.0 spec", () => {
 	let app: Hono<HonoEnv>;
+	let testPrivateKey: string;
 
 	const oauthExternalRepository = new CloudflareOAuthExternalRepository(env.DB);
 	const userRepository = new CloudflareUserRepository(env.DB);
+
+	beforeAll(async () => {
+		const { privateKey } = await generateKeyPair();
+		testPrivateKey = await exportKey(privateKey);
+	});
 
 	const setup = async (scopes?: ScopeId[], callbackUrls?: string[]) => {
 		// ユーザー作成
@@ -53,12 +73,12 @@ describe("OAuth 2.0 spec", () => {
 				iat: now,
 				exp: now + JWT_EXPIRATION,
 			},
-			env.SECRET,
+			TEST_SECRET,
 			JWT_ALG,
 		);
 		// "key=value; Path=/; ..." になっているので key=value だけ取り出す
 		const cookie = (
-			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, env.SECRET)
+			await generateSignedCookie(COOKIE_NAME.LOGIN_STATE, jwt, TEST_SECRET)
 		).split(";")[0];
 
 		// OAuth Client 登録
@@ -142,6 +162,28 @@ describe("OAuth 2.0 spec", () => {
 		};
 	};
 
+	const doAuthFlowWithParams = async (params: URLSearchParams) => {
+		const { userId, cookie, clientId } = await setup();
+		params.set("response_type", params.get("response_type") ?? "code");
+		params.set("client_id", clientId);
+		const res = await app.request(
+			`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+			{ headers: { Cookie: cookie } },
+		);
+
+		expect(res.status).toBe(200);
+		const resText = await res.text();
+		const callbackUrl = await authorize(app, resText, cookie);
+		const code = callbackUrl.searchParams.get("code");
+		assert.isNotNull(code);
+
+		return {
+			userId,
+			clientId,
+			code,
+		};
+	};
+
 	const doAccessTokenRequest = async (
 		scopes?: ScopeId[],
 		redirectUris?: string[],
@@ -169,13 +211,20 @@ describe("OAuth 2.0 spec", () => {
 
 		// 環境変数とリポジトリを注入するミドルウェア
 		const repositoryInjector = createMiddleware<HonoEnv>(async (c, next) => {
-			c.env = env;
+			c.env = {
+				...env,
+				SECRET: TEST_SECRET,
+				PRIVKEY_FOR_OAUTH: testPrivateKey,
+			};
 			c.set("OAuthExternalRepository", oauthExternalRepository);
 			c.set("UserRepository", userRepository);
 			await next();
 		});
 
-		app.use(repositoryInjector).route("/oauth", oauthRoute);
+		app
+			.use(repositoryInjector)
+			.route("/oauth", oauthRoute)
+			.route("/.well-known", wellKnownRoute);
 	});
 
 	afterEach(() => {
@@ -787,6 +836,138 @@ describe("OAuth 2.0 spec", () => {
 					expect(tokenRes.status).toBe(401);
 				}
 			});
+
+			describe("PKCE", () => {
+				it("exchanges a code when the S256 code_verifier matches", async () => {
+					const codeVerifier =
+						"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN";
+					const codeChallenge = await generateCodeChallenge(codeVerifier);
+					const { userId, clientId, code } = await doAuthFlowWithParams(
+						new URLSearchParams({
+							code_challenge: codeChallenge,
+							code_challenge_method: "S256",
+						}),
+					);
+					const oauthClientSecret =
+						await oauthExternalRepository.generateClientSecret(
+							clientId,
+							userId,
+						);
+
+					const body = new FormData();
+					body.append("grant_type", "authorization_code");
+					body.append("code", code);
+					body.append("code_verifier", codeVerifier);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+						headers: {
+							Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+						},
+					});
+					expect(tokenRes.status).toBe(200);
+				});
+
+				it("rejects a PKCE-protected code when code_verifier is missing", async () => {
+					const codeVerifier =
+						"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN";
+					const codeChallenge = await generateCodeChallenge(codeVerifier);
+					const { userId, clientId, code } = await doAuthFlowWithParams(
+						new URLSearchParams({
+							code_challenge: codeChallenge,
+							code_challenge_method: "S256",
+						}),
+					);
+					const oauthClientSecret =
+						await oauthExternalRepository.generateClientSecret(
+							clientId,
+							userId,
+						);
+
+					const body = new FormData();
+					body.append("grant_type", "authorization_code");
+					body.append("code", code);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+						headers: {
+							Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+						},
+					});
+					expect(tokenRes.status).toBe(401);
+					const json = await tokenRes.json<{ error: string }>();
+					expect(json.error).toBe("invalid_grant");
+				});
+
+				it("rejects a PKCE-protected code when code_verifier does not match", async () => {
+					const codeVerifier =
+						"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN";
+					const codeChallenge = await generateCodeChallenge(codeVerifier);
+					const { userId, clientId, code } = await doAuthFlowWithParams(
+						new URLSearchParams({
+							code_challenge: codeChallenge,
+							code_challenge_method: "S256",
+						}),
+					);
+					const oauthClientSecret =
+						await oauthExternalRepository.generateClientSecret(
+							clientId,
+							userId,
+						);
+
+					const body = new FormData();
+					body.append("grant_type", "authorization_code");
+					body.append("code", code);
+					body.append(
+						"code_verifier",
+						"wrong56789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+					);
+					const tokenRes = await app.request(TOKEN_ENDPOINT, {
+						method: "POST",
+						body,
+						headers: {
+							Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+						},
+					});
+					expect(tokenRes.status).toBe(401);
+				});
+
+				it("rejects unsupported code_challenge_method", async () => {
+					const { cookie, clientId } = await setup();
+					const params = new URLSearchParams({
+						response_type: "code",
+						client_id: clientId,
+						code_challenge:
+							"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMN",
+						code_challenge_method: "plain",
+					});
+					const res = await app.request(
+						`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+						{ headers: { Cookie: cookie } },
+					);
+					expect(res.status).toBe(302);
+					expect(res.headers.get("Location") ?? "").contains(
+						"error=invalid_request",
+					);
+				});
+
+				it("rejects code_challenge_method without code_challenge", async () => {
+					const { cookie, clientId } = await setup();
+					const params = new URLSearchParams({
+						response_type: "code",
+						client_id: clientId,
+						code_challenge_method: "S256",
+					});
+					const res = await app.request(
+						`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+						{ headers: { Cookie: cookie } },
+					);
+					expect(res.status).toBe(302);
+					expect(res.headers.get("Location") ?? "").contains(
+						"error=invalid_request",
+					);
+				});
+			});
 		});
 	});
 
@@ -841,6 +1022,129 @@ describe("OAuth 2.0 spec", () => {
 			const res = await doAccessTokenRequest();
 			expect(res.headers.get("Cache-Control")).toBe("no-store");
 			expect(res.headers.get("Pragma")).toBe("no-cache");
+		});
+
+		it("rejects a second exchange of the same authorization code", async () => {
+			const { userId, clientId, code } = await doAuthFlow();
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(clientId, userId);
+			const exchangeCode = async () => {
+				const body = new FormData();
+				body.append("grant_type", "authorization_code");
+				body.append("code", code);
+				return app.request(TOKEN_ENDPOINT, {
+					method: "POST",
+					body,
+					headers: {
+						Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+					},
+				});
+			};
+
+			const firstTokenRes = await exchangeCode();
+			expect(firstTokenRes.status).toBe(200);
+
+			const secondTokenRes = await exchangeCode();
+			expect(secondTokenRes.status).toBe(401);
+			const json = await secondTokenRes.json<{ error: string }>();
+			expect(json.error).toBe("invalid_grant");
+		});
+
+		it("atomically consumes an authorization code only once", async () => {
+			const { code } = await doAuthFlow();
+
+			await expect(oauthExternalRepository.consumeCode(code)).resolves.toBe(
+				true,
+			);
+			await expect(oauthExternalRepository.consumeCode(code)).resolves.toBe(
+				false,
+			);
+		});
+
+		it("stores newly generated client secrets as hashes while preserving token exchange", async () => {
+			const { userId, clientId, code } = await doAuthFlow();
+			const oauthClientSecret =
+				await oauthExternalRepository.generateClientSecret(clientId, userId);
+			const client = await oauthExternalRepository.getClientById(clientId);
+			assert.isDefined(client);
+			const generatedSecret = client.secrets.at(-1);
+			assert.isDefined(generatedSecret);
+			expect(generatedSecret.secret).toBe(
+				`******${oauthClientSecret.slice(-6)}`,
+			);
+			expect(generatedSecret.secret).not.toContain(
+				oauthClientSecret.slice(0, 8),
+			);
+			expect(generatedSecret.secretHash).toMatch(/^[0-9a-f]{64}$/);
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(clientId, oauthClientSecret),
+				},
+			});
+			expect(tokenRes.status).toBe(200);
+		});
+
+		it("accepts legacy plaintext client secrets during migration", async () => {
+			const { userId, clientId, code } = await doAuthFlow();
+			const legacySecret = "legacy-client-secret";
+			await env.DB.prepare(
+				"INSERT INTO oauth_client_secrets (client_id, secret, description, issued_by, issued_at) VALUES (?, ?, ?, ?, ?)",
+			)
+				.bind(clientId, legacySecret, "", userId, Date.now())
+				.run();
+
+			const body = new FormData();
+			body.append("grant_type", "authorization_code");
+			body.append("code", code);
+			const tokenRes = await app.request(TOKEN_ENDPOINT, {
+				method: "POST",
+				body,
+				headers: {
+					Authorization: getClientAuthHeader(clientId, legacySecret),
+				},
+			});
+			expect(tokenRes.status).toBe(200);
+		});
+	});
+
+	describe("Authorization Server Metadata", () => {
+		it("advertises implemented token auth methods and PKCE S256", async () => {
+			const res = await app.request("/.well-known/openid-configuration");
+			expect(res.status).toBe(200);
+			const json = await res.json<{
+				scopes_supported: string[];
+				response_types_supported: string[];
+				token_endpoint_auth_methods_supported: string[];
+				code_challenge_methods_supported: string[];
+			}>();
+			expect(json.scopes_supported).toEqual(
+				Object.values(SCOPES_BY_ID).map((scope) => scope.name),
+			);
+			expect(json.response_types_supported).toContain("token id_token");
+			expect(json.token_endpoint_auth_methods_supported).toContain(
+				"client_secret_basic",
+			);
+			expect(json.token_endpoint_auth_methods_supported).toContain(
+				"client_secret_post",
+			);
+			expect(json.code_challenge_methods_supported).toContain("S256");
+		});
+
+		it("serves OAuth authorization server metadata", async () => {
+			const res = await app.request("/.well-known/oauth-authorization-server");
+			expect(res.status).toBe(200);
+			const json = await res.json<Record<string, unknown>>();
+			expect(json).toHaveProperty("authorization_endpoint");
+			expect(json).toHaveProperty("code_challenge_methods_supported");
+			expect(json).not.toHaveProperty("userinfo_endpoint");
+			expect(json).not.toHaveProperty("claims_supported");
+			expect(json).not.toHaveProperty("id_token_signing_alg_values_supported");
 		});
 	});
 

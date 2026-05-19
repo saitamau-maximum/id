@@ -17,6 +17,8 @@ interface AuthorizeProps {
 		state?: string;
 		oidcNonce?: string;
 		oidcAuthTime?: number;
+		codeChallenge?: string;
+		codeChallengeMethod?: "S256";
 		token: string;
 		nowUnixMs: number;
 	};
@@ -112,6 +114,20 @@ export const _Authorize: FC<AuthorizeProps> = ({
 							type="hidden"
 							name="oidc_auth_time"
 							value={oauthFields.oidcAuthTime.toString()}
+						/>
+					)}
+					{oauthFields.codeChallenge && (
+						<input
+							type="hidden"
+							name="code_challenge"
+							value={oauthFields.codeChallenge}
+						/>
+					)}
+					{oauthFields.codeChallengeMethod && (
+						<input
+							type="hidden"
+							name="code_challenge_method"
+							value={oauthFields.codeChallengeMethod}
 						/>
 					)}
 					<input type="hidden" name="time" value={oauthFields.nowUnixMs} />

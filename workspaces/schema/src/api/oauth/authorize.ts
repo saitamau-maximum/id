@@ -53,6 +53,18 @@ export const OAuthAuthorizeRequestParams = v.object({
 	// クエリパラメータなので文字列として
 	max_age: v.optional(v.pipe(v.string(), v.digits())),
 	response_mode: v.optional(v.picklist(ALLOWED_RESPONSE_MODES)),
+
+	// PKCE parameters
+	code_challenge: v.optional(
+		v.pipe(
+			v.string(),
+			// RFC 7636 Section 4.2: https://www.rfc-editor.org/rfc/rfc7636#section-4.2
+			v.minLength(43),
+			v.maxLength(128),
+			v.regex(/^[A-Za-z0-9._~-]+$/),
+		),
+	),
+	code_challenge_method: v.optional(v.literal("S256")),
 });
 export type OAuthAuthorizeRequestParams = v.InferOutput<
 	typeof OAuthAuthorizeRequestParams

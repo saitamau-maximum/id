@@ -13,6 +13,8 @@ interface Param {
 	state?: string;
 	oidcNonce?: string;
 	oidcAuthTime?: number;
+	codeChallenge?: string;
+	codeChallengeMethod?: "S256";
 	time: number;
 }
 
@@ -36,6 +38,9 @@ const content = (param: Param) => {
 	if (param.oidcNonce) p.append("oidc_nonce", param.oidcNonce);
 	if (param.oidcAuthTime)
 		p.append("oidc_auth_time", param.oidcAuthTime.toString());
+	if (param.codeChallenge) p.append("code_challenge", param.codeChallenge);
+	if (param.codeChallengeMethod)
+		p.append("code_challenge_method", param.codeChallengeMethod);
 	p.append("time", param.time.toString());
 	return new TextEncoder().encode(p.toString());
 };
