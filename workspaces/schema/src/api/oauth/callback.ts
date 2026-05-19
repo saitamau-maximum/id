@@ -4,6 +4,10 @@ import {
 	ALLOWED_RESPONSE_TYPES,
 	OAUTH_SCOPE_REGEX,
 } from "../../constants/oauth-external";
+import {
+	PkceCodeChallenge,
+	PkceCodeChallengeMethod,
+} from "../../entity/oauth-external/pkce";
 
 export const OAuthCallbackRequestParams = v.object({
 	// hidden fields
@@ -15,6 +19,8 @@ export const OAuthCallbackRequestParams = v.object({
 	state: v.optional(v.string()),
 	oidc_nonce: v.optional(v.pipe(v.string(), v.nonEmpty())),
 	oidc_auth_time: v.optional(v.pipe(v.string(), v.digits(), v.toNumber())),
+	code_challenge: v.optional(PkceCodeChallenge),
+	code_challenge_method: v.optional(PkceCodeChallengeMethod),
 
 	// form で送られるので string になる
 	time: v.pipe(v.string(), v.nonEmpty(), v.digits(), v.toNumber()),

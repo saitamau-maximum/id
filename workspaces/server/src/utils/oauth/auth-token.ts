@@ -1,6 +1,7 @@
 // auth token を生成するための util
 // https://github.com/saitamau-maximum/auth/issues/27
 
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import { base64ToBinary, binaryToBase64 } from "./convert-bin-base64";
 import { sign, verify } from "./key";
 
@@ -13,6 +14,8 @@ interface Param {
 	state?: string;
 	oidcNonce?: string;
 	oidcAuthTime?: number;
+	codeChallenge?: string;
+	codeChallengeMethod?: PkceCodeChallengeMethod;
 	time: number;
 }
 
@@ -36,6 +39,9 @@ const content = (param: Param) => {
 	if (param.oidcNonce) p.append("oidc_nonce", param.oidcNonce);
 	if (param.oidcAuthTime)
 		p.append("oidc_auth_time", param.oidcAuthTime.toString());
+	if (param.codeChallenge) p.append("code_challenge", param.codeChallenge);
+	if (param.codeChallengeMethod)
+		p.append("code_challenge_method", param.codeChallengeMethod);
 	p.append("time", param.time.toString());
 	return new TextEncoder().encode(p.toString());
 };
