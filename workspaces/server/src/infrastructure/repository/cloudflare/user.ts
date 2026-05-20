@@ -338,7 +338,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
-			bio: user.profile.bio ?? undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
 				.filter((roleId) => v.is(RoleId, roleId))

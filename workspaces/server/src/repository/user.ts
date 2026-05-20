@@ -14,7 +14,7 @@ export type FetchApprovedUsersRes = Omit<
 >[];
 export type FetchMembersRes = Omit<
 	Member,
-	"certifications" | "oauthConnections"
+	"certifications" | "oauthConnections" | "bio"
 >[];
 export type FetchProvisionalUsersRes = (Omit<
 	User,
