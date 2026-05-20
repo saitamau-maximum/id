@@ -156,6 +156,8 @@ export const User = v.object({
 	isProvisional: v.boolean(),
 	lastPaymentConfirmedAt: v.nullable(v.date()),
 	lastLoginAt: v.optional(v.date()),
+	/* 招待リンクが発行された日時。会費計算の基準に使用する。 */
+	inviteIssuedAt: v.optional(v.date()),
 	roles: v.array(Role),
 	certifications: v.array(UserCertification),
 	oauthConnections: v.array(ExportableOAuthConnection),

@@ -97,6 +97,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				roles: true,
 				profile: true,
+				invitation: true,
 				certifications: {
 					with: {
 						certification: true,
@@ -126,6 +127,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			lastLoginAt: user.lastLoginAt ?? undefined,
+			inviteIssuedAt: user.invitation?.createdAt ?? undefined,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
