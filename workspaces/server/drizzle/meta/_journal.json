@@ -246,13 +246,6 @@
 			"when": 1779170124000,
 			"tag": "0034_oauth_pkce_secret_hash",
 			"breakpoints": true
-		},
-		{
-			"idx": 35,
-			"version": "6",
-			"when": 1779186910735,
-			"tag": "0035_sudden_nomad",
-			"breakpoints": true
 		}
 	]
 }

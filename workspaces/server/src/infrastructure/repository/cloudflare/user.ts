@@ -39,7 +39,6 @@ export class CloudflareUserRepository implements IUserRepository {
 	private async createUserInternal(
 		payload: Partial<UserProfile>,
 		invitationId?: string,
-		inviteIssuedAt?: Date,
 	): Promise<string> {
 		const userId = crypto.randomUUID();
 
@@ -49,7 +48,6 @@ export class CloudflareUserRepository implements IUserRepository {
 				id: userId,
 				lastLoginAt: new Date(),
 				...(invitationId && { invitationId }),
-				...(inviteIssuedAt && { inviteIssuedAt }),
 			}),
 			this.client.insert(schema.userProfiles).values({
 				id: crypto.randomUUID(),
@@ -76,29 +74,16 @@ export class CloudflareUserRepository implements IUserRepository {
 		invitationId: string,
 		payload: CreateTemporaryUserPayload = {},
 	): Promise<string> {
-		const invite = await this.client.query.invites.findFirst({
-			where: eq(schema.invites.id, invitationId),
-		});
-		return this.createUserInternal(
-			payload,
-			invitationId,
-			invite?.createdAt ?? undefined,
-		);
+		return this.createUserInternal(payload, invitationId);
 	}
 
 	async applyInvitationToExistingUser(
 		userId: string,
 		invitationId: string,
 	): Promise<void> {
-		const invite = await this.client.query.invites.findFirst({
-			where: eq(schema.invites.id, invitationId),
-		});
 		const res = await this.client
 			.update(schema.users)
-			.set({
-				invitationId,
-				...(invite?.createdAt && { inviteIssuedAt: invite.createdAt }),
-			})
+			.set({ invitationId })
 			.where(eq(schema.users.id, userId));
 
 		if (!res.success) {
@@ -112,6 +97,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				roles: true,
 				profile: true,
+				invitation: true,
 				certifications: {
 					with: {
 						certification: true,
@@ -141,7 +127,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			lastLoginAt: user.lastLoginAt ?? undefined,
-			inviteIssuedAt: user.inviteIssuedAt ?? undefined,
+			inviteIssuedAt: user.invitation?.createdAt ?? undefined,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
