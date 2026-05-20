@@ -9,7 +9,7 @@ export type UpdateUserPayload = Partial<UserProfile>;
 
 export type FetchApprovedUsersRes = Omit<
 	User,
-	"certifications" | "oauthConnections"
+	"certifications" | "oauthConnections" | "inviteIssuedAt"
 >[];
 export type FetchMembersRes = Omit<
 	Member,
@@ -17,7 +17,7 @@ export type FetchMembersRes = Omit<
 >[];
 export type FetchProvisionalUsersRes = Omit<
 	User,
-	"certifications" | "oauthConnections"
+	"certifications" | "oauthConnections" | "inviteIssuedAt"
 >[];
 
 export interface IUserRepository {
