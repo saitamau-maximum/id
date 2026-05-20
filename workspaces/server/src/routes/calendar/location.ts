@@ -1,6 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	CalendarLocationCreateParams,
+	type CalendarLocationGetLocationByIdResponse,
+	type CalendarLocationGetLocationsResponse,
 	CalendarLocationUpdateParams,
 } from "@idp/schema/api/calendar/location";
 import { factory } from "../../factory";
@@ -15,7 +17,7 @@ const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { LocationRepository } = c.var;
 		const locations = await LocationRepository.getLocations();
-		return c.json(locations);
+		return c.json<CalendarLocationGetLocationsResponse>(locations);
 	})
 	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
@@ -27,7 +29,7 @@ const route = app
 		if (!location) {
 			return c.body(null, 404);
 		}
-		return c.json(location);
+		return c.json<CalendarLocationGetLocationByIdResponse>(location);
 	})
 	.post(
 		"/",

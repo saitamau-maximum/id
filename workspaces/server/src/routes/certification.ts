@@ -4,6 +4,8 @@ import {
 	CertificationRequestParams,
 	CertificationReviewParams,
 	CertificationUpdateParams,
+	type GetAllCertificationsResponse,
+	type GetCertificationRequestsResponse,
 } from "@idp/schema/api/certification";
 import { factory } from "../factory";
 import { adminOnlyMiddleware, memberOnlyMiddleware } from "../middleware/auth";
@@ -14,7 +16,7 @@ const route = app
 	.get("/all", async (c) => {
 		const { CertificationRepository } = c.var;
 		const certifications = await CertificationRepository.getAllCertifications();
-		return c.json(certifications);
+		return c.json<GetAllCertificationsResponse>(certifications);
 	})
 	.post(
 		"/request",
@@ -38,7 +40,7 @@ const route = app
 		const { CertificationRepository } = c.var;
 		const requests =
 			await CertificationRepository.getAllCertificationRequests();
-		return c.json(requests);
+		return c.json<GetCertificationRequestsResponse>(requests);
 	})
 	.put(
 		"/review",

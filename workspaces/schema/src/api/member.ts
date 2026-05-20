@@ -7,12 +7,12 @@ export const GetMembersResponse = v.array(
 );
 export type GetMembersResponse = v.InferOutput<typeof GetMembersResponse>;
 
-export const GetMembersContributionByUserDisplayIDResponse = Contributions;
-export type GetMembersContributionByUserDisplayIDResponse = v.InferOutput<
-	typeof GetMembersContributionByUserDisplayIDResponse
->;
-
 export const GetMembersProfileByUserDisplayIDResponse = Member;
 export type GetMembersProfileByUserDisplayIDResponse = v.InferOutput<
 	typeof GetMembersProfileByUserDisplayIDResponse
+>;
+
+export const GetMembersContributionByUserDisplayIDResponse = Contributions;
+export type GetMembersContributionByUserDisplayIDResponse = v.InferOutput<
+	typeof GetMembersContributionByUserDisplayIDResponse
 >;

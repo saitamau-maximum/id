@@ -1,3 +1,8 @@
+import type {
+	GetMembersContributionByUserDisplayIDResponse,
+	GetMembersProfileByUserDisplayIDResponse,
+	GetMembersResponse,
+} from "@idp/schema/api/member";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { factory } from "../factory";
 import { memberOnlyMiddleware } from "../middleware/auth";
@@ -8,7 +13,7 @@ const route = app
 	.get("/list", memberOnlyMiddleware, async (c) => {
 		const { UserRepository } = c.var;
 		const members = await UserRepository.fetchMembers();
-		return c.json(members);
+		return c.json<GetMembersResponse>(members);
 	})
 	.get("/profile/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
@@ -21,7 +26,7 @@ const route = app
 		if (!member) {
 			return c.body(null, 404);
 		}
-		return c.json(member);
+		return c.json<GetMembersProfileByUserDisplayIDResponse>(member);
 	})
 	.get("/contribution/:userDisplayId", memberOnlyMiddleware, async (c) => {
 		const userDisplayId = c.req.param("userDisplayId");
@@ -49,7 +54,7 @@ const route = app
 		);
 
 		if (cached) {
-			return c.json(cached);
+			return c.json<GetMembersContributionByUserDisplayIDResponse>(cached);
 		}
 
 		const contributions = await ContributionRepository.getContributions(
@@ -62,7 +67,7 @@ const route = app
 			ContributionCacheRepository.set(githubConn.name, contributions),
 		);
 
-		return c.json(contributions);
+		return c.json<GetMembersContributionByUserDisplayIDResponse>(contributions);
 	});
 
 export { route as memberRoute };

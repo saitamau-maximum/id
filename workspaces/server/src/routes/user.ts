@@ -1,5 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
-import { UserProfileUpdateParams } from "@idp/schema/api/user";
+import {
+	type UserGetContributionsResponse,
+	UserProfileUpdateParams,
+} from "@idp/schema/api/user";
 import {
 	OAUTH_PROVIDER_IDS,
 	OAuthProviderId,
@@ -143,7 +146,7 @@ const route = app
 		);
 
 		if (cached) {
-			return c.json(cached, 200);
+			return c.json<UserGetContributionsResponse>(cached, 200);
 		}
 
 		const contributions = await ContributionRepository.getContributions(
@@ -156,7 +159,7 @@ const route = app
 			ContributionCacheRepository.set(githubConn.name, contributions),
 		);
 
-		return c.json(contributions, 200);
+		return c.json<UserGetContributionsResponse>(contributions, 200);
 	})
 	.put(
 		"/profile-image",
