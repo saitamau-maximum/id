@@ -1,5 +1,5 @@
+import type { AdminUserGetProvisionalUsersResponse } from "@idp/schema/api/admin/user";
 import { GRADE_BY_ID } from "@idp/schema/entity/grade";
-import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
 import { Check, X } from "react-feather";
 import { css } from "styled-system/css";
@@ -40,10 +40,7 @@ export const ProvisionalUsersTable = () => {
 const UserTableRow = ({
 	user,
 }: {
-	user: Omit<User, "certifications" | "oauthConnections"> & {
-		invitationTitle?: string;
-		invitationId?: string;
-	};
+	user: AdminUserGetProvisionalUsersResponse[number];
 }) => {
 	const { mutate: approveInvitation } = useApproveInvitation();
 	const { mutate: rejectInvitation } = useRejectInvitation();

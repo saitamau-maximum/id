@@ -1,6 +1,6 @@
+import type { AdminUserGetUsersResponse } from "@idp/schema/api/admin/user";
 import { GRADE_BY_ID } from "@idp/schema/entity/grade";
 import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
-import type { User } from "@idp/schema/entity/user";
 import { useCallback } from "react";
 import { Edit } from "react-feather";
 import { css } from "styled-system/css";
@@ -83,7 +83,7 @@ const ROLE_SLICE_LIMIT = 3;
 const UserTableRow = ({
 	user,
 }: {
-	user: Omit<User, "certifications" | "oauthConnections">;
+	user: AdminUserGetUsersResponse[number];
 }) => {
 	const { mutate: updateRole } = useUpdateRole(user.id);
 	const { mutate: confirmPayment } = useConfirmPayment(user.id);
