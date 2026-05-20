@@ -3,7 +3,7 @@ import { css } from "styled-system/css";
 
 interface Props {
 	to: string;
-	isActive: (location: string) => boolean;
+	isActive: (location: ReturnType<typeof useLocation>) => boolean;
 	children: React.ReactNode;
 	notification?: number;
 }
@@ -36,9 +36,7 @@ export const TabItem = ({
 					left: 0,
 					width: "100%",
 					height: "2px",
-					backgroundColor: isActive(location.pathname)
-						? "green.500"
-						: "transparent",
+					backgroundColor: isActive(location) ? "green.500" : "transparent",
 					transition: "background",
 				},
 				_hover: {

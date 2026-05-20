@@ -148,3 +148,23 @@ export const DEPARTMENT_BY_ID = {
 		name: "環境社会デザイン学科",
 	},
 } as const satisfies Record<DepartmentId, Department>;
+
+export function toDepartmentId(val: number | string): DepartmentId;
+export function toDepartmentId(val: undefined | null): undefined;
+export function toDepartmentId(
+	val: number | string | undefined | null,
+): DepartmentId | undefined;
+export function toDepartmentId(
+	val: number | string | undefined | null,
+): DepartmentId | undefined {
+	if (typeof val === "number") {
+		return v.parse(DepartmentId, val);
+	}
+	if (typeof val === "string") {
+		return v.parse(v.pipe(v.string(), v.toNumber(), DepartmentId), val);
+	}
+	if (val === undefined || val === null) {
+		return undefined;
+	}
+	throw new Error("not implemented");
+}

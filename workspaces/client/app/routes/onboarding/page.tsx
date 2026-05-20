@@ -1,10 +1,10 @@
 import { useEffect } from "react";
 import { type MetaFunction, useNavigate } from "react-router";
 import { css } from "styled-system/css";
-
+import { UserSettingForm } from "~/components/feature/user/setting/form";
 import { Progress } from "~/components/ui/progess";
 import { useAuth } from "~/hooks/use-auth";
-import { RegisterForm } from "./internal/components/form";
+import { useRegister } from "./internal/hooks/use-register";
 
 export const meta: MetaFunction = () => {
 	return [{ title: "初期設定 | Maximum IdP" }];
@@ -12,16 +12,18 @@ export const meta: MetaFunction = () => {
 
 export default function Onboarding() {
 	const { isLoading, isInitialized, isAuthorized, isProvisional } = useAuth();
+	const { mutate, isPending } = useRegister();
 	const navigate = useNavigate();
-	const shouldProoceed = !isLoading && !isInitialized && isAuthorized;
+	const shouldProceed = !isLoading && !isInitialized && isAuthorized;
 
 	useEffect(() => {
-		if (!shouldProoceed) {
+		if (!shouldProceed) {
 			navigate("/");
+			return;
 		}
-	}, [shouldProoceed, navigate]);
+	}, [shouldProceed, navigate]);
 
-	if (!shouldProoceed) {
+	if (!shouldProceed) {
 		return null;
 	}
 
@@ -54,20 +56,36 @@ export default function Onboarding() {
 						},
 					})}
 				>
-					{isProvisional && <Progress steps={registrationSteps} />}
-					<h1
-						className={css({
-							fontSize: "2xl",
-							fontWeight: "bold",
-							color: "gray.700",
-							textAlign: "center",
-							marginTop: isProvisional ? 8 : undefined,
-							marginBottom: 8,
-						})}
-					>
-						Maximum IDP 初期設定
-					</h1>
-					<RegisterForm />
+					<div className={css({ marginBottom: 8 })}>
+						{isProvisional && <Progress steps={registrationSteps} />}
+						<h1
+							className={css({
+								fontSize: "2xl",
+								fontWeight: "bold",
+								color: "gray.700",
+								textAlign: "center",
+								marginTop: isProvisional ? 8 : undefined,
+								marginBottom: 8,
+							})}
+						>
+							Maximum IdP 初期設定
+						</h1>
+						<span
+							className={css({
+								color: "gray.500",
+								fontSize: "md",
+							})}
+						>
+							以下のフォームに必要事項を入力して、初期設定を完了させましょう！
+							ID と氏名以外の情報は、後から更新できます。
+						</span>
+					</div>
+
+					<UserSettingForm
+						type="onboarding"
+						onSubmit={mutate}
+						isPending={isPending}
+					/>
 				</div>
 			</div>
 		</div>

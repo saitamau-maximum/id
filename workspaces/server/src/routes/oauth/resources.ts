@@ -37,7 +37,7 @@ const route = app
 			display_id: tokenInfo.user.profile.displayId,
 			display_name: tokenInfo.user.profile.displayName,
 			profile_image_url: tokenInfo.user.profile.profileImageURL,
-			roles: tokenInfo.user.roles.map((role) => role.name),
+			roles: tokenInfo.user.roles.map((role) => role.slug),
 		});
 	})
 	.all("/userinfo", async (c) => {

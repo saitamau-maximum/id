@@ -254,9 +254,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			"id" | "userId"
 		> = {
 			displayName: payload.displayName,
-			displayId: payload.displayId,
-			realName: payload.realName,
-			realNameKana: payload.realNameKana,
+			// ここは変更不可なので、 payload に含まれていても無視する
+			// displayId: payload.displayId,
+			// realName: payload.realName,
+			// realNameKana: payload.realNameKana,
 			profileImageURL: payload.profileImageURL,
 			academicEmail: payload.academicEmail ?? null, // undefined ではなく null をセットしないと更新されない
 			email: payload.email,

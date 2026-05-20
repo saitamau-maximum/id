@@ -1,8 +1,8 @@
 {
 	"version": "6",
 	"dialect": "sqlite",
-	"id": "d84ad0b1-53ec-4b45-93fd-1c1c7110d034",
-	"prevId": "b8964e9e-ff70-4fc2-894c-c87ab299f7b0",
+	"id": "c8300508-f99f-4199-aec1-fd8c0b33dc97",
+	"prevId": "d84ad0b1-53ec-4b45-93fd-1c1c7110d034",
 	"tables": {
 		"calendar_events": {
 			"name": "calendar_events",
@@ -675,6 +675,13 @@
 				},
 				"last_login_at": {
 					"name": "last_login_at",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				},
+				"invite_issued_at": {
+					"name": "invite_issued_at",
 					"type": "integer",
 					"primaryKey": false,
 					"notNull": false,

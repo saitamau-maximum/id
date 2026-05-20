@@ -79,3 +79,23 @@ export const isOutsideGrade = (
 ): grade is (typeof OUTSIDE_GRADE)[number] => {
 	return (OUTSIDE_GRADE as ReadonlyArray<GradeId>).includes(grade);
 };
+
+export function toGradeId(val: number | string): GradeId;
+export function toGradeId(val: undefined | null): undefined;
+export function toGradeId(
+	val: number | string | undefined | null,
+): GradeId | undefined;
+export function toGradeId(
+	val: number | string | undefined | null,
+): GradeId | undefined {
+	if (typeof val === "number") {
+		return v.parse(GradeId, val);
+	}
+	if (typeof val === "string") {
+		return v.parse(v.pipe(v.string(), v.toNumber(), GradeId), val);
+	}
+	if (val === undefined || val === null) {
+		return undefined;
+	}
+	throw new Error("not implemented");
+}

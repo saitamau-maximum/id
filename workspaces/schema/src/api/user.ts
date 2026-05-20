@@ -1,8 +1,8 @@
 import * as v from "valibot";
 import { Contributions } from "../entity/contribution";
-import { DEPARTMENT_BY_ID } from "../entity/department";
-import { FACULTY_IDS } from "../entity/faculty";
-import { isOutsideGrade } from "../entity/grade";
+import { DEPARTMENT_BY_ID, toDepartmentId } from "../entity/department";
+import { FACULTY_IDS, toFacultyId } from "../entity/faculty";
+import { isOutsideGrade, toGradeId } from "../entity/grade";
 import { UserProfile } from "../entity/user";
 
 export const UserProfileUpdateParams = v.config(
@@ -36,7 +36,10 @@ export const UserProfileUpdateParams = v.config(
 		v.forward(
 			v.partialCheck(
 				[["grade"], ["studentId"]],
-				({ grade, studentId }) => {
+				({ grade: _grade, studentId }) => {
+					// ほかの部分で未入力があると、 abortPipeEarly: false をしている都合上 grade などが string として入ってくることがあるので変換
+					const grade = toGradeId(_grade);
+
 					if (!isOutsideGrade(grade) && !studentId) return false;
 					return true;
 				},
@@ -47,7 +50,9 @@ export const UserProfileUpdateParams = v.config(
 		v.forward(
 			v.partialCheck(
 				[["grade"], ["academicEmail"]],
-				({ grade, academicEmail }) => {
+				({ grade: _grade, academicEmail }) => {
+					const grade = toGradeId(_grade);
+
 					if (!isOutsideGrade(grade) && !academicEmail) return false;
 					return true;
 				},
@@ -58,7 +63,9 @@ export const UserProfileUpdateParams = v.config(
 		v.forward(
 			v.partialCheck(
 				[["grade"], ["faculty"]],
-				({ grade, faculty }) => {
+				({ grade: _grade, faculty }) => {
+					const grade = toGradeId(_grade);
+
 					// B1-D3 は学部必須
 					if (!isOutsideGrade(grade) && !faculty) return false;
 					return true;
@@ -70,7 +77,10 @@ export const UserProfileUpdateParams = v.config(
 		v.forward(
 			v.partialCheck(
 				[["grade"], ["faculty"], ["department"]],
-				({ grade, faculty, department }) => {
+				({ grade: _grade, faculty: _faculty, department }) => {
+					const grade = toGradeId(_grade);
+					const faculty = toFacultyId(_faculty);
+
 					// B1-D3 の経済学部以外は学科必須
 					if (
 						!isOutsideGrade(grade) &&
@@ -87,7 +97,10 @@ export const UserProfileUpdateParams = v.config(
 		v.forward(
 			v.partialCheck(
 				[["faculty"], ["department"]],
-				({ faculty, department }) => {
+				({ faculty: _faculty, department: _department }) => {
+					const faculty = toFacultyId(_faculty);
+					const department = toDepartmentId(_department);
+
 					// データが正しいことを確認
 					if (faculty && department) {
 						const departmentData = DEPARTMENT_BY_ID[department];
