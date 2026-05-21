@@ -2,7 +2,6 @@ import * as v from "valibot";
 
 export const SCOPE_IDS = {
 	READ_BASIC_INFO: 1,
-	READ_ROLES: 2,
 
 	// OpenID 系
 	OPENID: 1000,
@@ -11,6 +10,7 @@ export const SCOPE_IDS = {
 	// 必要情報を持っていないので実装しないが、一応予約済みとしてコメントアウト
 	// ADDRESS: 1003,
 	// PHONE: 1004,
+	READ_ROLES: 1005,
 } as const;
 
 // もしSCOPE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
