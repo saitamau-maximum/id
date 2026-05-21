@@ -9,7 +9,7 @@ type OidcIdTokenClaims = Pick<
 >;
 
 type OidcIdTokenCustomClaims = {
-	roles: string[];
+	roles?: string[];
 };
 
 interface OidcIdTokenPayloadBase {
