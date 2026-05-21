@@ -1,5 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
-import { CreateOrUpdateEquipmentParams } from "@idp/schema/api/equipment";
+import {
+	CreateOrUpdateEquipmentParams,
+	type GetEquipmentByIdResponse,
+	type GetEquipmentsResponse,
+} from "@idp/schema/api/equipment";
 import { factory } from "../factory";
 import {
 	equipmentMutableMiddleware,
@@ -13,7 +17,7 @@ const route = app
 		const { EquipmentRepository } = c.var;
 
 		const equipments = await EquipmentRepository.getAllEquipments();
-		return c.json(equipments);
+		return c.json<GetEquipmentsResponse>(equipments);
 	})
 	.get("/:id", memberOnlyMiddleware, async (c) => {
 		const id = c.req.param("id");
@@ -27,7 +31,7 @@ const route = app
 			return c.body(null, 404);
 		}
 
-		return c.json(equipment);
+		return c.json<GetEquipmentByIdResponse>(equipment);
 	})
 	.post(
 		"/",

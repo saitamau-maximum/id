@@ -1,5 +1,9 @@
 import { vValidator } from "@hono/valibot-validator";
-import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
+import {
+	type OAuthAppGetClientByIdResponse,
+	type OAuthAppGetListResponse,
+	OAuthAppRegisterParams,
+} from "@idp/schema/api/oauth/manage";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
@@ -42,14 +46,16 @@ const secretDescriptionSchema = v.object({
 
 const route = app
 	.get("/list", authMiddleware, async (c) =>
-		c.json(await c.var.OAuthExternalRepository.getClients()),
+		c.json<OAuthAppGetListResponse>(
+			await c.var.OAuthExternalRepository.getClients(),
+		),
 	)
 	.get("/:clientId", authMiddleware, verifyOAuthClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
 
-		return c.json({
+		return c.json<OAuthAppGetClientByIdResponse>({
 			...rest,
 			secrets: await Promise.all(
 				secrets.map(async (secret) => ({

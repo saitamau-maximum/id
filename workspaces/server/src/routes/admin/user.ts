@@ -1,4 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
+import type {
+	AdminUserGetProvisionalUsersResponse,
+	AdminUserGetUsersResponse,
+} from "@idp/schema/api/admin/user";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { RoleId } from "@idp/schema/entity/role";
 import * as v from "valibot";
@@ -19,7 +23,7 @@ const route = app
 	.get("/list", async (c) => {
 		const { UserRepository } = c.var;
 		const users = await UserRepository.fetchApprovedUsers();
-		return c.json(users);
+		return c.json<AdminUserGetUsersResponse>(users);
 	})
 	.put(
 		"/:userId/role",
@@ -45,7 +49,7 @@ const route = app
 	.get("/provisional", async (c) => {
 		const { UserRepository } = c.var;
 		const users = await UserRepository.fetchProvisionalUsers();
-		return c.json(users);
+		return c.json<AdminUserGetProvisionalUsersResponse>(users);
 	})
 	.post("/:userId/approve", async (c) => {
 		const userId = c.req.param("userId");

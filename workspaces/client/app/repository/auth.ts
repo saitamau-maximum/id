@@ -1,8 +1,8 @@
-import type { User } from "@idp/schema/entity/user";
+import type { GetMeResponse } from "@idp/schema/api/auth";
 import { client } from "~/utils/hono";
 
 export interface IAuthRepository {
-	me: () => Promise<User>;
+	me: () => Promise<GetMeResponse>;
 	me$$key(): unknown[];
 	ping(): Promise<void>;
 	ping$$key(): unknown[];

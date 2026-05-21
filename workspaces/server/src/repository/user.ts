@@ -1,3 +1,4 @@
+import type { Invite } from "@idp/schema/entity/invite";
 import type { Member, PublicMember } from "@idp/schema/entity/member";
 import type { RoleId } from "@idp/schema/entity/role";
 import type { DashboardUser, User, UserProfile } from "@idp/schema/entity/user";
@@ -13,12 +14,15 @@ export type FetchApprovedUsersRes = Omit<
 >[];
 export type FetchMembersRes = Omit<
 	Member,
-	"certifications" | "oauthConnections"
+	"certifications" | "oauthConnections" | "bio"
 >[];
-export type FetchProvisionalUsersRes = Omit<
+export type FetchProvisionalUsersRes = (Omit<
 	User,
 	"certifications" | "oauthConnections" | "inviteIssuedAt"
->[];
+> & {
+	invitationTitle?: Invite["title"];
+	invitationId?: Invite["id"];
+})[];
 
 export interface IUserRepository {
 	createUser: (payload: CreateUserPayload) => Promise<string>;

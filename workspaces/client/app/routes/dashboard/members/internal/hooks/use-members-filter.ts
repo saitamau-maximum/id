@@ -1,5 +1,5 @@
+import type { GetMembersResponse } from "@idp/schema/api/member";
 import { GradeId } from "@idp/schema/entity/grade";
-import type { Member } from "@idp/schema/entity/member";
 import { type Role, RoleId } from "@idp/schema/entity/role";
 import { useCallback, useMemo, useState } from "react";
 import * as v from "valibot";
@@ -16,9 +16,7 @@ const katakanaToHiragana = (str: string) => {
 	);
 };
 
-export function useMembersFilter(
-	members: Omit<Member, "certifications" | "oauthConnections">[],
-) {
+export function useMembersFilter(members: GetMembersResponse) {
 	const [filter, setFilter] = useState<Filter>({
 		keyword: "",
 		selectedGrades: [],

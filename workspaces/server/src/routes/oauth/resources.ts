@@ -1,6 +1,9 @@
 // OAuth の Resource Owner としての役割を果たすルーティング
 
-import type { AuthUserResponse } from "@idp/schema/api/oauth/resources";
+import type {
+	AuthUserResponse,
+	UserInfoResponse,
+} from "@idp/schema/api/oauth/resources";
 import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
 import {
 	SCOPE_IDS,
@@ -97,7 +100,7 @@ const route = app
 			}
 		}
 
-		return c.json<OIDCUserInfo>(userInfo);
+		return c.json<UserInfoResponse>(userInfo);
 	});
 
 export { route as oauthResourcesRoute };

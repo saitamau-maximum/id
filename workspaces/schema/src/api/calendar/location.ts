@@ -24,3 +24,8 @@ export const CalendarLocationGetLocationsResponse = v.array(
 export type CalendarLocationGetLocationsResponse = v.InferOutput<
 	typeof CalendarLocationGetLocationsResponse
 >;
+
+export const CalendarLocationGetLocationByIdResponse = Location;
+export type CalendarLocationGetLocationByIdResponse = v.InferOutput<
+	typeof CalendarLocationGetLocationByIdResponse
+>;
