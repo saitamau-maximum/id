@@ -2,6 +2,7 @@ import * as v from "valibot";
 
 export const SCOPE_IDS = {
 	READ_BASIC_INFO: 1,
+	READ_ROLES: 2,
 
 	// OpenID 系
 	OPENID: 1000,
@@ -54,6 +55,11 @@ export const SCOPES_BY_ID = {
 		name: "email",
 		description:
 			"このサービスが、Maximum IdP に登録されている「連絡の取れるメールアドレス」を取得することを許可します。",
+	},
+	[SCOPE_IDS.READ_ROLES]: {
+		id: SCOPE_IDS.READ_ROLES,
+		name: "read:roles",
+		description: "このサービスがあなたのロール情報を読み取ることを許可します。",
 	},
 	// [SCOPE_IDS.ADDRESS]: {
 	// 	id: SCOPE_IDS.ADDRESS,
