@@ -5,7 +5,7 @@ import { importKey, sign } from "./key";
 
 type OidcIdTokenClaims = Pick<
 	OIDCUserInfo,
-	"name" | "nickname" | "preferred_username" | "picture" | "email"
+	"name" | "nickname" | "preferred_username" | "picture" | "email" | "roles"
 >;
 
 interface OidcIdTokenPayloadBase {

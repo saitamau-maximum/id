@@ -99,6 +99,9 @@ const route = app
 				userInfo.email_verified = false; // メールアドレス検証はしていないので false 固定
 			}
 		}
+		if (tokenInfo.scopes.some((scope) => scope.id === SCOPE_IDS.READ_ROLES)) {
+			userInfo.roles = tokenInfo.user.roles.map((role) => role.slug);
+		}
 
 		return c.json<UserInfoResponse>(userInfo);
 	});

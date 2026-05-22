@@ -241,6 +241,11 @@ const route = app
 								email: userInfo.email,
 							}
 						: {}),
+					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.READ_ROLES)
+						? {
+								roles: userInfo.roles.map((r) => r.slug),
+							}
+						: {}),
 				});
 			}
 

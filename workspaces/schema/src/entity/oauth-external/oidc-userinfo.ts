@@ -28,6 +28,11 @@ export const OIDCEmail = v.object({
 });
 export type OIDCEmail = v.InferOutput<typeof OIDCEmail>;
 
+export const OIDCRoles = v.object({
+	roles: v.array(v.string()),
+});
+export type OIDCRoles = v.InferOutput<typeof OIDCRoles>;
+
 // まだ持ってない
 // export const OIDCPhone = v.object({
 // 	phone_number: v.pipe(v.string(), v.nonEmpty()),
@@ -51,5 +56,6 @@ export const OIDCUserInfo = v.intersect([
 	OIDCBasicUserInfo,
 	v.partial(OIDCProfile),
 	v.partial(OIDCEmail),
+	v.partial(OIDCRoles),
 ]);
 export type OIDCUserInfo = v.InferOutput<typeof OIDCUserInfo>;
