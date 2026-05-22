@@ -5,12 +5,8 @@ import { importKey, sign } from "./key";
 
 type OidcIdTokenClaims = Pick<
 	OIDCUserInfo,
-	"name" | "nickname" | "preferred_username" | "picture" | "email"
+	"name" | "nickname" | "preferred_username" | "picture" | "email" | "roles"
 >;
-
-type OidcIdTokenCustomClaims = {
-	roles?: string[];
-};
 
 interface OidcIdTokenPayloadBase {
 	iss: string;
@@ -23,9 +19,7 @@ interface OidcIdTokenPayloadBase {
 	// acr, amr, azp は使わないので省略
 	at_hash: string;
 }
-type OidcIdTokenPayload = OidcIdTokenPayloadBase &
-	OidcIdTokenClaims &
-	OidcIdTokenCustomClaims;
+type OidcIdTokenPayload = OidcIdTokenPayloadBase & OidcIdTokenClaims;
 
 interface ParamBase {
 	clientId: string;
@@ -36,7 +30,7 @@ interface ParamBase {
 	accessToken: string;
 	privateKey: string;
 }
-type Param = ParamBase & OidcIdTokenClaims & OidcIdTokenCustomClaims;
+type Param = ParamBase & OidcIdTokenClaims;
 
 const signJWT = async (
 	payload: OidcIdTokenPayload,
