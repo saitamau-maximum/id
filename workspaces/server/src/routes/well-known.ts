@@ -4,7 +4,6 @@ import {
 } from "@idp/schema/constants/oauth-external";
 import { PKCE_CODE_CHALLENGE_METHODS } from "@idp/schema/entity/oauth-external/pkce";
 import { SCOPES_BY_ID } from "@idp/schema/entity/oauth-external/scope";
-import { cors } from "hono/cors";
 import { factory } from "../factory";
 import { claimsSupported, iss } from "../utils/oauth/constant";
 
@@ -69,7 +68,6 @@ const openidProviderMetadata = {
 } as const;
 
 const route = app
-	.use(cors())
 	.get("/openid-configuration", (c) => {
 		return c.json(openidProviderMetadata, 200);
 	})
