@@ -1,6 +1,7 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
 	type AnySQLiteColumn,
+	check,
 	index,
 	int,
 	integer,
@@ -52,6 +53,12 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	certifications: many(userCertifications),
 	socialLinks: many(socialLinks),
 	equipments: many(equipments),
+	point: one(points, {
+		fields: [users.id],
+		references: [points.userId],
+	}),
+	fromTransactions: many(pointTransactions),
+	toTransactions: many(pointTransactions),
 }));
 
 export const userProfiles = sqliteTable(
@@ -261,4 +268,79 @@ export const equipmentsRelations = relations(equipments, ({ one }) => ({
 		fields: [equipments.ownerId],
 		references: [users.id],
 	}),
+}));
+
+export const points = sqliteTable(
+	"points",
+	{
+		userId: text("user_id")
+			.references(() => users.id)
+			.notNull()
+			.primaryKey(),
+		balance: integer("balance").notNull().default(0),
+		updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
+	},
+	(table) => [
+		check("balance_non_negative", sql`${table.balance} >= 0`),
+		index("balance_idx").on(table.balance),
+	],
+);
+
+export const pointsRelations = relations(points, ({ one }) => ({
+	user: one(users, {
+		fields: [points.userId],
+		references: [users.id],
+	}),
+}));
+
+export const pointTransactions = sqliteTable(
+	"point_transactions",
+	{
+		// UUIDv7 など、時系列ソート可能な ID を想定
+		id: text("id").primaryKey(),
+		fromUserId: text("from_user_id").references(() => users.id),
+		toUserId: text("to_user_id").references(() => users.id),
+		amount: integer("amount").notNull(),
+		serviceId: text("service_id").references(() => pointServices.id),
+		description: text("description"),
+		createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+	},
+	(table) => [
+		index("from_user_idx").on(table.fromUserId),
+		index("to_user_idx").on(table.toUserId),
+		check("amount_positive", sql`${table.amount} > 0`),
+		check("from_to_different", sql`${table.fromUserId} != ${table.toUserId}`),
+	],
+);
+
+export const pointTransactionsRelations = relations(
+	pointTransactions,
+	({ one }) => ({
+		fromUser: one(users, {
+			fields: [pointTransactions.fromUserId],
+			references: [users.id],
+			relationName: "fromTransactions",
+		}),
+		toUser: one(users, {
+			fields: [pointTransactions.toUserId],
+			references: [users.id],
+			relationName: "toTransactions",
+		}),
+		service: one(pointServices, {
+			fields: [pointTransactions.serviceId],
+			references: [pointServices.id],
+		}),
+	}),
+);
+
+export const pointServices = sqliteTable("point_services", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull().unique(),
+	token: text("token").notNull().unique(),
+	description: text("description"),
+	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
+});
+
+export const pointServicesRelations = relations(pointServices, ({ many }) => ({
+	transactions: many(pointTransactions),
 }));
