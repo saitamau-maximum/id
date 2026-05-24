@@ -53,21 +53,13 @@ export const DEV_NEW_USER_CREATED_WO_INVITATION: ToastItem = {
 	description: "(開発環境のみ) 招待コードなしでユーザーが作成されました。",
 } as const;
 
-const TOAST_ITEMS = [
+export const TOAST_ITEMS = [
 	PLEASE_LOGIN_FOR_OAUTH,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
 	PLEASE_RELOGIN_FOR_OAUTH,
 	DEV_NEW_USER_CREATED_WO_INVITATION,
 ];
-
-// ハッシュ衝突チェック
-const TOAST_HASHES = TOAST_ITEMS.map((item) => ToastHashFn(item));
-if (new Set(TOAST_HASHES).size !== TOAST_HASHES.length) {
-	throw new Error(
-		"ToastItem のハッシュが重複しています。定義を見直してください。",
-	);
-}
 
 export const TOAST_MESSAGES = Object.fromEntries(
 	TOAST_ITEMS.map((item) => [ToastHashFn(item), item]),
