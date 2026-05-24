@@ -28,14 +28,8 @@ export const DEPARTMENT_IDS = {
 	ENVIRONMENT: 505,
 } as const;
 
-// もし DEPARTMENT_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
-const DEPARTMENT_IDS_VALUES = Object.values(DEPARTMENT_IDS);
-if (new Set(DEPARTMENT_IDS_VALUES).size !== DEPARTMENT_IDS_VALUES.length) {
-	throw new Error("Department ID は重複してはいけません");
-}
-
 export const DepartmentId = v.union(
-	DEPARTMENT_IDS_VALUES.map((departmentId) => v.literal(departmentId)),
+	Object.values(DEPARTMENT_IDS).map((departmentId) => v.literal(departmentId)),
 );
 export type DepartmentId = v.InferOutput<typeof DepartmentId>;
 

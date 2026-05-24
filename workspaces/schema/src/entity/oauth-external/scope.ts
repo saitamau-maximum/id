@@ -14,14 +14,8 @@ export const SCOPE_IDS = {
 	// PHONE: 1004,
 } as const;
 
-// もしSCOPE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
-const SCOPE_ID_VALUES = Object.values(SCOPE_IDS);
-if (new Set(SCOPE_ID_VALUES).size !== SCOPE_ID_VALUES.length) {
-	throw new Error("Scope IDは重複してはいけません");
-}
-
 export const ScopeId = v.union(
-	SCOPE_ID_VALUES.map((scopeId) => v.literal(scopeId)),
+	Object.values(SCOPE_IDS).map((scopeId) => v.literal(scopeId)),
 );
 export type ScopeId = v.InferOutput<typeof ScopeId>;
 

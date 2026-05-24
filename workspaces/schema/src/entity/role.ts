@@ -45,14 +45,8 @@ export const ROLE_IDS = {
 	...TEAM_ROLE_IDS,
 } as const;
 
-// もしROLE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
-const ROLE_IDS_VALUES = Object.values(ROLE_IDS);
-if (new Set(ROLE_IDS_VALUES).size !== ROLE_IDS_VALUES.length) {
-	throw new Error("Role IDは重複してはいけません");
-}
-
 export const RoleId = v.union(
-	ROLE_IDS_VALUES.map((roleId) => v.literal(roleId)),
+	Object.values(ROLE_IDS).map((roleId) => v.literal(roleId)),
 );
 export type RoleId = v.InferOutput<typeof RoleId>;
 
