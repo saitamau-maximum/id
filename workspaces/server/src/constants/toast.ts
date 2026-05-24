@@ -53,7 +53,7 @@ export const DEV_NEW_USER_CREATED_WO_INVITATION: ToastItem = {
 	description: "(開発環境のみ) 招待コードなしでユーザーが作成されました。",
 } as const;
 
-export const TOAST_ITEMS = [
+export const TOAST_ITEMS: ReadonlyArray<ToastItem> = [
 	PLEASE_LOGIN_FOR_OAUTH,
 	ONLY_GITHUB_LOGIN_IS_AVAILABLE_FOR_INVITATION,
 	PLEASE_CONNECT_OAUTH_ACCOUNT,
