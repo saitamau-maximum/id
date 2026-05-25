@@ -1,7 +1,7 @@
 import { useId } from "react";
-import { css } from "styled-system/css";
 import { FieldSet } from "../fieldset";
 import { LabelText } from "../label-text";
+import { RequiredIndicator } from "../required-indicator";
 
 type Props = {
 	label: string;
@@ -16,17 +16,7 @@ export const WithLabelField = ({ children, label, required }: Props) => {
 			<label htmlFor={id}>
 				<LabelText>
 					{label}
-					{required && (
-						<span
-							aria-hidden="true"
-							className={css({
-								color: "red",
-								marginLeft: "token(spacing.1)",
-							})}
-						>
-							*
-						</span>
-					)}
+					{required && <RequiredIndicator />}
 				</LabelText>
 			</label>
 			{children(id)}

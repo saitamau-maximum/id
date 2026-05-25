@@ -1,4 +1,13 @@
-import { OAUTH_SCOPE_REGEX } from "@idp/schema/constants/oauth-external";
+import {
+	ALLOWED_PROMPT_VALUES,
+	ALLOWED_RESPONSE_MODES,
+	ALLOWED_RESPONSE_TYPES,
+	OAUTH_SCOPE_REGEX,
+} from "@idp/schema/constants/oauth-external";
+import {
+	PkceCodeChallenge,
+	PkceCodeChallengeMethod,
+} from "@idp/schema/entity/oauth-external/pkce";
 import type { Context } from "hono";
 import { deleteCookie, getSignedCookie } from "hono/cookie";
 import { verify } from "hono/jwt";
@@ -133,16 +142,10 @@ const route = app
 			if (!success4) {
 				return errorRedirect("invalid_request", "response_type required");
 			}
-			if (
-				responseType !== "code" &&
-				responseType !== "id_token" &&
-				// 順番は不問 (OAuth 2.0 仕様)
-				responseType !== "id_token token" &&
-				responseType !== "token id_token"
-			) {
+			if (!v.is(v.picklist(ALLOWED_RESPONSE_TYPES), responseType)) {
 				return errorRedirect(
 					"unsupported_response_type",
-					"supported response_type is 'code', 'id_token token' or 'id_token' only",
+					`supported response_type is ${ALLOWED_RESPONSE_TYPES.join(", ")}`,
 				);
 			}
 
@@ -197,9 +200,7 @@ const route = app
 				return errorRedirect("invalid_request", "invalid nonce");
 			}
 			const { output: prompt, success: success7 } = v.safeParse(
-				v.optional(
-					v.picklist(["none", "login", "consent", "select_account"] as const),
-				),
+				v.optional(v.picklist(ALLOWED_PROMPT_VALUES)),
 				query.prompt,
 			);
 			if (!success7) {
@@ -215,7 +216,7 @@ const route = app
 			}
 			const maxAge = _maxAge ? Number.parseInt(_maxAge, 10) : undefined;
 			const { output: responseMode, success: success9 } = v.safeParse(
-				v.optional(v.picklist(["query", "fragment"] as const)),
+				v.optional(v.picklist(ALLOWED_RESPONSE_MODES)),
 				query.response_mode,
 			);
 			if (!success9) {
@@ -227,6 +228,34 @@ const route = app
 					"response_mode='fragment' is not allowed when response_type='code'",
 				);
 			}
+
+			const { output: codeChallenge, success: success10 } = v.safeParse(
+				v.optional(PkceCodeChallenge),
+				query.code_challenge,
+			);
+			if (!success10) {
+				return errorRedirect("invalid_request", "invalid code_challenge");
+			}
+			const { output: codeChallengeMethod, success: success11 } = v.safeParse(
+				v.optional(PkceCodeChallengeMethod),
+				query.code_challenge_method,
+			);
+			if (!success11) {
+				return errorRedirect(
+					"invalid_request",
+					"unsupported code_challenge_method",
+				);
+			}
+			if (codeChallengeMethod && !codeChallenge) {
+				return errorRedirect(
+					"invalid_request",
+					"code_challenge required when code_challenge_method is specified",
+				);
+			}
+			const storedCodeChallengeMethod = codeChallenge
+				? // code_challenge_method のデフォルト値は plain
+					(codeChallengeMethod ?? "plain")
+				: undefined;
 			// TODO: その他のパラメータもチェックする
 			// 仕様的には must, must not がないので無視しても問題はない
 
@@ -355,6 +384,8 @@ const route = app
 				state,
 				oidcNonce: nonce,
 				oidcAuthTime: loggedInAt,
+				codeChallenge,
+				codeChallengeMethod: storedCodeChallengeMethod,
 				clientInfo: client,
 			};
 		}),
@@ -370,6 +401,8 @@ const route = app
 				state,
 				oidcNonce,
 				oidcAuthTime,
+				codeChallenge,
+				codeChallengeMethod,
 				clientInfo,
 			} = c.req.valid("query");
 			const nowUnixMs = Date.now();
@@ -388,6 +421,8 @@ const route = app
 				state,
 				oidcNonce,
 				oidcAuthTime,
+				codeChallenge,
+				codeChallengeMethod,
 				time: nowUnixMs,
 				key: privateKey,
 			});
@@ -418,6 +453,8 @@ const route = app
 						state,
 						oidcNonce,
 						oidcAuthTime,
+						codeChallenge,
+						codeChallengeMethod,
 						token,
 						nowUnixMs,
 					}}

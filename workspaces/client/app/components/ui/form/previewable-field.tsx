@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { FieldValues, Path, useForm } from "react-hook-form";
+import { type FieldValues, type Path, useFormContext } from "react-hook-form";
 import { css } from "styled-system/css";
 import { Document } from "~/components/ui/document";
 import { Form } from "~/components/ui/form";
@@ -7,11 +7,6 @@ import { Switch } from "~/components/ui/switch";
 import { useMarkdown } from "~/hooks/use-markdown";
 
 interface Props<T extends FieldValues> {
-	// useFormContext を使うと register, watch を props で渡す必要がなくなるが、
-	// 現状そのためだけに context を作るのも微妙なので、 props で渡す形にしている
-	// 今後の拡張で context が必要になったら useFormContext を使う形にすると良いかも
-	register: ReturnType<typeof useForm<T>>["register"];
-	watch: ReturnType<typeof useForm<T>>["watch"];
 	name: Path<T>;
 	placeholder?: string;
 	maxLines?: number;
@@ -23,9 +18,8 @@ export const PreviewableField = <T extends FieldValues>({
 	placeholder,
 	maxLines,
 	maxLength,
-	register,
-	watch,
 }: Props<T>) => {
+	const { watch, register } = useFormContext<T>();
 	const [isPreview, setIsPreview] = useState(false);
 	const content = watch(name);
 	const length = content ? content.length : 0;

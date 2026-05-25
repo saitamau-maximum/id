@@ -34,6 +34,8 @@ const route = app
 				state,
 				oidc_nonce,
 				oidc_auth_time,
+				code_challenge,
+				code_challenge_method,
 				time,
 				auth_token,
 				authorized,
@@ -57,6 +59,8 @@ const route = app
 				state,
 				oidcNonce: oidc_nonce,
 				oidcAuthTime: oidc_auth_time,
+				codeChallenge: code_challenge,
+				codeChallengeMethod: code_challenge_method,
 				time,
 				key: publicKey,
 				hash: auth_token,
@@ -129,6 +133,8 @@ const route = app
 				redirect_uri,
 				accessToken,
 				scopes,
+				code_challenge,
+				code_challenge_method,
 				oidc_nonce,
 				oidc_auth_time,
 			)
@@ -166,12 +172,20 @@ const route = app
 						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
 							? {
 									name: userInfo.realName,
+									nickname: userInfo.displayName,
+									preferred_username: userInfo.displayId,
 									picture: userInfo.profileImageURL,
 								}
 							: {}),
 						...(scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
 							? {
 									email: userInfo.email,
+								}
+							: {}),
+						// Custom Claims
+						...(scopes.find((s) => s.id === SCOPE_IDS.READ_ROLES)
+							? {
+									roles: userInfo.roles.map((r) => r.slug),
 								}
 							: {}),
 					});

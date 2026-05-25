@@ -11,6 +11,7 @@ export const createMockOAuthExternalRepository =
 			getClients: vi.fn(),
 			updateManagers: vi.fn(),
 			generateClientSecret: vi.fn(),
+			verifyClientSecret: vi.fn(),
 			updateClientSecretDescription: vi.fn(),
 			deleteClientSecret: vi.fn(),
 			registerClient: vi.fn(),
@@ -21,7 +22,7 @@ export const createMockOAuthExternalRepository =
 			createAccessToken: vi.fn(),
 			getTokenByCode: vi.fn(),
 			deleteTokenById: vi.fn(),
-			setCodeUsed: vi.fn(),
+			consumeCode: vi.fn(),
 			getTokenByAccessToken: vi.fn(),
 
 			// cron

@@ -5,6 +5,7 @@ import {
 } from "@idp/schema/api/oauth/access-token";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
+import { binaryToBase64Url } from "../../utils/oauth/convert-bin-base64";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
@@ -13,6 +14,14 @@ const app = factory.createApp();
 
 const OAUTH_ERROR_URI =
 	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint";
+
+const generateCodeChallenge = async (codeVerifier: string) => {
+	const hash = await crypto.subtle.digest(
+		"SHA-256",
+		new TextEncoder().encode(codeVerifier),
+	);
+	return binaryToBase64Url(new Uint8Array(hash));
+};
 
 const route = app
 	.post(
@@ -29,7 +38,8 @@ const route = app
 				);
 		}),
 		async (c) => {
-			const { code, grant_type, redirect_uri } = c.req.valid("form");
+			const { code, grant_type, redirect_uri, code_verifier } =
+				c.req.valid("form");
 
 			const { client_id, client_secret, errorRes } = (() => {
 				const { client_id, client_secret } = c.req.valid("form");
@@ -114,7 +124,11 @@ const route = app
 			// client id, secret のペアが存在するかチェック
 			if (
 				tokenInfo.client.id !== client_id ||
-				!tokenInfo.client.secrets.some((s) => s.secret === client_secret)
+				!client_secret ||
+				!(await c.var.OAuthExternalRepository.verifyClientSecret(
+					client_id,
+					client_secret,
+				))
 			) {
 				return c.json(
 					{
@@ -124,6 +138,33 @@ const route = app
 					},
 					401,
 				);
+			}
+
+			if (tokenInfo.codeChallenge) {
+				if (!code_verifier) {
+					return c.json(
+						{
+							error: "invalid_grant",
+							error_description: "Missing code_verifier",
+							error_uri: OAUTH_ERROR_URI,
+						},
+						401,
+					);
+				}
+				const codeChallenge =
+					tokenInfo.codeChallengeMethod === "S256"
+						? await generateCodeChallenge(code_verifier)
+						: code_verifier;
+				if (codeChallenge !== tokenInfo.codeChallenge) {
+					return c.json(
+						{
+							error: "invalid_grant",
+							error_description: "Invalid code_verifier",
+							error_uri: OAUTH_ERROR_URI,
+						},
+						401,
+					);
+				}
 			}
 
 			// grant_type チェック
@@ -138,24 +179,20 @@ const route = app
 				);
 			}
 
-			// もしすでに token が使われていた場合
-			if (tokenInfo.codeUsed) {
-				// そのレコードを削除
-				// delete に失敗していても response は変わらないので結果は無視する
-				await c.var.OAuthExternalRepository.deleteTokenById(tokenInfo.id);
-				return c.json(
-					{
-						error: "invalid_grant",
-						error_description: "Invalid Code (Already Used)",
-						error_uri: OAUTH_ERROR_URI,
-					},
-					401,
-				);
-			}
-
 			// token が使われたことを記録
 			try {
-				await c.var.OAuthExternalRepository.setCodeUsed(code);
+				const consumed = await c.var.OAuthExternalRepository.consumeCode(code);
+				if (!consumed) {
+					await c.var.OAuthExternalRepository.deleteTokenById(tokenInfo.id);
+					return c.json(
+						{
+							error: "invalid_grant",
+							error_description: "Invalid Code (Already Used)",
+							error_uri: OAUTH_ERROR_URI,
+						},
+						401,
+					);
+				}
 			} catch {
 				return c.json(
 					{
@@ -194,12 +231,19 @@ const route = app
 					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
 						? {
 								name: userInfo.realName,
+								nickname: userInfo.displayName,
+								preferred_username: userInfo.displayId,
 								picture: userInfo.profileImageURL,
 							}
 						: {}),
 					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
 						? {
 								email: userInfo.email,
+							}
+						: {}),
+					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.READ_ROLES)
+						? {
+								roles: userInfo.roles.map((r) => r.slug),
 							}
 						: {}),
 				});

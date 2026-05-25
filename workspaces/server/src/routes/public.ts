@@ -2,12 +2,14 @@ import type {
 	GetAffiliationsSummaryResponse,
 	GetCertificationsResponse,
 	GetPublicMemberResponse,
+	GetRolesResponse,
 } from "@idp/schema/api/public";
 import {
 	GRADE_BY_ID,
 	isGraduateGrade,
 	isUndergraduateGrade,
 } from "@idp/schema/entity/grade";
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { factory } from "../factory";
 
 const app = factory.createApp();
@@ -43,6 +45,16 @@ const route = app
 	.get("/certifications", async (c) => {
 		return c.json<GetCertificationsResponse>(
 			await c.var.CertificationRepository.getCertificationsSummary(),
+		);
+	})
+	.get("/roles", async (c) => {
+		return c.json<GetRolesResponse>(
+			Object.values(ROLE_BY_ID).map((r) => ({
+				id: r.id,
+				slug: r.slug,
+				name: r.name,
+				color: r.color,
+			})),
 		);
 	})
 	.get("/affiliations-summary", async (c) => {

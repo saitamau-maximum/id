@@ -28,14 +28,8 @@ export const DEPARTMENT_IDS = {
 	ENVIRONMENT: 505,
 } as const;
 
-// もし DEPARTMENT_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
-const DEPARTMENT_IDS_VALUES = Object.values(DEPARTMENT_IDS);
-if (new Set(DEPARTMENT_IDS_VALUES).size !== DEPARTMENT_IDS_VALUES.length) {
-	throw new Error("Department ID は重複してはいけません");
-}
-
 export const DepartmentId = v.union(
-	DEPARTMENT_IDS_VALUES.map((departmentId) => v.literal(departmentId)),
+	Object.values(DEPARTMENT_IDS).map((departmentId) => v.literal(departmentId)),
 );
 export type DepartmentId = v.InferOutput<typeof DepartmentId>;
 
@@ -148,3 +142,23 @@ export const DEPARTMENT_BY_ID = {
 		name: "環境社会デザイン学科",
 	},
 } as const satisfies Record<DepartmentId, Department>;
+
+export function toDepartmentId(val: number | string): DepartmentId;
+export function toDepartmentId(val: undefined | null): undefined;
+export function toDepartmentId(
+	val: number | string | undefined | null,
+): DepartmentId | undefined;
+export function toDepartmentId(
+	val: number | string | undefined | null,
+): DepartmentId | undefined {
+	if (typeof val === "number") {
+		return v.parse(DepartmentId, val);
+	}
+	if (typeof val === "string") {
+		return v.parse(v.pipe(v.string(), v.toNumber(), DepartmentId), val);
+	}
+	if (val === undefined || val === null) {
+		return undefined;
+	}
+	throw new Error("not implemented");
+}

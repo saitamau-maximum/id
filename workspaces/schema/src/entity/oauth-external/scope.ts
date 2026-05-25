@@ -2,6 +2,8 @@ import * as v from "valibot";
 
 export const SCOPE_IDS = {
 	READ_BASIC_INFO: 1,
+	// write:basic_infoやadmin:basic_infoなどを追加する可能性があるので、2 ~ 5は空けておく
+	READ_ROLES: 6,
 
 	// OpenID 系
 	OPENID: 1000,
@@ -12,14 +14,8 @@ export const SCOPE_IDS = {
 	// PHONE: 1004,
 } as const;
 
-// もしSCOPE_IDSの値が重複していた場合、サーバーを起動する前にエラーを出す
-const SCOPE_ID_VALUES = Object.values(SCOPE_IDS);
-if (new Set(SCOPE_ID_VALUES).size !== SCOPE_ID_VALUES.length) {
-	throw new Error("Scope IDは重複してはいけません");
-}
-
 export const ScopeId = v.union(
-	SCOPE_ID_VALUES.map((scopeId) => v.literal(scopeId)),
+	Object.values(SCOPE_IDS).map((scopeId) => v.literal(scopeId)),
 );
 export type ScopeId = v.InferOutput<typeof ScopeId>;
 
@@ -54,6 +50,11 @@ export const SCOPES_BY_ID = {
 		name: "email",
 		description:
 			"このサービスが、Maximum IdP に登録されている「連絡の取れるメールアドレス」を取得することを許可します。",
+	},
+	[SCOPE_IDS.READ_ROLES]: {
+		id: SCOPE_IDS.READ_ROLES,
+		name: "read:roles",
+		description: "このサービスがあなたのロール情報を読み取ることを許可します。",
 	},
 	// [SCOPE_IDS.ADDRESS]: {
 	// 	id: SCOPE_IDS.ADDRESS,

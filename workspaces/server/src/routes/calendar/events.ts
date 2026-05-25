@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	CreateEventParams,
+	type GetEventsResponse,
 	UpdateEventParams,
 } from "@idp/schema/api/calendar/events";
 import { ROLE_IDS } from "@idp/schema/entity/role";
@@ -16,7 +17,7 @@ const route = app
 	.get("/", memberOnlyMiddleware, async (c) => {
 		const { CalendarRepository } = c.var;
 		const events = await CalendarRepository.getAllEvents();
-		return c.json(events);
+		return c.json<GetEventsResponse>(events);
 	})
 	.post(
 		"/",

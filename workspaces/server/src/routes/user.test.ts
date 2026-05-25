@@ -37,6 +37,12 @@ const DEFAULT_USER_PROFILE_FOR_UPDATE = {
 	socialLinks: ["https://example.com"],
 };
 
+const IGNORED_FIELDS_IN_UPDATE = [
+	"displayId",
+	"realName",
+	"realNameKana",
+] as const;
+
 type ProfilePayloadTestcases = [string, Record<string, unknown>][];
 const INVALID_PAYLOADS_FOR_REGISTER = [] satisfies ProfilePayloadTestcases;
 const INVALID_PAYLOADS_FOR_UPDATE = [
@@ -156,7 +162,7 @@ describe("User Handler", () => {
 			expect(response.status).toBe(201);
 			expect(mockUserRepository.registerUser).toHaveBeenCalledWith(
 				TEST_USER_ID,
-				expect.objectContaining(DEFAULT_USER_PROFILE_FOR_REGISTER),
+				DEFAULT_USER_PROFILE_FOR_REGISTER,
 			);
 		});
 
@@ -240,7 +246,15 @@ describe("User Handler", () => {
 			expect(response.status).toBe(204);
 			expect(mockUserRepository.updateUser).toHaveBeenCalledWith(
 				TEST_USER_ID,
-				expect.objectContaining(DEFAULT_USER_PROFILE_FOR_UPDATE),
+				Object.fromEntries(
+					// IGNORED_FIELDS_IN_UPDATE に含まれるフィールドは除外して比較する
+					Object.entries(DEFAULT_USER_PROFILE_FOR_UPDATE).filter(
+						([key]) =>
+							!IGNORED_FIELDS_IN_UPDATE.includes(
+								key as (typeof IGNORED_FIELDS_IN_UPDATE)[number],
+							),
+					),
+				),
 			);
 		});
 

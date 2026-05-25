@@ -1,6 +1,9 @@
 // OAuth の Resource Owner としての役割を果たすルーティング
 
-import type { AuthUserResponse } from "@idp/schema/api/oauth/resources";
+import type {
+	AuthUserResponse,
+	UserInfoResponse,
+} from "@idp/schema/api/oauth/resources";
 import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
 import {
 	SCOPE_IDS,
@@ -37,7 +40,7 @@ const route = app
 			display_id: tokenInfo.user.profile.displayId,
 			display_name: tokenInfo.user.profile.displayName,
 			profile_image_url: tokenInfo.user.profile.profileImageURL,
-			roles: tokenInfo.user.roles.map((role) => role.name),
+			roles: tokenInfo.user.roles.map((role) => role.slug),
 		});
 	})
 	.all("/userinfo", async (c) => {
@@ -96,8 +99,11 @@ const route = app
 				userInfo.email_verified = false; // メールアドレス検証はしていないので false 固定
 			}
 		}
+		if (tokenInfo.scopes.some((scope) => scope.id === SCOPE_IDS.READ_ROLES)) {
+			userInfo.roles = tokenInfo.user.roles.map((role) => role.slug);
+		}
 
-		return c.json<OIDCUserInfo>(userInfo);
+		return c.json<UserInfoResponse>(userInfo);
 	});
 
 export { route as oauthResourcesRoute };

@@ -1,5 +1,8 @@
 import { vValidator } from "@hono/valibot-validator";
-import { InviteCreateParams } from "@idp/schema/api/invite";
+import {
+	type GetInvitesResponse,
+	InviteCreateParams,
+} from "@idp/schema/api/invite";
 import { factory } from "../factory";
 import { adminOnlyMiddleware } from "../middleware/auth";
 import { noCacheMiddleware } from "../middleware/cache";
@@ -23,7 +26,7 @@ const protectedRoute = app
 	.get("/", async (c) => {
 		const { InviteRepository } = c.var;
 		const invites = await InviteRepository.getAllInvites();
-		return c.json(invites);
+		return c.json<GetInvitesResponse>(invites);
 	})
 	.post(
 		"/",

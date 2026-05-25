@@ -1,4 +1,5 @@
 import { GradeId } from "@idp/schema/entity/grade";
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import {
 	SCOPES_BY_ID,
 	type Scope,
@@ -10,6 +11,10 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
+import {
+	generateClientSecretHash,
+	maskClientSecret,
+} from "../../../utils/oauth/client-secret";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
 import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
 
@@ -78,6 +83,12 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...client,
+			secrets: client.secrets.map((secret) => ({
+				...secret,
+				secret: secret.secretHash
+					? maskClientSecret(secret.secretSuffix ?? secret.secret)
+					: secret.secret,
+			})),
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes
 				.map((clientScope) => clientScope.scopeId) // 型ガードを通すため scopeId で map し filter する
@@ -137,10 +148,13 @@ export class CloudflareOAuthExternalRepository
 
 	async generateClientSecret(clientId: string, userId: string) {
 		const secret = binaryToBase64(crypto.getRandomValues(new Uint8Array(39)));
+		const secretHash = await generateClientSecretHash(secret);
 
 		const res = await this.client.insert(schema.oauthClientSecrets).values({
 			clientId,
-			secret,
+			secret: secretHash,
+			secretHash,
+			secretSuffix: secret.slice(-6),
 			description: "",
 			issuedAt: new Date(),
 			issuedBy: userId,
@@ -148,6 +162,18 @@ export class CloudflareOAuthExternalRepository
 
 		if (!res.success) throw new Error("Failed to insert secret");
 		return secret;
+	}
+
+	async verifyClientSecret(clientId: string, secret: string) {
+		const secrets = await this.client.query.oauthClientSecrets.findMany({
+			where: (clientSecret, { eq }) => eq(clientSecret.clientId, clientId),
+		});
+		const secretHash = await generateClientSecretHash(secret);
+		return secrets.some((clientSecret) => {
+			if (clientSecret.secretHash)
+				return clientSecret.secretHash === secretHash;
+			return clientSecret.secret === secret;
+		});
 	}
 
 	async updateClientSecretDescription(
@@ -324,6 +350,8 @@ export class CloudflareOAuthExternalRepository
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		codeChallenge?: string,
+		codeChallengeMethod?: PkceCodeChallengeMethod,
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) {
@@ -339,6 +367,8 @@ export class CloudflareOAuthExternalRepository
 				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
+				codeChallenge,
+				codeChallengeMethod,
 				oidcNonce,
 				oidcAuthTime,
 				accessToken,
@@ -415,15 +445,19 @@ export class CloudflareOAuthExternalRepository
 		}
 	}
 
-	async setCodeUsed(code: string) {
+	async consumeCode(code: string) {
 		const res = await this.client
 			.update(schema.oauthTokens)
 			.set({ codeUsed: true })
-			.where(eq(schema.oauthTokens.code, code));
+			.where(
+				and(
+					eq(schema.oauthTokens.code, code),
+					eq(schema.oauthTokens.codeUsed, false),
+				),
+			)
+			.returning({ id: schema.oauthTokens.id });
 
-		if (!res.success) {
-			throw new Error("Failed to set code used");
-		}
+		return res.length === 1;
 	}
 
 	async getTokenByAccessToken(accessToken: string) {

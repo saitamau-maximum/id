@@ -3,7 +3,8 @@
 	"type": "module",
 	"scripts": {
 		"fix": "biome check --write ./src",
-		"check": "biome check ./src"
+		"check": "biome check ./src",
+		"test": "vitest"
 	},
 	"exports": {
 		"./api/*": "./src/api/*.ts",
@@ -12,5 +13,8 @@
 	},
 	"dependencies": {
 		"valibot": "^1.2.0"
+	},
+	"devDependencies": {
+		"vitest": "^3.2.4"
 	}
 }

@@ -14,14 +14,8 @@ export const GRADE_IDS = {
 	GUEST: 11,
 } as const;
 
-// もし GRADE_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
-const GRADE_ID_VALUES = Object.values(GRADE_IDS);
-if (new Set(GRADE_ID_VALUES).size !== GRADE_ID_VALUES.length) {
-	throw new Error("Grade IDは重複してはいけません");
-}
-
 export const GradeId = v.union(
-	GRADE_ID_VALUES.map((gradeId) => v.literal(gradeId)),
+	Object.values(GRADE_IDS).map((gradeId) => v.literal(gradeId)),
 );
 export type GradeId = v.InferOutput<typeof GradeId>;
 
@@ -79,3 +73,23 @@ export const isOutsideGrade = (
 ): grade is (typeof OUTSIDE_GRADE)[number] => {
 	return (OUTSIDE_GRADE as ReadonlyArray<GradeId>).includes(grade);
 };
+
+export function toGradeId(val: number | string): GradeId;
+export function toGradeId(val: undefined | null): undefined;
+export function toGradeId(
+	val: number | string | undefined | null,
+): GradeId | undefined;
+export function toGradeId(
+	val: number | string | undefined | null,
+): GradeId | undefined {
+	if (typeof val === "number") {
+		return v.parse(GradeId, val);
+	}
+	if (typeof val === "string") {
+		return v.parse(v.pipe(v.string(), v.toNumber(), GradeId), val);
+	}
+	if (val === undefined || val === null) {
+		return undefined;
+	}
+	throw new Error("not implemented");
+}

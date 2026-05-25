@@ -4,6 +4,7 @@ import type {
 	ClientSecret,
 	ClientToken,
 } from "@idp/schema/entity/oauth-external/client";
+import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
 import type { Scope, ScopeId } from "@idp/schema/entity/oauth-external/scope";
 import type { Role } from "@idp/schema/entity/role";
 import type { User, UserBasicInfo, UserProfile } from "@idp/schema/entity/user";
@@ -44,6 +45,7 @@ export type IOAuthExternalRepository = {
 	getClients: () => Promise<GetClientsRes[]>;
 	updateManagers: (clientId: string, userIds: string[]) => Promise<void>;
 	generateClientSecret: (clientId: string, userId: string) => Promise<string>;
+	verifyClientSecret: (clientId: string, secret: string) => Promise<boolean>;
 	updateClientSecretDescription: (
 		clientId: string,
 		secret: string,
@@ -77,12 +79,14 @@ export type IOAuthExternalRepository = {
 		redirectUri: string | undefined,
 		accessToken: string,
 		scopes: Scope[],
+		codeChallenge?: string,
+		codeChallengeMethod?: PkceCodeChallengeMethod,
 		oidcNonce?: string,
 		oidcAuthTime?: number,
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;
-	setCodeUsed: (code: string) => Promise<void>;
+	consumeCode: (code: string) => Promise<boolean>;
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;

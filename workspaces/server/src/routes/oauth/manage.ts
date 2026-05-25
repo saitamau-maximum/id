@@ -1,25 +1,21 @@
 import { vValidator } from "@hono/valibot-validator";
-import { OAuthAppRegisterParams } from "@idp/schema/api/oauth/manage";
+import {
+	type OAuthAppGetClientByIdResponse,
+	type OAuthAppGetListResponse,
+	OAuthAppRegisterParams,
+} from "@idp/schema/api/oauth/manage";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 import { vValidatorForFormdata } from "../../middleware/v-validator";
+import {
+	generateClientSecretHash,
+	maskClientSecret,
+} from "../../utils/oauth/client-secret";
 
 const app = factory.createApp();
-
-const generateHash = async (secret: string) => {
-	const hashBuffer = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(secret),
-	);
-	const hashArray = Array.from(new Uint8Array(hashBuffer));
-	const hashHex = hashArray
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
-	return hashHex;
-};
 
 const verifyOAuthClientMiddleware = factory.createMiddleware(
 	async (c, next) => {
@@ -50,22 +46,26 @@ const secretDescriptionSchema = v.object({
 
 const route = app
 	.get("/list", authMiddleware, async (c) =>
-		c.json(await c.var.OAuthExternalRepository.getClients()),
+		c.json<OAuthAppGetListResponse>(
+			await c.var.OAuthExternalRepository.getClients(),
+		),
 	)
 	.get("/:clientId", authMiddleware, verifyOAuthClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
 		const { secrets, ...rest } = client;
 
-		return c.json({
+		return c.json<OAuthAppGetClientByIdResponse>({
 			...rest,
 			secrets: await Promise.all(
 				secrets.map(async (secret) => ({
 					...secret,
 					// secret は 8bit * 39 = 312bit = 6bit * 52 -> 52 文字
-					secret: `******${secret.secret.slice(-6)}`,
+					secret: maskClientSecret(secret.secretSuffix ?? secret.secret),
 					// こうしてしまうと削除時などに secret が特定できないので、 hash を生成
-					secretHash: await generateHash(secret.secret),
+					secretHash:
+						secret.secretHash ??
+						(await generateClientSecretHash(secret.secret)),
 				})),
 			),
 		});
@@ -245,7 +245,7 @@ const route = app
 
 			return c.json({
 				secret,
-				secretHash: await generateHash(secret),
+				secretHash: await generateClientSecretHash(secret),
 			});
 		},
 	)
@@ -263,10 +263,12 @@ const route = app
 			if (!client) return c.text("Not found", 404);
 
 			for (const secret of client.secrets) {
-				if ((await generateHash(secret.secret)) === secretHash) {
+				const knownSecretHash =
+					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
+				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.updateClientSecretDescription(
 						clientId,
-						secret.secret,
+						secret.secretHash ? knownSecretHash : secret.secret,
 						description,
 					);
 					return c.text("OK");
@@ -286,10 +288,12 @@ const route = app
 			if (!client) return c.text("Not found", 404);
 
 			for (const secret of client.secrets) {
-				if ((await generateHash(secret.secret)) === secretHash) {
+				const knownSecretHash =
+					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
+				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.deleteClientSecret(
 						clientId,
-						secret.secret,
+						secret.secretHash ? knownSecretHash : secret.secret,
 					);
 					return c.text("OK");
 				}

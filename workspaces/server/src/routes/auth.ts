@@ -1,3 +1,4 @@
+import type { GetMeResponse } from "@idp/schema/api/auth";
 import { deleteCookie } from "hono/cookie";
 import { COOKIE_NAME } from "../constants/cookie";
 import { factory } from "../factory";
@@ -24,7 +25,7 @@ const route = app
 		if (!res) {
 			return c.body(null, 404);
 		}
-		return c.json(res);
+		return c.json<GetMeResponse>(res);
 	})
 	.get("/ping", authMiddleware, async (c) => {
 		const payload = c.get("jwtPayload");

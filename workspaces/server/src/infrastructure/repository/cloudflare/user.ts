@@ -97,6 +97,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			with: {
 				roles: true,
 				profile: true,
+				invitation: true,
 				certifications: {
 					with: {
 						certification: true,
@@ -126,6 +127,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			isProvisional: !!user.invitationId,
 			lastPaymentConfirmedAt: user.lastPaymentConfirmedAt,
 			lastLoginAt: user.lastLoginAt ?? undefined,
+			inviteIssuedAt: user.invitation?.createdAt ?? undefined,
 			displayName: user.profile.displayName ?? undefined,
 			realName: user.profile.realName ?? undefined,
 			realNameKana: user.profile.realNameKana ?? undefined,
@@ -238,9 +240,10 @@ export class CloudflareUserRepository implements IUserRepository {
 			"id" | "userId"
 		> = {
 			displayName: payload.displayName,
-			displayId: payload.displayId,
-			realName: payload.realName,
-			realNameKana: payload.realNameKana,
+			// ここは変更不可なので、 payload に含まれていても無視する
+			// displayId: payload.displayId,
+			// realName: payload.realName,
+			// realNameKana: payload.realNameKana,
 			profileImageURL: payload.profileImageURL,
 			academicEmail: payload.academicEmail ?? null, // undefined ではなく null をセットしないと更新されない
 			email: payload.email,
@@ -335,7 +338,6 @@ export class CloudflareUserRepository implements IUserRepository {
 			displayId: user.profile.displayId ?? undefined,
 			profileImageURL: user.profile.profileImageURL ?? undefined,
 			grade: v.is(GradeId, user.profile.grade) ? user.profile.grade : undefined,
-			bio: user.profile.bio ?? undefined,
 			roles: user.roles
 				.map((role) => role.roleId)
 				.filter((roleId) => v.is(RoleId, roleId))
