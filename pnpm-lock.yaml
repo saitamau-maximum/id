@@ -134,6 +134,10 @@ importers:
       valibot:
         specifier: ^1.2.0
         version: 1.2.0(typescript@5.9.3)
+    devDependencies:
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@25.2.3)(@vitest/ui@3.2.4)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
   workspaces/server:
     dependencies:

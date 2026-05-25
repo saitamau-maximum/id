@@ -8,14 +8,8 @@ export const FACULTY_IDS = {
 	ENGINEERING: 5,
 } as const;
 
-// もし FACULTY_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
-const FACULTY_IDS_VALUES = Object.values(FACULTY_IDS);
-if (new Set(FACULTY_IDS_VALUES).size !== FACULTY_IDS_VALUES.length) {
-	throw new Error("Faculty ID は重複してはいけません");
-}
-
 export const FacultyId = v.union(
-	FACULTY_IDS_VALUES.map((facultyId) => v.literal(facultyId)),
+	Object.values(FACULTY_IDS).map((facultyId) => v.literal(facultyId)),
 );
 export type FacultyId = v.InferOutput<typeof FacultyId>;
 

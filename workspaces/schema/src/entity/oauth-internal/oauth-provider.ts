@@ -5,16 +5,8 @@ export const OAUTH_PROVIDER_IDS = {
 	DISCORD: 2,
 } as const;
 
-// もし OAUTH_PROVIDER_IDS の値が重複していた場合、サーバーを起動する前にエラーを出す
-const OAUTH_PROVIDER_IDS_VALUES = Object.values(OAUTH_PROVIDER_IDS);
-if (
-	new Set(OAUTH_PROVIDER_IDS_VALUES).size !== OAUTH_PROVIDER_IDS_VALUES.length
-) {
-	throw new Error("OAuth Provider ID は重複してはいけません");
-}
-
 export const OAuthProviderId = v.union(
-	OAUTH_PROVIDER_IDS_VALUES.map((id) => v.literal(id)),
+	Object.values(OAUTH_PROVIDER_IDS).map((id) => v.literal(id)),
 );
 
 export type OAuthProviderId = v.InferOutput<typeof OAuthProviderId>;
