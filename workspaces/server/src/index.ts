@@ -9,8 +9,6 @@ import { CloudflareContributionCacheRepository } from "./infrastructure/reposito
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
 import { CloudflareEquipmentRepository } from "./infrastructure/repository/cloudflare/equipment";
-import { CloudflareExternalRoleRepository } from "./infrastructure/repository/cloudflare/external-role";
-import { CloudflareExternalRoleConditionRepository } from "./infrastructure/repository/cloudflare/external-role-condition";
 import { CloudflareInviteRepository } from "./infrastructure/repository/cloudflare/invite";
 import { CloudflareLocationRepository } from "./infrastructure/repository/cloudflare/location";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
@@ -88,14 +86,6 @@ export const route = app
 		// 招待
 		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
 		// 外部ロール同期
-		c.set(
-			"ExternalRoleRepository",
-			new CloudflareExternalRoleRepository(c.env.DB),
-		);
-		c.set(
-			"ExternalRoleConditionRepository",
-			new CloudflareExternalRoleConditionRepository(c.env.DB),
-		);
 		c.set("ExternalRoleProviderRepositories", {
 			[OAUTH_PROVIDER_IDS.GITHUB]: new GithubExternalRoleProviderRepository(
 				octokit,
