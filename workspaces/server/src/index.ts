@@ -1,3 +1,4 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
@@ -18,7 +19,9 @@ import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/c
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
+import { DiscordExternalRoleProviderRepository } from "./infrastructure/repository/discord/external-role";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
+import { GithubExternalRoleProviderRepository } from "./infrastructure/repository/github/external-role";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
@@ -93,6 +96,15 @@ export const route = app
 			"ExternalRoleConditionRepository",
 			new CloudflareExternalRoleConditionRepository(c.env.DB),
 		);
+		c.set("ExternalRoleProviderRepositories", {
+			[OAUTH_PROVIDER_IDS.GITHUB]: new GithubExternalRoleProviderRepository(
+				octokit,
+			),
+			[OAUTH_PROVIDER_IDS.DISCORD]: new DiscordExternalRoleProviderRepository(
+				c.env.DISCORD_BOT_TOKEN,
+				c.env.DISCORD_GUILD_ID,
+			),
+		});
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		c.set(

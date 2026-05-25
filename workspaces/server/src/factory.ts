@@ -1,3 +1,4 @@
+import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { createFactory } from "hono/factory";
 import type { JwtVariables } from "hono/jwt";
 import type { IContributionCacheRepository } from "./repository/cache";
@@ -8,6 +9,7 @@ import type { IDiscordBotRepository } from "./repository/discord-bot";
 import type { IEquipmentRepository } from "./repository/equipment";
 import type { IExternalRoleRepository } from "./repository/external-role";
 import type { IExternalRoleConditionRepository } from "./repository/external-role-condition";
+import type { IExternalRoleProviderRepository } from "./repository/external-role-provider";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -42,6 +44,10 @@ export type HonoEnv = {
 		// 外部ロール同期
 		ExternalRoleRepository: IExternalRoleRepository;
 		ExternalRoleConditionRepository: IExternalRoleConditionRepository;
+		ExternalRoleProviderRepositories: Record<
+			OAuthProviderId,
+			IExternalRoleProviderRepository
+		>;
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		OAuthInternalRepository: IOAuthInternalRepository;
