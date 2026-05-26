@@ -12,6 +12,7 @@ import { UserSettingFormAcademic } from "./partial-form/academic";
 import { UserSettingFormCertification } from "./partial-form/certification";
 import { UserSettingFormContact } from "./partial-form/contact";
 import { UserSettingFormOAuth } from "./partial-form/oauth";
+import { UserSettingFormRole } from "./partial-form/role";
 import type {
 	ChildFormProps,
 	FormInputValues,
@@ -73,6 +74,12 @@ const settingsTabs = [
 		label: "OAuth 連携",
 		hash: "#oauth",
 		component: UserSettingFormOAuth,
+		displayInOnboarding: false,
+	},
+	{
+		label: "ロール",
+		hash: "#role",
+		component: UserSettingFormRole,
 		displayInOnboarding: false,
 	},
 ] satisfies SettingsTabItem[];
