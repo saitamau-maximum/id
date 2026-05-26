@@ -18,10 +18,10 @@ import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/c
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
-import { DiscordExternalRoleProviderRepository } from "./infrastructure/repository/discord/external-role";
+import { DiscordExternalRoleProviderRepository } from "./infrastructure/repository/discord/role";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
-import { GithubExternalRoleProviderRepository } from "./infrastructure/repository/github/external-role";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
+import { GithubExternalRoleProviderRepository } from "./infrastructure/repository/github/role";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
