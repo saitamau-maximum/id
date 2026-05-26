@@ -1,7 +1,7 @@
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import type { RoleId } from "@idp/schema/entity/role";
-import type { ExternalRoleCondition } from "../repository/external-role-condition";
-import type { IExternalRoleProviderRepository } from "../repository/external-role-provider";
+import type { ExternalRoleCondition } from "./repository/external-role-condition";
+import type { IExternalRoleProviderRepository } from "./repository/external-role-provider";
 
 export interface SyncConnection {
 	providerId: OAuthProviderId;

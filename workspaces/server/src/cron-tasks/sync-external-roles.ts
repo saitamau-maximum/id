@@ -1,7 +1,7 @@
 import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
 import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import type { Context } from "hono";
-import { type SyncConnection, syncOneUser } from "../external-role-sync/sync";
+import { type SyncConnection, syncOneUser } from "../external-role-sync";
 import type { HonoEnv } from "../factory";
 
 /*
