@@ -36,6 +36,9 @@ const route = app
 		return c.text("OK", 200);
 	})
 	.post("/sync-external-roles", async (c) => {
+		// preview と production が同じ外部 API (GitHub Org / Discord Guild) を
+		// 奪い合うのを防ぐため、production 以外はスキップする。
+		if (c.env.ENV !== "production") return c.text("OK", 200);
 		c.executionCtx.waitUntil(syncExternalRolesTask(c));
 		return c.text("OK", 200);
 	});

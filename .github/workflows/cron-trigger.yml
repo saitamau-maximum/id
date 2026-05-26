@@ -45,9 +45,6 @@ jobs:
         if: github.event.schedule == '0 0 1 5 *'
         run: ./trigger remove-member-role
 
-      # 外部ロール sync は GitHub Org / Discord Guild へ書き込むため
-      # production のみ実行する。preview の DB 状態と prod の DB 状態が違うと
-      # 両者が外部 API を奪い合うため。
       - name: Sync External Roles [0 4 * * *]
-        if: github.event.schedule == '0 4 * * *' && matrix.host == 'api.id.maximum.vc'
+        if: github.event.schedule == '0 4 * * *'
         run: ./trigger sync-external-roles
