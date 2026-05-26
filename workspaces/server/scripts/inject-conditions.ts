@@ -7,10 +7,7 @@
  *   pnpm -C workspaces/server run inject:conditions:preview
  *   pnpm -C workspaces/server run inject:conditions:prod
  */
-import { execSync } from "node:child_process";
-import { unlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { spawnSync } from "node:child_process";
 import { CONDITIONS } from "../src/external-role-sync/conditions.ts";
 
 type Env = "local" | "preview" | "production";
@@ -36,17 +33,11 @@ const computeSignature = (sortedRoleIds: number[]): string =>
 const escapeSql = (s: string): string => s.replace(/'/g, "''");
 
 function generateSql(): string {
-	const lines: string[] = ["BEGIN TRANSACTION;", ""];
+	const lines: string[] = [];
 
 	for (const cond of CONDITIONS) {
 		const sorted = [...cond.requiredRoleIds].sort((a, b) => a - b);
 		const signature = computeSignature(sorted);
-		const roleLabel =
-			sorted.length === 0 ? "(all users)" : sorted.join(" AND ");
-
-		lines.push(
-			`-- provider=${cond.providerId} externalRoleId=${cond.externalRoleId} requiredRoles=[${roleLabel}]`,
-		);
 		lines.push(
 			`INSERT OR IGNORE INTO external_role_conditions (provider_id, external_role_id, requirement_count, requirement_signature)`,
 		);
@@ -62,10 +53,8 @@ function generateSql(): string {
 				`  SELECT id, ${roleId} FROM external_role_conditions WHERE provider_id = ${cond.providerId} AND external_role_id = '${escapeSql(cond.externalRoleId)}' AND requirement_signature = '${escapeSql(signature)}';`,
 			);
 		}
-		lines.push("");
 	}
 
-	lines.push("COMMIT;");
 	return lines.join("\n");
 }
 
@@ -86,18 +75,24 @@ function main() {
 	);
 	console.log(sql);
 
-	const tmpFile = join(tmpdir(), `idp-conditions-${Date.now()}.sql`);
-	writeFileSync(tmpFile, sql, "utf-8");
-
-	try {
-		execSync(
-			`wrangler d1 execute ${dbName} ${wranglerFlags} --file ${tmpFile}`,
-			{ stdio: "inherit", cwd: new URL("..", import.meta.url).pathname },
-		);
-		console.log("Done.");
-	} finally {
-		unlinkSync(tmpFile);
+	const result = spawnSync(
+		"pnpm",
+		[
+			"exec",
+			"wrangler",
+			"d1",
+			"execute",
+			dbName,
+			...wranglerFlags.split(" "),
+			"--command",
+			sql,
+		],
+		{ stdio: "inherit", cwd: new URL("..", import.meta.url).pathname },
+	);
+	if (result.status !== 0) {
+		process.exit(result.status ?? 1);
 	}
+	console.log("Done.");
 }
 
 main();
