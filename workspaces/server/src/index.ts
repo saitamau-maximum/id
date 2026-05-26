@@ -1,4 +1,3 @@
-import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import { createAppAuth } from "@octokit/auth-app";
 import { cors } from "hono/cors";
 import { csrf } from "hono/csrf";
@@ -112,14 +111,14 @@ export const route = app
 			c.env.DISCORD_CALENDAR_CHANNEL_ID,
 		);
 		c.set("DiscordBotRepository", discordBotRepo);
-		c.set("ExternalRoleProviderRepositories", {
-			[OAUTH_PROVIDER_IDS.GITHUB]: new GithubExternalRoleProviderRepository(
-				organizationRepo,
-			),
-			[OAUTH_PROVIDER_IDS.DISCORD]: new DiscordExternalRoleProviderRepository(
-				discordBotRepo,
-			),
-		});
+		c.set(
+			"GithubRoleProviderRepository",
+			new GithubExternalRoleProviderRepository(organizationRepo),
+		);
+		c.set(
+			"DiscordRoleProviderRepository",
+			new DiscordExternalRoleProviderRepository(discordBotRepo),
+		);
 
 		// ----- Dynamic Variables ----- //
 		c.set("roleIds", []);

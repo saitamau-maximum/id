@@ -27,8 +27,14 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 		UserRepository,
 		OAuthInternalRepository,
 		ExternalRoleConditionRepository,
-		ExternalRoleProviderRepositories,
+		GithubRoleProviderRepository,
+		DiscordRoleProviderRepository,
 	} = c.var;
+
+	const providerRepos = {
+		[OAUTH_PROVIDER_IDS.GITHUB]: GithubRoleProviderRepository,
+		[OAUTH_PROVIDER_IDS.DISCORD]: DiscordRoleProviderRepository,
+	};
 
 	// 全 condition は cron 開始時に一括取得し、各ユーザーで使い回す
 	// (ユーザー数 × DB 往復にしないため)
@@ -63,7 +69,7 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 				conditions,
 				userRoleIds,
 				connections: syncConnections,
-				providerRepos: ExternalRoleProviderRepositories,
+				providerRepos,
 			});
 
 			for (const r of results) {
