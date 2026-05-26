@@ -1,4 +1,4 @@
-import type { Octokit } from "octokit";
+import { type Octokit, RequestError } from "octokit";
 import type { IOrganizationRepository } from "../../../repository/organization";
 
 export class GithubOrganizationRepository implements IOrganizationRepository {
@@ -35,7 +35,10 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 				username,
 			})
 			.then((res) => res.data.state === "active")
-			.catch(() => false);
+			.catch((err) => {
+				if (err instanceof RequestError && err.status === 404) return false;
+				throw err;
+			});
 	}
 
 	async addTeamMember(teamSlug: string, username: string): Promise<void> {
