@@ -3,6 +3,7 @@ import { Contributions } from "../entity/contribution";
 import { DEPARTMENT_BY_ID, toDepartmentId } from "../entity/department";
 import { FACULTY_IDS, toFacultyId } from "../entity/faculty";
 import { isOutsideGrade, toGradeId } from "../entity/grade";
+import { RoleId } from "../entity/role";
 import { UserProfile } from "../entity/user";
 
 export const UserProfileUpdateParams = v.config(
@@ -126,3 +127,8 @@ export const UserGetContributionsResponse = Contributions;
 export type UserGetContributionsResponse = v.InferOutput<
 	typeof UserGetContributionsResponse
 >;
+
+export const UserRoleUpdateParams = v.object({
+	roleIds: v.array(RoleId),
+});
+export type UserRoleUpdateParams = v.InferOutput<typeof UserRoleUpdateParams>;
