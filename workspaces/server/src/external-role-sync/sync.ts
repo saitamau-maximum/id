@@ -1,10 +1,7 @@
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import type { RoleId } from "@idp/schema/entity/role";
+import type { ExternalRoleCondition } from "../repository/external-role-condition";
 import type { IExternalRoleProviderRepository } from "../repository/external-role-provider";
-import {
-	computeAssignedExternalRoles,
-	getManagedExternalRoleIds,
-} from "./conditions";
 
 export interface SyncConnection {
 	providerId: OAuthProviderId;
@@ -24,6 +21,50 @@ export interface ProviderSyncResult {
 	removed: string[];
 	failed: SyncFailure[];
 }
+
+/**
+ * provider が sync 管理対象として扱う外部ロール (externalRoleId) の集合を返す。
+ * sync 時、ユーザーが持つ外部ロールのうちこの集合に含まれるもののみが
+ * 削除対象になる (手動運用ロールには触らない)。
+ */
+export const getManagedExternalRoleIds = (
+	conditions: readonly ExternalRoleCondition[],
+	providerId: OAuthProviderId,
+): Set<string> => {
+	return new Set(
+		conditions
+			.filter((c) => c.providerId === providerId)
+			.map((c) => c.externalRoleId),
+	);
+};
+
+/**
+ * 指定された IdP ロールを持つユーザーが provider 側で持つべき外部ロール
+ * (externalRoleId) の集合を計算する。
+ *
+ * 1 condition は AND セマンティクス (requiredRoleIds を全て持つ場合に成立)。
+ * 同じ externalRoleId に対して複数 condition があれば、行間は OR で結合される
+ * = 1 つでも成立する condition があればその externalRoleId を付与する。
+ */
+export const computeAssignedExternalRoles = (
+	conditions: readonly ExternalRoleCondition[],
+	providerId: OAuthProviderId,
+	userRoleIds: ReadonlySet<RoleId>,
+): Set<string> => {
+	const assigned = new Set<string>();
+	for (const cond of conditions) {
+		if (cond.providerId !== providerId) continue;
+		let satisfied = true;
+		for (const req of cond.requiredRoleIds) {
+			if (!userRoleIds.has(req)) {
+				satisfied = false;
+				break;
+			}
+		}
+		if (satisfied) assigned.add(cond.externalRoleId);
+	}
+	return assigned;
+};
 
 /**
  * provider 側の現状 (current) と「持つべき」(shouldHave) を比較し、
@@ -62,6 +103,7 @@ export const computeDiff = (
  *   (sync 不要)。
  */
 export const syncOneUser = async (params: {
+	conditions: readonly ExternalRoleCondition[];
 	userRoleIds: ReadonlySet<RoleId>;
 	connections: readonly SyncConnection[];
 	providerRepos: Partial<
@@ -74,10 +116,14 @@ export const syncOneUser = async (params: {
 		const repo = params.providerRepos[conn.providerId];
 		if (!repo) continue;
 
-		const managed = getManagedExternalRoleIds(conn.providerId);
+		const managed = getManagedExternalRoleIds(
+			params.conditions,
+			conn.providerId,
+		);
 		if (managed.size === 0) continue;
 
 		const shouldHave = computeAssignedExternalRoles(
+			params.conditions,
 			conn.providerId,
 			params.userRoleIds,
 		);

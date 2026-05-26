@@ -28,8 +28,17 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 	const {
 		UserRepository,
 		OAuthInternalRepository,
+		ExternalRoleConditionRepository,
 		ExternalRoleProviderRepositories,
 	} = c.var;
+
+	// 全 condition は cron 開始時に一括取得し、各ユーザーで使い回す
+	// (ユーザー数 × DB 往復にしないため)
+	const conditions = await ExternalRoleConditionRepository.listAll();
+	if (conditions.length === 0) {
+		console.log("syncExternalRolesTask: no conditions defined, skipping.");
+		return;
+	}
 
 	const users = await UserRepository.fetchApprovedUsers();
 
@@ -53,6 +62,7 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 			});
 
 			const results = await syncOneUser({
+				conditions,
 				userRoleIds,
 				connections: syncConnections,
 				providerRepos: ExternalRoleProviderRepositories,

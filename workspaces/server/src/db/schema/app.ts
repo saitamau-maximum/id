@@ -262,3 +262,62 @@ export const equipmentsRelations = relations(equipments, ({ one }) => ({
 		references: [users.id],
 	}),
 }));
+
+// 外部ロール付与条件
+// 1 行 = 1 つの AND 条件 (requirements を全て満たすユーザーに external_role_id を付与する)。
+// 同じ (provider_id, external_role_id) に対して複数行あれば、行間は OR で結合される。
+// → 結果として OR-of-ANDs (積和標準形) で任意の論理式を表現できる。
+export const externalRoleConditions = sqliteTable(
+	"external_role_conditions",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		providerId: int("provider_id", { mode: "number" }).notNull(),
+		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
+		externalRoleId: text("external_role_id").notNull(),
+		// requirements の件数。「ユーザーが必要 role を全部持つ」判定を SQL の
+		//   GROUP BY ... HAVING COUNT(*) = requirement_count
+		// で行うため、冗長カラムとして持っておく。
+		requirementCount: int("requirement_count", { mode: "number" }).notNull(),
+		// requirements の正規化 (sort 済み role_id をカンマ区切り) を入れる。
+		// 「同じ (provider, role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
+		requirementSignature: text("requirement_signature").notNull(),
+	},
+	(table) => [
+		uniqueIndex("external_role_conditions_dedup").on(
+			table.providerId,
+			table.externalRoleId,
+			table.requirementSignature,
+		),
+		index("external_role_conditions_provider_idx").on(table.providerId),
+	],
+);
+
+export const externalRoleConditionRequirements = sqliteTable(
+	"external_role_condition_requirements",
+	{
+		conditionId: integer("condition_id")
+			.notNull()
+			.references(() => externalRoleConditions.id, { onDelete: "cascade" }),
+		requiredRoleId: int("required_role_id", { mode: "number" }).notNull(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.conditionId, table.requiredRoleId] }),
+	],
+);
+
+export const externalRoleConditionsRelations = relations(
+	externalRoleConditions,
+	({ many }) => ({
+		requirements: many(externalRoleConditionRequirements),
+	}),
+);
+
+export const externalRoleConditionRequirementsRelations = relations(
+	externalRoleConditionRequirements,
+	({ one }) => ({
+		condition: one(externalRoleConditions, {
+			fields: [externalRoleConditionRequirements.conditionId],
+			references: [externalRoleConditions.id],
+		}),
+	}),
+);
