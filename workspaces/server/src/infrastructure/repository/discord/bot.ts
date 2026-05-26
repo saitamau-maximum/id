@@ -102,6 +102,30 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		return await res.json<RESTPostAPIChannelMessageResult>();
 	}
 
+	async assignGuildMemberRole(userId: string, roleId: string): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, userId, roleId),
+			{ method: "PUT" },
+		);
+		if (!res.ok) {
+			throw new Error(
+				`Failed to assign Discord role ${roleId} to ${userId}: ${res.status} ${res.statusText}`,
+			);
+		}
+	}
+
+	async removeGuildMemberRole(userId: string, roleId: string): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, userId, roleId),
+			{ method: "DELETE" },
+		);
+		if (!res.ok) {
+			throw new Error(
+				`Failed to remove Discord role ${roleId} from ${userId}: ${res.status} ${res.statusText}`,
+			);
+		}
+	}
+
 	async sendCalendarNotification(
 		type: CalendarNotifyType,
 		event: CalendarEventForNotification,

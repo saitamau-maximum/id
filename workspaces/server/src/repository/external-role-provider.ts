@@ -1,15 +1,5 @@
 // 外部プロバイダ (GitHub Org / Discord Guild) に対するロール操作 API 抽象
-export interface FetchedExternalRole {
-	// プロバイダ側で安定的にロールを識別する文字列。
-	// GitHub Team は slug、Discord Role は snowflake。
-	externalRoleId: string;
-	name: string;
-}
-
 export interface IExternalRoleProviderRepository {
-	// プロバイダに存在するロール一覧を取得する (validation 用途)
-	fetchAvailableRoles(): Promise<FetchedExternalRole[]>;
-
 	/**
 	 * 指定ユーザーが現在持っている外部ロールのうち、 candidates に含まれるものを返す。
 	 *

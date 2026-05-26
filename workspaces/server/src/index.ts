@@ -91,15 +91,6 @@ export const route = app
 			"ExternalRoleConditionRepository",
 			new CloudflareExternalRoleConditionRepository(c.env.DB),
 		);
-		c.set("ExternalRoleProviderRepositories", {
-			[OAUTH_PROVIDER_IDS.GITHUB]: new GithubExternalRoleProviderRepository(
-				octokit,
-			),
-			[OAUTH_PROVIDER_IDS.DISCORD]: new DiscordExternalRoleProviderRepository(
-				c.env.DISCORD_BOT_TOKEN,
-				c.env.DISCORD_GUILD_ID,
-			),
-		});
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		c.set(
@@ -112,16 +103,23 @@ export const route = app
 		);
 		// GitHub 関連
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
-		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
+		const organizationRepo = new GithubOrganizationRepository(octokit);
+		c.set("OrganizationRepository", organizationRepo);
 		// Discord 関連
-		c.set(
-			"DiscordBotRepository",
-			new DiscordBotRepository(
-				c.env.DISCORD_BOT_TOKEN,
-				c.env.DISCORD_GUILD_ID,
-				c.env.DISCORD_CALENDAR_CHANNEL_ID,
-			),
+		const discordBotRepo = new DiscordBotRepository(
+			c.env.DISCORD_BOT_TOKEN,
+			c.env.DISCORD_GUILD_ID,
+			c.env.DISCORD_CALENDAR_CHANNEL_ID,
 		);
+		c.set("DiscordBotRepository", discordBotRepo);
+		c.set("ExternalRoleProviderRepositories", {
+			[OAUTH_PROVIDER_IDS.GITHUB]: new GithubExternalRoleProviderRepository(
+				organizationRepo,
+			),
+			[OAUTH_PROVIDER_IDS.DISCORD]: new DiscordExternalRoleProviderRepository(
+				discordBotRepo,
+			),
+		});
 
 		// ----- Dynamic Variables ----- //
 		c.set("roleIds", []);

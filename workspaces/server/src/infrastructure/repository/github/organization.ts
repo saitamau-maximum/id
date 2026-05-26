@@ -23,4 +23,40 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 			invitee_id: githubId,
 		});
 	}
+
+	async isActiveTeamMember(
+		teamSlug: string,
+		username: string,
+	): Promise<boolean> {
+		return await this.octokit
+			.request("GET /orgs/{org}/teams/{team_slug}/memberships/{username}", {
+				org: "saitamau-maximum",
+				team_slug: teamSlug,
+				username,
+			})
+			.then((res) => res.data.state === "active")
+			.catch(() => false);
+	}
+
+	async addTeamMember(teamSlug: string, username: string): Promise<void> {
+		await this.octokit.request(
+			"PUT /orgs/{org}/teams/{team_slug}/memberships/{username}",
+			{
+				org: "saitamau-maximum",
+				team_slug: teamSlug,
+				username,
+			},
+		);
+	}
+
+	async removeTeamMember(teamSlug: string, username: string): Promise<void> {
+		await this.octokit.request(
+			"DELETE /orgs/{org}/teams/{team_slug}/memberships/{username}",
+			{
+				org: "saitamau-maximum",
+				team_slug: teamSlug,
+				username,
+			},
+		);
+	}
 }
