@@ -271,13 +271,13 @@ export const externalRoleConditions = sqliteTable(
 	"external_role_conditions",
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
-		providerId: int("provider_id", { mode: "number" }).notNull(),
+		providerId: int("provider_id").notNull(),
 		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
 		externalRoleId: text("external_role_id").notNull(),
 		// requirements の件数。「ユーザーが必要 role を全部持つ」判定を SQL の
 		//   GROUP BY ... HAVING COUNT(*) = requirement_count
 		// で行うため、冗長カラムとして持っておく。
-		requirementCount: int("requirement_count", { mode: "number" }).notNull(),
+		requirementCount: int("requirement_count").notNull(),
 		// requirements の正規化 (sort 済み role_id をカンマ区切り) を入れる。
 		// 「同じ (provider, role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
 		requirementSignature: text("requirement_signature").notNull(),
@@ -298,7 +298,7 @@ export const externalRoleConditionRequirements = sqliteTable(
 		conditionId: integer("condition_id")
 			.notNull()
 			.references(() => externalRoleConditions.id, { onDelete: "cascade" }),
-		requiredRoleId: int("required_role_id", { mode: "number" }).notNull(),
+		requiredRoleId: int("required_role_id").notNull(),
 	},
 	(table) => [
 		primaryKey({ columns: [table.conditionId, table.requiredRoleId] }),
