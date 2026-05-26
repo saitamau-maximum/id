@@ -4,12 +4,10 @@ import type { Context } from "hono";
 import { type SyncConnection, syncOneUser } from "../external-role-sync/sync";
 import type { HonoEnv } from "../factory";
 
-/**
+/*
  * OAuthConnection から sync 用の externalUserId を抽出する。
- * - GitHub: provider 側の team membership API は username (login) を要求する
- *   ので `name` を使う (login 時に oauth_connections.name に保存している)。
+ * - GitHub: provider 側の team membership API は username (login) を要求するので `name` を使う
  * - Discord: snowflake (= providerUserId) をそのまま使う。
- *
  * name が null など必要な情報が欠けている場合は null を返す (caller がスキップ)。
  */
 const externalUserIdForConnection = (conn: OAuthConnection): string | null => {
