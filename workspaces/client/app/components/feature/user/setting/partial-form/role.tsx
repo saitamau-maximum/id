@@ -1,5 +1,5 @@
 import { ROLE_BY_ID, ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { css } from "styled-system/css";
 import { ButtonLike } from "~/components/ui/button-like";
 import { Form } from "~/components/ui/form";
@@ -9,11 +9,14 @@ import { useUpdateRole } from "../hooks/use-update-role";
 
 export const UserSettingFormRole = () => {
 	const { user, isLoading } = useAuth();
-	const { mutate: updateRole } = useUpdateRole();
+	const { mutate: updateRole, isPending } = useUpdateRole();
 
-	const [selectedRoleIds, setSelectedRoleIds] = useState(
-		!isLoading && user ? user.roles.map((r) => r.id) : [],
-	);
+	const [selectedRoleIds, setSelectedRoleIds] = useState<RoleId[]>([]);
+
+	useEffect(() => {
+		if (!isLoading && user)
+			setSelectedRoleIds(user.roles.map((role) => role.id));
+	}, [isLoading, user]);
 
 	const onToggleRole = useCallback(
 		(roleId: RoleId) => {
@@ -29,12 +32,15 @@ export const UserSettingFormRole = () => {
 		[selectedRoleIds],
 	);
 
+	const canSubmit = !isLoading && !isPending;
+
 	const onSubmit = useCallback(() => {
+		if (!canSubmit) return;
 		const selfAssignableSelectedRoleIds = selectedRoleIds.filter(
 			(roleId) => ROLE_BY_ID[roleId].selfAssignable,
 		);
 		updateRole(selfAssignableSelectedRoleIds);
-	}, [selectedRoleIds, updateRole]);
+	}, [selectedRoleIds, updateRole, canSubmit]);
 
 	return (
 		<>
@@ -140,8 +146,10 @@ export const UserSettingFormRole = () => {
 				</Form.SelectGroup>
 			)}
 
-			<button type="button" onClick={onSubmit}>
-				<ButtonLike variant="primary">更新</ButtonLike>
+			<button type="button" onClick={onSubmit} disabled={!canSubmit}>
+				<ButtonLike variant="primary" disabled={!canSubmit}>
+					更新
+				</ButtonLike>
 			</button>
 		</>
 	);
