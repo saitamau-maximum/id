@@ -335,4 +335,55 @@ describe("User Handler", () => {
 	test.todo("PUT /user/profile-image");
 	test.todo("DELETE /user/oauth-connection/:providerId");
 	test.todo("GET /user/profile-image/:userId");
+
+	describe("PUT /user/role", () => {
+		beforeEach(() => {
+			// member じゃないと更新できないので、常に MEMBER ロールを返すようにする
+			vi.mocked(mockUserRepository.fetchRolesByUserId).mockResolvedValue([
+				ROLE_IDS.MEMBER,
+			]);
+		});
+
+		it("should update self-assignable roles", async () => {
+			// JWT トークンを生成
+			const token = await createJWT(TEST_USER_ID);
+
+			const response = await app.request("/user/role", {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					roleIds: [ROLE_IDS.CP],
+				}),
+			});
+
+			expect(response.status).toBe(204);
+			expect(mockUserRepository.updateUserRole).toHaveBeenCalledWith(
+				TEST_USER_ID,
+				// Member ロールも含まれていることを確認する
+				expect.arrayContaining([ROLE_IDS.MEMBER, ROLE_IDS.CP]),
+			);
+		});
+
+		it("should not update non-self-assignable roles", async () => {
+			// JWT トークンを生成
+			const token = await createJWT(TEST_USER_ID);
+
+			const response = await app.request("/user/role", {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
+				},
+				body: JSON.stringify({
+					roleIds: [ROLE_IDS.ADMIN],
+				}),
+			});
+
+			expect(response.status).toBe(400);
+			expect(mockUserRepository.updateUserRole).not.toHaveBeenCalled();
+		});
+	});
 });
