@@ -12,7 +12,7 @@ export const UserSettingFormRole = () => {
 	const { mutate: updateRole } = useUpdateRole();
 
 	const [selectedRoleIds, setSelectedRoleIds] = useState(
-		user ? user.roles.map((r) => r.id) : [],
+		!isLoading && user ? user.roles.map((r) => r.id) : [],
 	);
 
 	const onToggleRole = useCallback(

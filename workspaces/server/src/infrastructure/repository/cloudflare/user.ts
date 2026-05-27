@@ -464,7 +464,8 @@ export class CloudflareUserRepository implements IUserRepository {
 			return;
 		}
 
-		const values = roleIds.map((roleId) => ({
+		// 重複があると UNIQUE 制約違反でエラーになるため、重複を排除しておく
+		const values = [...new Set(roleIds)].map((roleId) => ({
 			userId,
 			roleId,
 		}));
