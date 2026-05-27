@@ -245,7 +245,13 @@ const route = app
 
 			// もし self-assignable でないロールが含まれていたらエラー
 			if (roleIds.some((roleId) => !ROLE_BY_ID[roleId].selfAssignable)) {
-				return c.text("One or more roles cannot be self-assigned", 400);
+				const nonAssignableRoleNames = roleIds
+					.filter((roleId) => !ROLE_BY_ID[roleId].selfAssignable)
+					.map((roleId) => ROLE_BY_ID[roleId].name);
+				return c.text(
+					`Cannot assign ${nonAssignableRoleNames.join(", ")}`,
+					400,
+				);
 			}
 
 			// 現在持っているロールを取得
