@@ -1,6 +1,7 @@
 import type { OAuthProviderId } from "@idp/schema/entity/oauth-internal/oauth-provider";
-import type { RoleId } from "@idp/schema/entity/role";
+import { RoleId } from "@idp/schema/entity/role";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type {
 	ExternalRoleCondition,
@@ -28,7 +29,9 @@ export class CloudflareExternalRoleConditionRepository
 			providerId: row.providerId as OAuthProviderId,
 			externalRoleId: row.externalRoleId,
 			requiredRoleIds: new Set(
-				row.requirements.map((r) => r.requiredRoleId as RoleId),
+				row.requirements
+					.map((r) => r.requiredRoleId)
+					.filter((requiredRoleId) => v.is(RoleId, requiredRoleId)),
 			),
 		}));
 	}
