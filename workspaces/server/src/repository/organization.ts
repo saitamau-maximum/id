@@ -4,6 +4,11 @@ export interface IOrganizationRepository {
 	// 指定 username が指定 team の active メンバー (招待承諾済み) かを返す。
 	// pending や not member は false。
 	isActiveTeamMember: (teamSlug: string, username: string) => Promise<boolean>;
+	// 指定 username が所属する team slugs を一括取得する (GraphQL で 1 クエリ)。
+	fetchUserTeamMemberships: (
+		username: string,
+		teamSlugs: ReadonlySet<string>,
+	) => Promise<Set<string>>;
 	addTeamMember: (teamSlug: string, username: string) => Promise<void>;
 	removeTeamMember: (teamSlug: string, username: string) => Promise<void>;
 }

@@ -1,6 +1,13 @@
 import { type Octokit, RequestError } from "octokit";
 import type { IOrganizationRepository } from "../../../repository/organization";
 
+type TeamMembersQueryResult = {
+	organization: Record<
+		string,
+		{ members: { nodes: { login: string }[] } } | null
+	>;
+};
+
 export class GithubOrganizationRepository implements IOrganizationRepository {
 	constructor(private readonly octokit: Octokit) {}
 
@@ -39,6 +46,42 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 				if (err instanceof RequestError && err.status === 404) return false;
 				throw err;
 			});
+	}
+
+	async fetchUserTeamMemberships(
+		username: string,
+		teamSlugs: ReadonlySet<string>,
+	): Promise<Set<string>> {
+		const slugs = Array.from(teamSlugs);
+		if (slugs.length === 0) return new Set();
+
+		// 1 クエリで全チームの membership を確認する。
+		// team(slug) が存在しない場合は null が返るので安全に扱える。
+		// members(query) は前方一致検索のため nodes に返ってきたログインと
+		// 完全一致確認を行い active 所属かを判定する。
+		const teamFields = slugs
+			.map(
+				(slug, i) =>
+					`t${i}: team(slug: "${slug}") { members(query: "${username}", first: 1) { nodes { login } } }`,
+			)
+			.join("\n");
+
+		const result = await this.octokit.graphql<TeamMembersQueryResult>(`
+			query {
+				organization(login: "saitamau-maximum") {
+					${teamFields}
+				}
+			}
+		`);
+
+		return new Set(
+			slugs.filter((slug, i) => {
+				const nodes = result.organization[`t${i}`]?.members.nodes ?? [];
+				return nodes.some(
+					(n) => n.login.toLowerCase() === username.toLowerCase(),
+				);
+			}),
+		);
 	}
 
 	async addTeamMember(teamSlug: string, username: string): Promise<void> {
