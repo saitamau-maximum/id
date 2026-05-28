@@ -55,10 +55,6 @@ export const externalRoleConditions = sqliteTable(
 		providerId: int("provider_id").notNull(),
 		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
 		externalRoleId: text("external_role_id").notNull(),
-		// requirements の件数。「ユーザーが必要 role を全部持つ」判定を SQL の
-		//   GROUP BY ... HAVING COUNT(*) = requirement_count
-		// で行うため、冗長カラムとして持っておく。
-		requirementCount: int("requirement_count").notNull(),
 		// requirements の正規化 (sort 済み role_id をカンマ区切り) を入れる。
 		// 「同じ (provider, role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
 		requirementSignature: text("requirement_signature").notNull(),
