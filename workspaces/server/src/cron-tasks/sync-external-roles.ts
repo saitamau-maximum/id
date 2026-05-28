@@ -59,11 +59,13 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 			const connections =
 				await OAuthInternalRepository.fetchOAuthConnectionsByUserId(user.id);
 
-			const syncConnections: SyncConnection[] = connections.flatMap((conn) => {
-				const externalUserId = externalUserIdForConnection(conn);
-				if (!externalUserId) return [];
-				return [{ providerId: conn.providerId, externalUserId }];
-			});
+			const syncConnections: SyncConnection[] = connections
+				.map((conn) => {
+					const externalUserId = externalUserIdForConnection(conn);
+					if (!externalUserId) return null;
+					return { providerId: conn.providerId, externalUserId };
+				})
+				.filter((obj) => obj !== null);
 
 			const results = await syncOneUser({
 				conditions,
