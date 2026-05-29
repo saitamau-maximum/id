@@ -3,17 +3,21 @@ import { css } from "styled-system/css";
 
 interface Props {
 	role: Role;
+	variant?: "default" | "large";
 }
 
-export const RoleBadge = ({ role }: Props) => {
+export const RoleBadge = ({ role, variant }: Props) => {
 	return (
 		<span
 			className={css({
 				display: "inline-block",
-				padding: "token(spacing.1) token(spacing.2)",
+				padding:
+					variant === "large"
+						? "token(spacing.2) token(spacing.4)"
+						: "token(spacing.1) token(spacing.2)",
 				lineHeight: 1,
-				borderRadius: 8,
-				fontSize: 12,
+				borderRadius: variant === "large" ? 12 : 8,
+				fontSize: variant === "large" ? 14 : 12,
 				fontWeight: 500,
 				whiteSpace: "nowrap",
 			})}
