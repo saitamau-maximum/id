@@ -28,10 +28,13 @@ export class CloudflareExternalRoleConditionRepository
 			id: row.id,
 			providerId: row.providerId as OAuthProviderId,
 			externalRoleId: row.externalRoleId,
-			requiredRoleIds: new Set(
-				row.requirements
-					.map((r) => r.requiredRoleId)
-					.filter((requiredRoleId) => v.is(RoleId, requiredRoleId)),
+requiredRoleIds: new Set(
+				row.requirements.map((r) => {
+					if (!v.is(RoleId, r.requiredRoleId)) {
+						throw new Error(`Invalid required role ID: ${r.requiredRoleId}`);
+					}
+					return r.requiredRoleId;
+				}),
 			),
 		}));
 	}
