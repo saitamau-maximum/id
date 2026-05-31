@@ -1,8 +1,146 @@
 import type { OAuthConnection } from "@idp/schema/entity/oauth-internal/oauth-connection";
-import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import {
+	OAUTH_PROVIDER_IDS,
+	type OAuthProviderId,
+} from "@idp/schema/entity/oauth-internal/oauth-provider";
+import type { RoleId } from "@idp/schema/entity/role";
 import type { Context } from "hono";
-import { type SyncConnection, syncOneUser } from "../external-role-sync";
 import type { HonoEnv } from "../factory";
+import type { ExternalRoleCondition } from "../repository/external-role-condition";
+import type { IExternalRoleProviderRepository } from "../repository/external-role-provider";
+
+interface SyncConnection {
+	providerId: OAuthProviderId;
+	// GitHub は username (login)、Discord は snowflake
+	externalUserId: string;
+}
+
+interface SyncFailure {
+	externalRoleId: string;
+	action: "add" | "remove";
+	error: unknown;
+}
+
+interface ProviderSyncResult {
+	providerId: OAuthProviderId;
+	added: string[];
+	removed: string[];
+	failed: SyncFailure[];
+}
+
+const getManagedExternalRoleIds = (
+	conditions: readonly ExternalRoleCondition[],
+	providerId: OAuthProviderId,
+): Set<string> => {
+	return new Set(
+		conditions
+			.filter((c) => c.providerId === providerId)
+			.map((c) => c.externalRoleId),
+	);
+};
+
+const computeAssignedExternalRoles = (
+	conditions: readonly ExternalRoleCondition[],
+	providerId: OAuthProviderId,
+	userRoleIds: ReadonlySet<RoleId>,
+): Set<string> => {
+	const assigned = new Set<string>();
+	for (const cond of conditions) {
+		if (cond.providerId !== providerId) continue;
+		let satisfied = true;
+		for (const req of cond.requiredRoleIds) {
+			if (!userRoleIds.has(req)) {
+				satisfied = false;
+				break;
+			}
+		}
+		if (satisfied) assigned.add(cond.externalRoleId);
+	}
+	return assigned;
+};
+
+const computeDiff = (
+	shouldHave: ReadonlySet<string>,
+	current: ReadonlySet<string>,
+	managed: ReadonlySet<string>,
+): { adds: string[]; removes: string[] } => {
+	const adds: string[] = [];
+	for (const role of shouldHave) {
+		if (!current.has(role)) adds.push(role);
+	}
+	const removes: string[] = [];
+	for (const role of current) {
+		if (managed.has(role) && !shouldHave.has(role)) removes.push(role);
+	}
+	return { adds, removes };
+};
+
+const syncOneUser = async (params: {
+	conditions: readonly ExternalRoleCondition[];
+	userRoleIds: ReadonlySet<RoleId>;
+	connections: readonly SyncConnection[];
+	providerRepos: Partial<
+		Record<OAuthProviderId, IExternalRoleProviderRepository>
+	>;
+}): Promise<ProviderSyncResult[]> => {
+	const results: ProviderSyncResult[] = [];
+
+	for (const conn of params.connections) {
+		const repo = params.providerRepos[conn.providerId];
+		if (!repo) continue;
+
+		const managed = getManagedExternalRoleIds(
+			params.conditions,
+			conn.providerId,
+		);
+		if (managed.size === 0) continue;
+
+		const shouldHave = computeAssignedExternalRoles(
+			params.conditions,
+			conn.providerId,
+			params.userRoleIds,
+		);
+		const current = await repo.fetchUserRoles(conn.externalUserId, managed);
+		const { adds, removes } = computeDiff(shouldHave, current, managed);
+
+		const failed: SyncFailure[] = [];
+
+		const settledAdds = await Promise.allSettled(
+			adds.map((role) => repo.assignRole(conn.externalUserId, role)),
+		);
+		settledAdds.forEach((res, i) => {
+			if (res.status === "rejected") {
+				failed.push({
+					externalRoleId: adds[i],
+					action: "add",
+					error: res.reason,
+				});
+			}
+		});
+
+		const settledRemoves = await Promise.allSettled(
+			removes.map((role) => repo.removeRole(conn.externalUserId, role)),
+		);
+		settledRemoves.forEach((res, i) => {
+			if (res.status === "rejected") {
+				failed.push({
+					externalRoleId: removes[i],
+					action: "remove",
+					error: res.reason,
+				});
+			}
+		});
+
+		results.push({
+			providerId: conn.providerId,
+			added: adds,
+			removed: removes,
+			failed,
+		});
+	}
+
+	return results;
+};
 
 /*
  * OAuthConnection から sync 用の externalUserId を抽出する。
@@ -18,7 +156,6 @@ const externalUserIdForConnection = (conn: OAuthConnection): string | null => {
 };
 
 /**
- * 毎日 04:00 JST に実行される。
  * 本登録済み全ユーザーについて、IdP の roles を真値として GitHub Org Team /
  * Discord Guild Role に同期する。
  */
