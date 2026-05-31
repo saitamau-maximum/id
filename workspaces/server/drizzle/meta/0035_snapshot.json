@@ -261,13 +261,6 @@
 					"notNull": true,
 					"autoincrement": false
 				},
-				"requirement_count": {
-					"name": "requirement_count",
-					"type": "integer",
-					"primaryKey": false,
-					"notNull": true,
-					"autoincrement": false
-				},
 				"requirement_signature": {
 					"name": "requirement_signature",
 					"type": "text",

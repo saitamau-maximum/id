@@ -9,7 +9,6 @@ CREATE TABLE `external_role_conditions` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`provider_id` integer NOT NULL,
 	`external_role_id` text NOT NULL,
-	`requirement_count` integer NOT NULL,
 	`requirement_signature` text NOT NULL
 );
 --> statement-breakpoint
