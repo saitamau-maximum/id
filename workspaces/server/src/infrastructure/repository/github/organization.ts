@@ -92,7 +92,7 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 		`);
 
 		return new Set(
-			slugs.filter((slug, i) => {
+			slugs.filter((_slug, i) => {
 				const nodes = result.organization[`t${i}`]?.members.nodes ?? [];
 				return nodes.some(
 					(n) => n.login.toLowerCase() === username.toLowerCase(),
