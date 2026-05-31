@@ -105,4 +105,19 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 			},
 		);
 	}
+
+	async fetchUserRoles(
+		username: string,
+		candidates: ReadonlySet<string>,
+	): Promise<Set<string>> {
+		return this.fetchUserTeamMemberships(username, candidates);
+	}
+
+	async assignRole(username: string, teamSlug: string): Promise<void> {
+		await this.addTeamMember(teamSlug, username);
+	}
+
+	async removeRole(username: string, teamSlug: string): Promise<void> {
+		await this.removeTeamMember(teamSlug, username);
+	}
 }

@@ -126,6 +126,23 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		}
 	}
 
+	async fetchUserRoles(
+		snowflake: string,
+		candidates: ReadonlySet<string>,
+	): Promise<Set<string>> {
+		const member = await this.getGuildMember(snowflake);
+		if (member === null) return new Set();
+		return new Set(member.roles.filter((r) => candidates.has(r)));
+	}
+
+	async assignRole(snowflake: string, roleId: string): Promise<void> {
+		await this.assignGuildMemberRole(snowflake, roleId);
+	}
+
+	async removeRole(snowflake: string, roleId: string): Promise<void> {
+		await this.removeGuildMemberRole(snowflake, roleId);
+	}
+
 	async sendCalendarNotification(
 		type: CalendarNotifyType,
 		event: CalendarEventForNotification,

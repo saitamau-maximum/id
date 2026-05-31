@@ -7,7 +7,15 @@ import type { RoleId } from "@idp/schema/entity/role";
 import type { Context } from "hono";
 import type { HonoEnv } from "../factory";
 import type { ExternalRoleCondition } from "../repository/external-role-condition";
-import type { IExternalRoleProviderRepository } from "../repository/external-role-provider";
+
+interface RoleProvider {
+	fetchUserRoles(
+		externalUserId: string,
+		candidates: ReadonlySet<string>,
+	): Promise<Set<string>>;
+	assignRole(externalUserId: string, externalRoleId: string): Promise<void>;
+	removeRole(externalUserId: string, externalRoleId: string): Promise<void>;
+}
 
 interface SyncConnection {
 	providerId: OAuthProviderId;
@@ -79,9 +87,7 @@ const syncOneUser = async (params: {
 	conditions: readonly ExternalRoleCondition[];
 	userRoleIds: ReadonlySet<RoleId>;
 	connections: readonly SyncConnection[];
-	providerRepos: Partial<
-		Record<OAuthProviderId, IExternalRoleProviderRepository>
-	>;
+	providerRepos: Partial<Record<OAuthProviderId, RoleProvider>>;
 }): Promise<ProviderSyncResult[]> => {
 	const results: ProviderSyncResult[] = [];
 
@@ -164,13 +170,13 @@ export const syncExternalRolesTask = async (c: Context<HonoEnv>) => {
 		UserRepository,
 		OAuthInternalRepository,
 		ExternalRoleConditionRepository,
-		GithubRoleProviderRepository,
-		DiscordRoleProviderRepository,
+		OrganizationRepository,
+		DiscordBotRepository,
 	} = c.var;
 
 	const providerRepos = {
-		[OAUTH_PROVIDER_IDS.GITHUB]: GithubRoleProviderRepository,
-		[OAUTH_PROVIDER_IDS.DISCORD]: DiscordRoleProviderRepository,
+		[OAUTH_PROVIDER_IDS.GITHUB]: OrganizationRepository,
+		[OAUTH_PROVIDER_IDS.DISCORD]: DiscordBotRepository,
 	};
 
 	// 全 condition は cron 開始時に一括取得し、各ユーザーで使い回す

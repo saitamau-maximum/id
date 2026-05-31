@@ -17,10 +17,8 @@ import { CloudflareOAuthInternalRepository } from "./infrastructure/repository/c
 import { CloudflareUserRepository } from "./infrastructure/repository/cloudflare/user";
 import { CloudflareUserStorageRepository } from "./infrastructure/repository/cloudflare/user-storage";
 import { DiscordBotRepository } from "./infrastructure/repository/discord/bot";
-import { DiscordExternalRoleProviderRepository } from "./infrastructure/repository/discord/role";
 import { GithubContributionRepository } from "./infrastructure/repository/github/contribution";
 import { GithubOrganizationRepository } from "./infrastructure/repository/github/organization";
-import { GithubExternalRoleProviderRepository } from "./infrastructure/repository/github/role";
 import { adminRoute } from "./routes/admin";
 import { authRoute } from "./routes/auth";
 import { calendarRoute } from "./routes/calendar";
@@ -111,14 +109,6 @@ export const route = app
 			c.env.DISCORD_CALENDAR_CHANNEL_ID,
 		);
 		c.set("DiscordBotRepository", discordBotRepo);
-		c.set(
-			"GithubRoleProviderRepository",
-			new GithubExternalRoleProviderRepository(organizationRepo),
-		);
-		c.set(
-			"DiscordRoleProviderRepository",
-			new DiscordExternalRoleProviderRepository(discordBotRepo),
-		);
 
 		// ----- Dynamic Variables ----- //
 		c.set("roleIds", []);

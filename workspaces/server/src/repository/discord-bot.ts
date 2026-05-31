@@ -26,4 +26,10 @@ export interface IDiscordBotRepository {
 	): Promise<void>;
 	assignGuildMemberRole(userId: string, roleId: string): Promise<void>;
 	removeGuildMemberRole(userId: string, roleId: string): Promise<void>;
+	fetchUserRoles(
+		snowflake: string,
+		candidates: ReadonlySet<string>,
+	): Promise<Set<string>>;
+	assignRole(snowflake: string, roleId: string): Promise<void>;
+	removeRole(snowflake: string, roleId: string): Promise<void>;
 }
