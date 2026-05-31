@@ -95,8 +95,7 @@ export const route = app
 		);
 		// GitHub 関連
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
-		const organizationRepo = new GithubOrganizationRepository(octokit);
-		c.set("OrganizationRepository", organizationRepo);
+		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
 		// Discord 関連
 		const discordBotRepo = new DiscordBotRepository(
 			c.env.DISCORD_BOT_TOKEN,
