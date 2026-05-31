@@ -48,6 +48,23 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 			});
 	}
 
+	async isPendingTeamMember(
+		teamSlug: string,
+		username: string,
+	): Promise<boolean> {
+		return await this.octokit
+			.request("GET /orgs/{org}/teams/{team_slug}/memberships/{username}", {
+				org: "saitamau-maximum",
+				team_slug: teamSlug,
+				username,
+			})
+			.then((res) => res.data.state === "pending")
+			.catch((err) => {
+				if (err instanceof RequestError && err.status === 404) return false;
+				throw err;
+			});
+	}
+
 	async fetchUserTeamMemberships(
 		username: string,
 		teamSlugs: ReadonlySet<string>,
