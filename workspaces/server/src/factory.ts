@@ -38,8 +38,6 @@ export type HonoEnv = {
 		EquipmentRepository: IEquipmentRepository;
 		// 招待
 		InviteRepository: IInviteRepository;
-		// 外部ロール同期
-		ExternalRoleConditionRepository: IExternalRoleConditionRepository;
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		OAuthInternalRepository: IOAuthInternalRepository;
@@ -49,6 +47,8 @@ export type HonoEnv = {
 		OrganizationRepository: IOrganizationRepository;
 		// Discord 関連
 		DiscordBotRepository: IDiscordBotRepository;
+		// 外部ロール同期
+		ExternalRoleConditionRepository: IExternalRoleConditionRepository;
 		// ----- Dynamic Variables ----- //
 		roleIds: number[];
 		tokenInfo?: Awaited<

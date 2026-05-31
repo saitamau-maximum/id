@@ -83,11 +83,6 @@ export const route = app
 		c.set("EquipmentRepository", new CloudflareEquipmentRepository(c.env.DB));
 		// 招待
 		c.set("InviteRepository", new CloudflareInviteRepository(c.env.DB));
-		// 外部ロール同期
-		c.set(
-			"ExternalRoleConditionRepository",
-			new CloudflareExternalRoleConditionRepository(c.env.DB),
-		);
 		// ----- IdP OAuth & Connect ----- //
 		// 内外の OAuth 関連
 		c.set(
@@ -109,6 +104,11 @@ export const route = app
 			c.env.DISCORD_CALENDAR_CHANNEL_ID,
 		);
 		c.set("DiscordBotRepository", discordBotRepo);
+		// 外部ロール同期
+		c.set(
+			"ExternalRoleConditionRepository",
+			new CloudflareExternalRoleConditionRepository(c.env.DB),
+		);
 
 		// ----- Dynamic Variables ----- //
 		c.set("roleIds", []);
