@@ -1,10 +1,13 @@
 import { type Octokit, RequestError } from "octokit";
 import type { IOrganizationRepository } from "../../../repository/organization";
 
-type TeamMembersQueryResult = {
+type TeamMembershipQueryResult = {
 	organization: Record<
 		string,
-		{ members: { nodes: { login: string }[] } } | null
+		{
+			members: { nodes: { login: string }[] };
+			invitations: { nodes: { login: string | null }[] };
+		} | null
 	>;
 };
 
@@ -72,18 +75,21 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 		const slugs = Array.from(teamSlugs);
 		if (slugs.length === 0) return new Set();
 
-		// 1 クエリで全チームの membership を確認する。
-		// team(slug) が存在しない場合は null が返るので安全に扱える。
-		// members(query) は前方一致検索のため nodes に返ってきたログインと
-		// 完全一致確認を行い active 所属かを判定する。
+		// active と pending 両方を 1 クエリで取得する。
+		// pending 招待を含めないと、条件を満たさなくなったユーザーへの招待が
+		// diff に現れず、後で承認されたときに不正なロールが付与されてしまう。
+		// invitations の first は上限が 100。(GitHub GraphQL)
 		const teamFields = slugs
 			.map(
 				(slug, i) =>
-					`t${i}: team(slug: "${slug}") { members(query: "${username}", first: 1) { nodes { login } } }`,
+					`t${i}: team(slug: "${slug}") {
+						members(query: "${username}", first: 1) { nodes { login } }
+						invitations(first: 100) { nodes { login } }
+					}`,
 			)
 			.join("\n");
 
-		const result = await this.octokit.graphql<TeamMembersQueryResult>(`
+		const result = await this.octokit.graphql<TeamMembershipQueryResult>(`
 			query {
 				organization(login: "saitamau-maximum") {
 					${teamFields}
@@ -93,9 +99,12 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 
 		return new Set(
 			slugs.filter((_slug, i) => {
-				const nodes = result.organization[`t${i}`]?.members.nodes ?? [];
-				return nodes.some(
-					(n) => n.login.toLowerCase() === username.toLowerCase(),
+				const team = result.organization[`t${i}`];
+				if (!team) return false;
+				const lc = username.toLowerCase();
+				return (
+					team.members.nodes.some((n) => n.login.toLowerCase() === lc) ||
+					team.invitations.nodes.some((n) => n.login?.toLowerCase() === lc)
 				);
 			}),
 		);
