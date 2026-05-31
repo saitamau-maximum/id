@@ -28,7 +28,7 @@ export class CloudflareExternalRoleConditionRepository
 			id: row.id,
 			providerId: row.providerId as OAuthProviderId,
 			externalRoleId: row.externalRoleId,
-requiredRoleIds: new Set(
+			requiredRoleIds: new Set(
 				row.requirements.map((r) => {
 					if (!v.is(RoleId, r.requiredRoleId)) {
 						throw new Error(`Invalid required role ID: ${r.requiredRoleId}`);
