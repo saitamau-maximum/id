@@ -2,12 +2,14 @@ import { vValidator } from "@hono/valibot-validator";
 import {
 	type UserGetContributionsResponse,
 	UserProfileUpdateParams,
+	UserRoleUpdateParams,
 } from "@idp/schema/api/user";
 import {
 	OAUTH_PROVIDER_IDS,
 	OAuthProviderId,
 	REQUIRED_OAUTH_PROVIDER_IDS,
 } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import { ROLE_BY_ID } from "@idp/schema/entity/role";
 import { stream } from "hono/streaming";
 import * as v from "valibot";
 import { optimizeImage } from "wasm-image-optimization";
@@ -231,6 +233,43 @@ const route = app
 		} catch {
 			return c.text("Not found", 404);
 		}
-	});
+	})
+	.put(
+		"/role",
+		memberOnlyMiddleware,
+		vValidator("json", UserRoleUpdateParams),
+		async (c) => {
+			const { UserRepository } = c.var;
+			const payload = c.get("jwtPayload");
+			const { roleIds } = c.req.valid("json");
+
+			// もし self-assignable でないロールが含まれていたらエラー
+			if (roleIds.some((roleId) => !ROLE_BY_ID[roleId].selfAssignable)) {
+				const nonAssignableRoleNames = roleIds
+					.filter((roleId) => !ROLE_BY_ID[roleId].selfAssignable)
+					.map((roleId) => ROLE_BY_ID[roleId].name);
+				return c.text(
+					`Cannot assign ${nonAssignableRoleNames.join(", ")}`,
+					400,
+				);
+			}
+
+			// 現在持っているロールを取得
+			const currentRoleIds = await UserRepository.fetchRolesByUserId(
+				payload.userId,
+			);
+
+			const newRoleIds = [
+				// updateUserRole ではすべて上書きされてしまうので、現在持っているロールのうち self-assignable でないものはそのまま残す
+				...currentRoleIds.filter(
+					(roleId) => !ROLE_BY_ID[roleId].selfAssignable,
+				),
+				...roleIds,
+			];
+
+			await UserRepository.updateUserRole(payload.userId, newRoleIds);
+			return c.body(null, 204);
+		},
+	);
 
 export { route as userRoute };

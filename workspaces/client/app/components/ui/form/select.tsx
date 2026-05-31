@@ -31,6 +31,11 @@ export const Select = ({
 				"&:has(>input[type='checkbox']:checked)": {
 					borderColor: "green.600",
 				},
+				"&:has(>input[type='checkbox']:disabled)": {
+					borderColor: "gray.300",
+					cursor: "not-allowed",
+					opacity: 0.6,
+				},
 			})}
 		>
 			<input

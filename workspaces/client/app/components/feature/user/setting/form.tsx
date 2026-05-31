@@ -12,6 +12,7 @@ import { UserSettingFormAcademic } from "./partial-form/academic";
 import { UserSettingFormCertification } from "./partial-form/certification";
 import { UserSettingFormContact } from "./partial-form/contact";
 import { UserSettingFormOAuth } from "./partial-form/oauth";
+import { UserSettingFormRole } from "./partial-form/role";
 import type {
 	ChildFormProps,
 	FormInputValues,
@@ -75,6 +76,12 @@ const settingsTabs = [
 		component: UserSettingFormOAuth,
 		displayInOnboarding: false,
 	},
+	{
+		label: "ロール",
+		hash: "#role",
+		component: UserSettingFormRole,
+		displayInOnboarding: false,
+	},
 ] satisfies SettingsTabItem[];
 
 export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
@@ -83,9 +90,11 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 	const navigate = useNavigate();
 	const location = useLocation();
 
+	const currentTab = settingsTabs.find((tab) => tab.hash === location.hash);
+
 	useEffect(() => {
-		if (location.hash === "") navigate("#me", { replace: true });
-	}, [navigate, location.hash]);
+		if (!currentTab) navigate("#me", { replace: true });
+	}, [navigate, currentTab]);
 
 	const formMethods = useForm<FormInputValues, unknown, FormOutputValues>({
 		resolver: valibotResolver(UserProfileUpdateParams),
@@ -133,6 +142,8 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 		return undefined;
 	};
 
+	if (!currentTab) return null;
+
 	return (
 		<>
 			<Tab.List>
@@ -176,44 +187,40 @@ export const UserSettingForm = ({ type, isPending, onSubmit }: Props) => {
 						alignItems: "center",
 					})}
 				>
-					{settingsTabs.map((tab) => {
-						if (isOnboarding && !tab.displayInOnboarding) return null;
-						if (location.hash !== tab.hash) return null;
-						const Component = tab.component;
-						return (
-							<Component
-								key={tab.hash}
-								isOnboarding={isOnboarding}
-								getFormErrorMessage={getFormErrorMessage}
-							/>
-						);
-					})}
-
-					<hr
-						className={css({
-							width: "100%",
-							borderColor: "gray.300",
-						})}
+					<currentTab.component
+						isOnboarding={isOnboarding}
+						getFormErrorMessage={getFormErrorMessage}
 					/>
 
-					<button type="submit" disabled={!canSubmit}>
-						<ButtonLike variant="primary" disabled={!canSubmit}>
-							{isOnboarding ? "はじめる" : "更新"}
-						</ButtonLike>
-					</button>
-					<p
-						className={css({
-							fontSize: "sm",
-							color: "gray.500",
-						})}
-					>
-						{settingsTabs
-							// 資格試験・OAuth は関係ないので除外
-							.filter((tab) => tab.displayInOnboarding)
-							.map((tab) => `「${tab.label}」`)
-							.join("")}
-						のすべての入力内容にエラーがない場合に、ボタンが有効になります。
-					</p>
+					{/* 資格試験・OAuth・Roles は関係ないので表示しない */}
+					{currentTab.displayInOnboarding && (
+						<>
+							<hr
+								className={css({
+									width: "100%",
+									borderColor: "gray.300",
+								})}
+							/>
+
+							<button type="submit" disabled={!canSubmit}>
+								<ButtonLike variant="primary" disabled={!canSubmit}>
+									{isOnboarding ? "はじめる" : "更新"}
+								</ButtonLike>
+							</button>
+							<p
+								className={css({
+									fontSize: "sm",
+									color: "gray.500",
+								})}
+							>
+								{settingsTabs
+									.filter((tab) => tab.displayInOnboarding)
+									.map((tab) => `「${tab.label}」`)
+									.join("")}
+								のすべての入力内容にエラーがない場合に、ボタンが有効になります。
+							</p>
+						</>
+					)}
 				</form>
 			</FormProvider>
 		</>

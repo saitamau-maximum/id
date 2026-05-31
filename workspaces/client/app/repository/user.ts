@@ -14,6 +14,7 @@ export interface IUserRepository {
 	update: (params: UserProfileUpdateParams) => Promise<void>;
 	getContributions: () => Promise<UserGetContributionsResponse>;
 	getContributions$$key: () => unknown[];
+	selfUpdateUserRole: (roleIds: RoleId[]) => Promise<void>;
 
 	getAllUsers: () => Promise<AdminUserGetUsersResponse>;
 	getAllUsers$$key: () => unknown[];
@@ -116,6 +117,17 @@ export class UserRepositoryImpl implements IUserRepository {
 
 	getContributions$$key() {
 		return ["contribution"];
+	}
+
+	async selfUpdateUserRole(roleIds: RoleId[]) {
+		const res = await client.user.role.$put({
+			json: {
+				roleIds,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to update user role");
+		}
 	}
 
 	async getAllUsers() {
