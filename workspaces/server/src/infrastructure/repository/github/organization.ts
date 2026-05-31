@@ -6,7 +6,7 @@ type TeamMembershipQueryResult = {
 		string,
 		{
 			members: { nodes: { login: string }[] };
-			invitations: { nodes: { inviteeLogin: string | null }[] };
+			invitations: { nodes: { invitee: { login: string } | null }[] };
 		} | null
 	>;
 };
@@ -84,7 +84,7 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 				(slug, i) =>
 					`t${i}: team(slug: "${slug}") {
 						members(query: "${username}", first: 1) { nodes { login } }
-						invitations(first: 100) { nodes { inviteeLogin } }
+						invitations(first: 100) { nodes { invitee { login } } }
 					}`,
 			)
 			.join("\n");
@@ -105,7 +105,7 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 				return (
 					team.members.nodes.some((n) => n.login.toLowerCase() === lc) ||
 					team.invitations.nodes.some(
-						(n) => n.inviteeLogin?.toLowerCase() === lc,
+						(n) => n.invitee?.login?.toLowerCase() === lc,
 					)
 				);
 			}),
