@@ -44,28 +44,46 @@ export const oauthConnectionsRelations = relations(
 	}),
 );
 
+// IdP が管理する外部ロール (GitHub Team slug、Discord Role snowflake など)
+export const externalRoles = sqliteTable(
+	"external_roles",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		providerId: int("provider_id").notNull(),
+		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
+		roleId: text("role_id").notNull(),
+		name: text("name").notNull(),
+	},
+	(table) => [
+		uniqueIndex("external_roles_provider_role_unique").on(
+			table.providerId,
+			table.roleId,
+		),
+	],
+);
+
 // 外部ロール付与条件
 // 1 行 = 1 つの AND 条件 (requirements を全て満たすユーザーに external_role_id を付与する)。
-// 同じ (provider_id, external_role_id) に対して複数行あれば、行間は OR で結合される。
+// 同じ external_role_id に対して複数行あれば、行間は OR で結合される。
 // → 結果として OR-of-ANDs (積和標準形) で任意の論理式を表現できる。
 export const externalRoleConditions = sqliteTable(
 	"external_role_conditions",
 	{
 		id: integer("id").primaryKey({ autoIncrement: true }),
-		providerId: int("provider_id").notNull(),
-		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
-		externalRoleId: text("external_role_id").notNull(),
+		externalRoleId: integer("external_role_id")
+			.notNull()
+			.references(() => externalRoles.id, { onDelete: "cascade" }),
+		requirementCount: int("requirement_count").notNull(),
 		// requirements の正規化 (sort 済み role_id をカンマ区切り) を入れる。
-		// 「同じ (provider, role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
+		// 「同じ (external_role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
 		requirementSignature: text("requirement_signature").notNull(),
 	},
 	(table) => [
 		uniqueIndex("external_role_conditions_dedup").on(
-			table.providerId,
 			table.externalRoleId,
 			table.requirementSignature,
 		),
-		index("external_role_conditions_provider_idx").on(table.providerId),
+		index("external_role_conditions_role_idx").on(table.externalRoleId),
 	],
 );
 
@@ -82,9 +100,17 @@ export const externalRoleConditionRequirements = sqliteTable(
 	],
 );
 
+export const externalRolesRelations = relations(externalRoles, ({ many }) => ({
+	conditions: many(externalRoleConditions),
+}));
+
 export const externalRoleConditionsRelations = relations(
 	externalRoleConditions,
-	({ many }) => ({
+	({ one, many }) => ({
+		externalRole: one(externalRoles, {
+			fields: [externalRoleConditions.externalRoleId],
+			references: [externalRoles.id],
+		}),
 		requirements: many(externalRoleConditionRequirements),
 	}),
 );
