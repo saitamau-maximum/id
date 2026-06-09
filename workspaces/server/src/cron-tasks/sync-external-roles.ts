@@ -9,10 +9,7 @@ import type { HonoEnv } from "../factory";
 import type { ExternalRoleCondition } from "../repository/external-role-condition";
 
 interface RoleProvider {
-	fetchUserRoles(
-		externalUserId: string,
-		candidates: ReadonlySet<string>,
-	): Promise<Set<string>>;
+	fetchUserRoles(externalUserId: string): Promise<Set<string>>;
 	assignRole(externalUserId: string, externalRoleId: string): Promise<void>;
 	removeRole(externalUserId: string, externalRoleId: string): Promise<void>;
 }
@@ -106,7 +103,7 @@ const syncOneUser = async (params: {
 			conn.providerId,
 			params.userRoleIds,
 		);
-		const current = await repo.fetchUserRoles(conn.externalUserId, managed);
+		const current = await repo.fetchUserRoles(conn.externalUserId);
 		const { adds, removes } = computeDiff(shouldHave, current, managed);
 
 		const failed: SyncFailure[] = [];

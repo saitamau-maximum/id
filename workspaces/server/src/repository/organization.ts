@@ -13,10 +13,7 @@ export interface IOrganizationRepository {
 	) => Promise<Set<string>>;
 	addTeamMember: (teamSlug: string, username: string) => Promise<void>;
 	removeTeamMember: (teamSlug: string, username: string) => Promise<void>;
-	fetchUserRoles: (
-		username: string,
-		candidates: ReadonlySet<string>,
-	) => Promise<Set<string>>;
+	fetchUserRoles: (username: string) => Promise<Set<string>>;
 	assignRole: (username: string, teamSlug: string) => Promise<void>;
 	removeRole: (username: string, teamSlug: string) => Promise<void>;
 }

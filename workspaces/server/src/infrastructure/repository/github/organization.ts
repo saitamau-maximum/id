@@ -145,10 +145,7 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 		);
 	}
 
-	async fetchUserRoles(
-		username: string,
-		_candidates: ReadonlySet<string>,
-	): Promise<Set<string>> {
+	async fetchUserRoles(username: string): Promise<Set<string>> {
 		const rows = await this.db.query.externalRoles.findMany({
 			where: eq(schema.externalRoles.providerId, OAUTH_PROVIDER_IDS.GITHUB),
 		});

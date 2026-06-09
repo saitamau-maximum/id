@@ -133,10 +133,7 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		}
 	}
 
-	async fetchUserRoles(
-		snowflake: string,
-		_candidates: ReadonlySet<string>,
-	): Promise<Set<string>> {
+	async fetchUserRoles(snowflake: string): Promise<Set<string>> {
 		const rows = await this.db.query.externalRoles.findMany({
 			where: eq(schema.externalRoles.providerId, OAUTH_PROVIDER_IDS.DISCORD),
 		});
