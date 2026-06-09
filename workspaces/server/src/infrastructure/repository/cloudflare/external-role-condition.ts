@@ -20,14 +20,15 @@ export class CloudflareExternalRoleConditionRepository
 	async listAll(): Promise<ExternalRoleCondition[]> {
 		const rows = await this.client.query.externalRoleConditions.findMany({
 			with: {
+				externalRole: true,
 				requirements: true,
 			},
 		});
 
 		return rows.map((row) => ({
 			id: row.id,
-			providerId: row.providerId as OAuthProviderId,
-			externalRoleId: row.externalRoleId,
+			providerId: row.externalRole.providerId as OAuthProviderId,
+			externalRoleId: row.externalRole.roleId,
 			requiredRoleIds: new Set(
 				row.requirements.map((r) => {
 					if (!v.is(RoleId, r.requiredRoleId)) {
