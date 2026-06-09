@@ -1,4 +1,8 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
+import { eq } from "drizzle-orm";
+import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import { type Octokit, RequestError } from "octokit";
+import * as schema from "../../../db/schema";
 import type { IOrganizationRepository } from "../../../repository/organization";
 
 type TeamMembershipQueryResult = {
@@ -12,7 +16,14 @@ type TeamMembershipQueryResult = {
 };
 
 export class GithubOrganizationRepository implements IOrganizationRepository {
-	constructor(private readonly octokit: Octokit) {}
+	private readonly db: DrizzleD1Database<typeof schema>;
+
+	constructor(
+		private readonly octokit: Octokit,
+		d1: D1Database,
+	) {
+		this.db = drizzle(d1, { schema });
+	}
 
 	async checkIsMember(
 		userName: string,
@@ -136,9 +147,13 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 
 	async fetchUserRoles(
 		username: string,
-		candidates: ReadonlySet<string>,
+		_candidates: ReadonlySet<string>,
 	): Promise<Set<string>> {
-		return this.fetchUserTeamMemberships(username, candidates);
+		const rows = await this.db.query.externalRoles.findMany({
+			where: eq(schema.externalRoles.providerId, OAUTH_PROVIDER_IDS.GITHUB),
+		});
+		const teamSlugs = new Set(rows.map((r) => r.roleId));
+		return this.fetchUserTeamMemberships(username, teamSlugs);
 	}
 
 	async assignRole(username: string, teamSlug: string): Promise<void> {
