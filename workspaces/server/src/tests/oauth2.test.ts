@@ -380,6 +380,188 @@ describe("OAuth 2.0 spec", () => {
 				expect(callbackUrl.searchParams.has("code")).toBe(true);
 			});
 
+			it("skips consent after the same scopes were granted", async () => {
+				const { cookie, clientId } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+				});
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res1.status).toBe(200);
+				await authorize(await res1.text(), cookie);
+
+				const res2 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res2.status).toBe(302);
+				const redirectUrl = res2.headers.get("Location");
+				assert.isNotNull(redirectUrl);
+				expect(new URL(redirectUrl).searchParams.has("code")).toBe(true);
+			});
+
+			it("requires consent when requested scopes increase", async () => {
+				const { cookie, clientId, userId } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO, SCOPE_IDS.READ_ROLES],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const firstParams = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+					scope: "read:basic_info",
+				});
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${firstParams.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res1.status).toBe(200);
+				await authorize(await res1.text(), cookie);
+
+				const expandedParams = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+					scope: "read:basic_info read:roles",
+				});
+				const res2 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${expandedParams.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res2.status).toBe(200);
+				await authorize(await res2.text(), cookie);
+
+				const grantedScopes = await oauthExternalRepository.getGrantedScopes(
+					userId,
+					clientId,
+				);
+				expect(grantedScopes.map((scope) => scope.name).sort()).toEqual([
+					"read:basic_info",
+					"read:roles",
+				]);
+			});
+
+			it("shows consent when prompt=consent even if scopes were granted", async () => {
+				const { cookie, clientId } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+				});
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res1.status).toBe(200);
+				await authorize(await res1.text(), cookie);
+
+				params.set("prompt", "consent");
+				const res2 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res2.status).toBe(200);
+			});
+
+			it("handles prompt=none with granted and missing consent", async () => {
+				const { cookie, clientId } = await setup(
+					[SCOPE_IDS.OPENID],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+					scope: "openid",
+				});
+
+				const missingConsentParams = new URLSearchParams(params);
+				missingConsentParams.set("prompt", "none");
+				const missingConsentRes = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${missingConsentParams.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(missingConsentRes.status).toBe(302);
+				const missingConsentRedirect =
+					missingConsentRes.headers.get("Location");
+				assert.isNotNull(missingConsentRedirect);
+				expect(new URL(missingConsentRedirect).searchParams.get("error")).toBe(
+					"consent_required",
+				);
+
+				const loginRequiredRes = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${missingConsentParams.toString()}`,
+				);
+				expect(loginRequiredRes.status).toBe(302);
+				const loginRequiredRedirect = loginRequiredRes.headers.get("Location");
+				assert.isNotNull(loginRequiredRedirect);
+				expect(new URL(loginRequiredRedirect).searchParams.get("error")).toBe(
+					"login_required",
+				);
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res1.status).toBe(200);
+				await authorize(await res1.text(), cookie);
+
+				const grantedRes = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${missingConsentParams.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(grantedRes.status).toBe(302);
+				const grantedRedirect = grantedRes.headers.get("Location");
+				assert.isNotNull(grantedRedirect);
+				const grantedUrl = new URL(grantedRedirect);
+				expect(grantedUrl.searchParams.has("code")).toBe(true);
+				expect(grantedUrl.searchParams.has("error")).toBe(false);
+			});
+
+			it("requires consent again after the client grant is revoked", async () => {
+				const { cookie, clientId } = await setup(
+					[SCOPE_IDS.READ_BASIC_INFO],
+					[DEFAULT_REDIRECT_URI],
+				);
+				const params = new URLSearchParams({
+					response_type: "code",
+					client_id: clientId,
+				});
+
+				const res1 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res1.status).toBe(200);
+				await authorize(await res1.text(), cookie);
+
+				const skippedRes = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(skippedRes.status).toBe(302);
+
+				const revokeRes = await app.request(`/user/oauth-grants/${clientId}`, {
+					method: "DELETE",
+					headers: { Cookie: cookie },
+				});
+				expect(revokeRes.status).toBe(204);
+
+				const res2 = await app.request(
+					`${AUTHORIZATION_ENDPOINT}?${params.toString()}`,
+					{ headers: { Cookie: cookie } },
+				);
+				expect(res2.status).toBe(200);
+			});
+
 			it("expires code after 10 minutes [RECOMMENDED]", async () => {
 				// A maximum authorization code lifetime of 10 minutes is RECOMMENDED.
 				const { userId, clientId, code } = await doAuthFlow();

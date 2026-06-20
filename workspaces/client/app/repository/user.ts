@@ -4,6 +4,7 @@ import type {
 } from "@idp/schema/api/admin/user";
 import type {
 	UserGetContributionsResponse,
+	UserOAuthGrantsResponse,
 	UserProfileUpdateParams,
 } from "@idp/schema/api/user";
 import type { RoleId } from "@idp/schema/entity/role";
@@ -26,6 +27,9 @@ export interface IUserRepository {
 	rejectInvitation: (userId: string) => Promise<void>;
 	confirmPayment: (userId: string) => Promise<void>;
 	deleteOAuthConnection: (providerId: number) => Promise<void>;
+	getOAuthGrants: () => Promise<UserOAuthGrantsResponse>;
+	getOAuthGrants$$key: () => unknown[];
+	revokeOAuthGrant: (clientId: string) => Promise<void>;
 }
 
 export class UserRepositoryImpl implements IUserRepository {
@@ -238,6 +242,33 @@ export class UserRepositoryImpl implements IUserRepository {
 		});
 		if (!res.ok) {
 			throw new Error("Failed to delete OAuth connection");
+		}
+	}
+
+	async getOAuthGrants() {
+		const res = await client.user["oauth-grants"].$get();
+		if (!res.ok) {
+			throw new Error("Failed to fetch OAuth grants");
+		}
+		const data = await res.json();
+		return data.map((grant) => ({
+			...grant,
+			updatedAt: new Date(grant.updatedAt),
+		}));
+	}
+
+	getOAuthGrants$$key() {
+		return ["oauth-grants"];
+	}
+
+	async revokeOAuthGrant(clientId: string) {
+		const res = await client.user["oauth-grants"][":clientId"].$delete({
+			param: {
+				clientId,
+			},
+		});
+		if (!res.ok) {
+			throw new Error("Failed to revoke OAuth grant");
 		}
 	}
 }

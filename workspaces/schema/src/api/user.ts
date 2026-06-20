@@ -3,6 +3,8 @@ import { Contributions } from "../entity/contribution";
 import { DEPARTMENT_BY_ID, toDepartmentId } from "../entity/department";
 import { FACULTY_IDS, toFacultyId } from "../entity/faculty";
 import { isOutsideGrade, toGradeId } from "../entity/grade";
+import { Client } from "../entity/oauth-external/client";
+import { Scope } from "../entity/oauth-external/scope";
 import { RoleId } from "../entity/role";
 import { UserProfile } from "../entity/user";
 
@@ -132,3 +134,14 @@ export const UserRoleUpdateParams = v.object({
 	roleIds: v.array(RoleId),
 });
 export type UserRoleUpdateParams = v.InferOutput<typeof UserRoleUpdateParams>;
+
+export const UserOAuthGrantsResponse = v.array(
+	v.object({
+		client: v.pick(Client, ["id", "name", "description", "logoUrl"]),
+		scopes: v.array(Scope),
+		updatedAt: v.date(),
+	}),
+);
+export type UserOAuthGrantsResponse = v.InferOutput<
+	typeof UserOAuthGrantsResponse
+>;

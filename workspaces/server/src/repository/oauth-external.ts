@@ -37,6 +37,12 @@ type GetTokenByATRes = ClientToken & {
 	user: Pick<User, "id"> & { profile: Partial<UserProfile>; roles: Role[] };
 };
 
+type GetUserGrantedClientRes = {
+	client: Pick<Client, "id" | "name" | "description" | "logoUrl">;
+	scopes: Scope[];
+	updatedAt: Date;
+};
+
 export type IOAuthExternalRepository = {
 	// common
 	getClientById: (clientId: string) => Promise<GetClientByIdRes | undefined>;
@@ -90,6 +96,14 @@ export type IOAuthExternalRepository = {
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
+	getGrantedScopes: (userId: string, clientId: string) => Promise<Scope[]>;
+	upsertGrantScopes: (
+		userId: string,
+		clientId: string,
+		scopes: Scope[],
+	) => Promise<void>;
+	getUserGrantedClients: (userId: string) => Promise<GetUserGrantedClientRes[]>;
+	revokeClientGrant: (userId: string, clientId: string) => Promise<void>;
 
 	// cron
 	deleteExpiredAccessTokens: () => Promise<void>;
