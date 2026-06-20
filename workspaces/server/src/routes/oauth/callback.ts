@@ -1,18 +1,15 @@
 import { vValidator } from "@hono/valibot-validator";
 import { OAuthCallbackRequestParams } from "@idp/schema/api/oauth/callback";
-import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
-import { ACCESS_TOKEN_EXPIRES_IN } from "../../utils/oauth/constant";
-import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
-import { generateIdToken } from "../../utils/oauth/oidc-logic";
+import {
+	createAuthorizationSuccessRedirect,
+	OAUTH_ERROR_URI,
+} from "./authorization-success";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
-
-const OAUTH_ERROR_URI =
-	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint";
 
 const app = factory.createApp();
 
@@ -108,105 +105,25 @@ const route = app
 				return c.redirect(redirectTo.href, 302);
 			}
 
-			// scope 取得
-			const requestedScopes = new Set(scope ? scope.split(" ") : []);
-			const scopes = client.scopes.filter((data) => {
-				// scope リクエストしてない場合は requestedScopes = [] なので、全部 true として付与
-				if (requestedScopes.size === 0) return true;
-				// そうでない場合はリクエストされた scope だけを付与
-				return requestedScopes.has(data.name);
-			});
-
-			// code (240bit = 8bit * 30) を生成
-			const code = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
-
-			// access token (312bit = 8bit * 39) を生成
-			const accessToken = binaryToBase64(
-				crypto.getRandomValues(new Uint8Array(39)),
-			);
-
-			// DB に格納して返す
-			return await c.var.OAuthExternalRepository.createAccessToken(
-				client_id,
+			return await createAuthorizationSuccessRedirect(c, {
+				clientId: client_id,
 				userId,
-				code,
-				redirect_uri,
-				accessToken,
-				scopes,
-				code_challenge,
-				code_challenge_method,
-				oidc_nonce,
-				oidc_auth_time,
-			)
-				.then(async () => {
-					if (response_type === "code") {
-						redirectTo.searchParams.append("code", code);
-						return c.redirect(redirectTo.href, 302);
-					}
-
-					// OpenID Connect Implicit Flow
-					const res = new URLSearchParams();
-					if (
-						// 順不同なので
-						response_type === "id_token token" ||
-						response_type === "token id_token"
-					) {
-						// Access Token も返す
-						res.append("access_token", accessToken);
-						res.append("token_type", "Bearer");
-						res.append("expires_in", ACCESS_TOKEN_EXPIRES_IN.toString());
-					}
-
-					const userInfo =
-						await c.var.UserRepository.fetchUserProfileById(userId);
-
-					const id_token = await generateIdToken({
-						clientId: client_id,
-						userId,
-						exp: Math.floor(Date.now() / 1000) + ACCESS_TOKEN_EXPIRES_IN,
-						authTime: oidc_auth_time,
-						nonce: oidc_nonce,
-						accessToken,
-						privateKey: c.env.PRIVKEY_FOR_OAUTH,
-						// 必要最低限の情報は含める
-						...(scopes.find((s) => s.id === SCOPE_IDS.PROFILE)
-							? {
-									name: userInfo.realName,
-									nickname: userInfo.displayName,
-									preferred_username: userInfo.displayId,
-									picture: userInfo.profileImageURL,
-								}
-							: {}),
-						...(scopes.find((s) => s.id === SCOPE_IDS.EMAIL)
-							? {
-									email: userInfo.email,
-								}
-							: {}),
-						// Custom Claims
-						...(scopes.find((s) => s.id === SCOPE_IDS.READ_ROLES)
-							? {
-									roles: userInfo.roles.map((r) => r.slug),
-								}
-							: {}),
-					});
-
-					res.append("id_token", id_token);
-					if (state) res.append("state", state);
-
-					if (response_mode === "query") {
-						redirectTo.search = res.toString();
-					} else {
-						// default: fragment (Section 3.2.2.5)
-						redirectTo.hash = res.toString();
-					}
-					return c.redirect(redirectTo.href, 302);
-				})
-				.catch((e: Error) => {
-					redirectTo.searchParams.append("error", "server_error");
-					redirectTo.searchParams.append("error_description", e.message);
-					redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
-					return c.redirect(redirectTo.href, 302);
-				});
+				responseType: response_type,
+				responseMode: response_mode,
+				redirectUri: redirect_uri,
+				scope,
+				state,
+				oidcNonce: oidc_nonce,
+				oidcAuthTime: oidc_auth_time,
+				codeChallenge: code_challenge,
+				codeChallengeMethod: code_challenge_method,
+				saveGrant: true,
+			}).catch((e: Error) => {
+				redirectTo.searchParams.append("error", "server_error");
+				redirectTo.searchParams.append("error_description", e.message);
+				redirectTo.searchParams.append("error_uri", OAUTH_ERROR_URI);
+				return c.redirect(redirectTo.href, 302);
+			});
 		},
 	)
 	.all(async (c) => {

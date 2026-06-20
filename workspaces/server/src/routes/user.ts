@@ -1,6 +1,7 @@
 import { vValidator } from "@hono/valibot-validator";
 import {
 	type UserGetContributionsResponse,
+	type UserOAuthGrantsResponse,
 	UserProfileUpdateParams,
 	UserRoleUpdateParams,
 } from "@idp/schema/api/user";
@@ -219,6 +220,19 @@ const route = app
 		}
 
 		await OAuthInternalRepository.deleteOAuthConnection(userId, providerId);
+		return c.body(null, 204);
+	})
+	.get("/oauth-grants", memberOnlyMiddleware, async (c) => {
+		const { userId } = c.get("jwtPayload");
+		const grants =
+			await c.var.OAuthExternalRepository.getUserGrantedClients(userId);
+		return c.json<UserOAuthGrantsResponse>(grants, 200);
+	})
+	.delete("/oauth-grants/:clientId", memberOnlyMiddleware, async (c) => {
+		const { userId } = c.get("jwtPayload");
+		const clientId = c.req.param("clientId");
+
+		await c.var.OAuthExternalRepository.revokeClientGrant(userId, clientId);
 		return c.body(null, 204);
 	})
 	.get("/profile-image/:userId", async (c) => {

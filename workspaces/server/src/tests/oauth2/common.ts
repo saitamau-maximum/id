@@ -14,6 +14,7 @@ import type { HonoEnv } from "../../factory";
 import { CloudflareOAuthExternalRepository } from "../../infrastructure/repository/cloudflare/oauth-external";
 import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
 import { oauthRoute } from "../../routes/oauth";
+import { userRoute } from "../../routes/user";
 import { wellKnownRoute } from "../../routes/well-known";
 import { binaryToBase64Url } from "../../utils/oauth/convert-bin-base64";
 import { exportKey, generateKeyPair } from "../../utils/oauth/key";
@@ -57,6 +58,7 @@ export const createOAuthTestContext = async () => {
 	app
 		.use(repositoryInjector)
 		.route("/oauth", oauthRoute)
+		.route("/user", userRoute)
 		.route("/.well-known", wellKnownRoute);
 
 	const setup = async (scopes?: ScopeId[], callbackUrls?: string[]) => {

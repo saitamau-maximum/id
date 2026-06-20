@@ -73,6 +73,26 @@ export const oauthClientScopes = sqliteTable(
 	(table) => [primaryKey({ columns: [table.clientId, table.scopeId] })],
 );
 
+export const oauthGrants = sqliteTable(
+	"oauth_grants",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		clientId: text("client_id")
+			.notNull()
+			.references(() => oauthClients.id),
+		scopeId: int("scope_id", { mode: "number" }).notNull(),
+		createdAt: int("created_at", { mode: "timestamp_ms" }).notNull(),
+		updatedAt: int("updated_at", { mode: "timestamp_ms" }).notNull(),
+		revokedAt: int("revoked_at", { mode: "timestamp_ms" }),
+	},
+	(table) => [
+		primaryKey({ columns: [table.userId, table.clientId, table.scopeId] }),
+		index("oauth_grants_user_client_idx").on(table.userId, table.clientId),
+	],
+);
+
 export const oauthTokens = sqliteTable(
 	"oauth_tokens",
 	{
@@ -130,6 +150,7 @@ export const oauthClientsRelations = relations(
 		secrets: many(oauthClientSecrets),
 		callbacks: many(oauthClientCallbacks),
 		scopes: many(oauthClientScopes),
+		grants: many(oauthGrants),
 	}),
 );
 
@@ -180,6 +201,17 @@ export const oauthClientScopesRelations = relations(
 		}),
 	}),
 );
+
+export const oauthGrantsRelations = relations(oauthGrants, ({ one }) => ({
+	client: one(oauthClients, {
+		fields: [oauthGrants.clientId],
+		references: [oauthClients.id],
+	}),
+	user: one(users, {
+		fields: [oauthGrants.userId],
+		references: [users.id],
+	}),
+}));
 
 export const oauthTokensRelations = relations(oauthTokens, ({ one, many }) => ({
 	client: one(oauthClients, {

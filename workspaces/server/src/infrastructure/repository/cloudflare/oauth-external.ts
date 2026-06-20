@@ -6,7 +6,7 @@ import {
 	ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
@@ -518,6 +518,125 @@ export class CloudflareOAuthExternalRepository
 				socialLinks: undefined,
 			},
 		};
+	}
+
+	async getGrantedScopes(userId: string, clientId: string) {
+		const res = await this.client.query.oauthGrants.findMany({
+			where: (grant, { eq, and, isNull }) =>
+				and(
+					eq(grant.userId, userId),
+					eq(grant.clientId, clientId),
+					isNull(grant.revokedAt),
+				),
+		});
+
+		return res
+			.map((grant) => grant.scopeId)
+			.filter((scopeId) => v.is(ScopeId, scopeId))
+			.map((scopeId) => SCOPES_BY_ID[scopeId]);
+	}
+
+	async upsertGrantScopes(userId: string, clientId: string, scopes: Scope[]) {
+		if (scopes.length === 0) return;
+
+		const now = new Date();
+		const res = await this.client
+			.insert(schema.oauthGrants)
+			.values(
+				scopes.map((scope) => ({
+					userId,
+					clientId,
+					scopeId: scope.id,
+					createdAt: now,
+					updatedAt: now,
+					revokedAt: null,
+				})),
+			)
+			.onConflictDoUpdate({
+				target: [
+					schema.oauthGrants.userId,
+					schema.oauthGrants.clientId,
+					schema.oauthGrants.scopeId,
+				],
+				set: {
+					updatedAt: now,
+					revokedAt: null,
+				},
+			});
+
+		if (!res.success) throw new Error("Failed to upsert oauth grant");
+	}
+
+	async getUserGrantedClients(userId: string) {
+		const grants = await this.client.query.oauthGrants.findMany({
+			where: (grant, { eq, and, isNull }) =>
+				and(eq(grant.userId, userId), isNull(grant.revokedAt)),
+			with: {
+				client: true,
+			},
+		});
+
+		const grouped = new Map<
+			string,
+			{
+				client: {
+					id: string;
+					name: string;
+					description: string | null;
+					logoUrl: string | null;
+				};
+				scopeIds: Set<ScopeId>;
+				updatedAt: Date;
+			}
+		>();
+
+		for (const grant of grants) {
+			if (!v.is(ScopeId, grant.scopeId)) continue;
+
+			const existing = grouped.get(grant.clientId);
+			if (existing) {
+				existing.scopeIds.add(grant.scopeId);
+				if (existing.updatedAt < grant.updatedAt) {
+					existing.updatedAt = grant.updatedAt;
+				}
+				continue;
+			}
+
+			grouped.set(grant.clientId, {
+				client: {
+					id: grant.client.id,
+					name: grant.client.name,
+					description: grant.client.description,
+					logoUrl: grant.client.logoUrl,
+				},
+				scopeIds: new Set([grant.scopeId]),
+				updatedAt: grant.updatedAt,
+			});
+		}
+
+		return [...grouped.values()]
+			.map((grant) => ({
+				client: grant.client,
+				scopes: [...grant.scopeIds].map((scopeId) => SCOPES_BY_ID[scopeId]),
+				updatedAt: grant.updatedAt,
+			}))
+			.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+	}
+
+	async revokeClientGrant(userId: string, clientId: string) {
+		const now = new Date();
+		const res = await this.client
+			.update(schema.oauthGrants)
+			.set({ updatedAt: now, revokedAt: now })
+			.where(
+				and(
+					eq(schema.oauthGrants.userId, userId),
+					eq(schema.oauthGrants.clientId, clientId),
+					isNull(schema.oauthGrants.revokedAt),
+				),
+			);
+
+		if (!res.success) throw new Error("Failed to revoke oauth grant");
 	}
 
 	async deleteExpiredAccessTokens() {

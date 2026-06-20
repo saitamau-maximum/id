@@ -24,6 +24,10 @@ export const createMockOAuthExternalRepository =
 			deleteTokenById: vi.fn(),
 			consumeCode: vi.fn(),
 			getTokenByAccessToken: vi.fn(),
+			getGrantedScopes: vi.fn(),
+			upsertGrantScopes: vi.fn(),
+			getUserGrantedClients: vi.fn(),
+			revokeClientGrant: vi.fn(),
 
 			// cron
 			deleteExpiredAccessTokens: vi.fn(),

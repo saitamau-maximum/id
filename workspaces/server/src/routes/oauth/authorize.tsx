@@ -27,6 +27,10 @@ import { generateAuthToken } from "../../utils/oauth/auth-token";
 import { importKey } from "../../utils/oauth/key";
 import { _Authorize } from "./_templates/authorize";
 import { layoutRendererMiddleware } from "./_templates/layout";
+import {
+	createAuthorizationSuccessRedirect,
+	OAUTH_ERROR_URI,
+} from "./authorization-success";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/27
 
@@ -340,12 +344,12 @@ const route = app
 			};
 
 			if (isOidc && prompt === "none") {
-				// 現状では同意済みフラグを持っていないので、 consent interaction を強制することになる
-				// TODO: none でもうまくできるようにする
-				return errorRedirect(
-					"interaction_required",
-					"End-User must consent to use OpenID Connect",
-				);
+				if (!loggedInAt) {
+					return errorRedirect(
+						"login_required",
+						"End-User must be logged in to use prompt=none",
+					);
+				}
 			}
 			if (isOidc && prompt === "login") {
 				if (loggedInAt && loggedInAt + 20 > nowMs / 1000) {
@@ -382,6 +386,7 @@ const route = app
 				redirectTo,
 				scope,
 				state,
+				prompt,
 				oidcNonce: nonce,
 				oidcAuthTime: loggedInAt,
 				codeChallenge,
@@ -399,6 +404,7 @@ const route = app
 				redirectTo,
 				scope,
 				state,
+				prompt,
 				oidcNonce,
 				oidcAuthTime,
 				codeChallenge,
@@ -433,6 +439,51 @@ const route = app
 			// 初期登録まだ
 			if (!userInfo.initializedAt) {
 				return c.text("Forbidden: user not initialized", 403);
+			}
+
+			const grantedScopes =
+				await c.var.OAuthExternalRepository.getGrantedScopes(userId, clientId);
+			const grantedScopeNames = new Set(
+				grantedScopes.map((scope) => scope.name),
+			);
+			const hasAllRequestedScopes = clientInfo.scopes.every((scope) =>
+				grantedScopeNames.has(scope.name),
+			);
+
+			if (prompt === "none" && !hasAllRequestedScopes) {
+				const callback = new URL(redirectTo);
+				callback.searchParams.append("error", "consent_required");
+				callback.searchParams.append(
+					"error_description",
+					"End-User consent is required",
+				);
+				callback.searchParams.append("error_uri", OAUTH_ERROR_URI);
+				if (state) callback.searchParams.append("state", state);
+				return c.redirect(callback.toString(), 302);
+			}
+
+			if (prompt !== "consent" && hasAllRequestedScopes) {
+				const callback = new URL(redirectTo);
+				return await createAuthorizationSuccessRedirect(c, {
+					clientId,
+					userId,
+					responseType,
+					responseMode,
+					redirectUri,
+					scope,
+					state,
+					oidcNonce,
+					oidcAuthTime,
+					codeChallenge,
+					codeChallengeMethod,
+					saveGrant: false,
+				}).catch((e: Error) => {
+					callback.searchParams.append("error", "server_error");
+					callback.searchParams.append("error_description", e.message);
+					callback.searchParams.append("error_uri", OAUTH_ERROR_URI);
+					if (state) callback.searchParams.append("state", state);
+					return c.redirect(callback.href, 302);
+				});
 			}
 
 			return c.render(
