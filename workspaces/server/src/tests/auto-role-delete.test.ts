@@ -9,6 +9,7 @@ import { CloudflareUserRepository } from "../infrastructure/repository/cloudflar
 const clearDatabase = async () => {
 	await env.DB.exec(`
     PRAGMA foreign_keys = OFF;
+    DELETE FROM oauth_grants;
     DELETE FROM oauth_token_scopes;
     DELETE FROM oauth_tokens;
     DELETE FROM oauth_client_scopes;
