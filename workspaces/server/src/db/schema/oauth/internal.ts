@@ -44,7 +44,7 @@ export const oauthConnectionsRelations = relations(
 	}),
 );
 
-// IdP が管理する外部ロール (GitHub Team slug、Discord Role snowflake など)
+// IdP が管理する外部ロール (GitHub Team、Discord Role など)
 export const externalRoles = sqliteTable(
 	"external_roles",
 	{
