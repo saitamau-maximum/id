@@ -100,13 +100,15 @@ export const route = app
 			new GithubOrganizationRepository(octokit, c.env.DB),
 		);
 		// Discord 関連
-		const discordBotRepo = new DiscordBotRepository(
-			c.env.DISCORD_BOT_TOKEN,
-			c.env.DISCORD_GUILD_ID,
-			c.env.DISCORD_CALENDAR_CHANNEL_ID,
-			c.env.DB,
+		c.set(
+			"DiscordBotRepository",
+			new DiscordBotRepository(
+				c.env.DISCORD_BOT_TOKEN,
+				c.env.DISCORD_GUILD_ID,
+				c.env.DISCORD_CALENDAR_CHANNEL_ID,
+				c.env.DB,
+			),
 		);
-		c.set("DiscordBotRepository", discordBotRepo);
 		// 外部ロール同期
 		c.set(
 			"ExternalRoleConditionRepository",
