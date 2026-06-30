@@ -23,3 +23,12 @@ CREATE TABLE `external_roles` (
 );
 --> statement-breakpoint
 CREATE UNIQUE INDEX `external_roles_provider_role_unique` ON `external_roles` (`provider_id`,`role_id`);
+--> statement-breakpoint
+CREATE TABLE `external_user_roles` (
+	`user_id` text NOT NULL,
+	`role_id` integer NOT NULL,
+	`state` text,
+	PRIMARY KEY(`user_id`, `role_id`),
+	FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`role_id`) REFERENCES `external_roles`(`id`) ON UPDATE no action ON DELETE no action
+);

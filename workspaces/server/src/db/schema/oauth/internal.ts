@@ -100,8 +100,26 @@ export const externalRoleConditionRequirements = sqliteTable(
 	],
 );
 
+// IdP ユーザーが実際に持っている外部ロールのキャッシュ
+// プロバイダ側の API を毎回叩かずに済むよう、付与済みロールを DB に保持する。
+// state は GitHub の "active" / "pending" など、プロバイダ固有の付与状態を格納する。
+export const externalUserRoles = sqliteTable(
+	"external_user_roles",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		roleId: integer("role_id")
+			.notNull()
+			.references(() => externalRoles.id),
+		state: text("state"),
+	},
+	(table) => [primaryKey({ columns: [table.userId, table.roleId] })],
+);
+
 export const externalRolesRelations = relations(externalRoles, ({ many }) => ({
 	conditions: many(externalRoleConditions),
+	userRoles: many(externalUserRoles),
 }));
 
 export const externalRoleConditionsRelations = relations(
@@ -121,6 +139,20 @@ export const externalRoleConditionRequirementsRelations = relations(
 		condition: one(externalRoleConditions, {
 			fields: [externalRoleConditionRequirements.conditionId],
 			references: [externalRoleConditions.id],
+		}),
+	}),
+);
+
+export const externalUserRolesRelations = relations(
+	externalUserRoles,
+	({ one }) => ({
+		user: one(users, {
+			fields: [externalUserRoles.userId],
+			references: [users.id],
+		}),
+		externalRole: one(externalRoles, {
+			fields: [externalUserRoles.roleId],
+			references: [externalRoles.id],
 		}),
 	}),
 );

@@ -10,6 +10,7 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import {
+	externalUserRoles,
 	oauthClientSecrets,
 	oauthClients,
 	oauthConnections,
@@ -52,6 +53,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 	certifications: many(userCertifications),
 	socialLinks: many(socialLinks),
 	equipments: many(equipments),
+	externalUserRoles: many(externalUserRoles),
 }));
 
 export const userProfiles = sqliteTable(

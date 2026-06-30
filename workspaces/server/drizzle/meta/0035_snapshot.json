@@ -1283,6 +1283,61 @@
 			"uniqueConstraints": {},
 			"checkConstraints": {}
 		},
+		"external_user_roles": {
+			"name": "external_user_roles",
+			"columns": {
+				"user_id": {
+					"name": "user_id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"role_id": {
+					"name": "role_id",
+					"type": "integer",
+					"primaryKey": false,
+					"notNull": true,
+					"autoincrement": false
+				},
+				"state": {
+					"name": "state",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": false,
+					"autoincrement": false
+				}
+			},
+			"indexes": {},
+			"foreignKeys": {
+				"external_user_roles_user_id_users_id_fk": {
+					"name": "external_user_roles_user_id_users_id_fk",
+					"tableFrom": "external_user_roles",
+					"tableTo": "users",
+					"columnsFrom": ["user_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				},
+				"external_user_roles_role_id_external_roles_id_fk": {
+					"name": "external_user_roles_role_id_external_roles_id_fk",
+					"tableFrom": "external_user_roles",
+					"tableTo": "external_roles",
+					"columnsFrom": ["role_id"],
+					"columnsTo": ["id"],
+					"onDelete": "no action",
+					"onUpdate": "no action"
+				}
+			},
+			"compositePrimaryKeys": {
+				"external_user_roles_user_id_role_id_pk": {
+					"columns": ["user_id", "role_id"],
+					"name": "external_user_roles_user_id_role_id_pk"
+				}
+			},
+			"uniqueConstraints": {},
+			"checkConstraints": {}
+		},
 		"oauth_connections": {
 			"name": "oauth_connections",
 			"columns": {
