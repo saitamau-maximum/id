@@ -6,6 +6,7 @@ import type { ICertificationRepository } from "./repository/certification";
 import type { IContributionRepository } from "./repository/contribution";
 import type { IDiscordBotRepository } from "./repository/discord-bot";
 import type { IEquipmentRepository } from "./repository/equipment";
+import type { IExternalRoleConditionRepository } from "./repository/external-role-condition";
 import type { IInviteRepository } from "./repository/invite";
 import type { ILocationRepository } from "./repository/location";
 import type { IOAuthExternalRepository } from "./repository/oauth-external";
@@ -46,6 +47,8 @@ export type HonoEnv = {
 		OrganizationRepository: IOrganizationRepository;
 		// Discord 関連
 		DiscordBotRepository: IDiscordBotRepository;
+		// 外部ロール同期
+		ExternalRoleConditionRepository: IExternalRoleConditionRepository;
 		// ----- Dynamic Variables ----- //
 		roleIds: number[];
 		tokenInfo?: Awaited<

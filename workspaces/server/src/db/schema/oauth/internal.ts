@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { int, primaryKey, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import {
+	index,
+	int,
+	integer,
+	primaryKey,
+	sqliteTable,
+	text,
+	uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import { userProfiles, users } from "../app";
 
 // 外部OAuthプロバイダを利用して IdP にログインするための、OAuth Clientとしてのスキーマ
@@ -32,6 +40,119 @@ export const oauthConnectionsRelations = relations(
 		profile: one(userProfiles, {
 			fields: [oauthConnections.userId],
 			references: [userProfiles.userId],
+		}),
+	}),
+);
+
+// IdP が管理する外部ロール (GitHub Team、Discord Role など)
+export const externalRoles = sqliteTable(
+	"external_roles",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		providerId: int("provider_id").notNull(),
+		// GitHub Team の slug、Discord Role の snowflake などの provider 側 ID
+		roleId: text("role_id").notNull(),
+		name: text("name").notNull(),
+	},
+	(table) => [
+		uniqueIndex("external_roles_provider_role_unique").on(
+			table.providerId,
+			table.roleId,
+		),
+	],
+);
+
+// 外部ロール付与条件
+// 1 行 = 1 つの AND 条件 (requirements を全て満たすユーザーに external_role_id を付与する)。
+// 同じ external_role_id に対して複数行あれば、行間は OR で結合される。
+// → 結果として OR-of-ANDs (積和標準形) で任意の論理式を表現できる。
+export const externalRoleConditions = sqliteTable(
+	"external_role_conditions",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		externalRoleId: integer("external_role_id")
+			.notNull()
+			.references(() => externalRoles.id, { onDelete: "cascade" }),
+		requirementCount: int("requirement_count").notNull(),
+		// requirements の正規化 (sort 済み role_id をカンマ区切り) を入れる。
+		// 「同じ (external_role, requirements) の条件を二重登録」を UNIQUE で防ぐ。
+		requirementSignature: text("requirement_signature").notNull(),
+	},
+	(table) => [
+		uniqueIndex("external_role_conditions_dedup").on(
+			table.externalRoleId,
+			table.requirementSignature,
+		),
+		index("external_role_conditions_role_idx").on(table.externalRoleId),
+	],
+);
+
+export const externalRoleConditionRequirements = sqliteTable(
+	"external_role_condition_requirements",
+	{
+		conditionId: integer("condition_id")
+			.notNull()
+			.references(() => externalRoleConditions.id, { onDelete: "cascade" }),
+		requiredRoleId: int("required_role_id").notNull(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.conditionId, table.requiredRoleId] }),
+	],
+);
+
+// IdP ユーザーが実際に持っている外部ロールのキャッシュ
+// プロバイダ側の API を毎回叩かずに済むよう、付与済みロールを DB に保持する。
+// state は GitHub の "active" / "pending" など、プロバイダ固有の付与状態を格納する。
+export const externalUserRoles = sqliteTable(
+	"external_user_roles",
+	{
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id),
+		roleId: integer("role_id")
+			.notNull()
+			.references(() => externalRoles.id),
+		state: text("state"),
+	},
+	(table) => [primaryKey({ columns: [table.userId, table.roleId] })],
+);
+
+export const externalRolesRelations = relations(externalRoles, ({ many }) => ({
+	conditions: many(externalRoleConditions),
+	userRoles: many(externalUserRoles),
+}));
+
+export const externalRoleConditionsRelations = relations(
+	externalRoleConditions,
+	({ one, many }) => ({
+		externalRole: one(externalRoles, {
+			fields: [externalRoleConditions.externalRoleId],
+			references: [externalRoles.id],
+		}),
+		requirements: many(externalRoleConditionRequirements),
+	}),
+);
+
+export const externalRoleConditionRequirementsRelations = relations(
+	externalRoleConditionRequirements,
+	({ one }) => ({
+		condition: one(externalRoleConditions, {
+			fields: [externalRoleConditionRequirements.conditionId],
+			references: [externalRoleConditions.id],
+		}),
+	}),
+);
+
+export const externalUserRolesRelations = relations(
+	externalUserRoles,
+	({ one }) => ({
+		user: one(users, {
+			fields: [externalUserRoles.userId],
+			references: [users.id],
+		}),
+		externalRole: one(externalRoles, {
+			fields: [externalUserRoles.roleId],
+			references: [externalRoles.id],
 		}),
 	}),
 );

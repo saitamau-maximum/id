@@ -24,4 +24,15 @@ export interface IDiscordBotRepository {
 		type: CalendarNotifyType,
 		event: CalendarEventForNotification,
 	): Promise<void>;
+	assignGuildMemberRole(userId: string, roleId: string): Promise<void>;
+	removeGuildMemberRole(userId: string, roleId: string): Promise<void>;
+	fetchUserRoles(snowflake: string): Promise<Set<string>>;
+	assignRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]>;
+	removeRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]>;
 }

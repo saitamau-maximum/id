@@ -5,6 +5,9 @@ on:
     # 毎日 03:00 JST
     - cron: 0 3 * * *
       timezone: Asia/Tokyo
+    # 毎日 04:00 JST
+    - cron: 0 4 * * *
+      timezone: Asia/Tokyo
     # 5/1 00:00 JST
     - cron: 0 0 1 5 *
       timezone: Asia/Tokyo
@@ -41,3 +44,7 @@ jobs:
       - name: Remove Member Role [0 0 1 5 *]
         if: github.event.schedule == '0 0 1 5 *'
         run: ./trigger remove-member-role
+
+      - name: Sync External Roles [0 4 * * *]
+        if: github.event.schedule == '0 4 * * *'
+        run: ./trigger sync-external-roles

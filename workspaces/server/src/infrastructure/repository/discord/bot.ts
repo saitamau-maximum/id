@@ -1,3 +1,4 @@
+import { OAUTH_PROVIDER_IDS } from "@idp/schema/entity/oauth-internal/oauth-provider";
 import {
 	type RESTGetAPICurrentUserResult,
 	type RESTGetAPIGuildMemberResult,
@@ -7,6 +8,9 @@ import {
 	RouteBases,
 	Routes,
 } from "discord-api-types/v10";
+import { eq } from "drizzle-orm";
+import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
+import * as schema from "../../../db/schema";
 import type {
 	CalendarEventForNotification,
 	CalendarNotifyType,
@@ -18,16 +22,19 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 	private botToken: string;
 	private guildId: string;
 	private calendarNotifyChannelId: string;
+	private readonly db: DrizzleD1Database<typeof schema>;
 	private readonly CALENDAR_URL = "https://id.maximum.vc/calendar/";
 
 	constructor(
 		botToken: string,
 		guildId: string,
 		calendarNotifyChannelId: string,
+		d1: D1Database,
 	) {
 		this.botToken = botToken;
 		this.guildId = guildId;
 		this.calendarNotifyChannelId = calendarNotifyChannelId;
+		this.db = drizzle(d1, { schema });
 	}
 
 	private async fetchApi(endpoint: string, options?: RequestInit) {
@@ -100,6 +107,68 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 			body: JSON.stringify(params),
 		});
 		return await res.json<RESTPostAPIChannelMessageResult>();
+	}
+
+	async assignGuildMemberRole(userId: string, roleId: string): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, userId, roleId),
+			{ method: "PUT" },
+		);
+		if (!res.ok) {
+			throw new Error(
+				`Failed to assign Discord role ${roleId} to ${userId}: ${res.status} ${res.statusText}`,
+			);
+		}
+	}
+
+	async removeGuildMemberRole(userId: string, roleId: string): Promise<void> {
+		const res = await this.fetchApi(
+			Routes.guildMemberRole(this.guildId, userId, roleId),
+			{ method: "DELETE" },
+		);
+		if (!res.ok) {
+			throw new Error(
+				`Failed to remove Discord role ${roleId} from ${userId}: ${res.status} ${res.statusText}`,
+			);
+		}
+	}
+
+	async fetchUserRoles(snowflake: string): Promise<Set<string>> {
+		const rows = await this.db.query.externalRoles.findMany({
+			where: eq(schema.externalRoles.providerId, OAUTH_PROVIDER_IDS.DISCORD),
+		});
+		const managed = new Set(rows.map((r) => r.roleId));
+		const member = await this.getGuildMember(snowflake);
+		if (member === null) return new Set();
+		return new Set(member.roles.filter((r) => managed.has(r)));
+	}
+
+	async assignRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			roleIds.map((roleId) => this.assignGuildMemberRole(snowflake, roleId)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: roleIds[i], error: res.reason }]
+				: [],
+		);
+	}
+
+	async removeRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			roleIds.map((roleId) => this.removeGuildMemberRole(snowflake, roleId)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: roleIds[i], error: res.reason }]
+				: [],
+		);
 	}
 
 	async sendCalendarNotification(

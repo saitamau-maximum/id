@@ -1,5 +1,6 @@
 import { removeExpiredAccessTokenTask } from "../cron-tasks/remove-expired-access-token";
 import { removeMemberRoleTask } from "../cron-tasks/remove-member-role";
+import { syncExternalRolesTask } from "../cron-tasks/sync-external-roles";
 import { factory } from "../factory";
 
 const app = factory.createApp();
@@ -32,6 +33,13 @@ const route = app
 	})
 	.post("/remove-member-role", async (c) => {
 		c.executionCtx.waitUntil(removeMemberRoleTask(c));
+		return c.text("OK", 200);
+	})
+	.post("/sync-external-roles", async (c) => {
+		// preview と production が同じ外部 API (GitHub Org / Discord Guild) を
+		// 奪い合うのを防ぐため、production 以外はスキップする。
+		if (c.env.ENV !== "production") return c.text("OK", 200);
+		c.executionCtx.waitUntil(syncExternalRolesTask(c));
 		return c.text("OK", 200);
 	});
 

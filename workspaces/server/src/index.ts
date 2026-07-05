@@ -8,6 +8,7 @@ import { CloudflareContributionCacheRepository } from "./infrastructure/reposito
 import { CloudflareCalendarRepository } from "./infrastructure/repository/cloudflare/calendar";
 import { CloudflareCertificationRepository } from "./infrastructure/repository/cloudflare/certification";
 import { CloudflareEquipmentRepository } from "./infrastructure/repository/cloudflare/equipment";
+import { CloudflareExternalRoleConditionRepository } from "./infrastructure/repository/cloudflare/external-role-condition";
 import { CloudflareInviteRepository } from "./infrastructure/repository/cloudflare/invite";
 import { CloudflareLocationRepository } from "./infrastructure/repository/cloudflare/location";
 import { CloudflareOAuthAppRepository } from "./infrastructure/repository/cloudflare/oauth-app-storage";
@@ -94,7 +95,10 @@ export const route = app
 		);
 		// GitHub 関連
 		c.set("ContributionRepository", new GithubContributionRepository(octokit));
-		c.set("OrganizationRepository", new GithubOrganizationRepository(octokit));
+		c.set(
+			"OrganizationRepository",
+			new GithubOrganizationRepository(octokit, c.env.DB),
+		);
 		// Discord 関連
 		c.set(
 			"DiscordBotRepository",
@@ -102,7 +106,13 @@ export const route = app
 				c.env.DISCORD_BOT_TOKEN,
 				c.env.DISCORD_GUILD_ID,
 				c.env.DISCORD_CALENDAR_CHANNEL_ID,
+				c.env.DB,
 			),
+		);
+		// 外部ロール同期
+		c.set(
+			"ExternalRoleConditionRepository",
+			new CloudflareExternalRoleConditionRepository(c.env.DB),
 		);
 
 		// ----- Dynamic Variables ----- //
