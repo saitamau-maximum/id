@@ -14,6 +14,12 @@ export interface IOrganizationRepository {
 	addTeamMember: (teamSlug: string, username: string) => Promise<void>;
 	removeTeamMember: (teamSlug: string, username: string) => Promise<void>;
 	fetchUserRoles: (username: string) => Promise<Set<string>>;
-	assignRole: (username: string, teamSlug: string) => Promise<void>;
-	removeRole: (username: string, teamSlug: string) => Promise<void>;
+	assignRoles: (
+		username: string,
+		teamSlugs: string[],
+	) => Promise<{ roleId: string; error: unknown }[]>;
+	removeRoles: (
+		username: string,
+		teamSlugs: string[],
+	) => Promise<{ roleId: string; error: unknown }[]>;
 }

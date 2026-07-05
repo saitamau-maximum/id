@@ -8,10 +8,21 @@ import type { Context } from "hono";
 import type { HonoEnv } from "../factory";
 import type { ExternalRoleCondition } from "../repository/external-role-condition";
 
+interface RoleActionFailure {
+	roleId: string;
+	error: unknown;
+}
+
 interface RoleProvider {
 	fetchUserRoles(externalUserId: string): Promise<Set<string>>;
-	assignRole(externalUserId: string, externalRoleId: string): Promise<void>;
-	removeRole(externalUserId: string, externalRoleId: string): Promise<void>;
+	assignRoles(
+		externalUserId: string,
+		roleIds: string[],
+	): Promise<RoleActionFailure[]>;
+	removeRoles(
+		externalUserId: string,
+		roleIds: string[],
+	): Promise<RoleActionFailure[]>;
 }
 
 interface SyncConnection {
@@ -108,31 +119,19 @@ const syncOneUser = async (params: {
 
 		const failed: SyncFailure[] = [];
 
-		const settledAdds = await Promise.allSettled(
-			adds.map((role) => repo.assignRole(conn.externalUserId, role)),
-		);
-		settledAdds.forEach((res, i) => {
-			if (res.status === "rejected") {
-				failed.push({
-					externalRoleId: adds[i],
-					action: "add",
-					error: res.reason,
-				});
-			}
-		});
+		const addFailures = await repo.assignRoles(conn.externalUserId, adds);
+		for (const f of addFailures) {
+			failed.push({ externalRoleId: f.roleId, action: "add", error: f.error });
+		}
 
-		const settledRemoves = await Promise.allSettled(
-			removes.map((role) => repo.removeRole(conn.externalUserId, role)),
-		);
-		settledRemoves.forEach((res, i) => {
-			if (res.status === "rejected") {
-				failed.push({
-					externalRoleId: removes[i],
-					action: "remove",
-					error: res.reason,
-				});
-			}
-		});
+		const removeFailures = await repo.removeRoles(conn.externalUserId, removes);
+		for (const f of removeFailures) {
+			failed.push({
+				externalRoleId: f.roleId,
+				action: "remove",
+				error: f.error,
+			});
+		}
 
 		results.push({
 			providerId: conn.providerId,

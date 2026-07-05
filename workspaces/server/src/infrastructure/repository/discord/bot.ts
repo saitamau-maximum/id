@@ -143,12 +143,32 @@ export class DiscordBotRepository implements IDiscordBotRepository {
 		return new Set(member.roles.filter((r) => managed.has(r)));
 	}
 
-	async assignRole(snowflake: string, roleId: string): Promise<void> {
-		await this.assignGuildMemberRole(snowflake, roleId);
+	async assignRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			roleIds.map((roleId) => this.assignGuildMemberRole(snowflake, roleId)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: roleIds[i], error: res.reason }]
+				: [],
+		);
 	}
 
-	async removeRole(snowflake: string, roleId: string): Promise<void> {
-		await this.removeGuildMemberRole(snowflake, roleId);
+	async removeRoles(
+		snowflake: string,
+		roleIds: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			roleIds.map((roleId) => this.removeGuildMemberRole(snowflake, roleId)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: roleIds[i], error: res.reason }]
+				: [],
+		);
 	}
 
 	async sendCalendarNotification(

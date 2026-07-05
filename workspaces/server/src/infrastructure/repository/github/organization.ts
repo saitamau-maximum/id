@@ -153,11 +153,31 @@ export class GithubOrganizationRepository implements IOrganizationRepository {
 		return this.fetchUserTeamMemberships(username, teamSlugs);
 	}
 
-	async assignRole(username: string, teamSlug: string): Promise<void> {
-		await this.addTeamMember(teamSlug, username);
+	async assignRoles(
+		username: string,
+		teamSlugs: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			teamSlugs.map((teamSlug) => this.addTeamMember(teamSlug, username)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: teamSlugs[i], error: res.reason }]
+				: [],
+		);
 	}
 
-	async removeRole(username: string, teamSlug: string): Promise<void> {
-		await this.removeTeamMember(teamSlug, username);
+	async removeRoles(
+		username: string,
+		teamSlugs: string[],
+	): Promise<{ roleId: string; error: unknown }[]> {
+		const settled = await Promise.allSettled(
+			teamSlugs.map((teamSlug) => this.removeTeamMember(teamSlug, username)),
+		);
+		return settled.flatMap((res, i) =>
+			res.status === "rejected"
+				? [{ roleId: teamSlugs[i], error: res.reason }]
+				: [],
+		);
 	}
 }
