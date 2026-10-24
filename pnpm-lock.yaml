@@ -251,7 +251,7 @@ importers:
         specifier: ^4.13.13
         version: 4.13.13
       isbot:
-        specifier: ^5
+        specifier: ^5.2.2
         version: 5.2.2
       react:
         specifier: ^19.3.1

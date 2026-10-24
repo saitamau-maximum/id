@@ -22,6 +22,7 @@
 		"autoprefixer": "^10.6.1",
 		"chart.js": "^4.6.1",
 		"hono": "^4.13.13",
+		"isbot": "^5.2.2",
 		"react": "^19.3.1",
 		"react-aria-components": "^1.22.1",
 		"react-call": "^2.0.2",
@@ -37,8 +38,7 @@
 		"remark-parse": "^11.0.0",
 		"remark-rehype": "^11.1.2",
 		"unified": "^11.0.5",
-		"valibot": "1.5.0",
-		"isbot": "^5"
+		"valibot": "1.5.0"
 	},
 	"devDependencies": {
 		"@pandacss/dev": "^2.4.0",
@@ -48,7 +48,6 @@
 		"@types/node": "^26.6.5",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
-		"isbot": "^5.2.2",
 		"typescript": "^7.0.2",
 		"vite": "^8.3.5"
 	}
