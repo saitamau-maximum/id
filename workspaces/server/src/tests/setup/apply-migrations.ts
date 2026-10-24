@@ -1,12 +1,12 @@
-// ref: https://github.com/cloudflare/workers-sdk/blob/6ff6b3e1dd5d499ba9f0f84b1ca156280e12069d/fixtures/vitest-pool-workers-examples/d1/test/apply-migrations.ts
+// ref: https://github.com/cloudflare/workers-sdk/blob/ac79539606c583de8b7cb52c1c4857855d385961/fixtures/vitest-plugin-examples/d1/test/apply-migrations.ts
 
-import { applyD1Migrations, env } from "cloudflare:test";
+import { applyD1Migrations, type D1Migration } from "cloudflare:test";
+import { env as _env } from "cloudflare:workers";
 
 // ここでしか TEST_MIGRATIONS を使わないので export しない
-declare module "cloudflare:test" {
-	interface ProvidedEnv extends Env {
-		TEST_MIGRATIONS: D1Migration[];
-	}
+interface TestEnv extends Cloudflare.Env {
+	TEST_MIGRATIONS: D1Migration[];
 }
+const env = _env as TestEnv;
 
 await applyD1Migrations(env.DB, env.TEST_MIGRATIONS);
