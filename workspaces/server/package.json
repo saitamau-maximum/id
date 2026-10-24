@@ -42,12 +42,12 @@
 		"@types/prompts": "^2.4.9",
 		"drizzle-kit": "^0.31.11",
 		"ics": "^3.12.1",
-		"miniflare": "^4.20260210.0",
+		"miniflare": "^4.20260730.0",
 		"minimist": "^1.2.8",
 		"prompts": "^2.4.2",
 		"tsx": "^4.23.15",
 		"typescript": "^5.9.3",
 		"vitest": "^3.2.4",
-		"wrangler": "^4.64.0"
+		"wrangler": "^4.152.0"
 	}
 }
