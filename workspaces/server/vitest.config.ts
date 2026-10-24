@@ -1,6 +1,12 @@
-import { defineWorkersConfig } from "@cloudflare/vitest-pool-workers/config";
+import { cloudflareTest } from "@cloudflare/vitest-plugin";
+import { defineConfig } from "vitest/config";
 
-export default defineWorkersConfig({
+export default defineConfig({
+	plugins: [
+		cloudflareTest({
+			wrangler: { configPath: "./wrangler.toml" },
+		}),
+	],
 	test: {
 		exclude: ["src/tests/**/*.test.ts", "dist/**", "node_modules/**"],
 		// Error: no such module みたいなのが出てくるので
@@ -11,11 +17,6 @@ export default defineWorkersConfig({
 					enabled: true,
 					include: ["discord-api-types/v10", "ics", "wasm-image-optimization"],
 				},
-			},
-		},
-		poolOptions: {
-			workers: {
-				wrangler: { configPath: "./wrangler.toml" },
 			},
 		},
 	},
