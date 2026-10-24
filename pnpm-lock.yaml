@@ -372,8 +372,8 @@ importers:
         specifier: ^1.5.0
         version: 1.5.0(typescript@5.9.3)
       wasm-image-optimization:
-        specifier: ^1.4.5
-        version: 1.4.5
+        specifier: ^2.0.13
+        version: 2.0.13
     devDependencies:
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.12.11
@@ -2836,6 +2836,10 @@ packages:
   comma-separated-tokens@2.0.3:
     resolution: {integrity: sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==}
 
+  commander@15.0.0:
+    resolution: {integrity: sha512-z67u4ZhzCL/Tydu1lJARtEZYWbWaN7oYLHbsuzocr6y4N6WZAagG3RQ4FW61V1/0+jImpj293XfrcYnd1qxtPg==}
+    engines: {node: '>=22.12.0'}
+
   compressible@2.0.18:
     resolution: {integrity: sha512-AF3r7P5dWxL8MxyITRMlORQNaOA2IkAFaTr4k7BUumjPtRpGDTZpl0Pb1XCO6JeDCBdp126Cgs9sMxqSjgYyRg==}
     engines: {node: '>= 0.6'}
@@ -3599,11 +3603,6 @@ packages:
   mkdirp-classic@0.5.3:
     resolution: {integrity: sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==}
 
-  mkdirp@3.0.1:
-    resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   morgan@1.10.1:
     resolution: {integrity: sha512-223dMRJtI/l25dJKWpgij2cMtywuG/WiUKXdvwfbhGKBhy1puASqXwFzmWZ7+K73vUPoR7SS2Qz2cI/g9MKw0A==}
     engines: {node: '>= 0.8.0'}
@@ -4302,8 +4301,9 @@ packages:
       jsdom:
         optional: true
 
-  wasm-image-optimization@1.4.5:
-    resolution: {integrity: sha512-1+Lvzz5IjaDe+BXmG4ZWSdVfPItndzgAVFq8BTUEwIWQL/gF+4zqjASC03/6wT4Fq1sgOFomwK6qaOSsDyFtcw==}
+  wasm-image-optimization@2.0.13:
+    resolution: {integrity: sha512-MGaFZtdxMHZyaL3VUUcNkN8qccJcy33lcXoUIaegav/y1TiK6c2aALbKAjoe4bXHFI7nDl+5+TG0e9Y8j1/h9Q==}
+    hasBin: true
 
   which@4.0.0:
     resolution: {integrity: sha512-GlaYyEb07DPxYCKhKzplCWBJtvxZcZMrL+4UkrTSJHHPyZU4mYYTv3qaOe77H7EODLSSopAUFAc6W8U4yqvscg==}
@@ -4315,8 +4315,8 @@ packages:
     engines: {node: '>=8'}
     hasBin: true
 
-  worker-lib@2.0.8:
-    resolution: {integrity: sha512-nMx5ut10AaJZ1jf/4OJmIae9vvRP+Q134tWZ6h/TAjDhSeIHaRPH9SCuN0Wmacs3nZMZNzEQEA7hCGiQ68cHTg==}
+  worker-lib@2.2.1:
+    resolution: {integrity: sha512-CauU4vz3vZUBG3A2CY93GY94KLhbH8JtPKtuvKu2w5G07cHkZ73QkTAJ/lEHDL6arT5WDu1qpU++T0+kGDgSCg==}
 
   workerd@1.20260210.0:
     resolution: {integrity: sha512-Sb0WXhrvf+XHQigP2trAxQnXo7wxZFC4PWnn6I7LhFxiTvzxvOAqMEiLkIz58wggRCb54T/KAA8hdjkTniR5FA==}
@@ -6230,6 +6230,8 @@ snapshots:
 
   comma-separated-tokens@2.0.3: {}
 
+  commander@15.0.0: {}
+
   compressible@2.0.18:
     dependencies:
       mime-db: 1.54.0
@@ -7117,8 +7119,6 @@ snapshots:
   mkdirp-classic@0.5.3:
     optional: true
 
-  mkdirp@3.0.1: {}
-
   morgan@1.10.1(supports-color@10.2.2):
     dependencies:
       basic-auth: 2.0.1
@@ -7993,10 +7993,10 @@ snapshots:
       - tsx
       - yaml
 
-  wasm-image-optimization@1.4.5:
+  wasm-image-optimization@2.0.13:
     dependencies:
-      mkdirp: 3.0.1
-      worker-lib: 2.0.8
+      commander: 15.0.0
+      worker-lib: 2.2.1
 
   which@4.0.0:
     dependencies:
@@ -8008,7 +8008,7 @@ snapshots:
       siginfo: 2.0.0
       stackback: 0.0.2
 
-  worker-lib@2.0.8: {}
+  worker-lib@2.2.1: {}
 
   workerd@1.20260210.0:
     optionalDependencies:
