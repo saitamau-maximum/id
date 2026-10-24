@@ -19,7 +19,7 @@
 		"@react-router/node": "^8.5.0",
 		"@react-router/serve": "^8.5.0",
 		"@tanstack/react-query": "^5.104.5",
-		"autoprefixer": "^10.4.24",
+		"autoprefixer": "^10.6.1",
 		"chart.js": "^4.5.1",
 		"hono": "^4.13.13",
 		"react": "^19.3.1",
