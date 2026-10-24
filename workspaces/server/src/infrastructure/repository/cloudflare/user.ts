@@ -620,7 +620,7 @@ export class CloudflareUserRepository implements IUserRepository {
 			},
 		});
 
-		if (!profile || !profile.user) return null;
+		if (!profile?.user) return null;
 
 		return {
 			id: profile.user.id,

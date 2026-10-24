@@ -65,4 +65,5 @@ const protectedRoute = app
 	});
 
 const route = app.route("/", publicRoute).route("/", protectedRoute);
+
 export { route as inviteRoute };

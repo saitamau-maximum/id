@@ -48,7 +48,7 @@ const route = app
 
 				// Authorization ヘッダをチェック
 				const authHeader = c.req.header("Authorization");
-				if (!authHeader || !authHeader.startsWith("Basic ")) {
+				if (!authHeader?.startsWith("Basic ")) {
 					return {
 						errorRes: c.json(
 							{

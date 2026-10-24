@@ -43,7 +43,7 @@ class DiscordLoginProvider extends OAuthLoginProvider {
 
 	private async getDiscordUser() {
 		if (!this.honoVariables) throw new Error("honoVariables is not set");
-		if (!this.accessTokenResponse || !this.accessTokenResponse.access_token)
+		if (!this.accessTokenResponse?.access_token)
 			throw new Error("Access token response is not available");
 
 		if (!this.user)

@@ -18,7 +18,7 @@ const PAYMENT_UPDATE_STEPS = [
 export default function UpdatePaymentInfo() {
 	const { user } = useAuth();
 
-	if (!user || !user.initializedAt) return null;
+	if (!user?.initializedAt) return null;
 
 	return (
 		<div

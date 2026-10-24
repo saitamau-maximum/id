@@ -45,7 +45,7 @@ const route = app
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 
-		if (!githubConn || !githubConn.name) {
+		if (!githubConn?.name) {
 			return c.body(null, 404);
 		}
 

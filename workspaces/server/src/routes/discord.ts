@@ -57,7 +57,7 @@ const route = app
 		);
 		// Discord Docs には member.user は存在すると書かれているが
 		// なぜか存在しないことがあるので念のためチェックする
-		if (!member || !member.user) {
+		if (!member?.user) {
 			return c.json<DiscordInfoNotJoinedResponse>({ status: "not_joined" });
 		}
 		// 載せたくない情報も含まれているので制限する

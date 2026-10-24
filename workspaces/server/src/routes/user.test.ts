@@ -179,47 +179,47 @@ describe("User Handler", () => {
 			expect(response.status).toBe(401);
 		});
 
-		it.each([
-			...INVALID_PAYLOADS_FOR_BOTH,
-			...INVALID_PAYLOADS_FOR_REGISTER,
-		])("should return 400 for invalid input: %s", async (_description, invalidPayload) => {
-			const token = await createJWT(TEST_USER_ID);
+		it.each([...INVALID_PAYLOADS_FOR_BOTH, ...INVALID_PAYLOADS_FOR_REGISTER])(
+			"should return 400 for invalid input: %s",
+			async (_description, invalidPayload) => {
+				const token = await createJWT(TEST_USER_ID);
 
-			const response = await app.request("/user/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: convertPayload({
-					...DEFAULT_USER_PROFILE_FOR_REGISTER,
-					...invalidPayload,
-				}),
-			});
+				const response = await app.request("/user/register", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: convertPayload({
+						...DEFAULT_USER_PROFILE_FOR_REGISTER,
+						...invalidPayload,
+					}),
+				});
 
-			expect(response.status).toBe(400);
-		});
+				expect(response.status).toBe(400);
+			},
+		);
 
-		it.each([
-			...VALID_PAYLOADS_FOR_BOTH,
-			...VALID_PAYLOADS_FOR_REGISTER,
-		])("should return 201 for valid input: %s", async (_description, validPayload) => {
-			const token = await createJWT(TEST_USER_ID);
+		it.each([...VALID_PAYLOADS_FOR_BOTH, ...VALID_PAYLOADS_FOR_REGISTER])(
+			"should return 201 for valid input: %s",
+			async (_description, validPayload) => {
+				const token = await createJWT(TEST_USER_ID);
 
-			const response = await app.request("/user/register", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: convertPayload({
-					...DEFAULT_USER_PROFILE_FOR_REGISTER,
-					...validPayload,
-				}),
-			});
+				const response = await app.request("/user/register", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: convertPayload({
+						...DEFAULT_USER_PROFILE_FOR_REGISTER,
+						...validPayload,
+					}),
+				});
 
-			expect(response.status).toBe(201);
-		});
+				expect(response.status).toBe(201);
+			},
+		);
 	});
 
 	describe("PUT /user/update", () => {
@@ -288,47 +288,47 @@ describe("User Handler", () => {
 			expect(response.status).toBe(403);
 		});
 
-		it.each([
-			...INVALID_PAYLOADS_FOR_BOTH,
-			...INVALID_PAYLOADS_FOR_UPDATE,
-		])("should return 400 for invalid input: %s", async (_description, invalidPayload) => {
-			const token = await createJWT(TEST_USER_ID);
+		it.each([...INVALID_PAYLOADS_FOR_BOTH, ...INVALID_PAYLOADS_FOR_UPDATE])(
+			"should return 400 for invalid input: %s",
+			async (_description, invalidPayload) => {
+				const token = await createJWT(TEST_USER_ID);
 
-			const response = await app.request("/user/update", {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: convertPayload({
-					...DEFAULT_USER_PROFILE_FOR_UPDATE,
-					...invalidPayload,
-				}),
-			});
+				const response = await app.request("/user/update", {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: convertPayload({
+						...DEFAULT_USER_PROFILE_FOR_UPDATE,
+						...invalidPayload,
+					}),
+				});
 
-			expect(response.status).toBe(400);
-		});
+				expect(response.status).toBe(400);
+			},
+		);
 
-		it.each([
-			...VALID_PAYLOADS_FOR_BOTH,
-			...VALID_PAYLOADS_FOR_UPDATE,
-		])("should return 204 for valid input: %s", async (_description, validPayload) => {
-			const token = await createJWT(TEST_USER_ID);
+		it.each([...VALID_PAYLOADS_FOR_BOTH, ...VALID_PAYLOADS_FOR_UPDATE])(
+			"should return 204 for valid input: %s",
+			async (_description, validPayload) => {
+				const token = await createJWT(TEST_USER_ID);
 
-			const response = await app.request("/user/update", {
-				method: "PUT",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
-				},
-				body: convertPayload({
-					...DEFAULT_USER_PROFILE_FOR_UPDATE,
-					...validPayload,
-				}),
-			});
+				const response = await app.request("/user/update", {
+					method: "PUT",
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: `Bearer ${token}`,
+					},
+					body: convertPayload({
+						...DEFAULT_USER_PROFILE_FOR_UPDATE,
+						...validPayload,
+					}),
+				});
 
-			expect(response.status).toBe(204);
-		});
+				expect(response.status).toBe(204);
+			},
+		);
 	});
 
 	test.todo("GET /user/contributions");

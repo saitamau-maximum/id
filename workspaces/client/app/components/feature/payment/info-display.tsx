@@ -18,7 +18,7 @@ const Emphasize = ({ children }: { children: React.ReactNode }) => (
 export const PaymentInfoDisplay = () => {
 	const { user } = useAuth();
 
-	if (!user || !user.initializedAt) return null;
+	if (!user?.initializedAt) return null;
 
 	// 招待リンクの発行日時を基準に会費を計算する
 	// inviteIssuedAt がない場合（招待リンク発行日時記録前に登録したユーザー）は initializedAt にフォールバック
