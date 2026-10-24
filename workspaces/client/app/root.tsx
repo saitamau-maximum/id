@@ -94,10 +94,10 @@ export default function App() {
 				<ToastProvider>
 					<InvitationProvider>
 						<Outlet />
-						<UserSelector.Root />
-						<RoleSelector.Root />
-						<ConfirmDialog.Root />
-						<InformationDialog.Root />
+						<UserSelector />
+						<RoleSelector />
+						<ConfirmDialog />
+						<InformationDialog />
 					</InvitationProvider>
 				</ToastProvider>
 			</QueryClientProvider>

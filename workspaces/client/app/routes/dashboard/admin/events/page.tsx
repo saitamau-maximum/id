@@ -14,10 +14,10 @@ export default function AdminEvents() {
 		<div>
 			<EventsEditor />
 			<LocationEditor />
-			<CreateEventDialog.Root />
-			<EditEventDialog.Root />
-			<CreateLocationDialog.Root />
-			<EditLocationDialog.Root />
+			<CreateEventDialog />
+			<EditEventDialog />
+			<CreateLocationDialog />
+			<EditLocationDialog />
 		</div>
 	);
 }

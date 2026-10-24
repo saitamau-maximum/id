@@ -31,7 +31,7 @@ export default function AdminInvites() {
 				</h2>
 				<ProvisionalUsersTable />
 			</div>
-			<GenerateInvitationURLDialog.Root />
+			<GenerateInvitationURLDialog />
 		</div>
 	);
 }
