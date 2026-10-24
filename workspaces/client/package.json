@@ -37,18 +37,19 @@
 		"remark-parse": "^11.0.0",
 		"remark-rehype": "^11.1.2",
 		"unified": "^11.0.5",
-		"valibot": "1.5.0"
+		"valibot": "1.5.0",
+		"isbot": "^5"
 	},
 	"devDependencies": {
 		"@pandacss/dev": "^2.4.0",
 		"@pandacss/preset-base": "^2.4.0",
 		"@pandacss/preset-panda": "^2.4.0",
 		"@react-router/dev": "^8.5.0",
-		"@types/node": "^25.2.3",
+		"@types/node": "^26.6.5",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"isbot": "^5.2.2",
-		"typescript": "^5.9.3",
+		"typescript": "^7.0.2",
 		"vite": "^8.3.5"
 	}
 }

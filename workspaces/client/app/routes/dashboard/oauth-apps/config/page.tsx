@@ -30,12 +30,12 @@ export const clientLoader = async ({ params }: Route.ClientLoaderArgs) => {
 	}
 };
 
-export const meta = ({ data }: Route.MetaArgs) => {
-	if (!data) {
+export const meta = ({ loaderData }: Route.MetaArgs) => {
+	if (!loaderData) {
 		// データがない場合はデフォルトのタイトルを返す
 		return [{ title: "Maximum IdP" }];
 	}
-	return [{ title: `${data.name} の設定 | Maximum IdP` }];
+	return [{ title: `${loaderData.name} の設定 | Maximum IdP` }];
 };
 
 const configSectionStyle = css({
