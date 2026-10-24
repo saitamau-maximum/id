@@ -298,8 +298,8 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
       valibot:
-        specifier: 1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: 1.5.0
+        version: 1.5.0(typescript@5.9.3)
     devDependencies:
       "@pandacss/dev":
         specifier: ^1.8.1
@@ -331,8 +331,8 @@ importers:
   workspaces/schema:
     dependencies:
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.5.0
+        version: 1.5.0(typescript@5.9.3)
     devDependencies:
       vitest:
         specifier: ^3.2.4
@@ -342,7 +342,7 @@ importers:
     dependencies:
       "@hono/valibot-validator":
         specifier: ^0.6.1
-        version: 0.6.1(hono@4.11.9)(valibot@1.2.0(typescript@5.9.3))
+        version: 0.6.1(hono@4.11.9)(valibot@1.5.0(typescript@5.9.3))
       "@idp/schema":
         specifier: workspace:*
         version: link:../schema
@@ -365,8 +365,8 @@ importers:
         specifier: ^5.0.5
         version: 5.0.5
       valibot:
-        specifier: ^1.2.0
-        version: 1.2.0(typescript@5.9.3)
+        specifier: ^1.5.0
+        version: 1.5.0(typescript@5.9.3)
       wasm-image-optimization:
         specifier: ^1.4.5
         version: 1.4.5
@@ -6874,10 +6874,10 @@ packages:
       }
     engines: { node: ">= 0.4.0" }
 
-  valibot@1.2.0:
+  valibot@1.5.0:
     resolution:
       {
-        integrity: sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==,
+        integrity: sha512-nil6AkP2TChWL43Z5uJ6GTxX01CUA+g8LWUM+N/rB9NBbkUMaUsi9PUNzlUPgoKASgmx9f7eGOYpJ04/fSa6FQ==,
       }
     peerDependencies:
       typescript: ">=5"
@@ -7699,10 +7699,10 @@ snapshots:
     dependencies:
       hono: 4.11.9
 
-  "@hono/valibot-validator@0.6.1(hono@4.11.9)(valibot@1.2.0(typescript@5.9.3))":
+  "@hono/valibot-validator@0.6.1(hono@4.11.9)(valibot@1.5.0(typescript@5.9.3))":
     dependencies:
       hono: 4.11.9
-      valibot: 1.2.0(typescript@5.9.3)
+      valibot: 1.5.0(typescript@5.9.3)
 
   "@hookform/resolvers@5.2.2(react-hook-form@7.71.1(react@19.2.4))":
     dependencies:
@@ -8905,7 +8905,7 @@ snapshots:
       react-router: 7.13.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       semver: 7.7.4
       tinyglobby: 0.2.15
-      valibot: 1.2.0(typescript@5.9.3)
+      valibot: 1.5.0(typescript@5.9.3)
       vite: 7.3.1(@types/node@25.2.3)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.9.1)
       vite-node: 3.2.4(@types/node@25.2.3)(lightningcss@1.30.2)(supports-color@10.2.2)(tsx@4.21.0)(yaml@2.9.1)
     optionalDependencies:
@@ -11749,7 +11749,7 @@ snapshots:
 
   utils-merge@1.0.1: {}
 
-  valibot@1.2.0(typescript@5.9.3):
+  valibot@1.5.0(typescript@5.9.3):
     optionalDependencies:
       typescript: 5.9.3
 

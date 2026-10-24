@@ -38,7 +38,7 @@
 		"remark-parse": "^11.0.0",
 		"remark-rehype": "^11.1.2",
 		"unified": "^11.0.5",
-		"valibot": "1.2.0"
+		"valibot": "1.5.0"
 	},
 	"devDependencies": {
 		"@pandacss/dev": "^1.8.1",
