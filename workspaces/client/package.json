@@ -3,7 +3,7 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"prepare": "react-router typegen && panda codegen",
+		"prepare": "react-router typegen && panda codegen --clean",
 		"build": "NODE_ENV=production react-router build",
 		"dev": "react-router dev",
 		"start": "NODE_ENV=production react-router-serve ./build/server/index.js",
@@ -40,7 +40,9 @@
 		"valibot": "1.5.0"
 	},
 	"devDependencies": {
-		"@pandacss/dev": "^1.8.1",
+		"@pandacss/dev": "^2.4.0",
+		"@pandacss/preset-base": "^2.4.0",
+		"@pandacss/preset-panda": "^2.4.0",
 		"@react-router/dev": "^8.5.0",
 		"@types/node": "^25.2.3",
 		"@types/react": "^19.3.0",
