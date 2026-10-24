@@ -1,9 +1,10 @@
 packages:
   - workspaces/*
 
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - better-sqlite3
-  - esbuild
-  - sharp
-  - workerd
+shellEmulator: true
+
+allowBuilds:
+  better-sqlite3: true
+  esbuild: true
+  sharp: true
+  workerd: true
