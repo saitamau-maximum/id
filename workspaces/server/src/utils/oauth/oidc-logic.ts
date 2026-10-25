@@ -1,5 +1,6 @@
 import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
 import { binaryToBase64Url } from "../convert-bin-base64";
+import { sha512 } from "../hash";
 import { iss } from "./constant";
 import { importKey, sign } from "./key";
 
@@ -55,11 +56,8 @@ const signJWT = async (
 const generateAtHash = async (accessToken: string) => {
 	// at_hash は access_token のハッシュ値の左半分を Base64url エンコードしたもの
 	// ハッシュアルゴリズムは signJWT と同じ = SHA-512
-	const hash = await crypto.subtle.digest(
-		{ name: "SHA-512" },
-		new TextEncoder().encode(accessToken),
-	);
-	const leftHalf = new Uint8Array(hash.slice(0, 32)); // SHA-512 は 64B なので左半分は 32B
+	const hash = await sha512(new TextEncoder().encode(accessToken));
+	const leftHalf = hash.slice(0, 32); // SHA-512 は 64B なので左半分は 32B
 	return binaryToBase64Url(leftHalf);
 };
 
@@ -71,11 +69,8 @@ export const generateSub = async (clientId: string, userId: string) => {
 	// - 同じ入力に対しては同じ結果
 	// そのため、 Client ID と User ID を組み合わせてハッシュをとることにする
 	const payload = `${clientId}_${userId}`;
-	const hash = await crypto.subtle.digest(
-		{ name: "SHA-512" },
-		new TextEncoder().encode(payload),
-	);
-	return binaryToBase64Url(new Uint8Array(hash));
+	const hash = await sha512(new TextEncoder().encode(payload));
+	return binaryToBase64Url(hash);
 };
 
 export const generateIdToken = async ({

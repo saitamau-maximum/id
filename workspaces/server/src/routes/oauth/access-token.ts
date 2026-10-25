@@ -6,6 +6,7 @@ import {
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
 import { binaryToBase64Url } from "../../utils/convert-bin-base64";
+import { sha256 } from "../../utils/hash";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
@@ -16,11 +17,8 @@ const OAUTH_ERROR_URI =
 	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint";
 
 const generateCodeChallenge = async (codeVerifier: string) => {
-	const hash = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(codeVerifier),
-	);
-	return binaryToBase64Url(new Uint8Array(hash));
+	const hash = await sha256(new TextEncoder().encode(codeVerifier));
+	return binaryToBase64Url(hash);
 };
 
 const route = app

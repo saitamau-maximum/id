@@ -1,11 +1,8 @@
+import { digestToHex, sha256 } from "../hash";
+
 export const generateClientSecretHash = async (secret: string) => {
-	const hashBuffer = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(secret),
-	);
-	return Array.from(new Uint8Array(hashBuffer))
-		.map((b) => b.toString(16).padStart(2, "0"))
-		.join("");
+	const hash = await sha256(new TextEncoder().encode(secret));
+	return digestToHex(hash);
 };
 
 export const maskClientSecret = (secret: string) => `******${secret.slice(-6)}`;

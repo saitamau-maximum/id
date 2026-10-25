@@ -16,6 +16,7 @@ import { CloudflareUserRepository } from "../../infrastructure/repository/cloudf
 import { oauthRoute } from "../../routes/oauth";
 import { wellKnownRoute } from "../../routes/well-known";
 import { binaryToBase64Url } from "../../utils/convert-bin-base64";
+import { sha256 } from "../../utils/hash";
 import { exportKey, generateKeyPair } from "../../utils/oauth/key";
 
 export const AUTHORIZATION_ENDPOINT = "/oauth/authorize";
@@ -26,11 +27,8 @@ export const DEFAULT_REDIRECT_URI = "https://idp.test/oauth/callback";
 const TEST_SECRET = "test-secret";
 
 export const generateCodeChallenge = async (codeVerifier: string) => {
-	const hash = await crypto.subtle.digest(
-		"SHA-256",
-		new TextEncoder().encode(codeVerifier),
-	);
-	return binaryToBase64Url(new Uint8Array(hash));
+	const hash = await sha256(new TextEncoder().encode(codeVerifier));
+	return binaryToBase64Url(hash);
 };
 
 export const getClientAuthHeader = (clientId: string, clientSecret: string) =>
