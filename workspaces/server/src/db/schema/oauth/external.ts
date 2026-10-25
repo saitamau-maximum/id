@@ -40,8 +40,7 @@ export const oauthClientSecrets = sqliteTable(
 			.notNull()
 			.references(() => oauthClients.id),
 		secret: text("secret").notNull(),
-		secretHash: text("secret_hash"),
-		secretSuffix: text("secret_suffix"),
+		secretSuffix: text("secret_suffix").notNull(),
 		description: text("description"),
 		issuedBy: text("issued_by")
 			.notNull()
