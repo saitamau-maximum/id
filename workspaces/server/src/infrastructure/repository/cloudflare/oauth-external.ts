@@ -13,10 +13,7 @@ import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 import { binaryToBase64 } from "../../../utils/convert-bin-base64";
 import { digestToHex, sha256 } from "../../../utils/hash";
-import {
-	generateClientSecretHash,
-	maskClientSecret,
-} from "../../../utils/oauth/client-secret";
+import { generateClientSecretHash } from "../../../utils/oauth/client-secret";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
 
 const hashToken = async (token: string): Promise<string> => {
@@ -89,10 +86,6 @@ export class CloudflareOAuthExternalRepository
 
 		return {
 			...client,
-			secrets: client.secrets.map((secret) => ({
-				...secret,
-				secret: maskClientSecret(secret.secretSuffix),
-			})),
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes
 				.map((clientScope) => clientScope.scopeId) // 型ガードを通すため scopeId で map し filter する
