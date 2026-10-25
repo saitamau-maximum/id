@@ -60,12 +60,8 @@ const route = app
 			secrets: await Promise.all(
 				secrets.map(async (secret) => ({
 					...secret,
-					// secret は 8bit * 39 = 312bit = 6bit * 52 -> 52 文字
-					secret: maskClientSecret(secret.secretSuffix ?? secret.secret),
-					// こうしてしまうと削除時などに secret が特定できないので、 hash を生成
-					secretHash:
-						secret.secretHash ??
-						(await generateClientSecretHash(secret.secret)),
+					secret: maskClientSecret(secret.secretSuffix),
+					secretHash: secret.secret,
 				})),
 			),
 		});
@@ -247,12 +243,11 @@ const route = app
 			if (!client) return c.text("Not found", 404);
 
 			for (const secret of client.secrets) {
-				const knownSecretHash =
-					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
+				const knownSecretHash = secret.secret;
 				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.updateClientSecretDescription(
 						clientId,
-						secret.secretHash ? knownSecretHash : secret.secret,
+						knownSecretHash,
 						description,
 					);
 					return c.text("OK");
@@ -272,12 +267,11 @@ const route = app
 			if (!client) return c.text("Not found", 404);
 
 			for (const secret of client.secrets) {
-				const knownSecretHash =
-					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
+				const knownSecretHash = secret.secret;
 				if (knownSecretHash === secretHash) {
 					await c.var.OAuthExternalRepository.deleteClientSecret(
 						clientId,
-						secret.secretHash ? knownSecretHash : secret.secret,
+						knownSecretHash,
 					);
 					return c.text("OK");
 				}

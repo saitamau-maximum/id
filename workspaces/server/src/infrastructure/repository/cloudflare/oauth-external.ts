@@ -6,7 +6,7 @@ import {
 	ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
-import { and, eq, inArray, or } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
@@ -91,9 +91,7 @@ export class CloudflareOAuthExternalRepository
 			...client,
 			secrets: client.secrets.map((secret) => ({
 				...secret,
-				secret: secret.secretHash
-					? maskClientSecret(secret.secretSuffix ?? secret.secret)
-					: secret.secret,
+				secret: maskClientSecret(secret.secretSuffix),
 			})),
 			callbackUrls: callbacks.map((callback) => callback.callbackUrl),
 			scopes: scopes
@@ -159,7 +157,6 @@ export class CloudflareOAuthExternalRepository
 		const res = await this.client.insert(schema.oauthClientSecrets).values({
 			clientId,
 			secret: secretHash,
-			secretHash,
 			secretSuffix: secret.slice(-6),
 			description: "",
 			issuedAt: new Date(),
@@ -176,9 +173,7 @@ export class CloudflareOAuthExternalRepository
 		});
 		const secretHash = await generateClientSecretHash(secret);
 		return secrets.some((clientSecret) => {
-			if (clientSecret.secretHash)
-				return clientSecret.secretHash === secretHash;
-			return clientSecret.secret === secret;
+			return clientSecret.secret === secretHash;
 		});
 	}
 
@@ -407,11 +402,8 @@ export class CloudflareOAuthExternalRepository
 	async getTokenByCode(code: string) {
 		const codeHash = await hashToken(code);
 		const res = await this.client.query.oauthTokens.findFirst({
-			where: (token, { eq, and, gt, or }) =>
-				and(
-					or(eq(token.code, codeHash), eq(token.code, code)),
-					gt(token.codeExpiresAt, new Date()),
-				),
+			where: (token, { eq, and, gt }) =>
+				and(eq(token.code, codeHash), gt(token.codeExpiresAt, new Date())),
 			with: {
 				client: {
 					with: {
@@ -479,10 +471,7 @@ export class CloudflareOAuthExternalRepository
 			.set(updateValues)
 			.where(
 				and(
-					or(
-						eq(schema.oauthTokens.code, codeHash),
-						eq(schema.oauthTokens.code, code),
-					),
+					eq(schema.oauthTokens.code, codeHash),
 					eq(schema.oauthTokens.codeUsed, false),
 				),
 			)
@@ -494,12 +483,9 @@ export class CloudflareOAuthExternalRepository
 	async getTokenByAccessToken(accessToken: string) {
 		const tokenHash = await hashToken(accessToken);
 		const res = await this.client.query.oauthTokens.findFirst({
-			where: (token, { eq, and, gt, or }) =>
+			where: (token, { eq, and, gt }) =>
 				and(
-					or(
-						eq(token.accessToken, tokenHash),
-						eq(token.accessToken, accessToken),
-					),
+					eq(token.accessToken, tokenHash),
 					gt(token.accessTokenExpiresAt, new Date()),
 				),
 			with: {
