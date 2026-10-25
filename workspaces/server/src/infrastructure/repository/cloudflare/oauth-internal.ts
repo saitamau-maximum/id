@@ -12,6 +12,7 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthInternalRepository } from "./../../../repository/oauth-internal";
+import { decrypt, deriveKey, encrypt } from "../../../utils/encryption";
 
 export class CloudflareOAuthInternalRepository
 	implements IOAuthInternalRepository
@@ -22,6 +23,32 @@ export class CloudflareOAuthInternalRepository
 	constructor(db: D1Database, env: Env) {
 		this.client = drizzle(db, { schema });
 		this.env = env;
+	}
+
+	private async deriveEncryptionKey(): Promise<CryptoKey> {
+		return deriveKey(
+			this.env.SECRET,
+			// key rotation 時には乱数部分を変えれば OK
+			"oauth-connection-token-encryption.381338454502",
+			{ name: "AES-GCM", length: 256 },
+			["encrypt", "decrypt"],
+		);
+	}
+
+	private async encryptToken(
+		token: string | null | undefined,
+	): Promise<string | null> {
+		if (!token) return null;
+		const encryptionKey = await this.deriveEncryptionKey();
+		return encrypt(encryptionKey, token);
+	}
+
+	private async decryptToken(
+		token: string | null | undefined,
+	): Promise<string | null> {
+		if (!token) return null;
+		const encryptionKey = await this.deriveEncryptionKey();
+		return decrypt(encryptionKey, token);
 	}
 
 	async fetchUserIdByProviderInfo(
@@ -78,13 +105,21 @@ export class CloudflareOAuthInternalRepository
 	}
 
 	async createOAuthConnection(data: OAuthConnection): Promise<void> {
-		await this.client.insert(schema.oauthConnections).values(data);
+		const refreshToken = await this.encryptToken(data.refreshToken);
+		await this.client.insert(schema.oauthConnections).values({
+			...data,
+			refreshToken,
+		});
 	}
 
 	async updateOAuthConnection(data: OAuthConnection): Promise<void> {
+		const refreshToken = await this.encryptToken(data.refreshToken);
 		await this.client
 			.update(schema.oauthConnections)
-			.set(data)
+			.set({
+				...data,
+				refreshToken,
+			})
 			.where(
 				and(
 					eq(schema.oauthConnections.userId, data.userId),
@@ -130,15 +165,21 @@ export class CloudflareOAuthInternalRepository
 
 		if (!res?.refreshToken) return null;
 
+		// しばらくの間は暗号化されていない可能性があるので、復号に失敗した場合は null を返して再ログインを促す
+		const decryptedRefreshToken = await this.decryptToken(
+			res.refreshToken,
+		).catch(() => null);
+		if (!decryptedRefreshToken) return null;
+
 		if (providerId === OAUTH_PROVIDER_IDS.GITHUB) {
 			// GitHub の場合、 Access Token をそのまま Refresh Token として保存している
-			return res.refreshToken;
+			return decryptedRefreshToken;
 		}
 		if (providerId === OAUTH_PROVIDER_IDS.DISCORD) {
 			// Discord の場合、 Refresh Token から Access Token を取得する
 			const body = new URLSearchParams();
 			body.set("grant_type", "refresh_token");
-			body.set("refresh_token", res.refreshToken);
+			body.set("refresh_token", decryptedRefreshToken);
 			body.set("client_id", this.env.DISCORD_OAUTH_ID);
 			body.set("client_secret", this.env.DISCORD_OAUTH_SECRET);
 
@@ -156,7 +197,7 @@ export class CloudflareOAuthInternalRepository
 				await this.client
 					.update(schema.oauthConnections)
 					.set({
-						refreshToken: response.refresh_token,
+						refreshToken: await this.encryptToken(response.refresh_token),
 						refreshTokenExpiresAt: null,
 					})
 					.where(
