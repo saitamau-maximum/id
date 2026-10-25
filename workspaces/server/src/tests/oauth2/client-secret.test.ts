@@ -34,10 +34,9 @@ describe("OAuth client secrets", () => {
 		assert.isDefined(client);
 		const generatedSecret = client.secrets.at(-1);
 		assert.isDefined(generatedSecret);
-		expect(generatedSecret.secret).toBe(`******${oauthClientSecret.slice(-6)}`);
+		expect(generatedSecret.secretSuffix).toBe(oauthClientSecret.slice(-6));
 		expect(generatedSecret.secret).not.toContain(oauthClientSecret.slice(0, 8));
-		// temporarily commented out
-		// expect(generatedSecret.secretHash).toMatch(/^[0-9a-f]{64}$/);
+		expect(generatedSecret.secret).toMatch(/^[0-9a-f]{64}$/);
 
 		const body = new FormData();
 		body.append("grant_type", "authorization_code");
