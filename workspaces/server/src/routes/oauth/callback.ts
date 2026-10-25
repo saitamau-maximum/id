@@ -3,9 +3,9 @@ import { OAuthCallbackRequestParams } from "@idp/schema/api/oauth/callback";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
 import { cookieAuthMiddleware } from "../../middleware/auth";
+import { binaryToBase64 } from "../../utils/convert-bin-base64";
 import { validateAuthToken } from "../../utils/oauth/auth-token";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../utils/oauth/constant";
-import { binaryToBase64 } from "../../utils/oauth/convert-bin-base64";
 import { derivePublicKey, importKey, jwkToKey } from "../../utils/oauth/key";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 

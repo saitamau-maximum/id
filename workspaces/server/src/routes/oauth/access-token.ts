@@ -5,7 +5,7 @@ import {
 } from "@idp/schema/api/oauth/access-token";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
-import { binaryToBase64Url } from "../../utils/oauth/convert-bin-base64";
+import { binaryToBase64Url } from "../../utils/convert-bin-base64";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29

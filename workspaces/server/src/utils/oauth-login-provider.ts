@@ -22,8 +22,8 @@ import {
 } from "../constants/toast";
 import type { HonoEnv } from "../factory";
 import { validateInvitation } from "../service/invite";
+import { binaryToBase64 } from "./convert-bin-base64";
 import { getCookieDomain, getDeleteCookieOptions } from "./cookie";
-import { binaryToBase64 } from "./oauth/convert-bin-base64";
 import type { Awaitable } from "./types";
 
 export abstract class OAuthLoginProvider {

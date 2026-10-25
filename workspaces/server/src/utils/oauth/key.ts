@@ -1,4 +1,4 @@
-import { binaryToBase64Url } from "./convert-bin-base64";
+import { binaryToBase64Url } from "../convert-bin-base64";
 
 type JsonWebKeyWithKid = JsonWebKey & { kid: string };
 

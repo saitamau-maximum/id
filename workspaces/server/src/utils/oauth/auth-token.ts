@@ -2,7 +2,7 @@
 // https://github.com/saitamau-maximum/auth/issues/27
 
 import type { PkceCodeChallengeMethod } from "@idp/schema/entity/oauth-external/pkce";
-import { base64ToBinary, binaryToBase64 } from "./convert-bin-base64";
+import { base64ToBinary, binaryToBase64 } from "../convert-bin-base64";
 import { sign, verify } from "./key";
 
 interface Param {
