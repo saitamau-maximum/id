@@ -5,8 +5,12 @@ import {
 } from "@idp/schema/api/oauth/access-token";
 import { SCOPE_IDS } from "@idp/schema/entity/oauth-external/scope";
 import { factory } from "../../factory";
-import { binaryToBase64Url } from "../../utils/convert-bin-base64";
+import {
+	binaryToBase64,
+	binaryToBase64Url,
+} from "../../utils/convert-bin-base64";
 import { sha256 } from "../../utils/hash";
+import { ACCESS_TOKEN_EXPIRES_IN } from "../../utils/oauth/constant";
 import { generateIdToken } from "../../utils/oauth/oidc-logic";
 
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
@@ -177,9 +181,22 @@ const route = app
 				);
 			}
 
-			// token が使われたことを記録
+			// DB に保存されている access token は SHA256 でハッシュ化されているため復元できない
+			// → ここで新しい access token を生成して保存する
+			const accessToken = binaryToBase64(
+				crypto.getRandomValues(new Uint8Array(39)),
+			);
+			const accessTokenExpiresAt = new Date(
+				nowUnixMs + ACCESS_TOKEN_EXPIRES_IN * 1000,
+			);
+
+			// token が使われたことを記録し、生成したアクセストークンを保存
 			try {
-				const consumed = await c.var.OAuthExternalRepository.consumeCode(code);
+				const consumed = await c.var.OAuthExternalRepository.consumeCode(
+					code,
+					accessToken,
+					accessTokenExpiresAt,
+				);
 				if (!consumed) {
 					await c.var.OAuthExternalRepository.deleteTokenById(tokenInfo.id);
 					return c.json(
@@ -202,13 +219,10 @@ const route = app
 				);
 			}
 
-			// token の残り時間を計算
-			const remMs = tokenInfo.accessTokenExpiresAt.getTime() - nowUnixMs;
-
 			const res: AccessTokenResponse = {
-				access_token: tokenInfo.accessToken,
+				access_token: accessToken,
 				token_type: "bearer",
-				expires_in: Math.floor(remMs / 1000),
+				expires_in: ACCESS_TOKEN_EXPIRES_IN,
 				scope: tokenInfo.scopes.map((s) => s.name).join(" "),
 			};
 
@@ -220,10 +234,10 @@ const route = app
 				res.id_token = await generateIdToken({
 					clientId: tokenInfo.clientId,
 					userId: tokenInfo.userId,
-					exp: Math.floor(tokenInfo.accessTokenExpiresAt.getTime() / 1000),
+					exp: Math.floor(accessTokenExpiresAt.getTime() / 1000),
 					authTime: tokenInfo.oidcParams.authTime,
 					nonce: tokenInfo.oidcParams.nonce,
-					accessToken: tokenInfo.accessToken,
+					accessToken: accessToken,
 					privateKey: c.env.PRIVKEY_FOR_OAUTH,
 					// 必要最低限の情報は含める
 					...(tokenInfo.scopes.find((s) => s.id === SCOPE_IDS.PROFILE)

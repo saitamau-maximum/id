@@ -6,17 +6,23 @@ import {
 	ScopeId,
 } from "@idp/schema/entity/oauth-external/scope";
 import { ROLE_BY_ID, RoleId } from "@idp/schema/entity/role";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, or } from "drizzle-orm";
 import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
 import { binaryToBase64 } from "../../../utils/convert-bin-base64";
+import { digestToHex, sha256 } from "../../../utils/hash";
 import {
 	generateClientSecretHash,
 	maskClientSecret,
 } from "../../../utils/oauth/client-secret";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
+
+const hashToken = async (token: string): Promise<string> => {
+	const hash = await sha256(new TextEncoder().encode(token));
+	return digestToHex(hash);
+};
 
 // user table から基本的な情報を取得するためのやつ
 const USER_BASIC_INFO_COLUMNS_GETTER = {
@@ -356,6 +362,8 @@ export class CloudflareOAuthExternalRepository
 		oidcAuthTime?: number,
 	) {
 		const time = Date.now();
+		const codeHash = await hashToken(code);
+		const accessTokenHash = await hashToken(accessToken);
 
 		// transaction が使えないが、 batch だと autoincrement な token id を取得できないので、 Cloudflare の力を信じてふつうに insert する
 		const tokenInsertRes = await this.client
@@ -363,7 +371,7 @@ export class CloudflareOAuthExternalRepository
 			.values({
 				clientId,
 				userId,
-				code,
+				code: codeHash,
 				codeExpiresAt: new Date(time + 1 * 60 * 1000), // 1 min
 				codeUsed: false,
 				redirectUri,
@@ -371,7 +379,7 @@ export class CloudflareOAuthExternalRepository
 				codeChallengeMethod,
 				oidcNonce,
 				oidcAuthTime,
-				accessToken,
+				accessToken: accessTokenHash,
 				accessTokenExpiresAt: new Date(time + ACCESS_TOKEN_EXPIRES_IN * 1000), // 1 hour
 			})
 			.returning();
@@ -397,9 +405,13 @@ export class CloudflareOAuthExternalRepository
 	}
 
 	async getTokenByCode(code: string) {
+		const codeHash = await hashToken(code);
 		const res = await this.client.query.oauthTokens.findFirst({
-			where: (token, { eq, and, gt }) =>
-				and(eq(token.code, code), gt(token.codeExpiresAt, new Date())),
+			where: (token, { eq, and, gt, or }) =>
+				and(
+					or(eq(token.code, codeHash), eq(token.code, code)),
+					gt(token.codeExpiresAt, new Date()),
+				),
 			with: {
 				client: {
 					with: {
@@ -445,13 +457,32 @@ export class CloudflareOAuthExternalRepository
 		}
 	}
 
-	async consumeCode(code: string) {
+	async consumeCode(
+		code: string,
+		newAccessToken?: string,
+		accessTokenExpiresAt?: Date,
+	) {
+		const codeHash = await hashToken(code);
+		const updateValues: {
+			codeUsed: boolean;
+			accessToken?: string;
+			accessTokenExpiresAt?: Date;
+		} = { codeUsed: true };
+
+		if (newAccessToken && accessTokenExpiresAt) {
+			updateValues.accessToken = await hashToken(newAccessToken);
+			updateValues.accessTokenExpiresAt = accessTokenExpiresAt;
+		}
+
 		const res = await this.client
 			.update(schema.oauthTokens)
-			.set({ codeUsed: true })
+			.set(updateValues)
 			.where(
 				and(
-					eq(schema.oauthTokens.code, code),
+					or(
+						eq(schema.oauthTokens.code, codeHash),
+						eq(schema.oauthTokens.code, code),
+					),
 					eq(schema.oauthTokens.codeUsed, false),
 				),
 			)
@@ -461,10 +492,14 @@ export class CloudflareOAuthExternalRepository
 	}
 
 	async getTokenByAccessToken(accessToken: string) {
+		const tokenHash = await hashToken(accessToken);
 		const res = await this.client.query.oauthTokens.findFirst({
-			where: (token, { eq, and, gt }) =>
+			where: (token, { eq, and, gt, or }) =>
 				and(
-					eq(token.accessToken, accessToken),
+					or(
+						eq(token.accessToken, tokenHash),
+						eq(token.accessToken, accessToken),
+					),
 					gt(token.accessTokenExpiresAt, new Date()),
 				),
 			with: {
