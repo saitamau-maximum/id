@@ -128,7 +128,7 @@ export class CloudflareOAuthInternalRepository
 			},
 		});
 
-		if (!res || !res.refreshToken) return null;
+		if (!res?.refreshToken) return null;
 
 		if (providerId === OAUTH_PROVIDER_IDS.GITHUB) {
 			// GitHub の場合、 Access Token をそのまま Refresh Token として保存している

@@ -88,23 +88,15 @@ const route = app
 			try {
 				const clientId = crypto.randomUUID();
 				if (icon) {
-					const optimizedImageArrayBuffer = await optimizeImage({
+					const optimizedImage = await optimizeImage({
 						image: await icon.arrayBuffer(),
 						width: 256,
 						height: 256,
 						format: "webp",
 					});
 
-					if (!optimizedImageArrayBuffer) {
-						throw new Error("Failed to optimize image");
-					}
-
-					const optimizedImageUint8Array = new Uint8Array(
-						optimizedImageArrayBuffer,
-					);
-
 					await c.var.OAuthAppStorageRepository.uploadAppIcon(
-						new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+						new Blob([optimizedImage.data], { type: "image/webp" }),
 						clientId,
 					);
 				}
@@ -157,23 +149,15 @@ const route = app
 
 			try {
 				if (icon) {
-					const optimizedImageArrayBuffer = await optimizeImage({
+					const optimizedImage = await optimizeImage({
 						image: await icon.arrayBuffer(),
 						width: 256,
 						height: 256,
 						format: "webp",
 					});
 
-					if (!optimizedImageArrayBuffer) {
-						throw new Error("Failed to optimize image");
-					}
-
-					const optimizedImageUint8Array = new Uint8Array(
-						optimizedImageArrayBuffer,
-					);
-
 					await c.var.OAuthAppStorageRepository.uploadAppIcon(
-						new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+						new Blob([optimizedImage.data], { type: "image/webp" }),
 						clientId,
 					);
 				}

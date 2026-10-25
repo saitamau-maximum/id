@@ -15,8 +15,8 @@ export const clientLoader = ({ params }: Route.ClientLoaderArgs) => {
 	return { userDisplayId };
 };
 
-export const meta = ({ data }: Route.MetaArgs) => {
-	return [{ title: `@${data.userDisplayId} の情報 | Maximum IdP` }];
+export const meta = ({ loaderData }: Route.MetaArgs) => {
+	return [{ title: `@${loaderData.userDisplayId} の情報 | Maximum IdP` }];
 };
 
 export default function Profile() {

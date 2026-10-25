@@ -139,7 +139,7 @@ const route = app
 			(conn) => conn.providerId === OAUTH_PROVIDER_IDS.GITHUB,
 		);
 
-		if (!githubConn || !githubConn.name) {
+		if (!githubConn?.name) {
 			return c.body(null, 404);
 		}
 
@@ -174,22 +174,15 @@ const route = app
 
 			const { image } = c.req.valid("form");
 
-			const optimizedImageArrayBuffer = await optimizeImage({
+			const optimizedImage = await optimizeImage({
 				image: await image.arrayBuffer(),
 				width: 256,
 				height: 256,
 				format: "webp",
 			});
-			if (!optimizedImageArrayBuffer) {
-				throw new Error("Failed to optimize image");
-			}
-
-			const optimizedImageUint8Array = new Uint8Array(
-				optimizedImageArrayBuffer,
-			);
 
 			await UserStorageRepository.uploadProfileImage(
-				new Blob([optimizedImageUint8Array], { type: "image/webp" }),
+				new Blob([optimizedImage.data], { type: "image/webp" }),
 				payload.userId,
 			);
 

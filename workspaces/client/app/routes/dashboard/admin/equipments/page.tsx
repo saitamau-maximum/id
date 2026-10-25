@@ -17,7 +17,7 @@ export default function EquipmentsPage() {
 		>
 			<div>
 				<EquipmentEditor />
-				<EquipmentDialog.Root />
+				<EquipmentDialog />
 			</div>
 		</div>
 	);

@@ -88,7 +88,7 @@ const route = app
 				redirectTo = new URL(redirect_uri);
 			} else {
 				// `/authorize` 側で client_id に対応する callback_url は必ず存在して 1 つだけであることを保証している
-				if (!client || client.callbackUrls.length !== 1) {
+				if (client?.callbackUrls.length !== 1) {
 					return c.text(
 						"Internal Server Error: client callback not found",
 						500,

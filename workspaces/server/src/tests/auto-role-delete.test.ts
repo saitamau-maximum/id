@@ -1,4 +1,4 @@
-import { env } from "cloudflare:test";
+import { env } from "cloudflare:workers";
 import { ROLE_IDS, type RoleId } from "@idp/schema/entity/role";
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/d1";

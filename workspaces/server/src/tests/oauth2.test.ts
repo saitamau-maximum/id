@@ -1,7 +1,7 @@
 // OAuth 2.0 の仕様に沿っているかのテスト
 // ref: https://datatracker.ietf.org/doc/html/rfc6749
 
-import { env } from "cloudflare:test";
+import { env } from "cloudflare:workers";
 import type { AccessTokenResponse } from "@idp/schema/api/oauth/access-token";
 import {
 	SCOPE_IDS,
@@ -731,58 +731,58 @@ describe("OAuth 2.0 spec", () => {
 
 	describe.each([
 		["/oauth/resources/authuser", [SCOPE_IDS.READ_BASIC_INFO]],
-	] as [
-		string,
-		ScopeId[],
-	][])("Resource Owner Endpoints (%s)", (path, scopes) => {
-		it("accepts access token in Authorization header", async () => {
-			const { access_token } = await doAccessTokenRequest(scopes).then((res) =>
-				res.json<AccessTokenResponse>(),
-			);
-			const res = await app.request(path, {
-				headers: { Authorization: `Bearer ${access_token}` },
-			});
-			expect(res.ok).toBe(true);
-		});
-
-		describe("Access Token Validation [MUST]", () => {
-			// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
-			it("rejects malformed access token", async () => {
-				const res = await app.request(path, {
-					headers: { Authorization: "Bearer malformed_token" },
-				});
-				expect(res.status).toBe(401);
-			});
-
-			it("rejects expired access token", async () => {
+	] as [string, ScopeId[]][])(
+		"Resource Owner Endpoints (%s)",
+		(path, scopes) => {
+			it("accepts access token in Authorization header", async () => {
 				const { access_token } = await doAccessTokenRequest(scopes).then(
 					(res) => res.json<AccessTokenResponse>(),
 				);
-				// // トークンの有効期限は 1h だが余裕をもって 1h1m 後にする
-				vi.advanceTimersByTime(61 * 60 * 1000);
 				const res = await app.request(path, {
 					headers: { Authorization: `Bearer ${access_token}` },
 				});
-				expect(res.status).toBe(401);
+				expect(res.ok).toBe(true);
 			});
 
-			it("rejects access token with insufficient scope", async () => {
-				if (scopes.length === 0) {
-					// スコープがない場合はスキップ
-					return;
-				}
-				// 必要なスコープ以外を付与
-				const incorrectScopes = Object.values(SCOPE_IDS).filter(
-					(scope) => !scopes.includes(scope),
-				);
-				const { access_token } = await doAccessTokenRequest(
-					incorrectScopes,
-				).then((res) => res.json<AccessTokenResponse>());
-				const res = await app.request(path, {
-					headers: { Authorization: `Bearer ${access_token}` },
+			describe("Access Token Validation [MUST]", () => {
+				// The resource server MUST validate the access token and ensure that it has not expired and that its scope covers the requested resource
+				it("rejects malformed access token", async () => {
+					const res = await app.request(path, {
+						headers: { Authorization: "Bearer malformed_token" },
+					});
+					expect(res.status).toBe(401);
 				});
-				expect(res.status).toBe(403);
+
+				it("rejects expired access token", async () => {
+					const { access_token } = await doAccessTokenRequest(scopes).then(
+						(res) => res.json<AccessTokenResponse>(),
+					);
+					// // トークンの有効期限は 1h だが余裕をもって 1h1m 後にする
+					vi.advanceTimersByTime(61 * 60 * 1000);
+					const res = await app.request(path, {
+						headers: { Authorization: `Bearer ${access_token}` },
+					});
+					expect(res.status).toBe(401);
+				});
+
+				it("rejects access token with insufficient scope", async () => {
+					if (scopes.length === 0) {
+						// スコープがない場合はスキップ
+						return;
+					}
+					// 必要なスコープ以外を付与
+					const incorrectScopes = Object.values(SCOPE_IDS).filter(
+						(scope) => !scopes.includes(scope),
+					);
+					const { access_token } = await doAccessTokenRequest(
+						incorrectScopes,
+					).then((res) => res.json<AccessTokenResponse>());
+					const res = await app.request(path, {
+						headers: { Authorization: `Bearer ${access_token}` },
+					});
+					expect(res.status).toBe(403);
+				});
 			});
-		});
-	});
+		},
+	);
 });

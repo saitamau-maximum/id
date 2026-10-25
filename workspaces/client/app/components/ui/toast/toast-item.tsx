@@ -57,38 +57,38 @@ const ICONS = {
 	info: <Info className={css({ color: "sky.500" })} />,
 } as const;
 
-export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
-	const InnerContent = () => {
-		return (
-			<>
-				{ICONS[type]}
-				<div className={css({ width: "100%" })}>
-					<span
+const InnerContent = ({ type, title, description }: ToastItemProps) => {
+	return (
+		<>
+			{ICONS[type]}
+			<div className={css({ width: "100%" })}>
+				<span
+					className={css({
+						fontSize: "md",
+						fontWeight: "bold",
+						textWrap: "balance",
+						color: "inherit",
+					})}
+				>
+					{title}
+				</span>
+				{description && (
+					<p
 						className={css({
-							fontSize: "md",
-							fontWeight: "bold",
+							fontSize: "sm",
 							textWrap: "balance",
 							color: "inherit",
 						})}
 					>
-						{title}
-					</span>
-					{description && (
-						<p
-							className={css({
-								fontSize: "sm",
-								textWrap: "balance",
-								color: "inherit",
-							})}
-						>
-							{description}
-						</p>
-					)}
-				</div>
-			</>
-		);
-	};
+						{description}
+					</p>
+				)}
+			</div>
+		</>
+	);
+};
 
+export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
 	if (to) {
 		return (
 			<Link
@@ -100,7 +100,7 @@ export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
 					linkStyle,
 				)}
 			>
-				<InnerContent />
+				<InnerContent type={type} title={title} description={description} />
 			</Link>
 		);
 	}
@@ -111,7 +111,7 @@ export const ToastItem = ({ type, title, description, to }: ToastItemProps) => {
 				type,
 			})}
 		>
-			<InnerContent />
+			<InnerContent type={type} title={title} description={description} />
 		</div>
 	);
 };

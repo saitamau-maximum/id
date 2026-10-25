@@ -1,7 +1,7 @@
 {
 	"include": ["app/**/*", "styled-system/**/*", ".react-router/types/**/*"],
 	"compilerOptions": {
-		"lib": ["DOM", "DOM.Iterable", "ES2022"],
+		"lib": ["DOM", "ES2022"],
 		"types": ["node", "vite/client"],
 		"target": "ES2022",
 		"module": "ES2022",
@@ -9,9 +9,9 @@
 		"jsx": "react-jsx",
 		"jsxImportSource": "react",
 		"rootDirs": [".", "./.react-router/types"],
-		"baseUrl": ".",
 		"paths": {
-			"~/*": ["./app/*"]
+			"~/*": ["./app/*"],
+			"styled-system/*": ["./styled-system/*"]
 		},
 		"esModuleInterop": true,
 		"verbatimModuleSyntax": true,

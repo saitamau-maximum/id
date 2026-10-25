@@ -49,7 +49,7 @@ export const UserSettingFormCertification = () => {
 
 	return (
 		<>
-			<CertificationRequestDialog.Root />
+			<CertificationRequestDialog />
 
 			<p
 				className={css({ color: "gray.600", textAlign: "left", width: "100%" })}

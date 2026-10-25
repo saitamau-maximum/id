@@ -21,7 +21,7 @@ export function useDiscordInvite() {
 		},
 		onSuccess: (result) => {
 			// DiscordInvitation が表示されている時点で user は存在するはず
-			if (!user || !user.displayId) return;
+			if (!user?.displayId) return;
 
 			queryClient.invalidateQueries({
 				queryKey: discordRepository.getDiscordInfoByUserDisplayID$$key(
