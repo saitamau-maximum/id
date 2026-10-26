@@ -2,7 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	// ---------- common ---------- //
 	"main": "src/index.ts",
-	"compatibility_date": "2024-12-13",
+	"compatibility_date": "2026-10-01",
 	"account_id": "338e04f1067dcfb64f701ebc7c5041a0",
 	"triggers": {
 		// GHA 経由で Cron Trigger するようになりました
