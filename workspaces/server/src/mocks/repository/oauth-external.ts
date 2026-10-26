@@ -27,5 +27,8 @@ export const createMockOAuthExternalRepository =
 
 			// cron
 			deleteExpiredAccessTokens: vi.fn(),
+
+			// temporary
+			migrateClientSecretToHash: vi.fn(),
 		};
 	};

@@ -557,4 +557,43 @@ export class CloudflareOAuthExternalRepository
 			]);
 		}
 	}
+
+	// temporary
+	async migrateClientSecretToHash() {
+		const secrets = await this.client.query.oauthClientSecrets.findMany({
+			where: (clientSecret, { isNull }) => isNull(clientSecret.secretHash),
+		});
+		console.log(`Found ${secrets.length} secrets to migrate to hash`);
+
+		for (const secret of secrets) {
+			const secretHash = await generateClientSecretHash(secret.secret);
+
+			// insert して delete する (clientId, secret が primary key になっているので)
+			const res = await this.client.batch([
+				this.client.insert(schema.oauthClientSecrets).values({
+					clientId: secret.clientId,
+					secret: secretHash,
+					secretHash: secretHash,
+					secretSuffix: secret.secretSuffix ?? secret.secret.slice(-6),
+					description: secret.description,
+					issuedAt: secret.issuedAt,
+					issuedBy: secret.issuedBy,
+				}),
+				this.client
+					.delete(schema.oauthClientSecrets)
+					.where(
+						and(
+							eq(schema.oauthClientSecrets.clientId, secret.clientId),
+							eq(schema.oauthClientSecrets.secret, secret.secret),
+						),
+					),
+			]);
+
+			if (!res.every((r) => r.success)) {
+				throw new Error(
+					`Failed to migrate secret for client ${secret.clientId} and secret ${maskClientSecret(secret.secret)}`,
+				);
+			}
+		}
+	}
 }
