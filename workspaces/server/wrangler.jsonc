@@ -1,0 +1,140 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "idp-preview",
+	"main": "src/index.ts",
+	"compatibility_date": "2024-12-13",
+	"dev": {
+		"port": 8787
+	},
+	"vars": {
+		"GITHUB_APP_ID": "387915",
+		"GITHUB_APP_INSTALLID": "41674415",
+		"ENV": "development",
+		"CLIENT_ORIGIN": "http://localhost:5173"
+	},
+	"kv_namespaces": [
+		{
+			"binding": "CACHE",
+			"id": "dev" // dev なので仮の ID を指定
+		}
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_id": "dev", // dev なので仮の ID を指定
+			"database_name": "idp-db-local",
+			"migrations_dir": "drizzle"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "STORAGE",
+			"bucket_name": "idp-storage-local"
+		}
+	],
+	// GHA 経由で Cron Trigger するようになりました
+	// .github/workflows/cron-trigger.yml を参照
+	"triggers": {
+		"crons": []
+	},
+	"observability": {
+		"enabled": true,
+		"head_sampling_rate": 1
+	},
+	"env": {
+		"preview": {
+			"name": "idp-server-preview",
+			"vars": {
+				"GITHUB_APP_ID": "387915",
+				"GITHUB_APP_INSTALLID": "41674415",
+				"GITHUB_OAUTH_ID": "Ov23liW34LxmO5QdFO25",
+				"DISCORD_OAUTH_ID": "1363752651518509116",
+				"DISCORD_GUILD_ID": "1036566020070060032",
+				"DISCORD_CALENDAR_CHANNEL_ID": "1363796953305186375",
+				"DISCORD_GITHUB_NOTIFICATION_CHANNEL_ID": "1502949254862471238",
+				"ENV": "preview",
+				"CLIENT_ORIGIN": "" // これは OAuth 周りで使うが、 Preview では OAuth は使わないので空にしておく　必要なら適宜設定する
+			},
+			"routes": [
+				{
+					"pattern": "api-preview.id.maximum.vc",
+					"custom_domain": true
+				}
+			],
+			"d1_databases": [
+				{
+					"database_id": "a6e54aed-340c-4495-9010-6e679c83bc45",
+					"binding": "DB",
+					"database_name": "idp-db-preview",
+					"migrations_dir": "drizzle"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "CACHE",
+					"id": "8566bd47321c43cab679ab65bb60e38b"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "STORAGE",
+					"bucket_name": "idp-storage-preview"
+				}
+			],
+			"triggers": {
+				"crons": []
+			},
+			"observability": {
+				"enabled": true,
+				"head_sampling_rate": 1
+			}
+		},
+		"production": {
+			"name": "idp-server",
+			"vars": {
+				"GITHUB_APP_ID": "3440677",
+				"GITHUB_APP_INSTALLID": "125508088",
+				"GITHUB_OAUTH_ID": "Ov23liTyEwcxd81RFZlI",
+				"DISCORD_OAUTH_ID": "1363752651518509116",
+				"DISCORD_GUILD_ID": "1036566020070060032",
+				"DISCORD_CALENDAR_CHANNEL_ID": "1363796953305186375",
+				"DISCORD_GITHUB_NOTIFICATION_CHANNEL_ID": "1502949254862471238",
+				"ENV": "production",
+				"CLIENT_ORIGIN": "https://id.maximum.vc"
+			},
+			"routes": [
+				{
+					"pattern": "api.id.maximum.vc",
+					"custom_domain": true
+				}
+			],
+			"d1_databases": [
+				{
+					"database_id": "7b42a115-ebac-47c9-9388-759082eb0d22",
+					"binding": "DB",
+					"database_name": "idp-db",
+					"migrations_dir": "drizzle"
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "CACHE",
+					"id": "0cd11121be304250a5246b2c1a5e185d"
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "STORAGE",
+					"bucket_name": "idp-storage"
+				}
+			],
+			"triggers": {
+				"crons": []
+			},
+			"observability": {
+				"enabled": true,
+				"head_sampling_rate": 1
+			}
+		}
+	}
+}
