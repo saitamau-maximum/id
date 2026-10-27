@@ -384,6 +384,9 @@ importers:
       '@types/minimist':
         specifier: ^1.2.5
         version: 1.2.5
+      '@types/node':
+        specifier: ^26.6.5
+        version: 26.6.5
       '@types/prompts':
         specifier: ^2.4.9
         version: 2.4.9
