@@ -121,7 +121,7 @@ const route = app
 			const code = binaryToBase64(crypto.getRandomValues(new Uint8Array(30)));
 
 			// access token (312bit = 8bit * 39) を生成
-			// - 312 は 56 (= 7 * 8) の倍数なので、 base64 に変換しても padding が発生しない
+			// - 312 は 6 の倍数でもあるので、 base64 に変換しても padding が発生しない
 			// - implicit flow の場合は access token を返す必要があるので、ここで生成しておく
 			// - そうでない場合、 code と引き換えに access token エンドポイントで更新される (SHA256 が保存されるので復元できないため)
 			const accessToken = binaryToBase64(
