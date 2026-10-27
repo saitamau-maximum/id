@@ -134,15 +134,15 @@ pnpm seed
 
 ## よく使用するコマンド
 
-| コマンド | 説明 |
-|----------|------|
-| `pnpm dev` | 開発サーバー起動（Client + Server） |
-| `pnpm build` | 全体ビルド |
-| `pnpm check` | リンター・型チェック実行 |
-| `pnpm fix` | リンター自動修正 |
-| `pnpm seed` | データベースシード |
-| `pnpm apply:migrations:local` | ローカルマイグレーション |
-| `pnpm generate:migrations` | マイグレーションファイル生成 |
+| コマンド                      | 説明                                |
+| ----------------------------- | ----------------------------------- |
+| `pnpm dev`                    | 開発サーバー起動（Client + Server） |
+| `pnpm build`                  | 全体ビルド                          |
+| `pnpm check`                  | リンター・型チェック実行            |
+| `pnpm fix`                    | リンター自動修正                    |
+| `pnpm seed`                   | データベースシード                  |
+| `pnpm apply:migrations:local` | ローカルマイグレーション            |
+| `pnpm generate:migrations`    | マイグレーションファイル生成        |
 
 ## ディレクトリ構造
 
@@ -174,7 +174,7 @@ pnpm seed
 ### 環境変数
 
 - 機密情報は `.env` や `.dev.vars` に設定（Git管理対象外）
-- 公開情報は `wrangler.toml` に設定
+- 公開情報は `wrangler.jsonc` に設定
 
 ### データベース
 
