@@ -13,7 +13,7 @@ import { generateIdToken } from "../../utils/oauth/oidc-logic";
 const app = factory.createApp();
 
 const OAUTH_ERROR_URI =
-	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#access-token-endpoint";
+	"https://github.com/saitamau-maximum/id/blob/main/docs/oauth/errors.md#access-token-endpoint";
 
 const generateCodeChallenge = async (codeVerifier: string) => {
 	const hash = await crypto.subtle.digest(

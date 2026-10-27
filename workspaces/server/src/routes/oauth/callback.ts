@@ -12,7 +12,7 @@ import { generateIdToken } from "../../utils/oauth/oidc-logic";
 // 仕様はここ参照: https://github.com/saitamau-maximum/auth/issues/29
 
 const OAUTH_ERROR_URI =
-	"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint";
+	"https://github.com/saitamau-maximum/id/blob/main/docs/oauth/errors.md#authorization-endpoint";
 
 const app = factory.createApp();
 
