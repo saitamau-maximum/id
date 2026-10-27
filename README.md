@@ -8,7 +8,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 また、 Admin から招待を受けた方は、 GitHub アカウントを紐づけ、承認を受けることで利用できます。
 
 IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、他の Maximum が提供するサービスに対して IdP を利用した認証を行うことができます。
-詳しくは [リポジトリの Wiki](https://github.com/saitamau-maximum/id/wiki/oauth-docs) を参照してください。
+詳しくは [docs](/docs/oauth/index.md) を参照してください。
 
 ## Development
 
