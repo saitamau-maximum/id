@@ -65,7 +65,7 @@ async function init() {
 
 	const mf = new Miniflare({
 		d1Persist: ".wrangler/state/v3/d1",
-		// wrangler.toml の database_id を入れる
+		// wrangler.jsonc の database_id を入れる
 		d1Databases: { DB: "dev" },
 		modules: true,
 		script: "",
