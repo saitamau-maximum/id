@@ -148,10 +148,15 @@ Resource Owner が認可しなかったことを表しています。
 > エラーが起きなかった場合、以下の内容が JSON でレスポンスとして返されます。
 
 <!-- markdownlint-disable-next-line MD001 -->
-#### invalid_request: Authorization header is not allowed
+#### invalid_request: Missing client_id or client_secret
 
-`Authorization: foo` がリクエストヘッダに付与されています。
-外してください。
+POST body に `client_id`, `client_secret` が含まれておらず、リクエストヘッダにも `Authorization: Basic <token>` が付与されていないようです。
+どちらかの方法で指定してください。
+
+#### invalid_request: Invalid Authorization Header
+
+リクエストヘッダの `Authorization: Basic <token>` の形式がおかしいみたいです。
+`<client_id>:<client_secret>` を Base64 エンコードしたものを指定しているか確認してください。
 
 #### invalid_request: Invalid Parameters
 
