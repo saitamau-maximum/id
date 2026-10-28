@@ -24,12 +24,12 @@ Scopes Needed:
 Returns:
 
 ```ts
-interface UserInfo {
-	id: string;
-	display_id: string | undefined;
-	display_name: string | undefined;
-	profile_image_url: string | undefined;
-	roles: string[];
+{
+  id: string,                 // 内部ユーザー ID
+  display_id: string,         // @ID
+  display_name: string,       // ユーザー表示名
+  profile_image_url: string,  // プロフィール写真 URL
+  roles: string[],            // ユーザーに割り当てられている Role slug (admin, member, accountant, ...)
 }
 ```
 
@@ -48,36 +48,27 @@ Scopes Optional:
 Returns:
 
 ```ts
-// openid scope がついている場合:
-interface OIDCBasicUserInfo {
-	sub: string;
-	updated_at?: number;
-}
+{
+  // すべてのリクエストで含まれる情報
+  sub: string,          // id_token の sub と同じ値
+  updated_at?: number,  // IdP 上の Settings でユーザー情報が更新された日時
 
-// profile scope がついている場合、以下の情報も返されます
-interface OIDCProfile {
-	name: string | undefined;
-	given_name: string | undefined;
-	family_name: string | undefined;
-	nickname: string | undefined;
-	preferred_username: string | undefined;
-	profile: undefined; // 未完成の public profile へのリンクを返す予定
-	picture: string | undefined; // URL
-	website: string | undefined; // URL
-	gender: undefined; // 情報を持ってないし持つつもりもないです
-	birthdate: undefined; // 情報を持っていません
-	zoneinfo: "Asia/Tokyo"; // 現状固定しているが、後に変わるかも
-	locale: "ja-JP"; // 現状固定しているが、後に変わるかも
-}
+  // profile scope が存在している場合に含まれる情報
+  name?: string,                // 本名
+  family_name?: string,         // 名字
+  given_name?: string,          // 名前
+  nickname?: string,            // 表示名
+  preferred_username?: string,  // @ID
+  picture?: string,             // プロフィール写真 URL
+  website?: string,             // SocialLinks の一番上に設定されている URL
+  zoneinfo: string,             // "Asia/Tokyo" (現状固定)
+  locale: string,               // "ja-JP" (現状固定)
 
-// email scope がついている場合、以下の情報も返されます
-interface OIDCEmail {
-	email: string | undefined;
-	email_verified: false; // 現在メールアドレス検証していないので常に false です
-}
+  // email scope が存在している場合に含まれる情報
+  email?: string,           // 連絡の取れるメールアドレス
+  email_verified: boolean,  // false (現状固定)
 
-// read:roles scope がついている場合、以下の情報も返されます
-interface OIDCRoles {
-	roles: string[];
+  // read:roles scope が存在している場合に含まれる情報
+  roles?: string[],  // ユーザーに割り当てられている Role slug (admin, member, accountant, ...)
 }
 ```
