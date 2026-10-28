@@ -6,10 +6,6 @@ Server 側のパスです。
 これらのパスは開発時にのみ利用可能です。
 Preview, Production 環境では利用できません。
 
-## `/dev/cron`
-
-Cron Trigger をテストできます。
-
 ## `/dev/oauth/:clientId/:clientSecret`
 
 > [!NOTE]
