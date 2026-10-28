@@ -6,8 +6,8 @@ OAuth で認証して Access Token を得たら、ここの API を使えるよ�
 
 ## 共通仕様
 
-- URL の prefix として `https://id.maximum.vc/oauth/resources` をつけてください
-  - 例えば、 `GET /authuser` なら `https://id.maximum.vc/oauth/resources/authuser` に GET を投げてください
+- URL の prefix として `https://api.id.maximum.vc/oauth/resources` をつけてください
+  - 例えば、 `GET /authuser` なら `https://api.id.maximum.vc/oauth/resources/authuser` に GET を投げてください
 - Header に含めてください:
 
   ```http
