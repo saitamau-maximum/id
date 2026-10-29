@@ -8,7 +8,7 @@ Maximum IdP は、埼玉大学のプログラミングサークル Maximum の�
 また、 Admin から招待を受けた方は、 GitHub アカウントを紐づけ、承認を受けることで利用できます。
 
 IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、他の Maximum が提供するサービスに対して IdP を利用した認証を行うことができます。
-詳しくは [リポジトリの Wiki](https://github.com/saitamau-maximum/id/wiki/oauth-docs) を参照してください。
+詳しくは [docs](/docs/oauth/index.md) を参照してください。
 
 ## Development
 
@@ -29,7 +29,6 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 `workspaces/server` ディレクトリ内の `.dev.vars.example` を `.dev.vars` という名前でコピーし、変更します。
 
 必須となる環境変数は以下の通りです。
-
 - `SECRET`: JWT の署名や Cookie の暗号化に使用する鍵
   - 適当な文字列を設定してください。
   - `openssl rand -base64 32` が便利です。
@@ -66,7 +65,6 @@ IdP 自身が OAuth2.0 認証サーバーとしての機能を持っており、
 
 なお、セキュリティの都合上 GitHub App (Dev) は Readonly になっています。
 すなわち、以下の機能は利用できません。
-
 - GitHub Organization へのメンバー追加
 
 </details>
@@ -113,7 +111,6 @@ Guild ID と Channel ID は、ブラウザで Discord を開いたときに URL 
 `[vars]` がローカル開発用、 `[env.preview.vars]` が Preview 環境用、 `[env.production.vars]` が本番環境用です。
 
 各変数の説明を以下に記載します。
-
 - `CLIENT_REDIRECT_URL`: ログイン後にクライアント側にリダイレクトされる URL。
 - `CLIENT_ORIGIN`: クライアント側の URL。
 - `GITHUB_APP_ID`: GitHub App の ID。 [GitHub App 設定画面](https://github.com/organizations/saitamau-maximum/settings/apps/maximum-idp-dev) から取得できます。 個人の GitHub App を使う場合には適宜変更してください。
@@ -185,4 +182,4 @@ chmod +x .husky/pre-commit
 
 Cloudflare に格納されている機密情報のメモ。
 開発時には特に気にしなくてよいです。
-<https://github.com/saitamau-maximum/id/wiki/credentials-memo> を参照してください。
+[/docs/credentials-memo.md](./docs/credentials-memo.md) を参照してください。

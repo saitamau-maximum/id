@@ -73,7 +73,7 @@ export const ICalDisplay = ({ url }: Props) => {
 				<br />
 				登録方法は
 				<a
-					href="https://github.com/saitamau-maximum/id/wiki/add-ical"
+					href="https://github.com/saitamau-maximum/id/blob/main/docs/add-ics-calendar.md"
 					target="_blank"
 					rel="noreferrer"
 				>

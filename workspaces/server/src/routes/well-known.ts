@@ -28,7 +28,7 @@ const oauthAuthorizationServerMetadata = {
 	],
 	// token_endpoint_auth_signing_alg_values_supported: [], // 未実装
 	service_documentation:
-		"https://github.com/saitamau-maximum/id/wiki/oauth-docs",
+		"https://github.com/saitamau-maximum/id/blob/main/docs/oauth/index.md",
 	ui_locales_supported: ["ja-JP"],
 	// 以下未実装
 	// op_policy_uri: "",

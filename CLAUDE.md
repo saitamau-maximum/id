@@ -134,15 +134,15 @@ pnpm seed
 
 ## よく使用するコマンド
 
-| コマンド | 説明 |
-|----------|------|
-| `pnpm dev` | 開発サーバー起動（Client + Server） |
-| `pnpm build` | 全体ビルド |
-| `pnpm check` | リンター・型チェック実行 |
-| `pnpm fix` | リンター自動修正 |
-| `pnpm seed` | データベースシード |
-| `pnpm apply:migrations:local` | ローカルマイグレーション |
-| `pnpm generate:migrations` | マイグレーションファイル生成 |
+| コマンド                      | 説明                                |
+| ----------------------------- | ----------------------------------- |
+| `pnpm dev`                    | 開発サーバー起動（Client + Server） |
+| `pnpm build`                  | 全体ビルド                          |
+| `pnpm check`                  | リンター・型チェック実行            |
+| `pnpm fix`                    | リンター自動修正                    |
+| `pnpm seed`                   | データベースシード                  |
+| `pnpm apply:migrations:local` | ローカルマイグレーション            |
+| `pnpm generate:migrations`    | マイグレーションファイル生成        |
 
 ## ディレクトリ構造
 
@@ -294,4 +294,4 @@ chore: 依存関係を更新
 
 - [本番環境](https://id.maximum.vc)
 - [GitHub リポジトリ](https://github.com/saitamau-maximum/id)
-- [Wiki（OAuth ドキュメント）](https://github.com/saitamau-maximum/id/wiki/oauth-docs)
+- [Wiki（OAuth ドキュメント）](/docs/oauth/index.md)

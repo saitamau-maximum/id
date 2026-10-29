@@ -128,7 +128,7 @@ const route = app
 				callback.searchParams.append("error_description", description);
 				callback.searchParams.append(
 					"error_uri",
-					"https://github.com/saitamau-maximum/id/wiki/oauth-errors#authorization-endpoint",
+					"https://github.com/saitamau-maximum/id/blob/main/docs/oauth/errors.md#authorization-endpoint",
 				);
 				if (state) callback.searchParams.append("state", state);
 
