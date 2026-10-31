@@ -86,7 +86,11 @@ export type IOAuthExternalRepository = {
 	) => Promise<void>;
 	getTokenByCode: (code: string) => Promise<GetTokenByCodeRes | undefined>;
 	deleteTokenById: (tokenId: number) => Promise<void>;
-	consumeCode: (code: string) => Promise<boolean>;
+	consumeCode: (
+		code: string,
+		newAccessToken?: string,
+		accessTokenExpiresAt?: Date,
+	) => Promise<boolean>;
 	getTokenByAccessToken: (
 		accessToken: string,
 	) => Promise<GetTokenByATRes | undefined>;
