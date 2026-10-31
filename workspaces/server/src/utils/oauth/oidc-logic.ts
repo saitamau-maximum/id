@@ -1,6 +1,6 @@
 import type { OIDCUserInfo } from "@idp/schema/entity/oauth-external/oidc-userinfo";
+import { binaryToBase64Url } from "../convert-bin-base64";
 import { iss } from "./constant";
-import { binaryToBase64Url } from "./convert-bin-base64";
 import { importKey, sign } from "./key";
 
 type OidcIdTokenClaims = Pick<

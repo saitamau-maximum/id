@@ -15,7 +15,7 @@ import { CloudflareOAuthExternalRepository } from "../../infrastructure/reposito
 import { CloudflareUserRepository } from "../../infrastructure/repository/cloudflare/user";
 import { oauthRoute } from "../../routes/oauth";
 import { wellKnownRoute } from "../../routes/well-known";
-import { binaryToBase64Url } from "../../utils/oauth/convert-bin-base64";
+import { binaryToBase64Url } from "../../utils/convert-bin-base64";
 import { exportKey, generateKeyPair } from "../../utils/oauth/key";
 
 export const AUTHORIZATION_ENDPOINT = "/oauth/authorize";

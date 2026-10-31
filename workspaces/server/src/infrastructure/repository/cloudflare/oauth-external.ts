@@ -11,12 +11,12 @@ import { type DrizzleD1Database, drizzle } from "drizzle-orm/d1";
 import * as v from "valibot";
 import * as schema from "../../../db/schema";
 import type { IOAuthExternalRepository } from "./../../../repository/oauth-external";
+import { binaryToBase64 } from "../../../utils/convert-bin-base64";
 import {
 	generateClientSecretHash,
 	maskClientSecret,
 } from "../../../utils/oauth/client-secret";
 import { ACCESS_TOKEN_EXPIRES_IN } from "../../../utils/oauth/constant";
-import { binaryToBase64 } from "../../../utils/oauth/convert-bin-base64";
 
 // user table から基本的な情報を取得するためのやつ
 const USER_BASIC_INFO_COLUMNS_GETTER = {
