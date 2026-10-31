@@ -10,10 +10,7 @@ import { optimizeImage } from "wasm-image-optimization";
 import { factory } from "../../factory";
 import { authMiddleware } from "../../middleware/auth";
 import { vValidatorForFormdata } from "../../middleware/v-validator";
-import {
-	generateClientSecretHash,
-	maskClientSecret,
-} from "../../utils/oauth/client-secret";
+import { generateClientSecretHash } from "../../utils/oauth/client-secret";
 
 const app = factory.createApp();
 
@@ -53,22 +50,7 @@ const route = app
 	.get("/:clientId", authMiddleware, verifyOAuthClientMiddleware, async (c) => {
 		const client = c.get("oauthClientInfo");
 		if (!client) return c.text("Not found", 404);
-		const { secrets, ...rest } = client;
-
-		return c.json<OAuthAppGetClientByIdResponse>({
-			...rest,
-			secrets: await Promise.all(
-				secrets.map(async (secret) => ({
-					...secret,
-					// secret は 8bit * 39 = 312bit = 6bit * 52 -> 52 文字
-					secret: maskClientSecret(secret.secretSuffix ?? secret.secret),
-					// こうしてしまうと削除時などに secret が特定できないので、 hash を生成
-					secretHash:
-						secret.secretHash ??
-						(await generateClientSecretHash(secret.secret)),
-				})),
-			),
-		});
+		return c.json<OAuthAppGetClientByIdResponse>(client);
 	})
 	.post(
 		"/register",
@@ -240,19 +222,17 @@ const route = app
 		vValidator("json", secretDescriptionSchema),
 		async (c) => {
 			// memo: secret 情報のうち変更できるのは description のみ
-			const { clientId, hash: secretHash } = c.req.param();
+			const { clientId, hash: givenSecret } = c.req.param();
 			const { description } = c.req.valid("json");
 
 			const client = c.get("oauthClientInfo");
 			if (!client) return c.text("Not found", 404);
 
-			for (const secret of client.secrets) {
-				const knownSecretHash =
-					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
-				if (knownSecretHash === secretHash) {
+			for (const { secret } of client.secrets) {
+				if (secret === givenSecret) {
 					await c.var.OAuthExternalRepository.updateClientSecretDescription(
 						clientId,
-						secret.secretHash ? knownSecretHash : secret.secret,
+						secret,
 						description,
 					);
 					return c.text("OK");
@@ -267,17 +247,15 @@ const route = app
 		authMiddleware,
 		verifyOAuthClientMiddleware,
 		async (c) => {
-			const { clientId, hash: secretHash } = c.req.param();
+			const { clientId, hash: givenSecret } = c.req.param();
 			const client = c.get("oauthClientInfo");
 			if (!client) return c.text("Not found", 404);
 
-			for (const secret of client.secrets) {
-				const knownSecretHash =
-					secret.secretHash ?? (await generateClientSecretHash(secret.secret));
-				if (knownSecretHash === secretHash) {
+			for (const { secret } of client.secrets) {
+				if (secret === givenSecret) {
 					await c.var.OAuthExternalRepository.deleteClientSecret(
 						clientId,
-						secret.secretHash ? knownSecretHash : secret.secret,
+						secret,
 					);
 					return c.text("OK");
 				}

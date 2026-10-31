@@ -97,7 +97,4 @@ export type IOAuthExternalRepository = {
 
 	// cron
 	deleteExpiredAccessTokens: () => Promise<void>;
-
-	// temporary
-	migrateClientSecretToHash: () => Promise<void>;
 };

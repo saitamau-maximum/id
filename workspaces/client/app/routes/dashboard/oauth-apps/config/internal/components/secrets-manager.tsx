@@ -82,7 +82,7 @@ export const SecretsManager = ({ appId, secrets }: Props) => {
 										color: "gray.700",
 									})}
 								>
-									{secret.secret}
+									******{secret.secretSuffix}
 								</code>
 							</div>
 							<p
@@ -115,7 +115,7 @@ export const SecretsManager = ({ appId, secrets }: Props) => {
 							>
 								<IconButton
 									type="button"
-									onClick={handleDeleteSecret(secret.secretHash)}
+									onClick={handleDeleteSecret(secret.secret)}
 									label="Delete"
 								>
 									<Trash2 size={16} className={css({ color: "rose.400" })} />

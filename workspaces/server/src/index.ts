@@ -203,12 +203,6 @@ export const route = app
 	.route("/dev", devRoute)
 	.route("/.well-known", wellKnownRoute)
 	.route("/cron", cronRoute)
-	.route("/webhook", webhookRoute)
-	// 一時的なものなのでここに置く
-	.get("/migrate/oauth-client-secret-hash", async (c) => {
-		const oauthExternalRepository = c.get("OAuthExternalRepository");
-		await oauthExternalRepository.migrateClientSecretToHash();
-		return c.text("OK");
-	});
+	.route("/webhook", webhookRoute);
 
 export default app;

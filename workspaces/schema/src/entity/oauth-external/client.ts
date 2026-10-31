@@ -15,8 +15,7 @@ export type Client = v.InferOutput<typeof Client>;
 export const ClientSecret = v.object({
 	clientId: Client.entries.id,
 	secret: v.string(),
-	secretHash: v.nullable(v.string()),
-	secretSuffix: v.nullable(v.string()),
+	secretSuffix: v.string(),
 	description: v.nullable(v.string()),
 	issuedBy: User.entries.id,
 	issuedAt: v.date(),
@@ -26,12 +25,14 @@ export type ClientSecret = v.InferOutput<typeof ClientSecret>;
 /**
  * IdP フロントエンドで公開しても問題ない情報
  *
- * - secret は一部マスク済み (ref: server/src/routes/oauth/manage.ts)
- * - マスクすると一意に識別できない可能性があるので、 Hash も一緒に返している
+ * - secret はハッシュ済み (ref: server/src/routes/oauth/manage.ts)
  */
-export const ExportableClientSecret = v.intersect([
-	v.object({ secretHash: v.string() }),
-	v.pick(ClientSecret, ["secret", "description", "issuedBy", "issuedAt"]),
+export const ExportableClientSecret = v.pick(ClientSecret, [
+	"secret",
+	"secretSuffix",
+	"description",
+	"issuedBy",
+	"issuedAt",
 ]);
 export type ExportableClientSecret = v.InferOutput<
 	typeof ExportableClientSecret

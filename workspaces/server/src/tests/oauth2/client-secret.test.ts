@@ -34,9 +34,9 @@ describe("OAuth client secrets", () => {
 		assert.isDefined(client);
 		const generatedSecret = client.secrets.at(-1);
 		assert.isDefined(generatedSecret);
-		expect(generatedSecret.secret).toBe(`******${oauthClientSecret.slice(-6)}`);
+		expect(generatedSecret.secretSuffix).toBe(oauthClientSecret.slice(-6));
 		expect(generatedSecret.secret).not.toContain(oauthClientSecret.slice(0, 8));
-		expect(generatedSecret.secretHash).toMatch(/^[0-9a-f]{64}$/);
+		expect(generatedSecret.secret).toMatch(/^[0-9a-f]{64}$/);
 
 		const body = new FormData();
 		body.append("grant_type", "authorization_code");
@@ -51,13 +51,20 @@ describe("OAuth client secrets", () => {
 		expect(tokenRes.status).toBe(200);
 	});
 
-	it("accepts legacy plaintext client secrets during migration", async () => {
+	it("rejects legacy plaintext client secrets after migration", async () => {
 		const { userId, clientId, code } = await ctx.doAuthFlow();
 		const legacySecret = "legacy-client-secret";
 		await env.DB.prepare(
-			"INSERT INTO oauth_client_secrets (client_id, secret, description, issued_by, issued_at) VALUES (?, ?, ?, ?, ?)",
+			"INSERT INTO oauth_client_secrets (client_id, secret, secret_suffix, description, issued_by, issued_at) VALUES (?, ?, ?, ?, ?, ?)",
 		)
-			.bind(clientId, legacySecret, "", userId, Date.now())
+			.bind(
+				clientId,
+				legacySecret,
+				legacySecret.slice(-6),
+				"",
+				userId,
+				Date.now(),
+			)
 			.run();
 
 		const body = new FormData();
@@ -70,6 +77,6 @@ describe("OAuth client secrets", () => {
 				Authorization: getClientAuthHeader(clientId, legacySecret),
 			},
 		});
-		expect(tokenRes.status).toBe(200);
+		expect(tokenRes.status).toBe(401);
 	});
 });
